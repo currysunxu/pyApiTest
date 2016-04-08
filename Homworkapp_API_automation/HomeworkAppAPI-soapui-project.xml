@@ -1,0 +1,1394 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="14dca7da-0b16-4da1-b873-2fcc153c7b79" activeEnvironment="Default" name="HomeworkAppAPI" lastOpened="2016-04-08T11:11:16.795+08:00" resourceRoot="" soapui-version="5.2.1" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings><con:setting id="Port">8081</con:setting></con:settings><con:interface xsi:type="con:RestService" id="f71972c0-316a-4d8d-8157-03ec3c51f84f" wadlVersion="http://wadl.dev.java.net/2009/02" name="http://tbv3service.ef.cn" type="rest" definitionUrl="http://tbv3service.ef.cn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT"/><con:endpoints><con:endpoint>http://tbv3service.ef.cn</con:endpoint></con:endpoints><con:resource name="StudentLogin" path="/api/v1/Token/Student" id="882e3728-e586-438b-9bd4-1e30c50184f4"><con:settings/><con:parameters/><con:method name="Student" id="39e2b30c-c9d2-4c65-a975-ea7cbb0ef2d2" method="POST"><con:settings/><con:parameters/><con:representation type="REQUEST"><con:mediaType>application/json</con:mediaType><con:params/></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="REQUEST"><con:mediaType>application/x-www-form-urlencoded</con:mediaType><con:params/></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType>application/json; charset=utf-8</con:mediaType><con:status>200</con:status><con:params/><con:element xmlns:stud="http://tbv3service.ef.cn/api/v1/Token/Student">stud:Response</con:element></con:representation><con:representation type="FAULT"><con:mediaType>application/json; charset=utf-8</con:mediaType><con:status>400</con:status><con:params/><con:element xmlns:stud="http://tbv3service.ef.cn/api/v1/Token/Student">stud:Fault</con:element></con:representation><con:representation type="REQUEST"><con:mediaType>text/xml</con:mediaType><con:params/></con:representation><con:request name="Request 1" id="bc4430ff-9b2e-427c-842c-89b4e9691b36" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+   "Password": "12345",
+   "UserName": "chris1128825"
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/Token/Student</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters/><con:parameterOrder/></con:request></con:method></con:resource><con:resource name="GetStudentProgressInfo" path="/api/v1/StudentProgress" id="c3172148-53e5-44fd-8ea4-cb85019952e7"><con:settings/><con:parameters><con:parameter><con:name>X-BA-TOKEN</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>X-BA-TRACE-ID</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="StudentProgress" id="5a7b37da-8c8f-4c30-9c53-8fa94ef2cdcc" method="PUT"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="REQUEST"><con:mediaType>application/json</con:mediaType><con:params/></con:representation><con:representation type="FAULT"><con:mediaType>application/json; charset=utf-8</con:mediaType><con:status>401</con:status><con:params/><con:element xmlns:stud="http://tbv3service.ef.cn/api/v1/StudentProgress">stud:Fault</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType>application/json; charset=utf-8</con:mediaType><con:status>200</con:status><con:params/><con:element xmlns:stud="http://tbv3service.ef.cn/api/v1/StudentProgress">stud:Response</con:element></con:representation><con:request name="Request 1" id="b3e78ba3-1cec-49ed-bb19-af1d129b9bdb" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 1,
+  "Percentage" : 0.03125
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="3ED59945-6EAA-41E6-894A-40F9EE587C71"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 2" id="c8cc96d2-e102-4813-a9fc-1d92b3e97ea0" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 2,
+  "Percentage" : 0.0625
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="F047DC5C-4AE0-4874-9C79-DBDBD26A730D"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 3" id="635722a9-74a3-4166-82b8-aff71d001f15" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 3,
+  "Percentage" : 0.09375
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="6D22BDC4-81AF-45DF-A0D1-52CE268796C1"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 4" id="8e64869a-3ef3-485a-abb3-8dac36c181bc" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 4,
+  "Percentage" : 0.125
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="684A335C-ED37-4ACF-B15B-F37510689F7C"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 5" id="3385b4f5-9033-4d4b-b0c1-474c1499cac2" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 5,
+  "Percentage" : 0.15625
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="C2DA975A-7E66-456A-AAE9-893E9B8FCBAF"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 6" id="d7158305-257e-4e67-8d75-cf77596da38e" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 6,
+  "Percentage" : 0.1875
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="E553CF5A-D327-4CD6-AF90-C50593A97881"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 7" id="05852911-b26d-4825-9bd1-d8374de1572f" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 7,
+  "Percentage" : 0.21875
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="A5AD0EFB-C14B-4849-B242-CE33B48CC38D"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 8" id="18a50f39-55eb-4d6b-8567-04e0a3d58847" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 8,
+  "Percentage" : 0.25
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="9A65745B-25F6-4C89-B483-1283577001C2"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 9" id="4480f6fd-44e9-4229-9521-2472ba38d867" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 9,
+  "Percentage" : 0.28125
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="F2204B54-617A-43A3-AC5A-774D817B4133"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 10" id="b67aada7-107d-45aa-b5e1-777594ba8afc" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 10,
+  "Percentage" : 0.3125
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="A4168E55-7168-452C-8754-B7FB3CB82B08"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 11" id="d525fe52-7988-4600-a207-6aa7c3f93081" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 11,
+  "Percentage" : 0.34375
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="AFEA98D9-D928-441B-9E3B-7DA758FC77DB"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 12" id="63f3775a-fb4a-4a9c-82d3-de65a99faec9" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 12,
+  "Percentage" : 0.375
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="FC6F063B-4536-4B21-AED1-FC398BA0590F"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 13" id="ccb64100-1633-4cea-9b0c-e1bdc7e84fe5" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 13,
+  "Percentage" : 0.40625
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="6F1E1F3E-2487-4FDC-BC4C-7FFD65B02553"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 14" id="67e8b1bb-327c-4506-8ecf-d302e7fe011d" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 14,
+  "Percentage" : 0.4375
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="F6D846E6-1936-4CF9-92B2-158CC2904211"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 15" id="7ba6f457-bdd7-4bbb-a198-aeb9281f05b7" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 15,
+  "Percentage" : 0.46875
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="45B0BA60-E7B1-4FE1-A664-3DF6326A4EF3"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 16" id="7955e833-2ce5-477b-89b4-09055bf8d882" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 16,
+  "Percentage" : 0.5
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="88993E8B-3FA9-4FD0-85D3-9C11CB29E9FA"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 17" id="97326c65-6732-47a4-91c8-edfc8bf5a581" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 17,
+  "Percentage" : 0.53125
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="1912C71D-8010-43B0-90E1-8E324D93352F"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 18" id="742d7203-9088-4b65-80ca-3c0ffaf91bb6" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 18,
+  "Percentage" : 0.5625
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="7A0C5F6D-3C5E-42C4-AC5C-4951F91756AD"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 19" id="7aa5cde7-8453-4c0a-991f-2edde6248c70" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 19,
+  "Percentage" : 0.59375
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="206F039B-225E-41AA-B86D-BD74579B853E"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 20" id="50f17cae-016a-471e-bd2a-0bae8ee30857" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 20,
+  "Percentage" : 0.625
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="E2241DF6-44AE-4F5C-9D72-CDADE297F9B9"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 21" id="2bec1a69-d784-42d0-9dfb-0b2cdde0284e" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 21,
+  "Percentage" : 0.65625
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="1B17B4EC-03CD-445C-BABF-64E735364061"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 22" id="e1fd7d0a-4c8e-49e9-9df4-7580d49ccff0" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 22,
+  "Percentage" : 0.6875
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="3AC0EA55-A4FD-45C6-9634-AFBBB381A6F3"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 23" id="c995afbb-eebb-41df-a52a-81d54572a34b" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 23,
+  "Percentage" : 0.71875
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="E792D296-3528-4B13-B843-A75ACF303E47"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 24" id="01d9a876-3526-40aa-8daf-d5d1a27c4cf3" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 24,
+  "Percentage" : 0.75
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="BFDE02E8-4807-4DC9-84A3-B517F6483500"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 25" id="167646cf-299e-41ce-b58e-6efb096f5b4f" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 25,
+  "Percentage" : 0.78125
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="2AFA446C-78AC-4D30-9A53-33D57E66A960"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 26" id="34327e0d-7e25-4653-af2c-9b79a1404766" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 26,
+  "Percentage" : 0.8125
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="7194ED3F-2DE9-4101-956D-5FCD50B410A0"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 27" id="a4711063-6189-409e-a00c-46a7b0e581b2" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 27,
+  "Percentage" : 0.84375
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="023CAC84-5D59-4ED0-BE07-C29CD989D703"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 28" id="e9555b5c-d741-42b1-ad9b-aa38bfa62803" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 28,
+  "Percentage" : 0.875
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="6E601BB3-4DA9-4415-8F36-DAF128D84F50"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 29" id="49025273-5526-412d-9113-6b8e4600bcce" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 29,
+  "Percentage" : 0.90625
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="BA8EE9E7-CA59-493F-9393-248DD1B42121"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 30" id="9ab93b41-8263-44b4-8fd7-766fcf5684bf" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 30,
+  "Percentage" : 0.9375
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="4CA52E35-ED56-482C-82C4-1D71E4244D17"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 31" id="b0e263a4-3459-4f64-ab8c-1666a753e108" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 31,
+  "Percentage" : 0.96875
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="3814B81A-0277-4143-9432-CB1E06A37134"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 32" id="f82baaa6-75a1-4e32-93dc-4acb31532ac5" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 32,
+  "Percentage" : 1
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="0C43D0A3-DC6B-463B-AECF-830F78A6D64E"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request><con:request name="Request 33" id="70714498-8438-4558-9158-6494dd64ebf1" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 32,
+  "Percentage" : 1
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="CCA0A928-48F6-4738-8798-2D8A7073BD56"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request></con:method></con:resource><con:resource name="UpdateStudentAnswerBatch" path="/api/v1/ActivityAnswer/Batch" id="eba94935-bf34-4cf9-9520-3503951cd5ce"><con:settings/><con:parameters><con:parameter><con:name>X-BA-TOKEN</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>X-BA-TRACE-ID</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="Batch" id="3e0a1239-d7d7-4c5a-b4ff-4b1324576c79" method="PUT"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="REQUEST"><con:mediaType>application/json</con:mediaType><con:params/></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:request name="Request 1" id="b5c25e73-73fd-4228-8a62-1012c1dee4d4" mediaType="application/json" postQueryString="false"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>[
+  {
+    "ActivitySnapshotKey" : "1dbcaaee-a75f-4123-bdc3-9f8aab85ee25",
+    "ActivityKey" : "466c82f9-b2f9-4f40-bc5e-f26fd4a47c37",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "gaps" : [
+            "gububu",
+            "bubjbu",
+            "bjbjbj",
+            "bjbjbj",
+            "bubjbi",
+            "bhbubub",
+            "vhvhvhvh"
+          ]
+        }
+      ],
+      "StudentScore" : 0,
+      "CorrectAnswers" : [
+        {
+          "gaps" : [
+            "love",
+            "don't like",
+            "prefer",
+            "prefer",
+            "like",
+            "enjoy",
+            "hate"
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 7,
+      "TotalQuestionCount" : 1,
+      "CompleteQuestionCount" : 1,
+      "CorrectQuestionCount" : 0
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "65f082a8-a0b9-4a99-8432-1b37bd996217",
+    "ActivityKey" : "58783f3f-39e7-48a1-a1cb-f5ce46b4192c",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "to listening"
+          ]
+        },
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "dance"
+          ]
+        },
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "to play"
+          ]
+        }
+      ],
+      "StudentScore" : 4,
+      "CorrectAnswers" : [
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "listening"
+          ]
+        },
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "dance"
+          ]
+        },
+        {
+          "options" : [
+            "singing"
+          ]
+        },
+        {
+          "options" : [
+            "to play"
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 6,
+      "TotalQuestionCount" : 6,
+      "CompleteQuestionCount" : 6,
+      "CorrectQuestionCount" : 4
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "90a77b0b-a9a6-44cf-bd6f-acc180441bcd",
+    "ActivityKey" : "3fd9190a-0a2c-4aa3-8abb-939131db1131",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "options" : [
+            "Brian likes rock music."
+          ]
+        },
+        {
+          "options" : [
+            "Gemma likes country music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian loves electronic music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian doesn’t like country music."
+          ]
+        },
+        {
+          "options" : [
+            "Gemma likes electronic music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian likes electronic music."
+          ]
+        }
+      ],
+      "StudentScore" : 4,
+      "CorrectAnswers" : [
+        {
+          "options" : [
+            "Brian likes rock music."
+          ]
+        },
+        {
+          "options" : [
+            "Gemma likes country music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian likes country music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian doesn’t like hip-hop."
+          ]
+        },
+        {
+          "options" : [
+            "Gemma likes electronic music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian likes electronic music."
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 6,
+      "TotalQuestionCount" : 6,
+      "CompleteQuestionCount" : 6,
+      "CorrectQuestionCount" : 4
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "3e672dcc-8fc2-466e-993c-352a51978fae",
+    "ActivityKey" : "71cd1193-b9b0-434a-83b6-d70d0a5c69f8",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "items" : [
+            "I",
+            "love",
+            "to",
+            "dance",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "My",
+            "brother",
+            "prefers",
+            "listening",
+            "to",
+            "hip-hop",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "We",
+            "don’t",
+            "enjoy",
+            "going",
+            "festivals",
+            "music",
+            ".",
+            "to"
+          ]
+        },
+        {
+          "items" : [
+            "when",
+            "running",
+            "I’m",
+            "I",
+            ".",
+            "to",
+            "rock",
+            "prefer",
+            "listening"
+          ]
+        },
+        {
+          "items" : [
+            "boring",
+            "listening",
+            ".",
+            "music",
+            "hate",
+            "I",
+            "to"
+          ]
+        },
+        {
+          "items" : [
+            "He",
+            "music",
+            "loud",
+            "doesn’t",
+            "to",
+            "listening",
+            "like",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "music",
+            "dance",
+            ".",
+            "to",
+            "classical",
+            "She",
+            "to",
+            "prefers"
+          ]
+        },
+        {
+          "items" : [
+            "We",
+            "songs",
+            "enjoy",
+            "playing",
+            "hip-hop",
+            "."
+          ]
+        }
+      ],
+      "StudentScore" : 2,
+      "CorrectAnswers" : [
+        {
+          "items" : [
+            "I",
+            "love",
+            "to",
+            "dance",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "My",
+            "brother",
+            "prefers",
+            "listening",
+            "to",
+            "hip-hop",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "We",
+            "don’t",
+            "enjoy",
+            "going",
+            "to",
+            "music",
+            "festivals",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "I",
+            "prefer",
+            "listening",
+            "to",
+            "rock",
+            "when",
+            "I’m",
+            "running",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "I",
+            "hate",
+            "listening",
+            "to",
+            "boring",
+            "music",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "He",
+            "doesn’t",
+            "like",
+            "listening",
+            "to",
+            "loud",
+            "music",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "She",
+            "prefers",
+            "to",
+            "dance",
+            "to",
+            "classical",
+            "music",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "We",
+            "enjoy",
+            "playing",
+            "hip-hop",
+            "songs",
+            "."
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 8,
+      "TotalQuestionCount" : 8,
+      "CompleteQuestionCount" : 8,
+      "CorrectQuestionCount" : 2
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "159fe236-bbb5-4c9a-9007-64fd8228b41f",
+    "ActivityKey" : "e5943f1e-24b9-4240-bc0f-b38b6455506f",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "gaps" : [
+            "hinihi"
+          ]
+        },
+        {
+          "gaps" : [
+            "vhvhvhv"
+          ]
+        },
+        {
+          "gaps" : [
+            "bujbjnj"
+          ]
+        },
+        {
+          "gaps" : [
+            "vyfgvgv"
+          ]
+        },
+        {
+          "gaps" : [
+            "gugugug"
+          ]
+        },
+        {
+          "gaps" : [
+            "bububjb"
+          ]
+        }
+      ],
+      "StudentScore" : 0,
+      "CorrectAnswers" : [
+        {
+          "gaps" : [
+            "classical music"
+          ]
+        },
+        {
+          "gaps" : [
+            "rock music"
+          ]
+        },
+        {
+          "gaps" : [
+            "dance to J-pop"
+          ]
+        },
+        {
+          "gaps" : [
+            "singing"
+          ]
+        },
+        {
+          "gaps" : [
+            "country music"
+          ]
+        },
+        {
+          "gaps" : [
+            "listening to CDs"
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 6,
+      "TotalQuestionCount" : 6,
+      "CompleteQuestionCount" : 6,
+      "CorrectQuestionCount" : 0
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "11ba5883-e50a-4601-8c95-fb7d6e54f4de",
+    "ActivityKey" : "ccd623c4-c038-499b-8bd8-78af0f2acd38",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "options" : [
+            "classical"
+          ]
+        },
+        {
+          "options" : [
+            "Mark thinks classical music is boring."
+          ]
+        },
+        {
+          "options" : [
+            "He likes it."
+          ]
+        },
+        {
+          "options" : [
+            "pop"
+          ]
+        },
+        {
+          "options" : [
+            "doesn’t like electronic music or hip-hop."
+          ]
+        }
+      ],
+      "StudentScore" : 5,
+      "CorrectAnswers" : [
+        {
+          "options" : [
+            "classical"
+          ]
+        },
+        {
+          "options" : [
+            "Mark thinks classical music is boring."
+          ]
+        },
+        {
+          "options" : [
+            "He likes it."
+          ]
+        },
+        {
+          "options" : [
+            "pop"
+          ]
+        },
+        {
+          "options" : [
+            "doesn’t like electronic music or hip-hop."
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 5,
+      "TotalQuestionCount" : 5,
+      "CompleteQuestionCount" : 5,
+      "CorrectQuestionCount" : 5
+    },
+    "StudentId" : "22081620"
+  }
+]</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/ActivityAnswer/Batch</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="66135453-D2D1-4505-9584-BC4BD68D4D15"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request></con:method></con:resource><con:resource name="GetStudentInfoByGroupId" path="/api/v1/UserInfo/Group/{GroupIdKey}" id="00faa73e-cfce-4a1d-be53-de4278d05f53"><con:settings/><con:parameters><con:parameter><con:name>X-BA-TOKEN</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>GroupIdKey</con:name><con:value/><con:style>TEMPLATE</con:style><con:default/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="GetUserInfoByGroupId" id="9a1db4c2-cf20-4b24-a8e5-9ffd679dc35e" method="GET"><con:settings/><con:parameters/><con:request name="Request 1" id="9dfd4d09-d1c4-49e4-bb53-04961423b704" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="GroupIdKey" value="${GroupKey}"/>
+  <con:entry key="X-BA-TOKEN" value="${Token}"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>GroupIdKey</con:entry></con:parameterOrder></con:request></con:method></con:resource><con:resource name="GetStudentInfoByStudentId" path="/api/v1/UserInfo/StudentId/{StudentIdKey}" id="f354a83b-cc96-4ac6-a220-4440692b24bb"><con:settings/><con:parameters><con:parameter><con:name>X-BA-TOKEN</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>StudentIdKey</con:name><con:value/><con:style>TEMPLATE</con:style><con:default/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="Method 1" id="d9e00fa6-0fdd-431c-8c5a-67f4b7d76ebf" method="GET"><con:settings/><con:parameters/><con:request name="Request 1" id="975eb82f-fe92-4845-a043-2e876a1537e8" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>StudentIdKey</con:entry></con:parameterOrder></con:request></con:method></con:resource><con:resource name="GetHomeworkCourseByCurrentUser" path="/api/v1/HomeworkCourseInfo" id="ed82979c-70d7-4511-bf03-717208326ba6"><con:settings/><con:parameters><con:parameter><con:name>X-BA-TOKEN</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="Method 1" id="ecff0c78-35f4-4919-9e37-faf552469358" method="GET"><con:settings/><con:parameters/><con:request name="Request 1" id="3851ad73-34b7-4cee-b9c9-2635ca0f71bf" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry></con:parameterOrder></con:request></con:method></con:resource><con:resource name="SignOut" path="/api/v1/Token" id="b07171fb-28c2-4fd5-871d-74b8e0396a91"><con:settings/><con:parameters><con:parameter><con:name>X-BA-TOKEN</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>X-BA-TRACE-ID</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="Token" id="b3965c01-c709-4b2a-91ff-201a42bb03a0" method="DELETE"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="REQUEST"><con:mediaType>application/json</con:mediaType><con:params/></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>204</con:status><con:params/><con:element>data</con:element></con:representation><con:request name="Request 1" id="583e7163-b7cd-4439-abe8-b8cc96779085" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:originalUri>http://tbv3service.ef.cn/api/v1/Token</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="DF48CBC9D23849D89AA7F83BCBBFC2AE3A0F747356364BF790948D3BDFF8B08675D2D7E504F549D2B51FC38535021DE430BBDD11E252424B816FB02E9D72D960"/>
+  <con:entry key="X-BA-TRACE-ID" value="BEC7021F-D6DD-4141-A21B-320D6BE21274"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:request></con:method></con:resource><con:resource name="QueryCourseSchedule" path="/api/v1/OdinCourseSchedule" id="6e405fda-d669-4c46-a59e-b62fb44eacb4"><con:settings/><con:parameters><con:parameter><con:name>X-BA-TOKEN</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="Method 1" id="f25d8d8b-ac79-4b75-a37f-e0f0d8106ac2" method="POST"><con:settings/><con:parameters/><con:request name="Request 1" id="2916997e-1f70-48cc-a50b-d41a4ea2b1ef" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+	"TeacherId": ""
+}</con:request><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters/><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry></con:parameterOrder></con:request></con:method></con:resource><con:resource name="GetTeacherUserInfo" path="/api/v1/UserInfo/Teacher/{UserId}" id="d7283877-dda4-427f-aaa0-8ad0ce21529b"><con:settings/><con:parameters><con:parameter><con:name>UserId</con:name><con:value/><con:style>TEMPLATE</con:style><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>X-BA-TOKEN</con:name><con:style>HEADER</con:style></con:parameter></con:parameters><con:method name="Method 1" id="c0c7cc14-266a-4a05-93d2-c17d065a8e39" method="GET"><con:settings/><con:parameters/><con:request name="Request 1" id="05305931-ba0d-4252-a5f1-26305d88e23d" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters/><con:parameterOrder><con:entry>UserId</con:entry><con:entry/></con:parameterOrder></con:request></con:method></con:resource><con:resource name="GetHomeworkCourseActivityByCourseKey" path="/api/v1/HomeworkActivity/{CurrentCourseKey}" id="8292f10b-2f27-4692-be52-de2931cbdbef"><con:settings/><con:parameters><con:parameter><con:name>X-BA-TOKEN</con:name><con:value/><con:style>HEADER</con:style><con:default/><con:description xsi:nil="true"/></con:parameter><con:parameter><con:name>CurrentCourseKey</con:name><con:value/><con:style>TEMPLATE</con:style><con:default/><con:description xsi:nil="true"/></con:parameter></con:parameters><con:method name="Method 1" id="02fc4a46-66a1-4525-a97c-d61940d92456" method="GET"><con:settings/><con:parameters/><con:request name="Request 1" id="a103e50a-351e-48b9-93c0-59f077f41d03" mediaType="application/json"><con:settings/><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters/><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>CurrentCourseKey</con:entry></con:parameterOrder></con:request></con:method></con:resource><con:resource name="Staff" path="/API/v1/Token/Staff/" id="e189b9d1-c1fa-4e82-acb0-3abe08698c0d"><con:settings/><con:parameters/><con:method name="Method 1" id="1abba4b8-fe6c-4d20-b9e2-46707aa40740" method="POST"><con:settings/><con:parameters/><con:request name="Request 1" id="34b9786d-601b-4628-8f37-f6ceac5c4b42" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+    "UserName": "Ruby.jin@ef.com", 
+    "Password": "Welcome*5", 
+    "DeviceId": "Device Id String", 
+    "DeviceType": 0, 
+    "Platform": 0
+}</con:request><con:originalUri>http://tbv3service.ef.cn/API/v1/Token/Staff/</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters/></con:request></con:method></con:resource></con:interface><con:testSuite id="96b27e13-1413-405b-a111-eb67acf4edac" name="Student"><con:description>This is Suite is related to operator about the student.</con:description><con:settings/><con:savedRecentRuns>1</con:savedRecentRuns><con:runType>SEQUENTIAL</con:runType><con:testCase id="531b8ece-922d-4e42-99a8-f928c4f12ef6" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="Login" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="Login" id="11590ad0-7f87-4bfb-88a0-d5a47836930f"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/Token/Student" methodName="Student" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="Login" id="bc4430ff-9b2e-427c-842c-89b4e9691b36" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+   "Password": "${#TestCase#StudentPassword}",
+   "UserName": "${#TestCase#StudentUserName}" 
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/Token/Student</con:originalUri><con:assertion type="Simple Contains" id="6169e363-83d2-469b-a40d-329810a0edac" name="Contains"><con:configuration><token>"Token"</token><ignoreCase>false</ignoreCase><useRegEx>false</useRegEx></con:configuration></con:assertion><con:assertion type="JsonPath Match" id="02bad3da-401b-41e8-b0a2-ba4cd787b046" name="JsonPath Match"><con:configuration><path>$.UserInfo.UserId</path><content>22081620</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Match" id="37b940d0-8062-43c8-a211-619526cef521" name="JsonPath Match 2"><con:configuration><path>$.UserInfo.Name</path><content>Chris McCormick</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Existence Match" id="4594df99-7693-4cc0-8541-ff06753e438b" name="Check for existence of [GroupKey]"><con:configuration><path>$.UserInfo.GroupKey</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters/><con:parameterOrder/></con:restRequest></con:config></con:testStep><con:testStep type="transfer" name="PropertiesTransfer" id="3168978b-1209-4939-b89d-0f52ecd2004b"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>Token</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Login</con:sourceStep><con:sourcePath>$.Token</con:sourcePath><con:targetType>Token</con:targetType><con:targetStep>#TestSuite#</con:targetStep><con:targetPath/><con:type>JSONPATH</con:type><con:targetTransferType>JSONPATH</con:targetTransferType><con:upgraded>true</con:upgraded></con:transfers><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>GroupKey</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Login</con:sourceStep><con:sourcePath>$.UserInfo.Group.Key</con:sourcePath><con:targetType>GroupKey</con:targetType><con:targetStep>#TestSuite#</con:targetStep><con:type>JSONPATH</con:type><con:targetTransferType>JSONPATH</con:targetTransferType><con:upgraded>true</con:upgraded></con:transfers><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>UserId</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Login</con:sourceStep><con:sourcePath>$.UserInfo.UserId</con:sourcePath><con:targetType>StudentId</con:targetType><con:targetStep>#TestSuite#</con:targetStep><con:targetPath/><con:type>JSONPATH</con:type><con:targetTransferType>JSONPATH</con:targetTransferType><con:upgraded>true</con:upgraded></con:transfers><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>Name</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Login</con:sourceStep><con:sourcePath>$.UserInfo.Name</con:sourcePath><con:targetType>Name</con:targetType><con:targetStep>#TestSuite#</con:targetStep><con:type>JSONPATH</con:type><con:targetTransferType>JSONPATH</con:targetTransferType><con:upgraded>true</con:upgraded></con:transfers><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>SchoolCode</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Login</con:sourceStep><con:sourcePath>$.UserInfo.Group.SchoolCode</con:sourcePath><con:targetType>SchoolCode</con:targetType><con:targetStep>#TestSuite#</con:targetStep><con:type>JSONPATH</con:type><con:targetTransferType>JSONPATH</con:targetTransferType><con:upgraded>true</con:upgraded></con:transfers><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>OdinCourseCode</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>Login</con:sourceStep><con:sourcePath>$.UserInfo.Group.OdinCourseCode</con:sourcePath><con:targetType>OdinCourseCode</con:targetType><con:targetStep>#TestSuite#</con:targetStep><con:type>JSONPATH</con:type><con:targetTransferType>JSONPATH</con:targetTransferType><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:properties><con:property><con:name>StudentPassword</con:name><con:value>12345</con:value></con:property><con:property><con:name>StudentUserName</con:name><con:value>chris1128825</con:value></con:property></con:properties><con:reportParameters/><con:breakPoints><con:testStepId>11590ad0-7f87-4bfb-88a0-d5a47836930f</con:testStepId><con:status>NONE</con:status><con:properties/></con:breakPoints><con:breakPoints><con:testStepId>3168978b-1209-4939-b89d-0f52ecd2004b</con:testStepId><con:status>NONE</con:status><con:properties/></con:breakPoints></con:testCase><con:testCase id="79d4dd3d-4005-44a7-9848-9d86a8ed83d8" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="GetUserInfoByGroupId" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="GetUserInfoByGroupId" id="7470e9a0-8d9b-4e87-982d-e0153be3cde9"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/UserInfo/Group/{GroupIdKey}" methodName="GetUserInfoByGroupId" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="GetUserInfoByGroupId" id="9dfd4d09-d1c4-49e4-bb53-04961423b704" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:originalUri>http://tbv3service.ef.cn/api/v1/UserInfo/Group/4f7fbf90-e7b9-4730-b989-674ef0c07295</con:originalUri><con:assertion type="JsonPath Match" id="2780824e-c854-44c5-a104-f363c5e32236" name="Match content of [Name]"><con:configuration><path>$.Name</path><content>${#TestSuite#Name}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Match" id="a6f2791f-9c62-45ff-be47-aa3846b2d0f5" name="Match content of [GroupKey]"><con:configuration><path>$.GroupKey</path><content>${#TestSuite#GroupKey}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Existence Match" id="1e28079a-d03b-4cac-8d0d-9a5ee0f42a79" name="Check for existence of [SchoolCode]"><con:configuration><path>$.Group.SchoolCode</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="GroupIdKey" value="${#TestSuite#GroupKey}"/>
+  <con:entry key="X-BA-TOKEN" value="${#TestSuite#Token}"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>GroupIdKey</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties/><con:reportParameters/></con:testCase><con:testCase id="aacc92bc-9a22-498a-aee8-1b059a2e5515" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="GetUserInfoByStudentId" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="GetUserInfoByStudentId" id="a0ccc7a5-40dd-4057-a29b-6f1189aeab1e"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/UserInfo/StudentId/{StudentIdKey}" methodName="Method 1" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="GetUserInfoByStudentId" id="975eb82f-fe92-4845-a043-2e876a1537e8" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:originalUri>http://tbv3service.ef.cn/api/v1/UserInfo/StudentId</con:originalUri><con:assertion type="JsonPath Match" id="104d27df-b1e5-4ddf-815d-600ae44b18f3" name="Match content of [UserId]"><con:configuration><path>$.UserId</path><content>${#TestSuite#StudentId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Match" id="c29d259e-e52d-4235-9d1f-3d8210023690" name="Match content of [Key]"><con:configuration><path>$.Group.Key</path><content>${#TestSuite#GroupKey}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Match" id="0cdfe306-1319-4355-a836-cbc7d9809fdb" name="Match content of [SchoolCode]"><con:configuration><path>$.Group.SchoolCode</path><content>${#TestSuite#SchoolCode}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="StudentIdKey" value="${#TestSuite#StudentId}"/>
+  <con:entry key="X-BA-TOKEN" value="${#TestSuite#Token}"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>StudentId</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties/><con:reportParameters/></con:testCase><con:testCase id="872ea332-9d67-4b50-8558-b91c95c4c32e" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="GetHomeworkCourseByCurrentUser" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="GetHomeworkCourseByCurrentUser" id="dcc9686c-00f3-4fb6-9a62-31e090d11b68"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/HomeworkCourseInfo" methodName="Method 1" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="GetHomeworkCourseByCurrentUser" id="3851ad73-34b7-4cee-b9c9-2635ca0f71bf" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:originalUri>http://tbv3service.ef.cn/api/v1/HomeworkCourseInfo</con:originalUri><con:assertion type="JsonPath Existence Match" id="32c636d4-9135-4668-ac29-4d79cae6385d" name="Check for existence of [Children]"><con:configuration><path>$[0].Children</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Match" id="114f8080-020d-4a0b-b5d4-5d2116598e02" name="Match content of [Code]"><con:configuration><path>$[0].Code</path><content>${#TestSuite#OdinCourseCode}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Match" id="6610ec5a-7204-4e91-9e5b-b60eb19378c6" name="Match content of [Name]"><con:configuration><path>$[0].Name</path><content>Book 3</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters><entry key="X-BA-TOKEN" value="${#TestSuite#Token}" xmlns="http://eviware.com/soapui/config"/></con:parameters><con:parameterOrder><con:entry/></con:parameterOrder></con:restRequest></con:config></con:testStep><con:testStep type="transfer" name="PropertyTransfer" id="a2facce6-2174-4d58-ab02-7f911b5da884"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>CourseKey</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>GetHomeworkCourseByCurrentUser</con:sourceStep><con:sourcePath>$[0].Key</con:sourcePath><con:targetType>CourseKey</con:targetType><con:targetStep>#TestSuite#</con:targetStep><con:targetPath/><con:type>JSONPATH</con:type><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:properties/><con:reportParameters/><con:breakPoints><con:testStepId>dcc9686c-00f3-4fb6-9a62-31e090d11b68</con:testStepId><con:status>NONE</con:status><con:properties/></con:breakPoints><con:breakPoints><con:testStepId>a2facce6-2174-4d58-ab02-7f911b5da884</con:testStepId><con:status>NONE</con:status><con:properties/></con:breakPoints></con:testCase><con:testCase id="e8c131e7-7434-4b3f-a0e9-67c2e86dd634" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="GetHomeworkCourseActivityByCourseKey" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="GetHomeworkCourseActivityByCourseKey" id="97bb29c4-c497-4f90-a108-de78d5f2a687"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/HomeworkActivity/{CurrentCourseKey}" methodName="Method 1" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="GetHomeworkCourseActivityByCourseKey" id="a103e50a-351e-48b9-93c0-59f077f41d03" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:originalUri>http://tbv3service.ef.cn/api/v1/HomeworkActivity/%24%7BCourseKey%7D</con:originalUri><con:assertion type="Invalid HTTP Status Codes" id="52499c72-a594-44e3-80d4-996feb57ad3d" name="Invalid HTTP Status Codes"><con:configuration><codes>400, 403, 404, 409, 500, 501</codes></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="${#TestSuite#Token}"/>
+  <con:entry key="CurrentCourseKey" value="${#TestSuite#CourseKey}"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>CurrentCourseKey</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties/><con:reportParameters/></con:testCase><con:testCase id="476996f3-fd6c-4b64-8353-ceb25fc39c8d" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="GetStudentProgressInfo" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="GetStudentProgressInfo" id="7ee9f46d-4e35-4b34-bbe6-009d714c648c"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/StudentProgress" methodName="StudentProgress" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="GetStudentProgressInfo" id="b3e78ba3-1cec-49ed-bb19-af1d129b9bdb" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+  "CourseKey" : "283ece50-acc0-4781-afc1-82eb000990f7",
+  "TotalValue" : 32,
+  "CompletedValue" : 1,
+  "Percentage" : 0.03125
+}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/StudentProgress</con:originalUri><con:assertion type="JsonPath Match" id="89c83fa4-a5b5-42c0-8fae-dc99e633ceb5" name="Match content of [StudentId]"><con:configuration><path>$.StudentId</path><content>${#TestSuite#StudentId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="JsonPath Match" id="69451c65-7636-4d23-824e-1dbb47ab9a7d" name="Match content of [CourseKey]"><con:configuration><path>$.CourseKey</path><content>283ece50-acc0-4781-afc1-82eb000990f7</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="${#TestSuite#Token}"/>
+  <con:entry key="X-BA-TRACE-ID" value="3ED59945-6EAA-41E6-894A-40F9EE587C71"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties/><con:reportParameters/></con:testCase><con:testCase id="e2e52ed4-1ba8-406f-9db4-146b181fa33b" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="UpdateStudentAnswerBatch" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="Copy of UpdateStudentAnswerBatch" id="cf45da8c-0811-4028-867e-9674dd25879e"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/ActivityAnswer/Batch" methodName="Batch" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="Copy of UpdateStudentAnswerBatch" id="b5c25e73-73fd-4228-8a62-1012c1dee4d4" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>[
+  {
+    "ActivitySnapshotKey" : "1dbcaaee-a75f-4123-bdc3-9f8aab85ee25",
+    "ActivityKey" : "466c82f9-b2f9-4f40-bc5e-f26fd4a47c37",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "gaps" : [
+            "gububu",
+            "bubjbu",
+            "bjbjbj",
+            "bjbjbj",
+            "bubjbi",
+            "bhbubub",
+            "vhvhvhvh"
+          ]
+        }
+      ],
+      "StudentScore" : 0,
+      "CorrectAnswers" : [
+        {
+          "gaps" : [
+            "love",
+            "don't like",
+            "prefer",
+            "prefer",
+            "like",
+            "enjoy",
+            "hate"
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 7,
+      "TotalQuestionCount" : 1,
+      "CompleteQuestionCount" : 1,
+      "CorrectQuestionCount" : 0
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "65f082a8-a0b9-4a99-8432-1b37bd996217",
+    "ActivityKey" : "58783f3f-39e7-48a1-a1cb-f5ce46b4192c",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "to listening"
+          ]
+        },
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "dance"
+          ]
+        },
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "to play"
+          ]
+        }
+      ],
+      "StudentScore" : 4,
+      "CorrectAnswers" : [
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "listening"
+          ]
+        },
+        {
+          "options" : [
+            "to sing"
+          ]
+        },
+        {
+          "options" : [
+            "dance"
+          ]
+        },
+        {
+          "options" : [
+            "singing"
+          ]
+        },
+        {
+          "options" : [
+            "to play"
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 6,
+      "TotalQuestionCount" : 6,
+      "CompleteQuestionCount" : 6,
+      "CorrectQuestionCount" : 4
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "90a77b0b-a9a6-44cf-bd6f-acc180441bcd",
+    "ActivityKey" : "3fd9190a-0a2c-4aa3-8abb-939131db1131",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "options" : [
+            "Brian likes rock music."
+          ]
+        },
+        {
+          "options" : [
+            "Gemma likes country music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian loves electronic music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian doesn’t like country music."
+          ]
+        },
+        {
+          "options" : [
+            "Gemma likes electronic music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian likes electronic music."
+          ]
+        }
+      ],
+      "StudentScore" : 4,
+      "CorrectAnswers" : [
+        {
+          "options" : [
+            "Brian likes rock music."
+          ]
+        },
+        {
+          "options" : [
+            "Gemma likes country music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian likes country music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian doesn’t like hip-hop."
+          ]
+        },
+        {
+          "options" : [
+            "Gemma likes electronic music."
+          ]
+        },
+        {
+          "options" : [
+            "Brian likes electronic music."
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 6,
+      "TotalQuestionCount" : 6,
+      "CompleteQuestionCount" : 6,
+      "CorrectQuestionCount" : 4
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "3e672dcc-8fc2-466e-993c-352a51978fae",
+    "ActivityKey" : "71cd1193-b9b0-434a-83b6-d70d0a5c69f8",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "items" : [
+            "I",
+            "love",
+            "to",
+            "dance",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "My",
+            "brother",
+            "prefers",
+            "listening",
+            "to",
+            "hip-hop",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "We",
+            "don’t",
+            "enjoy",
+            "going",
+            "festivals",
+            "music",
+            ".",
+            "to"
+          ]
+        },
+        {
+          "items" : [
+            "when",
+            "running",
+            "I’m",
+            "I",
+            ".",
+            "to",
+            "rock",
+            "prefer",
+            "listening"
+          ]
+        },
+        {
+          "items" : [
+            "boring",
+            "listening",
+            ".",
+            "music",
+            "hate",
+            "I",
+            "to"
+          ]
+        },
+        {
+          "items" : [
+            "He",
+            "music",
+            "loud",
+            "doesn’t",
+            "to",
+            "listening",
+            "like",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "music",
+            "dance",
+            ".",
+            "to",
+            "classical",
+            "She",
+            "to",
+            "prefers"
+          ]
+        },
+        {
+          "items" : [
+            "We",
+            "songs",
+            "enjoy",
+            "playing",
+            "hip-hop",
+            "."
+          ]
+        }
+      ],
+      "StudentScore" : 2,
+      "CorrectAnswers" : [
+        {
+          "items" : [
+            "I",
+            "love",
+            "to",
+            "dance",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "My",
+            "brother",
+            "prefers",
+            "listening",
+            "to",
+            "hip-hop",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "We",
+            "don’t",
+            "enjoy",
+            "going",
+            "to",
+            "music",
+            "festivals",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "I",
+            "prefer",
+            "listening",
+            "to",
+            "rock",
+            "when",
+            "I’m",
+            "running",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "I",
+            "hate",
+            "listening",
+            "to",
+            "boring",
+            "music",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "He",
+            "doesn’t",
+            "like",
+            "listening",
+            "to",
+            "loud",
+            "music",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "She",
+            "prefers",
+            "to",
+            "dance",
+            "to",
+            "classical",
+            "music",
+            "."
+          ]
+        },
+        {
+          "items" : [
+            "We",
+            "enjoy",
+            "playing",
+            "hip-hop",
+            "songs",
+            "."
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 8,
+      "TotalQuestionCount" : 8,
+      "CompleteQuestionCount" : 8,
+      "CorrectQuestionCount" : 2
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "159fe236-bbb5-4c9a-9007-64fd8228b41f",
+    "ActivityKey" : "e5943f1e-24b9-4240-bc0f-b38b6455506f",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "gaps" : [
+            "hinihi"
+          ]
+        },
+        {
+          "gaps" : [
+            "vhvhvhv"
+          ]
+        },
+        {
+          "gaps" : [
+            "bujbjnj"
+          ]
+        },
+        {
+          "gaps" : [
+            "vyfgvgv"
+          ]
+        },
+        {
+          "gaps" : [
+            "gugugug"
+          ]
+        },
+        {
+          "gaps" : [
+            "bububjb"
+          ]
+        }
+      ],
+      "StudentScore" : 0,
+      "CorrectAnswers" : [
+        {
+          "gaps" : [
+            "classical music"
+          ]
+        },
+        {
+          "gaps" : [
+            "rock music"
+          ]
+        },
+        {
+          "gaps" : [
+            "dance to J-pop"
+          ]
+        },
+        {
+          "gaps" : [
+            "singing"
+          ]
+        },
+        {
+          "gaps" : [
+            "country music"
+          ]
+        },
+        {
+          "gaps" : [
+            "listening to CDs"
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 6,
+      "TotalQuestionCount" : 6,
+      "CompleteQuestionCount" : 6,
+      "CorrectQuestionCount" : 0
+    },
+    "StudentId" : "22081620"
+  },
+  {
+    "ActivitySnapshotKey" : "11ba5883-e50a-4601-8c95-fb7d6e54f4de",
+    "ActivityKey" : "ccd623c4-c038-499b-8bd8-78af0f2acd38",
+    "Answer" : {
+      "StudentAnswers" : [
+        {
+          "options" : [
+            "classical"
+          ]
+        },
+        {
+          "options" : [
+            "Mark thinks classical music is boring."
+          ]
+        },
+        {
+          "options" : [
+            "He likes it."
+          ]
+        },
+        {
+          "options" : [
+            "pop"
+          ]
+        },
+        {
+          "options" : [
+            "doesn’t like electronic music or hip-hop."
+          ]
+        }
+      ],
+      "StudentScore" : 5,
+      "CorrectAnswers" : [
+        {
+          "options" : [
+            "classical"
+          ]
+        },
+        {
+          "options" : [
+            "Mark thinks classical music is boring."
+          ]
+        },
+        {
+          "options" : [
+            "He likes it."
+          ]
+        },
+        {
+          "options" : [
+            "pop"
+          ]
+        },
+        {
+          "options" : [
+            "doesn’t like electronic music or hip-hop."
+          ]
+        }
+      ],
+      "AnswerType" : 0,
+      "TotalScore" : 5,
+      "TotalQuestionCount" : 5,
+      "CompleteQuestionCount" : 5,
+      "CorrectQuestionCount" : 5
+    },
+    "StudentId" : "22081620"
+  }
+]</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/ActivityAnswer/Batch</con:originalUri><con:assertion type="Invalid HTTP Status Codes" id="2835fdd0-7ff4-436a-ab57-e6afc8731ff2" name="Invalid HTTP Status Codes"><con:configuration><codes>400, 401, 403, 404. 409, 500, 501</codes></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="${#TestSuite#Token}"/>
+  <con:entry key="X-BA-TRACE-ID" value="66135453-D2D1-4505-9584-BC4BD68D4D15"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties/><con:reportParameters/></con:testCase><con:testCase id="2a81f76e-5d12-4dc0-bb71-a79291ee45a6" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="SignOut" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="Copy of SignOut" id="0d478e58-e87c-48c5-88e3-fd38bf3c3fdf"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/Token" methodName="Token" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="Copy of SignOut" id="583e7163-b7cd-4439-abe8-b8cc96779085" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:originalUri>http://tbv3service.ef.cn/api/v1/Token</con:originalUri><con:assertion type="Invalid HTTP Status Codes" id="ace12345-ed60-435a-a930-cc1c5872b919" name="Invalid HTTP Status Codes"><con:configuration><codes>400, 401, 403, 404. 409, 500, 501</codes></con:configuration></con:assertion><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="X-BA-TOKEN" value="${#TestSuite#Token}"/>
+  <con:entry key="X-BA-TRACE-ID" value="BEC7021F-D6DD-4141-A21B-320D6BE21274"/>
+</con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry><con:entry>X-BA-TRACE-ID</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties/><con:reportParameters/><con:breakPoints><con:testStepId>0d478e58-e87c-48c5-88e3-fd38bf3c3fdf</con:testStepId><con:status>NONE</con:status><con:properties/></con:breakPoints></con:testCase><con:properties><con:property><con:name>StudentUserName</con:name><con:value>chris1128825</con:value></con:property><con:property><con:name>StudentPassword</con:name><con:value>12345</con:value></con:property><con:property><con:name>Token</con:name><con:value>38A5EA722AE54F2C927B16D92B0D15E728255AE7147C4F64870741BA23824A1AB8CDED6D3AD84510B2EE4AF80AFC179C202B98AAE36F4A1A802F786B6A92139F</con:value></con:property><con:property><con:name>GroupKey</con:name><con:value>4f7fbf90-e7b9-4730-b989-674ef0c07295</con:value></con:property><con:property><con:name>StudentId</con:name><con:value>22081620</con:value></con:property><con:property><con:name>Name</con:name><con:value>Chris McCormick</con:value></con:property><con:property><con:name>SchoolCode</con:name><con:value>CND</con:value></con:property><con:property><con:name>OdinCourseCode</con:name><con:value>TBv3Bk3</con:value></con:property><con:property><con:name>CourseKey</con:name><con:value>33ead0fe-41c1-473d-badc-9f57bdc3073d</con:value></con:property></con:properties><con:reportParameters/></con:testSuite><con:testSuite id="7c7fae0c-3beb-4b43-bc7f-2097f702d7f7" name="Teacher"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="f9a781d3-b748-403d-874e-d2d7879bf992" discardOkResults="true" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="TeacherOperation" searchProperties="true" maxResults="0"><con:settings/><con:testStep type="restrequest" name="StuffSignIn" id="b100f6bd-3684-48f5-a531-4615c12fcf12"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/API/v1/Token/Staff/" methodName="Method 1" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="StuffSignIn" id="34b9786d-601b-4628-8f37-f6ceac5c4b42" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+    "UserName": "Ruby.jin@ef.com", 
+    "Password": "Welcome*5", 
+    "DeviceId": "Device Id String", 
+    "DeviceType": 0, 
+    "Platform": 0
+}</con:request><con:originalUri>http://tbv3service.ef.cn/API/v1/Token/Staff/</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters/></con:restRequest></con:config></con:testStep><con:testStep type="transfer" name="TeacherPropertyTransfer" id="e9a76b5f-74a6-42dd-97ae-0d0b79a0d292"><con:settings/><con:config xsi:type="con:PropertyTransfersStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true" ignoreEmpty="false" transferToAll="false" entitize="false" transferChildNodes="false"><con:name>Token</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>StuffSignIn</con:sourceStep><con:sourcePath>$.Token</con:sourcePath><con:targetType>Token</con:targetType><con:targetStep>TeacherProperties</con:targetStep><con:targetPath/><con:type>JSONPATH</con:type><con:upgraded>true</con:upgraded></con:transfers><con:transfers setNullOnMissingSource="true" transferTextContent="true" failOnError="true"><con:name>TeacherId</con:name><con:sourceType>Response</con:sourceType><con:sourceStep>StuffSignIn</con:sourceStep><con:sourcePath>$.UserInfo.UserId</con:sourcePath><con:targetType>TeacherId</con:targetType><con:targetStep>TeacherProperties</con:targetStep><con:targetPath/><con:type>JSONPATH</con:type><con:upgraded>true</con:upgraded></con:transfers></con:config></con:testStep><con:testStep type="properties" name="TeacherProperties" id="2128142e-e83c-4002-b645-b1f4100a45d1"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>Token</con:name><con:value>3202D0C6B0DF4ED89CA23420692CA647E591C88CA1004227B8A350F26AAB1A102CE9D61D584B4952983434F45E258C472D4EFD65BD7E44F3AA314E7324C3ED0C</con:value></con:property><con:property><con:name>TeacherId</con:name><con:value>35457</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="restrequest" name="QueryCourseSchedule" id="2b20a0d5-9393-4271-ae9c-fab884872abc"><con:settings/><con:config service="http://tbv3service.ef.cn" methodName="Method 1" resourcePath="/api/v1/OdinCourseSchedule" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="QueryCourseSchedule" id="6a173f4a-109d-45c7-a420-fa46acd46c3e" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request>{
+	"TeacherId": "${TeacherId}",
+	"SchoolCode": "CND"
+	"Year": 2016,
+	"Month": 5,
+	"Day": 3
+	}</con:request><con:originalUri>http://tbv3service.ef.cn/api/v1/OdinCourseSchedule</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:environmentSpec><con:entry environmentId="4165e570-3b6e-4882-90c5-cab9f67ef8c1"><con:authProfile>No Authorization</con:authProfile></con:entry></con:environmentSpec><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters><entry key="X-BA-TOKEN" value="${Token}" xmlns="http://eviware.com/soapui/config"/></con:parameters><con:parameterOrder><con:entry>X-BA-TOKEN</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:testStep type="restrequest" name="GetTeacherUserInfo" id="04e5c841-e2c1-494b-9f31-3a280363665b"><con:settings/><con:config service="http://tbv3service.ef.cn" resourcePath="/api/v1/UserInfo/Teacher/{UserId}" methodName="Method 1" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:restRequest name="GetTeacherUserInfo" id="05305931-ba0d-4252-a5f1-26305d88e23d" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://tbv3service.ef.cn</con:endpoint><con:request/><con:originalUri>http://tbv3service.ef.cn/api/v1/UserInfo/Teacher/</con:originalUri><con:credentials><con:selectedAuthProfile>No Authorization</con:selectedAuthProfile><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:parameters><entry key="UserId" value="${TeacherId}" xmlns="http://eviware.com/soapui/config"/></con:parameters><con:parameterOrder><con:entry>UserId</con:entry></con:parameterOrder></con:restRequest></con:config></con:testStep><con:properties/><con:reportParameters/><con:breakPoints><con:testStepId>b100f6bd-3684-48f5-a531-4615c12fcf12</con:testStepId><con:status>NONE</con:status><con:properties/></con:breakPoints><con:breakPoints><con:testStepId>2128142e-e83c-4002-b645-b1f4100a45d1</con:testStepId><con:status>NONE</con:status><con:properties/></con:breakPoints><con:breakPoints><con:testStepId>e9a76b5f-74a6-42dd-97ae-0d0b79a0d292</con:testStepId><con:status>NONE</con:status><con:properties/></con:breakPoints></con:testCase><con:properties/><con:reportParameters/></con:testSuite><con:requirements/><con:properties><con:property><con:name>Token</con:name><con:value/></con:property></con:properties><con:wssContainer/><con:databaseConnectionContainer/><con:oAuth2ProfileContainer/><con:reporting><con:reportTemplates/><con:xmlTemplates/><con:xmlTemplates/><con:parameters/><con:parameters/></con:reporting><con:reporting/><con:environment id="4165e570-3b6e-4882-90c5-cab9f67ef8c1" name="TB_Live"><con:service type="REST" name="http://tbv3service.ef.cn"><con:endpoint authProfile="Inherit From Parent" username="" password="" domain="" incomingWss="" outgoingWss="" wssTimeToLive="" wssType="">http://tbv3service.ef.cn</con:endpoint></con:service><con:property><con:name>Token</con:name><con:value/></con:property><con:databaseConnectionContainer/></con:environment><con:authRepository/><con:loadUiTest name="Login LoadTest" id="efddc1dd-faf1-4b28-938d-06c8c82d4c3b"><con:settings><con:setting id="soapUIObjectSourceId">531b8ece-922d-4e42-99a8-f928c4f12ef6</con:setting><con:setting id="soapUIObjectSourceType">soapUIObjectSourceType_TestCase</con:setting></con:settings><con1:loadui-project id="a22b9a72-ddc1-44e5-b326-c6f7e718c540" label="Login LoadTest" xmlns:con1="http://eviware.com/loadui/config"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.saveReport" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.reportFolder" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.reportFormat" type="java.lang.String"/><con1:property propagates="true" key="Temporary project" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.rate" type="java.lang.Long">10</con1:property><con1:property propagates="true" key="ModelItem.loadDistributionType" type="com.smartbear.load.facade.LoadDistributionType">PerScenario</con1:property><con1:property propagates="true" key="ModelItem.remoteMode" type="java.lang.String"/></con1:properties><con1:attributes/><con1:addons/><con1:scene label="New Scenario" id="4f7c82c8-1b01-4202-9b37-c55b399de556" version="13"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="SceneItem.followProject" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="SceneItem.scenarioRatePercentage" type="java.lang.Long">100</con1:property><con1:property propagates="true" key="SceneItem.scenarioRateSpecific" type="java.lang.Long">10</con1:property></con1:properties><con1:attributes/><con1:addons/><con1:component type="com.eviware.loadui.impl.component.IntervalComponent" label="Interval 1" id="bb7000d1-1738-4379-ad50-0426ffebeefe" category="Scheduler"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="startAt" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="duration" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="unit" type="java.lang.String">Sec</con1:property><con1:property propagates="true" key="mode" type="java.lang.String">Single</con1:property><con1:property propagates="true" key="defaultMode" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Interval</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.impl.component.generators.FixedVU" label="Fixed Load 1" id="fbebcc80-aaa8-47fe-95fd-e4fcd8898242" category="Generators"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="load" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="interval" type="java.lang.Long">1000</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Fixed Load</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.components.soapui.SoapUISamplerComponent" label="Student:Login" id="309c04d6-6ad9-4649-8931-7b04e429bc54" category="Runners"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="concurrentSamples" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="property_name_is_not_relevant_for_private_property" type="java.lang.Long">9223372036854775807</con1:property><con1:property propagates="true" key="maxQueueSize" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="countDiscarded" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disabledTestSteps" type="java.lang.String"/><con1:property propagates="true" key="_thinkTime" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="ReadyApiTestCase" type="com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase">531b8ece-922d-4e42-99a8-f928c4f12ef6</con1:property><con1:property propagates="true" key="raiseError" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="outputTestCaseProperties" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="OutputLevel" type="java.lang.String">TestCase only</con1:property><con1:property propagates="true" key="closeConnectionsAfterRequest" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disableSoapuiAssertions" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="forceShareDatasources" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Ready API TestCase Runner</con1:property></con1:attributes><con1:addons/></con1:component><con1:connection outputTerminalId="bb7000d1-1738-4379-ad50-0426ffebeefe/outgoingTerminal" inputTerminalId="fbebcc80-aaa8-47fe-95fd-e4fcd8898242/stateTerminal"/><con1:connection outputTerminalId="fbebcc80-aaa8-47fe-95fd-e4fcd8898242/triggerTerminal" inputTerminalId="309c04d6-6ad9-4649-8931-7b04e429bc54/triggerTerminal"/><con1:connection outputTerminalId="309c04d6-6ad9-4649-8931-7b04e429bc54/runningTerminal" inputTerminalId="fbebcc80-aaa8-47fe-95fd-e4fcd8898242/Sample Count"/></con1:scene><con1:statistics><con1:page title="DefaultLoadUIStatisticPage"><con1:chartGroup type="com.eviware.loadui.api.statistics.model.chart.line.LineChartView" title="" groupType="Monitors"><con1:attributes/></con1:chartGroup></con1:page></con1:statistics></con1:loadui-project><con:loadUITestScenario projectId="a22b9a72-ddc1-44e5-b326-c6f7e718c540" scenarioId="4f7c82c8-1b01-4202-9b37-c55b399de556" name="New Scenario" id="a1eb2244-75f6-4399-ba78-f03be2b10612"><con:settings/></con:loadUITestScenario><con:reportParameters/></con:loadUiTest><con:loadUiTest name="GetUserInfoByGroupId LoadTest" id="548f5dbc-6aed-456c-9e24-4f3c24064e00"><con:settings><con:setting id="soapUIObjectSourceId">79d4dd3d-4005-44a7-9848-9d86a8ed83d8</con:setting><con:setting id="soapUIObjectSourceType">soapUIObjectSourceType_TestCase</con:setting></con:settings><con1:loadui-project id="cde4dc12-fcb3-45b7-90ce-55ff5c1ef23e" label="GetUserInfoByGroupId LoadTest" xmlns:con1="http://eviware.com/loadui/config"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.saveReport" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.reportFolder" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.reportFormat" type="java.lang.String"/><con1:property propagates="true" key="Temporary project" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.rate" type="java.lang.Long">10</con1:property><con1:property propagates="true" key="ModelItem.loadDistributionType" type="com.smartbear.load.facade.LoadDistributionType">PerScenario</con1:property><con1:property propagates="true" key="ModelItem.remoteMode" type="java.lang.String"/></con1:properties><con1:attributes/><con1:addons/><con1:scene label="New Scenario" id="694a7041-0d9b-4fba-b29e-025f00c753d3" version="13"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="SceneItem.followProject" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="SceneItem.scenarioRatePercentage" type="java.lang.Long">100</con1:property><con1:property propagates="true" key="SceneItem.scenarioRateSpecific" type="java.lang.Long">10</con1:property></con1:properties><con1:attributes/><con1:addons/><con1:component type="com.eviware.loadui.impl.component.IntervalComponent" label="Interval 1" id="e2453ea2-1c58-41f0-96cb-1019242776a7" category="Scheduler"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="startAt" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="duration" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="unit" type="java.lang.String">Sec</con1:property><con1:property propagates="true" key="mode" type="java.lang.String">Single</con1:property><con1:property propagates="true" key="defaultMode" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Interval</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.impl.component.generators.FixedVU" label="Fixed Load 1" id="b60e3499-3ad3-4759-9c10-53e70f769dd3" category="Generators"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="load" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="interval" type="java.lang.Long">1000</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Fixed Load</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.components.soapui.SoapUISamplerComponent" label="Student:GetUserInfoByGroupId" id="6a481092-88ce-4927-aa9d-f04c527680b6" category="Runners"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="concurrentSamples" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="property_name_is_not_relevant_for_private_property" type="java.lang.Long">9223372036854775807</con1:property><con1:property propagates="true" key="maxQueueSize" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="countDiscarded" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disabledTestSteps" type="java.lang.String"/><con1:property propagates="true" key="_thinkTime" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="ReadyApiTestCase" type="com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase">79d4dd3d-4005-44a7-9848-9d86a8ed83d8</con1:property><con1:property propagates="true" key="raiseError" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="outputTestCaseProperties" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="OutputLevel" type="java.lang.String">TestCase only</con1:property><con1:property propagates="true" key="closeConnectionsAfterRequest" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disableSoapuiAssertions" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="forceShareDatasources" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Ready API TestCase Runner</con1:property></con1:attributes><con1:addons/></con1:component><con1:connection outputTerminalId="e2453ea2-1c58-41f0-96cb-1019242776a7/outgoingTerminal" inputTerminalId="b60e3499-3ad3-4759-9c10-53e70f769dd3/stateTerminal"/><con1:connection outputTerminalId="b60e3499-3ad3-4759-9c10-53e70f769dd3/triggerTerminal" inputTerminalId="6a481092-88ce-4927-aa9d-f04c527680b6/triggerTerminal"/><con1:connection outputTerminalId="6a481092-88ce-4927-aa9d-f04c527680b6/runningTerminal" inputTerminalId="b60e3499-3ad3-4759-9c10-53e70f769dd3/Sample Count"/></con1:scene><con1:statistics><con1:page title="DefaultLoadUIStatisticPage"><con1:chartGroup type="com.eviware.loadui.api.statistics.model.chart.line.LineChartView" title="" groupType="Monitors"><con1:attributes/></con1:chartGroup></con1:page></con1:statistics></con1:loadui-project><con:loadUITestScenario projectId="cde4dc12-fcb3-45b7-90ce-55ff5c1ef23e" scenarioId="694a7041-0d9b-4fba-b29e-025f00c753d3" name="New Scenario" id="3f8fec87-cdf4-4afb-9190-4111c794efab"><con:settings/></con:loadUITestScenario><con:reportParameters/></con:loadUiTest><con:loadUiTest name="GetUserInfoByStudentId LoadTest" id="da3020d8-8f57-4c4d-98b0-8d263fe7dc4e"><con:settings><con:setting id="soapUIObjectSourceId">aacc92bc-9a22-498a-aee8-1b059a2e5515</con:setting><con:setting id="soapUIObjectSourceType">soapUIObjectSourceType_TestCase</con:setting></con:settings><con1:loadui-project id="38287fd4-d67b-44cc-8015-b649496207c9" label="GetUserInfoByStudentId LoadTest" xmlns:con1="http://eviware.com/loadui/config"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.saveReport" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.reportFolder" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.reportFormat" type="java.lang.String"/><con1:property propagates="true" key="Temporary project" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.rate" type="java.lang.Long">10</con1:property><con1:property propagates="true" key="ModelItem.loadDistributionType" type="com.smartbear.load.facade.LoadDistributionType">PerScenario</con1:property><con1:property propagates="true" key="ModelItem.remoteMode" type="java.lang.String"/></con1:properties><con1:attributes/><con1:addons/><con1:scene label="New Scenario" id="b89f6c0b-aea8-48f0-9dd6-499a5f2dbb4c" version="13"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="SceneItem.followProject" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="SceneItem.scenarioRatePercentage" type="java.lang.Long">100</con1:property><con1:property propagates="true" key="SceneItem.scenarioRateSpecific" type="java.lang.Long">10</con1:property></con1:properties><con1:attributes/><con1:addons/><con1:component type="com.eviware.loadui.impl.component.IntervalComponent" label="Interval 1" id="dc5a999f-4f2a-4207-88f8-6d9649ad89b9" category="Scheduler"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="startAt" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="duration" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="unit" type="java.lang.String">Sec</con1:property><con1:property propagates="true" key="mode" type="java.lang.String">Single</con1:property><con1:property propagates="true" key="defaultMode" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Interval</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.impl.component.generators.FixedVU" label="Fixed Load 1" id="a2476729-3e4c-4d30-9ed1-de7dea73acaa" category="Generators"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="load" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="interval" type="java.lang.Long">1000</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Fixed Load</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.components.soapui.SoapUISamplerComponent" label="Student:GetUserInfoByStudentId" id="b7d4c58f-7ca3-40db-a374-70d38ccaf452" category="Runners"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="concurrentSamples" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="property_name_is_not_relevant_for_private_property" type="java.lang.Long">9223372036854775807</con1:property><con1:property propagates="true" key="maxQueueSize" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="countDiscarded" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disabledTestSteps" type="java.lang.String"/><con1:property propagates="true" key="_thinkTime" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="ReadyApiTestCase" type="com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase">aacc92bc-9a22-498a-aee8-1b059a2e5515</con1:property><con1:property propagates="true" key="raiseError" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="outputTestCaseProperties" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="OutputLevel" type="java.lang.String">TestCase only</con1:property><con1:property propagates="true" key="closeConnectionsAfterRequest" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disableSoapuiAssertions" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="forceShareDatasources" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Ready API TestCase Runner</con1:property></con1:attributes><con1:addons/></con1:component><con1:connection outputTerminalId="dc5a999f-4f2a-4207-88f8-6d9649ad89b9/outgoingTerminal" inputTerminalId="a2476729-3e4c-4d30-9ed1-de7dea73acaa/stateTerminal"/><con1:connection outputTerminalId="a2476729-3e4c-4d30-9ed1-de7dea73acaa/triggerTerminal" inputTerminalId="b7d4c58f-7ca3-40db-a374-70d38ccaf452/triggerTerminal"/><con1:connection outputTerminalId="b7d4c58f-7ca3-40db-a374-70d38ccaf452/runningTerminal" inputTerminalId="a2476729-3e4c-4d30-9ed1-de7dea73acaa/Sample Count"/></con1:scene><con1:statistics><con1:page title="DefaultLoadUIStatisticPage"/></con1:statistics></con1:loadui-project><con:loadUITestScenario projectId="38287fd4-d67b-44cc-8015-b649496207c9" scenarioId="b89f6c0b-aea8-48f0-9dd6-499a5f2dbb4c" name="New Scenario" id="760c8cc8-c6e2-4dce-ad8e-2a0f212593fa"><con:settings/></con:loadUITestScenario><con:reportParameters/></con:loadUiTest><con:loadUiTest name="GetHomeworkCourseByCurrentUser LoadTest" id="fe140650-017a-4465-8a6d-f0a1c7d742a4"><con:settings><con:setting id="soapUIObjectSourceId">872ea332-9d67-4b50-8558-b91c95c4c32e</con:setting><con:setting id="soapUIObjectSourceType">soapUIObjectSourceType_TestCase</con:setting></con:settings><con1:loadui-project id="91389e08-f734-434b-b9bf-3da98504342d" label="GetHomeworkCourseByCurrentUser LoadTest" xmlns:con1="http://eviware.com/loadui/config"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.saveReport" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.reportFolder" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.reportFormat" type="java.lang.String"/><con1:property propagates="true" key="Temporary project" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.rate" type="java.lang.Long">10</con1:property><con1:property propagates="true" key="ModelItem.loadDistributionType" type="com.smartbear.load.facade.LoadDistributionType">PerScenario</con1:property><con1:property propagates="true" key="ModelItem.remoteMode" type="java.lang.String"/></con1:properties><con1:attributes/><con1:addons/><con1:scene label="New Scenario" id="05ede58f-564a-47a5-8b70-e528aa23a061" version="13"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="SceneItem.followProject" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="SceneItem.scenarioRatePercentage" type="java.lang.Long">100</con1:property><con1:property propagates="true" key="SceneItem.scenarioRateSpecific" type="java.lang.Long">10</con1:property></con1:properties><con1:attributes/><con1:addons/><con1:component type="com.eviware.loadui.impl.component.IntervalComponent" label="Interval 1" id="daa57ff0-64e5-435d-b3ba-e53b43c11f6f" category="Scheduler"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="startAt" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="duration" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="unit" type="java.lang.String">Sec</con1:property><con1:property propagates="true" key="mode" type="java.lang.String">Single</con1:property><con1:property propagates="true" key="defaultMode" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Interval</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.impl.component.generators.FixedVU" label="Fixed Load 1" id="24cfbf1c-42dc-4a08-8c05-527d9f25a2ff" category="Generators"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="load" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="interval" type="java.lang.Long">1000</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Fixed Load</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.components.soapui.SoapUISamplerComponent" label="Student:GetHomeworkCourseByCurrentUser" id="0ca7cdae-4460-4c21-bcfb-82566a64d832" category="Runners"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="concurrentSamples" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="property_name_is_not_relevant_for_private_property" type="java.lang.Long">9223372036854775807</con1:property><con1:property propagates="true" key="maxQueueSize" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="countDiscarded" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disabledTestSteps" type="java.lang.String"/><con1:property propagates="true" key="_thinkTime" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="ReadyApiTestCase" type="com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase">872ea332-9d67-4b50-8558-b91c95c4c32e</con1:property><con1:property propagates="true" key="raiseError" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="outputTestCaseProperties" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="OutputLevel" type="java.lang.String">TestCase only</con1:property><con1:property propagates="true" key="closeConnectionsAfterRequest" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disableSoapuiAssertions" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="forceShareDatasources" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Ready API TestCase Runner</con1:property></con1:attributes><con1:addons/></con1:component><con1:connection outputTerminalId="daa57ff0-64e5-435d-b3ba-e53b43c11f6f/outgoingTerminal" inputTerminalId="24cfbf1c-42dc-4a08-8c05-527d9f25a2ff/stateTerminal"/><con1:connection outputTerminalId="24cfbf1c-42dc-4a08-8c05-527d9f25a2ff/triggerTerminal" inputTerminalId="0ca7cdae-4460-4c21-bcfb-82566a64d832/triggerTerminal"/><con1:connection outputTerminalId="0ca7cdae-4460-4c21-bcfb-82566a64d832/runningTerminal" inputTerminalId="24cfbf1c-42dc-4a08-8c05-527d9f25a2ff/Sample Count"/></con1:scene><con1:statistics><con1:page title="DefaultLoadUIStatisticPage"/></con1:statistics></con1:loadui-project><con:loadUITestScenario projectId="91389e08-f734-434b-b9bf-3da98504342d" scenarioId="05ede58f-564a-47a5-8b70-e528aa23a061" name="New Scenario" id="61605d67-3681-482e-89bf-4a9168b875f6"><con:settings/></con:loadUITestScenario><con:reportParameters/></con:loadUiTest><con:loadUiTest name="GetHomeworkCourseActivityByCourseKey LoadTest" id="cd773aca-f743-463a-8d56-dd2b4019b19e"><con:settings><con:setting id="soapUIObjectSourceId">e8c131e7-7434-4b3f-a0e9-67c2e86dd634</con:setting><con:setting id="soapUIObjectSourceType">soapUIObjectSourceType_TestCase</con:setting></con:settings><con1:loadui-project id="852eab28-2f65-44f2-bfd9-9dbd01a53056" label="GetHomeworkCourseActivityByCourseKey LoadTest" xmlns:con1="http://eviware.com/loadui/config"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.saveReport" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.reportFolder" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.reportFormat" type="java.lang.String"/><con1:property propagates="true" key="Temporary project" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.rate" type="java.lang.Long">10</con1:property><con1:property propagates="true" key="ModelItem.loadDistributionType" type="com.smartbear.load.facade.LoadDistributionType">PerScenario</con1:property><con1:property propagates="true" key="ModelItem.remoteMode" type="java.lang.String"/></con1:properties><con1:attributes/><con1:addons/><con1:scene label="New Scenario" id="281487ad-8116-4e1b-ac40-07f93b469632" version="13"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="SceneItem.followProject" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="SceneItem.scenarioRatePercentage" type="java.lang.Long">100</con1:property><con1:property propagates="true" key="SceneItem.scenarioRateSpecific" type="java.lang.Long">10</con1:property></con1:properties><con1:attributes/><con1:addons/><con1:component type="com.eviware.loadui.impl.component.IntervalComponent" label="Interval 1" id="d731828a-4a16-45e0-bdd2-e3f8a7629b6d" category="Scheduler"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="startAt" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="duration" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="unit" type="java.lang.String">Sec</con1:property><con1:property propagates="true" key="mode" type="java.lang.String">Single</con1:property><con1:property propagates="true" key="defaultMode" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Interval</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.impl.component.generators.FixedVU" label="Fixed Load 1" id="25b4c5e7-9bea-4a03-9dac-e603612a51c8" category="Generators"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="load" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="interval" type="java.lang.Long">1000</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Fixed Load</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.components.soapui.SoapUISamplerComponent" label="Student:GetHomeworkCourseActivityByCourseKey" id="4bcadb35-4c9a-49fe-b598-92d87e813d2f" category="Runners"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="concurrentSamples" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="property_name_is_not_relevant_for_private_property" type="java.lang.Long">9223372036854775807</con1:property><con1:property propagates="true" key="maxQueueSize" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="countDiscarded" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disabledTestSteps" type="java.lang.String"/><con1:property propagates="true" key="_thinkTime" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="ReadyApiTestCase" type="com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase">e8c131e7-7434-4b3f-a0e9-67c2e86dd634</con1:property><con1:property propagates="true" key="raiseError" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="outputTestCaseProperties" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="OutputLevel" type="java.lang.String">TestCase only</con1:property><con1:property propagates="true" key="closeConnectionsAfterRequest" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disableSoapuiAssertions" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="forceShareDatasources" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Ready API TestCase Runner</con1:property></con1:attributes><con1:addons/></con1:component><con1:connection outputTerminalId="d731828a-4a16-45e0-bdd2-e3f8a7629b6d/outgoingTerminal" inputTerminalId="25b4c5e7-9bea-4a03-9dac-e603612a51c8/stateTerminal"/><con1:connection outputTerminalId="25b4c5e7-9bea-4a03-9dac-e603612a51c8/triggerTerminal" inputTerminalId="4bcadb35-4c9a-49fe-b598-92d87e813d2f/triggerTerminal"/><con1:connection outputTerminalId="4bcadb35-4c9a-49fe-b598-92d87e813d2f/runningTerminal" inputTerminalId="25b4c5e7-9bea-4a03-9dac-e603612a51c8/Sample Count"/></con1:scene><con1:statistics><con1:page title="DefaultLoadUIStatisticPage"/></con1:statistics></con1:loadui-project><con:loadUITestScenario projectId="852eab28-2f65-44f2-bfd9-9dbd01a53056" scenarioId="281487ad-8116-4e1b-ac40-07f93b469632" name="New Scenario" id="8e93bbe5-5be2-485d-a9ff-1addbbc02be3"><con:settings/></con:loadUITestScenario><con:reportParameters/></con:loadUiTest><con:loadUiTest name="GetStudentProgressInfo LoadTest" id="2eb0f882-a51e-477c-8564-76817a5a0960"><con:settings><con:setting id="soapUIObjectSourceId">476996f3-fd6c-4b64-8353-ceb25fc39c8d</con:setting><con:setting id="soapUIObjectSourceType">soapUIObjectSourceType_TestCase</con:setting></con:settings><con1:loadui-project id="dd1725d0-93ab-44b2-b431-29122b03a4e6" label="GetStudentProgressInfo LoadTest" xmlns:con1="http://eviware.com/loadui/config"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.saveReport" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.reportFolder" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.reportFormat" type="java.lang.String"/><con1:property propagates="true" key="Temporary project" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.rate" type="java.lang.Long">10</con1:property><con1:property propagates="true" key="ModelItem.loadDistributionType" type="com.smartbear.load.facade.LoadDistributionType">PerScenario</con1:property><con1:property propagates="true" key="ModelItem.remoteMode" type="java.lang.String"/></con1:properties><con1:attributes/><con1:addons/><con1:scene label="New Scenario" id="068ba592-7709-4d6f-acc0-f03349af13b5" version="13"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="SceneItem.followProject" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="SceneItem.scenarioRatePercentage" type="java.lang.Long">100</con1:property><con1:property propagates="true" key="SceneItem.scenarioRateSpecific" type="java.lang.Long">10</con1:property></con1:properties><con1:attributes/><con1:addons/><con1:component type="com.eviware.loadui.impl.component.IntervalComponent" label="Interval 1" id="afd6625f-e4b0-48be-980c-38dfb4194386" category="Scheduler"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="startAt" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="duration" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="unit" type="java.lang.String">Sec</con1:property><con1:property propagates="true" key="mode" type="java.lang.String">Single</con1:property><con1:property propagates="true" key="defaultMode" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Interval</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.impl.component.generators.FixedVU" label="Fixed Load 1" id="454c3228-7f5e-4a4d-962b-496cc6b36d5a" category="Generators"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="load" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="interval" type="java.lang.Long">1000</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Fixed Load</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.components.soapui.SoapUISamplerComponent" label="Student:GetStudentProgressInfo" id="be843b62-a2b4-49f2-ab48-21a8390a0bb4" category="Runners"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="concurrentSamples" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="property_name_is_not_relevant_for_private_property" type="java.lang.Long">9223372036854775807</con1:property><con1:property propagates="true" key="maxQueueSize" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="countDiscarded" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disabledTestSteps" type="java.lang.String"/><con1:property propagates="true" key="_thinkTime" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="ReadyApiTestCase" type="com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase">476996f3-fd6c-4b64-8353-ceb25fc39c8d</con1:property><con1:property propagates="true" key="raiseError" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="outputTestCaseProperties" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="OutputLevel" type="java.lang.String">TestCase only</con1:property><con1:property propagates="true" key="closeConnectionsAfterRequest" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disableSoapuiAssertions" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="forceShareDatasources" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Ready API TestCase Runner</con1:property></con1:attributes><con1:addons/></con1:component><con1:connection outputTerminalId="afd6625f-e4b0-48be-980c-38dfb4194386/outgoingTerminal" inputTerminalId="454c3228-7f5e-4a4d-962b-496cc6b36d5a/stateTerminal"/><con1:connection outputTerminalId="454c3228-7f5e-4a4d-962b-496cc6b36d5a/triggerTerminal" inputTerminalId="be843b62-a2b4-49f2-ab48-21a8390a0bb4/triggerTerminal"/><con1:connection outputTerminalId="be843b62-a2b4-49f2-ab48-21a8390a0bb4/runningTerminal" inputTerminalId="454c3228-7f5e-4a4d-962b-496cc6b36d5a/Sample Count"/></con1:scene><con1:statistics><con1:page title="DefaultLoadUIStatisticPage"><con1:chartGroup type="com.eviware.loadui.api.statistics.model.chart.line.LineChartView" title="" groupType="Monitors"><con1:attributes/></con1:chartGroup></con1:page></con1:statistics></con1:loadui-project><con:loadUITestScenario projectId="dd1725d0-93ab-44b2-b431-29122b03a4e6" scenarioId="068ba592-7709-4d6f-acc0-f03349af13b5" name="New Scenario" id="e5e55563-126a-4f20-99de-b605b35ab035"><con:settings/></con:loadUITestScenario><con:reportParameters/></con:loadUiTest><con:loadUiTest name="UpdateStudentAnswerBatch LoadTest" id="b5c1efa2-d8b4-468c-8c44-e64e924753d9"><con:settings><con:setting id="soapUIObjectSourceId">e2e52ed4-1ba8-406f-9db4-146b181fa33b</con:setting><con:setting id="soapUIObjectSourceType">soapUIObjectSourceType_TestCase</con:setting></con:settings><con1:loadui-project id="c39f45b4-ef22-4078-8ed2-2fee11e0c15c" label="UpdateStudentAnswerBatch LoadTest" xmlns:con1="http://eviware.com/loadui/config"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.saveReport" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.reportFolder" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.reportFormat" type="java.lang.String"/><con1:property propagates="true" key="Temporary project" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.rate" type="java.lang.Long">10</con1:property><con1:property propagates="true" key="ModelItem.loadDistributionType" type="com.smartbear.load.facade.LoadDistributionType">PerScenario</con1:property><con1:property propagates="true" key="ModelItem.remoteMode" type="java.lang.String"/></con1:properties><con1:attributes/><con1:addons/><con1:scene label="New Scenario" id="1ce196cc-9582-40da-b5b2-6622aa862eba" version="13"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="SceneItem.followProject" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="SceneItem.scenarioRatePercentage" type="java.lang.Long">100</con1:property><con1:property propagates="true" key="SceneItem.scenarioRateSpecific" type="java.lang.Long">10</con1:property></con1:properties><con1:attributes/><con1:addons/><con1:component type="com.eviware.loadui.impl.component.IntervalComponent" label="Interval 1" id="346f0be2-e9ae-4db0-bf36-de32e513696c" category="Scheduler"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="startAt" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="duration" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="unit" type="java.lang.String">Sec</con1:property><con1:property propagates="true" key="mode" type="java.lang.String">Single</con1:property><con1:property propagates="true" key="defaultMode" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Interval</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.impl.component.generators.FixedVU" label="Fixed Load 1" id="a7510e41-2f89-4e3c-8891-234cb00238dc" category="Generators"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="load" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="interval" type="java.lang.Long">1000</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Fixed Load</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.components.soapui.SoapUISamplerComponent" label="Student:UpdateStudentAnswerBatch" id="593339cc-0446-47d0-a5ba-2552963c8caf" category="Runners"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="concurrentSamples" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="property_name_is_not_relevant_for_private_property" type="java.lang.Long">9223372036854775807</con1:property><con1:property propagates="true" key="maxQueueSize" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="countDiscarded" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disabledTestSteps" type="java.lang.String"/><con1:property propagates="true" key="_thinkTime" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="ReadyApiTestCase" type="com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase">e2e52ed4-1ba8-406f-9db4-146b181fa33b</con1:property><con1:property propagates="true" key="raiseError" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="outputTestCaseProperties" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="OutputLevel" type="java.lang.String">TestCase only</con1:property><con1:property propagates="true" key="closeConnectionsAfterRequest" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disableSoapuiAssertions" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="forceShareDatasources" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Ready API TestCase Runner</con1:property></con1:attributes><con1:addons/></con1:component><con1:connection outputTerminalId="346f0be2-e9ae-4db0-bf36-de32e513696c/outgoingTerminal" inputTerminalId="a7510e41-2f89-4e3c-8891-234cb00238dc/stateTerminal"/><con1:connection outputTerminalId="a7510e41-2f89-4e3c-8891-234cb00238dc/triggerTerminal" inputTerminalId="593339cc-0446-47d0-a5ba-2552963c8caf/triggerTerminal"/><con1:connection outputTerminalId="593339cc-0446-47d0-a5ba-2552963c8caf/runningTerminal" inputTerminalId="a7510e41-2f89-4e3c-8891-234cb00238dc/Sample Count"/></con1:scene><con1:statistics><con1:page title="DefaultLoadUIStatisticPage"><con1:chartGroup type="com.eviware.loadui.api.statistics.model.chart.line.LineChartView" title="" groupType="Monitors"><con1:attributes/></con1:chartGroup></con1:page></con1:statistics></con1:loadui-project><con:loadUITestScenario projectId="c39f45b4-ef22-4078-8ed2-2fee11e0c15c" scenarioId="1ce196cc-9582-40da-b5b2-6622aa862eba" name="New Scenario" id="ffa19f15-8e4b-402a-a9bc-b805810bbc7b"><con:settings/></con:loadUITestScenario><con:reportParameters/></con:loadUiTest><con:loadUiTest name="SignOut LoadTest" id="9937b03c-f09e-4fc0-82fa-9d5f8643b008"><con:settings><con:setting id="soapUIObjectSourceId">2a81f76e-5d12-4dc0-bb71-a79291ee45a6</con:setting><con:setting id="soapUIObjectSourceType">soapUIObjectSourceType_TestCase</con:setting></con:settings><con1:loadui-project id="b2d236a7-db49-47d2-920e-53ba872a866c" label="SignOut LoadTest" xmlns:con1="http://eviware.com/loadui/config"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.saveReport" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="ModelItem.reportFolder" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.reportFormat" type="java.lang.String"/><con1:property propagates="true" key="Temporary project" type="java.lang.String"/><con1:property propagates="true" key="ModelItem.rate" type="java.lang.Long">10</con1:property><con1:property propagates="true" key="ModelItem.loadDistributionType" type="com.smartbear.load.facade.LoadDistributionType">PerScenario</con1:property><con1:property propagates="true" key="ModelItem.remoteMode" type="java.lang.String"/></con1:properties><con1:attributes/><con1:addons/><con1:scene label="New Scenario" id="136f1523-38d6-4102-84be-95c35a5c77f9" version="13"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="CanvasItem.abortOnFinish" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="SceneItem.followProject" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="SceneItem.scenarioRatePercentage" type="java.lang.Long">100</con1:property><con1:property propagates="true" key="SceneItem.scenarioRateSpecific" type="java.lang.Long">10</con1:property></con1:properties><con1:attributes/><con1:addons/><con1:component type="com.eviware.loadui.impl.component.IntervalComponent" label="Interval 1" id="5dd6e6f3-8a83-4116-a6fe-b4a54e4de746" category="Scheduler"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="startAt" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="duration" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="unit" type="java.lang.String">Sec</con1:property><con1:property propagates="true" key="mode" type="java.lang.String">Single</con1:property><con1:property propagates="true" key="defaultMode" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Interval</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.impl.component.generators.FixedVU" label="Fixed Load 1" id="e5f11625-2858-4754-89f6-c8d6b1e0162e" category="Generators"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="stateProperty" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="load" type="java.lang.Long">5</con1:property><con1:property propagates="true" key="interval" type="java.lang.Long">1000</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Fixed Load</con1:property></con1:attributes><con1:addons/></con1:component><con1:component type="com.eviware.loadui.components.soapui.SoapUISamplerComponent" label="Student:SignOut" id="c6ecf2d0-5e32-43ec-9bdb-80de9ade266d" category="Runners"><con1:properties><con1:property propagates="true" key="ModelItem.description" type="java.lang.String"/><con1:property propagates="true" key="concurrentSamples" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="property_name_is_not_relevant_for_private_property" type="java.lang.Long">9223372036854775807</con1:property><con1:property propagates="true" key="maxQueueSize" type="java.lang.Long">1000</con1:property><con1:property propagates="true" key="countDiscarded" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disabledTestSteps" type="java.lang.String"/><con1:property propagates="true" key="_thinkTime" type="java.lang.Long">0</con1:property><con1:property propagates="true" key="ReadyApiTestCase" type="com.eviware.soapui.impl.wsdl.testcase.WsdlTestCase">2a81f76e-5d12-4dc0-bb71-a79291ee45a6</con1:property><con1:property propagates="true" key="raiseError" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="outputTestCaseProperties" type="java.lang.Boolean">true</con1:property><con1:property propagates="true" key="OutputLevel" type="java.lang.String">TestCase only</con1:property><con1:property propagates="true" key="closeConnectionsAfterRequest" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="disableSoapuiAssertions" type="java.lang.Boolean">false</con1:property><con1:property propagates="true" key="forceShareDatasources" type="java.lang.Boolean">true</con1:property></con1:properties><con1:attributes><con1:property key="com.eviware.loadui.api.model.ComponentItem@type">Ready API TestCase Runner</con1:property></con1:attributes><con1:addons/></con1:component><con1:connection outputTerminalId="5dd6e6f3-8a83-4116-a6fe-b4a54e4de746/outgoingTerminal" inputTerminalId="e5f11625-2858-4754-89f6-c8d6b1e0162e/stateTerminal"/><con1:connection outputTerminalId="e5f11625-2858-4754-89f6-c8d6b1e0162e/triggerTerminal" inputTerminalId="c6ecf2d0-5e32-43ec-9bdb-80de9ade266d/triggerTerminal"/><con1:connection outputTerminalId="c6ecf2d0-5e32-43ec-9bdb-80de9ade266d/runningTerminal" inputTerminalId="e5f11625-2858-4754-89f6-c8d6b1e0162e/Sample Count"/></con1:scene><con1:statistics><con1:page title="DefaultLoadUIStatisticPage"><con1:chartGroup type="com.eviware.loadui.api.statistics.model.chart.line.LineChartView" title="" groupType="Monitors"><con1:attributes/></con1:chartGroup></con1:page></con1:statistics></con1:loadui-project><con:loadUITestScenario projectId="b2d236a7-db49-47d2-920e-53ba872a866c" scenarioId="136f1523-38d6-4102-84be-95c35a5c77f9" name="New Scenario" id="c5be02b4-c564-42e9-a9b2-5f14ed88ac01"><con:settings/></con:loadUITestScenario><con:reportParameters/></con:loadUiTest><con:tags/></con:soapui-project>
