@@ -1,4 +1,5 @@
 import datetime
+import os
 from time import sleep
 
 from ptest.decorator import BeforeClass, AfterMethod
@@ -6,7 +7,7 @@ from ptest.decorator import BeforeClass, AfterMethod
 from ..Moutai import Token
 from ..OnlineClassroom.KidsEVC import KidsEVCService
 from ..OnlineClassroom.ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2utc, local2est, \
-    ServiceSubTypeCode
+    ServiceSubTypeCode, get_UAT_schedule_tool, get_STG_schedule_tool
 
 
 class Base():
@@ -36,13 +37,19 @@ class Base():
     @BeforeClass()
     def create_class(self):
         self.evc_service = KidsEVCService(host=self.host)
-        #self.create_and_assign_class_at_QA(self.est_start_time, self.est_end_time, teacher_id="10366584")
+        self.create_and_assign_class_at_QA(self.est_start_time, self.est_end_time, teacher_id="10366584", test_env="QA")#os.environ['test_env'])
         print(local2utc(self.est_start_time))
         print(local2utc(self.est_end_time))
 
-    def create_and_assign_class_at_QA(self, start_time, end_time, teacher_id):
+    def create_and_assign_class_at_QA(self, start_time, end_time, teacher_id, test_env="QA"):
         kids_class = KidsClass(start_time, end_time, teacher={"id": teacher_id, "teacher_name": "KON1", "teacher_password": "1"}, serverSubTypeCode=ServiceSubTypeCode.KONRegular.value)
-        school_service = get_QA_schedule_tool()
+        school_service = None
+        if "QA" == test_env:
+            school_service = get_QA_schedule_tool()
+        if "UAT" == test_env:
+            school_service = get_UAT_schedule_tool()
+        if "STG" == test_env:
+            school_service = get_STG_schedule_tool()
         print(school_service.schedule_kids_class(kids_class))
         sleep(3)
 
