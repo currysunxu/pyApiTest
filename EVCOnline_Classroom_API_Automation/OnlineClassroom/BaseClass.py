@@ -21,13 +21,26 @@ class Base():
         "Platform": 0
     }
 
-    start_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 20:00:00"
-    start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=14)
-    start_time = start_time_date.strftime("%Y-%m-%d %H:%M:%S")
+    start_time = None
+    end_time = None
 
-    end_time =  datetime.datetime.now().date().strftime('%Y-%m-%d') + " 21:30:00"
-    end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=14)
-    end_time = end_time_date.strftime("%Y-%m-%d %H:%M:%S")
+    if os.environ["Start_Time"] == "Default":
+        start_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 20:00:00"
+        start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=14)
+        start_time = start_time_date.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        start_time = os.environ["Start_Time"]
+
+    if os.environ["End_Time"] == "Default":
+        end_time =  datetime.datetime.now().date().strftime('%Y-%m-%d') + " 21:30:00"
+        end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=14)
+        end_time = end_time_date.strftime("%Y-%m-%d %H:%M:%S")
+    else:
+        end_time = os.environ["End_Time"]
+
+
+
+
 #"2018-6-24 7:00:00"
     est_start_time =  local2est(start_time)
     est_end_time = local2est(end_time)
@@ -37,11 +50,11 @@ class Base():
     @BeforeClass()
     def create_class(self):
         self.evc_service = KidsEVCService(host=self.host)
-        self.create_and_assign_class_at_QA(self.est_start_time, self.est_end_time, teacher_id="10366584", test_env="QA")#os.environ['test_env'])
+        self.create_and_assign_class(self.est_start_time, self.est_end_time, teacher_id="10366584", test_env=os.environ['test_env'])#os.environ['test_env'])
         print(local2utc(self.est_start_time))
         print(local2utc(self.est_end_time))
 
-    def create_and_assign_class_at_QA(self, start_time, end_time, teacher_id, test_env="QA"):
+    def create_and_assign_class(self, start_time, end_time, teacher_id, test_env="QA"):
         kids_class = KidsClass(start_time, end_time, teacher={"id": teacher_id, "teacher_name": "KON1", "teacher_password": "1"}, serverSubTypeCode=ServiceSubTypeCode.KONRegular.value)
         school_service = None
         if "QA" == test_env:
