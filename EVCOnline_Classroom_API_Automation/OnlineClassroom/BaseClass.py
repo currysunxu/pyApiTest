@@ -21,6 +21,8 @@ class Base():
         "Platform": 0
     }
 
+    teacher_id = os.environ['Teacher_Id']
+
     start_time = None
     end_time = None
 
@@ -50,7 +52,7 @@ class Base():
     @BeforeClass()
     def create_class(self):
         self.evc_service = KidsEVCService(host=self.host)
-        self.create_and_assign_class(self.est_start_time, self.est_end_time, teacher_id="10366584", test_env=os.environ['test_env'])#os.environ['test_env'])
+        self.create_and_assign_class(self.est_start_time, self.est_end_time, teacher_id=self.teacher_id, test_env=os.environ['test_env'])#os.environ['test_env'])
         print(local2utc(self.est_start_time))
         print(local2utc(self.est_end_time))
 
