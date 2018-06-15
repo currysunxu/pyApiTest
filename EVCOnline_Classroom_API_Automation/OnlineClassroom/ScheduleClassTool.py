@@ -236,4 +236,4 @@ def get_QA_schedule_tool():
     return ScheduleClassTool(admin="KONSA", password="1", host="http://qa.englishtown.com")
 
 def get_STG_schedule_tool():
-    return ScheduleClassTool(admin="BBroekmann1", password="1", host="http://staging.englishtown.com")
+    return ScheduleClassTool(admin="BBroekmann1", password="mail", host="http://staging.englishtown.com")
