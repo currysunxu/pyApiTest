@@ -23,7 +23,7 @@ class APITestCases(Base):
         response = self.evc_service.login(user_name=self.user_info["UserName"], password=self.user_info["Password"])
         assert_that(response.json(), match_to("Token"))
         assert_that(response.json(), match_to("UserInfo.UserInfo.UserId"))
-        assert_that(jmespath.search("UserInfo.UserInfo.UserId", response.json()), equal_to('12226218'))
+        #assert_that(jmespath.search("UserInfo.UserInfo.UserId", response.json()), equal_to('12226218'))
         return response
 
     @Test()

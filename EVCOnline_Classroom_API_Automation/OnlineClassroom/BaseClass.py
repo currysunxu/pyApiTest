@@ -42,7 +42,7 @@ class Base():
             "DeviceType": 0,
             "Platform": 0
         }
-    if "STG" == "STG":
+    if os.environ["test_env"] == "STG":
         host = "https://e1svc-staging.ef.cn"
         user_info = {
             "UserName": "null183",
