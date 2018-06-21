@@ -4,9 +4,9 @@ from time import sleep
 
 from ptest.decorator import BeforeClass, AfterMethod
 
-from ..Moutai import Token
-from ..OnlineClassroom.KidsEVC import KidsEVCService
-from ..OnlineClassroom.ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2utc, local2est, \
+from ..Lib.Moutai import Token
+from .KidsEVC import KidsEVCService
+from .ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2utc, local2est, \
     ServiceSubTypeCode, get_UAT_schedule_tool, get_STG_schedule_tool
 
 
@@ -22,14 +22,14 @@ class Base():
 
     if os.environ["Start_Time"] == "Default":
         start_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 20:00:00"
-        start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=14)
+        start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=1)
         start_time = start_time_date.strftime("%Y-%m-%d %H:%M:%S")
     else:
         start_time = os.environ["Start_Time"]
 
     if os.environ["End_Time"] == "Default":
         end_time =  datetime.datetime.now().date().strftime('%Y-%m-%d') + " 21:30:00"
-        end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=14)
+        end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=1)
         end_time = end_time_date.strftime("%Y-%m-%d %H:%M:%S")
     else:
         end_time = os.environ["End_Time"]
