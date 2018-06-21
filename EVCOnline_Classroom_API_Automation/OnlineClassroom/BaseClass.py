@@ -13,16 +13,10 @@ from ..OnlineClassroom.ScheduleClassTool import KidsClass, get_QA_schedule_tool,
 class Base():
     token_pattern = Token("X-BA-TOKEN", "Token")
     class_id = None
-    host = "https://e1svc-qa.ef.com"
-    user_info = {
-        "UserName": "jenkin0528tb",
-        "Password": "12345",
-        "DeviceType": 0,
-        "Platform": 0
-    }
+    user_info = None
 
-    teacher_id = os.environ['Teacher_Id']
-
+    teacher_id =  os.environ['Teacher_Id']
+    host = None
     start_time = None
     end_time = None
 
@@ -40,11 +34,25 @@ class Base():
     else:
         end_time = os.environ["End_Time"]
 
+    if os.environ["test_env"] == "QA":
+        host = "https://e1svc-qa.ef.com"
+        user_info = {
+            "UserName": "jenkin0528tb",
+            "Password": "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
+    if "STG" == "STG":
+        host = "https://e1svc-staging.ef.cn"
+        user_info = {
+            "UserName": "null183",
+            "Password": "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
 
-
-
-#"2018-6-24 7:00:00"
-    est_start_time =  local2est(start_time)
+    # "2018-6-24 7:00:00"
+    est_start_time = local2est(start_time)
     est_end_time = local2est(end_time)
 
     evc_service = None
