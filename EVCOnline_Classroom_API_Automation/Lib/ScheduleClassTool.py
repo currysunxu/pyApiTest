@@ -39,9 +39,10 @@ def local2utc(local_st):
 
 
 class ServiceSubTypeCode(Enum):
-    KONDemo = "KONDemo"
-    KONGPDemo = "KONGPDemo"
-    KONRegular = "KONReg"
+    KONDemo = "KPLDemo"
+    KONGPDemo = "KGPDemo"
+    KONRegular = "KPL"
+    KONGPRegular = "KGP"
 
 
 class EvcServerCode(Enum):
@@ -55,7 +56,7 @@ class KidsClass():
                  end_time,
                  teacher={"id": "937668", "teacher_name": "KON1", "teacher_password": "1"},
                  serverSubTypeCode=ServiceSubTypeCode.KONDemo.value,
-                 partnerCode="KON",
+                 partnerCode="Kids",
                  evcServerCode=EvcServerCode.EVCCN1.value,
                  classDuration=30
                  ):
