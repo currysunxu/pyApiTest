@@ -54,12 +54,15 @@ class KidsClass():
     def __init__(self,
                  start_time,
                  end_time,
+                 levelCode,
+                 marketCode,
                  teacher={"id": "937668", "teacher_name": "KON1", "teacher_password": "1"},
                  serverSubTypeCode=ServiceSubTypeCode.KONDemo.value,
                  partnerCode="Kids",
                  evcServerCode=EvcServerCode.EVCCN1.value,
-                 classDuration=30
-                 ):
+                 classDuration=30,
+                 teachingItem="en"):
+        self.teachingItem = teachingItem
         self.teacher = teacher
         self.serviceSubTypeCode = serverSubTypeCode
         self.partnerCode = partnerCode
@@ -67,6 +70,8 @@ class KidsClass():
         self.classDuration = classDuration
         self.start_time = start_time
         self.end_time = end_time
+        self.levelCode = levelCode
+        self.marketCode = marketCode
 
     def set_admin(self, value):
         self.admin = value
@@ -82,6 +87,9 @@ class KidsClass():
 
     def set_classDuration(self, value):
         self.classDuration = value
+
+    def set_levelCode(self, value):
+        self.levelCode = value
 
 
 class ScheduleClassTool:
@@ -164,7 +172,10 @@ class ScheduleClassTool:
                                   serviceSubTypeCode=kids_class.serviceSubTypeCode,
                                   partnercode=kids_class.partnerCode,
                                   evcServerCode=kids_class.serverCode,
-                                  classDuration=str(kids_class.classDuration))
+                                  classDuration=str(kids_class.classDuration),
+                                  levelCode=kids_class.levelCode,
+                                  marketCode=kids_class.marketCode,
+                                  teachingItem=kids_class.teachingItem)
 
     def schedule_cp20(self, teacher_id,
                       start_time,
@@ -177,6 +188,7 @@ class ScheduleClassTool:
                       marketCode="Global",
                       evcServerCode="evcus1",
                       classDuration="20",
+                      teachingItem="en"
                       ):
         parameters = {
             '__VIEWSTATE': self.get_view_state(),
@@ -185,14 +197,15 @@ class ScheduleClassTool:
             'txtTeacherMemberId': teacher_id,
             'txtStartTime': start_time,
             'txtEndTime': end_time,
-            'txtServiceTypeCode': serviceTpyeCode,
-            'txtServiceSubTypeCode': serviceSubTypeCode,
-            'txtLevelCode': levelCode,
-            'txtLanguageCode': languageCode,
-            'txtMarketCode': marketCode,
-            'txtPartnerCode': partnercode,
-            'txtEvcServerCode': evcServerCode,
+            'txtServiceType': serviceTpyeCode,
+            'txtServiceSubType': serviceSubTypeCode,
+            'txtLevel': levelCode,
+            'txtLanguage': languageCode,
+            'txtMarket': marketCode,
+            'txtPartner': partnercode,
+            'txtEvcServer': evcServerCode,
             'txtClassDuration': classDuration,
+            'txtTeachingItem': teachingItem,
             'txtTemplateId': '1',
             'btnDoAll': 'Do All'
 
@@ -204,7 +217,7 @@ class ScheduleClassTool:
         pattern = re.compile(r'ClassIds: (\d.*\d)</span>')
         match_result = pattern.findall(response)
         if len(match_result) == 0:
-            raise Exception("Failed to assign class. It's might be already booked.")
+            print("Failed to assign class. It's might be already booked.")
         if len(match_result) == 1:
             return match_result[0].split(", ")
         if len(match_result) > 1:

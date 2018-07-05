@@ -83,5 +83,11 @@ class KidsEVCService():
 
         return self.mou_tai.post(url="/api/v2/OnlineClassBooking/", json=body)
 
+    def get_after_class_report(self, class_id):
+        api_url = "/api/v2/AfterClassReport/" + class_id
+        return self.mou_tai.get(api_url)
+
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
+
+
