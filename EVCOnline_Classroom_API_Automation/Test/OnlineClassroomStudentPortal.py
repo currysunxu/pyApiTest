@@ -45,8 +45,8 @@ class APITestCases(Base):
     @Test()
     def test_get_calendar_non_class(self):
         self.test_login()
-        response = self.evc_service.get_calendar(self.HF_program_code, ClassType.REGULAR.value, "2019-10-10T01:00:00.000000Z",
-                                                 "2019-10-10T02:00:00.000000Z")
+        response = self.evc_service.get_calendar(self.HF_program_code, ClassType.REGULAR.value, "2017-10-10T01:00:00.000000Z",
+                                                 "2017-10-10T02:00:00.000000Z")
         assert_that(jmespath.search("BookableSlots", response.json()), equal_to(None))
         return response
 
@@ -69,15 +69,15 @@ class APITestCases(Base):
         assert_that(response.json(), match_to("[0].TeacherProfile"))
         assert_that((self.teacher_id in jmespath.search("[].TeacherProfile.UserInfo.UserId", response.json())))
         assert_that(jmespath.search("[1].TeacherProfile.Description",
-                                    response.json()) == "\"\"Hey everyone, I'm chris b.teacher.\"\"-chris b.")
-        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.UserId", response.json()) == "10703777")
-        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.Name", response.json()) == "chris b.")
+                                    response.json()) == self.teacher_profile["Description"])
+        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.UserId", response.json()) == self.teacher_profile["UserId"])
+        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.Name", response.json()) == self.teacher_profile["UserName"])
         assert_that(jmespath.search("[1].TeacherProfile.UserInfo.Gender", response.json()) == 2)
-        assert_that(jmespath.search("[1].ProgramCode", response.json()) == "HF")
+        assert_that(jmespath.search("[1].ProgramCode", response.json()) == self.HF_program_code)
         assert_that(jmespath.search("[1].ClassType", response.json()) == "Regular")
-        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.Cellphone", response.json()) == None)
+        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.Cellphone", response.json()) == self.teacher_profile["Cellphone"])
         assert_that(jmespath.search("[1].TeacherProfile.UserInfo.AvatarUrl",
-                                    response.json()) == "http://qa.englishtown.com/opt-media/?id=b54fe1b3-aa1f-4676-965b-d0b5107ed69c")
+                                    response.json()) == self.teacher_profile["AvatarUrl"])
         return response
 
     @Test()
@@ -144,7 +144,7 @@ class APITestCases(Base):
                                                "Begin")
         assert_that(response.json(), match_to("Succeed"))
 
-        #Check that the student OCH is subtract with 1.
+        #Check that the student OCH is subtracted with 1.
         response = self.evc_service.get_OCH_credit(student_id, program_code)
         assert_that(jmespath.search("[?ClassType=='Regular'].AvailableOCH", response.json())[0] == 999)
 
@@ -222,9 +222,3 @@ class APITestCases(Base):
         self.test_login()
         response = self.evc_service.get_after_class_report("796213")
         print("Test")
-
-
-    #@Test()
-    def cancel_class(self):
-        self.test_login()
-        self.evc_service.cancel_class("796248")

@@ -14,6 +14,7 @@ class Base():
     token_pattern = Token("X-BA-TOKEN", "Token")
     class_id = None
     user_info = None
+    teacher_profile = None
 
     teacher_id = os.environ['Teacher_Id']
     host = None
@@ -59,6 +60,14 @@ class Base():
             "Platform": 0
         }
         teacher_list = ["10703777", "10366584", "10366576"]
+        teacher_profile = {
+            "UserId" : "10703777",
+            "Description": "\"\"Hey everyone, I'm chris b.teacher.\"\"-chris b.",
+            "UserName": "chris b.",
+            "Gender": 2,
+            "Cellphone": None,
+            "AvatarUrl": "http://qa.englishtown.com/opt-media/?id=b54fe1b3-aa1f-4676-965b-d0b5107ed69c"
+        }
     if os.environ["test_env"] == "STG":
         host = "https://e1svc-staging.ef.cn"
         user_info = {
