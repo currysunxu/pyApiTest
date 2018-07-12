@@ -67,7 +67,7 @@ class APITestCases(Base):
                                                                        local2utc(self.regular_end_time), self.HF_program_code,
                                                                        ClassType.REGULAR.value, student_id)
         assert_that(response.json(), match_to("[0].TeacherProfile"))
-        assert_that((self.teacher_id in jmespath.search("[].TeacherProfile.UserInfo.UserId", response.json())))
+        assert_that((str(self.teacher_id) in jmespath.search("[].TeacherProfile.UserInfo.UserId", response.json())))
         assert_that(jmespath.search("[1].TeacherProfile.Description",
                                     response.json()) == self.teacher_profile["Description"])
         assert_that(jmespath.search("[1].TeacherProfile.UserInfo.UserId", response.json()) == self.teacher_profile["UserId"])
@@ -133,9 +133,10 @@ class APITestCases(Base):
         assert_that(response.json(), match_to("[*].StudentId"))
         assert_that(jmespath.search("length([])", response.json()) == 2)
         #Verify that the student got 1000 OCH at Regular
-        assert_that(jmespath.search("[?ClassType=='Regular'].AvailableOCH", response.json())[0] == 1000)
+        assert_that(response.json(), match_to("[?ClassType=='Regular'].AvailableOCH"))
+        OCH_number_before_booking = jmespath.search("[?ClassType=='Regular'].AvailableOCH" ,response.json())
         sleep(2)
-
+        print(class_id)
         response = self.evc_service.book_class("C", "2", session_start_time, session_end_time, teacher_id, program_code,
                                                ClassType.REGULAR.value,
                                                class_id,
@@ -146,7 +147,7 @@ class APITestCases(Base):
 
         #Check that the student OCH is subtracted with 1.
         response = self.evc_service.get_OCH_credit(student_id, program_code)
-        assert_that(jmespath.search("[?ClassType=='Regular'].AvailableOCH", response.json())[0] == 999)
+        assert_that(jmespath.search("[?ClassType=='Regular'].AvailableOCH", response.json())[0] == (OCH_number_before_booking[0] - 1))
 
         #Check book failed with the class which is already booked.
         response = self.evc_service.book_class("C", "2", session_start_time, session_end_time, teacher_id, program_code,
