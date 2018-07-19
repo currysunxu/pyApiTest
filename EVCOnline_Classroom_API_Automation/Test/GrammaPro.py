@@ -7,12 +7,13 @@ from ptest.decorator import TestClass, Test, AfterMethod, BeforeSuite, AfterSuit
 from Lib.HamcrestMatcher import match_to
 
 import Settings
+from Business.GP import GPService
 
 GPUsers = {'QA': {'username': 'gptest1', 'password': '12345'},
            'Staging': {'username': 'gptest1', 'password': '12345'},
            'Live': {'username': 'gptest1', 'password': '12345'}}
 
-from Business.GP import GPService
+
 
 
 @TestClass()
