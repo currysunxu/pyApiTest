@@ -19,9 +19,3 @@ class GPService():
 
     def get_student_profile_gp(self):
         return self.mou_tai.get("/api/v2/StudentProfile/GP")
-
-if __name__ == '__main__':
-    test = GPService("https://e1svc-qa.ef.cn")
-    token = test.login('gptest1','12345')
-    profile = test.get_student_profile()
-    print(profile.text)
