@@ -34,11 +34,11 @@ class Moutai():
         url_combined = self.host + url
         if self.token is None:
             self.request_session = requests.session()
-            result = self.request_session.request(method, url_combined, json=user_info, headers=self.headers, **kwargs)
+            result = self.request_session.request(method, url_combined, json=user_info, verify=False, headers=self.headers, **kwargs)
             assert_that(result.status_code, equal_to(200))
             return result
         else:
-            athentication_result = requests.request(method, url=url_combined, json=user_info,
+            athentication_result = requests.request(method, url=url_combined, json=user_info,verify=False,
                                                  headers=self.headers, **kwargs)
             assert_that(athentication_result.status_code, equal_to(200), "Status code is not 200!")
             self.headers[self.token.get_name()] = self.__extract_token_value(self.token, athentication_result)
@@ -52,16 +52,16 @@ class Moutai():
     def post(self, url, json=None, **kwargs):
         url_combined = self.host + url
         if self.token is None:
-            return self.request_session.post(url_combined, json=json, headers=self.headers, **kwargs)
+            return self.request_session.post(url_combined, json=json,verify=False, headers=self.headers, **kwargs)
         else:
-            return requests.post(url_combined, json=json, headers=self.headers, **kwargs)
+            return requests.post(url_combined, json=json,verify=False, headers=self.headers, **kwargs)
 
     def get(self, url, params=None, **kwargs):
         url_combined = self.host + url
         if self.token is None:
-            return self.request_session.get(url_combined, headers=self.headers, **kwargs)
+            return self.request_session.get(url_combined, verify=False,headers=self.headers, **kwargs,)
         else:
-            return requests.get(url_combined, params, headers=self.headers, **kwargs)
+            return requests.get(url_combined, params, verify=False,headers=self.headers, **kwargs)
 
     def head(self, url, **kwargs):
         url_combined = self.host + url
@@ -80,9 +80,9 @@ class Moutai():
     def requests(self, method, url, **kwargs):
         url_combined = self.host + url
         if self.token is None:
-            return self.request_session.request(method, url_combined, headers=self.headers, **kwargs)
+            return self.request_session.request(method, url_combined, verify=False,headers=self.headers, **kwargs)
         else:
-            return requests.request(method, url_combined, headers=self.headers, **kwargs)
+            return requests.request(method, url_combined, verify=False,headers=self.headers, **kwargs)
 
     def delete(self, url, **kwargs):
         url_combined = self.host + url
