@@ -19,3 +19,6 @@ class GPService():
 
     def get_student_profile_gp(self):
         return self.mou_tai.get("/api/v2/StudentProfile/GP")
+
+    def sign_out(self):
+        return self.mou_tai.delete(url="/api/v2/Token/")
