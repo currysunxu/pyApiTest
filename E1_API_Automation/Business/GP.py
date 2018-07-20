@@ -1,4 +1,4 @@
-from Lib.Moutai import Moutai,Token
+from ..Lib.Moutai import Moutai,Token
 
 
 class GPService():

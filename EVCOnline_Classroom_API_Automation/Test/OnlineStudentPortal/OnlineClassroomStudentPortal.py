@@ -5,9 +5,9 @@ import jmespath
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
-from ..Lib.BaseClass import Base
-from ..Lib.HamcrestMatcher import match_to
-from ..Lib.ScheduleClassTool import local2utc
+from Lib.HamcrestMatcher import match_to
+from Lib.ScheduleClassTool import local2utc
+from Test.OnlineStudentPortal.EVCBaseClass import EVCBase
 
 
 class ClassType(Enum):
@@ -16,7 +16,7 @@ class ClassType(Enum):
 
 
 @TestClass()
-class APITestCases(Base):
+class APITestCases(EVCBase):
 
     @Test()
     def test_login(self):

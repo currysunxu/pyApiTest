@@ -4,13 +4,13 @@ from time import sleep
 
 from ptest.decorator import AfterMethod, BeforeSuite
 
-from .KidsEVC import KidsEVCService
-from .ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2est, \
+from ...Business.KidsEVC import KidsEVCService
+from ...Lib.ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2est, \
     ServiceSubTypeCode, get_UAT_schedule_tool, get_STG_schedule_tool
-from ..Lib.Moutai import Token
+from ...Lib.Moutai import Token
 
 
-class Base():
+class EVCBase():
     token_pattern = Token("X-BA-TOKEN", "Token")
     class_id = None
     user_info = None
