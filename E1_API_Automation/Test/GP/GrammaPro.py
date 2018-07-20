@@ -6,7 +6,7 @@ from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test, AfterMethod, BeforeSuite, AfterSuite
 from ...Lib.HamcrestMatcher import match_to
 
-from ...Settings import ENVIRONMENT,env_key
+from ...Settings import ENVIRONMENT, env_key
 from ...Test.GP.GrammerProBase import GrammarProBaseClass
 
 GPUsers = {'QA': {'username': 'gptest1', 'password': '12345'},

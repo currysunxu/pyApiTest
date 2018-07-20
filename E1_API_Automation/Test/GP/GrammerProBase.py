@@ -6,6 +6,7 @@ from ptest.decorator import AfterMethod, BeforeSuite, AfterSuite,BeforeClass,Aft
 from ...Business.GP import GPService
 from ...Settings import ENVIRONMENT
 
+
 class GrammarProBaseClass():
 
     @BeforeClass()
