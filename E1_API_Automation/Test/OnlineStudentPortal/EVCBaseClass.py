@@ -16,6 +16,11 @@ class EVCBase():
     user_info = None
     teacher_profile = None
 
+    # os.environ['Teacher_Id'] = "xxxxxxx"
+    # os.environ["Start_Time"] = "xxxxxxx"
+    # os.environ["End_Time"] = "xxxxxxx"
+    # os.environ["test_env"] == "QA"
+
     teacher_id = os.environ['Teacher_Id']
     host = None
     start_time = None
