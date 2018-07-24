@@ -18,7 +18,7 @@ class TestStudentProgressService:
         assert_that(len(history_list), equal_to(2))
 
     @Test()
-    def get_student_activity_detail_history_by_activity_ids_1_students(self):
+    def get_student_activity_detail_history_by_activity_ids_1_student(self):
         response = self.service.get_student_activity_detial_history_by_activity_ids([17847, 17451], [12224023])
         history_list = response.ActivityDetailHistoryList.ActivityDetailHistoryList
         assert_that(len(history_list), equal_to(1))
