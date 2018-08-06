@@ -84,14 +84,14 @@ class Moutai():
         else:
             return requests.request(method, url_combined, verify=False,headers=self.headers, **kwargs)
 
-    def delete(self, url, **kwargs):
+    def delete(self, url,**kwargs):
         url_combined = self.host + url
         if self.token is None:
             return self.request_session.delete(url_combined, headers=self.headers, **kwargs)
         else:
             return requests.delete(url_combined, headers=self.headers, **kwargs)
 
-    def put(self, url, json,**kwargs):
+    def put(self, url, json=None, **kwargs):
         url_combined = self.host + url
         if self.token is None:
             return self.request_session.request("put", url_combined, json=json, headers=self.headers, **kwargs)
