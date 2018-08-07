@@ -34,7 +34,7 @@ class EVCBase():
     teacher_list = {}
 
     if os.environ["Start_Time"] == "Default":
-        start_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 20:00:00"
+        start_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 21:00:00"
         start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=1)
         start_time = start_time_date.strftime("%Y-%m-%d %H:%M:%S")
     else:
@@ -75,7 +75,7 @@ class EVCBase():
             "UserName": "chris b.",
             "Gender": 2,
             "Cellphone": None,
-            "AvatarUrl": "http://qa.englishtown.com/opt-media/?id=b54fe1b3-aa1f-4676-965b-d0b5107ed69c"
+            "AvatarUrl": "http://qa.englishtown.cn/opt-media/?id=b54fe1b3-aa1f-4676-965b-d0b5107ed69c"
         }
     if os.environ["test_env"] == "STG":
         host = "https://e1svc-staging.ef.cn"
