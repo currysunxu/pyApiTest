@@ -66,18 +66,20 @@ class APITestCases(EVCBase):
         response = self.evc_service.get_available_online_class_session(local2utc(self.regular_start_time),
                                                                        local2utc(self.regular_end_time), self.HF_program_code,
                                                                        ClassType.REGULAR.value, student_id)
-        assert_that(response.json(), match_to("[0].TeacherProfile"))
+        assert_that(response.json(), match_to("[].TeacherProfile"))
         assert_that((str(self.teacher_id) in jmespath.search("[].TeacherProfile.UserInfo.UserId", response.json())))
-        assert_that(jmespath.search("[1].TeacherProfile.Description",
-                                    response.json()) == self.teacher_profile["Description"])
-        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.UserId", response.json()) == self.teacher_profile["UserId"])
-        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.Name", response.json()) == self.teacher_profile["UserName"])
-        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.Gender", response.json()) == 2)
-        assert_that(jmespath.search("[1].ProgramCode", response.json()) == self.HF_program_code)
-        assert_that(jmespath.search("[1].ClassType", response.json()) == "Regular")
-        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.Cellphone", response.json()) == self.teacher_profile["Cellphone"])
-        assert_that(jmespath.search("[1].TeacherProfile.UserInfo.AvatarUrl",
-                                    response.json()) == self.teacher_profile["AvatarUrl"])
+
+        filter = "[?TeacherProfile.UserInfo.UserId=='" + self.teacher_profile["UserId"] + "']"
+        assert_that(jmespath.search(filter + ".TeacherProfile.Description",
+                                    response.json())[0] == self.teacher_profile["Description"])
+        assert_that(jmespath.search(filter + ".TeacherProfile.UserInfo.UserId", response.json())[0] == self.teacher_profile["UserId"])
+        assert_that(jmespath.search(filter + ".TeacherProfile.UserInfo.Name", response.json())[0] == self.teacher_profile["UserName"])
+        assert_that(jmespath.search(filter + ".TeacherProfile.UserInfo.Gender", response.json())[0] == 2)
+        assert_that(jmespath.search(filter + ".ProgramCode", response.json())[0] == self.HF_program_code)
+        assert_that(jmespath.search(filter + ".ClassType", response.json())[0] == "Regular")
+        assert_that(len(jmespath.search(filter + ".TeacherProfile.UserInfo.Cellphone", response.json())) == 0)
+        assert_that(jmespath.search(filter + ".TeacherProfile.UserInfo.AvatarUrl",
+                                    response.json())[0] == self.teacher_profile["AvatarUrl"])
         return response
 
     @Test()
@@ -137,7 +139,7 @@ class APITestCases(EVCBase):
         OCH_number_before_booking = jmespath.search("[?ClassType=='Regular'].AvailableOCH" ,response.json())
         sleep(2)
         print(class_id)
-        response = self.evc_service.book_class("C", "2", session_start_time, session_end_time, teacher_id, program_code,
+        response = self.evc_service.book_class("C", "2", "2", session_start_time, session_end_time, teacher_id, program_code,
                                                ClassType.REGULAR.value,
                                                class_id,
                                                True,
@@ -150,13 +152,13 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("[?ClassType=='Regular'].AvailableOCH", response.json())[0] == (OCH_number_before_booking[0] - 1))
 
         #Check book failed with the class which is already booked.
-        response = self.evc_service.book_class("C", "2", session_start_time, session_end_time, teacher_id, program_code,
+        response = self.evc_service.book_class("C", "2", "2", session_start_time, session_end_time, teacher_id, program_code,
                                                ClassType.REGULAR.value,
                                                class_id,
                                                True,
                                                student_id,
                                                "Begin")
-        assert_that(jmespath.search("Succeed", response.json()) == False)
+        assert_that("Reason: 207" in jmespath.search("Message", response.json()))
 
         query_book_response = self.evc_service.query_online_class_booking(local2utc(self.regular_start_time),
                                                                           local2utc(self.regular_end_time), program_code,
