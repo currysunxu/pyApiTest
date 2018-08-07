@@ -43,10 +43,11 @@ class KidsEVCService():
         }
         return self.mou_tai.post("/api/v2/OCHCreditSummary/", json=body)
 
-    def book_class(self, book_code, lesson_number, start_stamp, end_stamp, teacher_id, program_code, class_type,
+    def book_class(self, book_code, lesson_number, unit_number, start_stamp, end_stamp, teacher_id, program_code, class_type,
                    class_id, need_recoder, student_id, state):
         body = {
             "BookCode": book_code,
+            "UnitNumber": unit_number,
             "LessonNumber": lesson_number,
             "StartStamp": start_stamp,
             "EndStamp": end_stamp,
