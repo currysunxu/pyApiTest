@@ -76,7 +76,17 @@ class EVCBase():
             "Cellphone": None,
             "AvatarUrl": "http://qa.englishtown.cn/opt-media/?id=b54fe1b3-aa1f-4676-965b-d0b5107ed69c"
         }
+        after_report_info = {
+            "Student_User_Name": "fr062201",
+            "Student_Password": "12345",
+            "ClassId": "801720"
+        }
     if os.environ["test_env"] == "STG":
+        '''
+        STG data will be flesh out when SF team to migrate the Live data every 28 days.
+        Caroline is working on this data.
+        The code will be changed for STG in the coming day.
+        '''
         host = "https://e1svc-staging.ef.cn"
         user_info = {
             "UserName": "null183",
@@ -92,6 +102,11 @@ class EVCBase():
             "Gender": 2,
             "Cellphone": None,
             "AvatarUrl": "http://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
+        }
+        after_report_info = {
+            "Student_User_Name": "addison",
+            "Student_Password": "12345",
+            "ClassId": "247002"
         }
 
     def get_different_teacher(teacher_id, teacher_list):
