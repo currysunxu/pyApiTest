@@ -5,6 +5,7 @@ import jmespath
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
+from E1_API_Automation.Business.KidsEVC import KidsEVCService
 from ...Lib.HamcrestMatcher import match_to
 from ...Lib.ScheduleClassTool import local2utc
 from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
@@ -220,9 +221,13 @@ class APITestCases(EVCBase):
         assert_that(response.status_code == 401)
 
 
-    #@Test()
+    @Test()
     def get_after_class_report(self):
-        # TODO: Blocked, we need to have a already finished class with teacher response, and to retrieve the class report
-        self.test_login()
-        response = self.evc_service.get_after_class_report("796213")
-        print("Test")
+        self.test_login()# This login is used to for after method. we will change it in the future.
+        local_evc_service = KidsEVCService(host=self.host)
+        local_evc_service.login(self.after_report_info["Student_User_Name"], self.after_report_info["Student_Password"])
+        response = self.evc_service.get_after_class_report(self.after_report_info['ClassId'])
+        assert_that(jmespath.search("ClassId", response.json()) == self.after_report_info['ClassId'])
+        assert_that(response.json(), match_to("Comment"))
+        assert_that(response.json(), match_to("Improvement"))
+        assert_that(response.json(), match_to("Suggestion"))

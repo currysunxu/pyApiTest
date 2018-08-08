@@ -76,6 +76,11 @@ class EVCBase():
             "Cellphone": None,
             "AvatarUrl": "http://qa.englishtown.cn/opt-media/?id=b54fe1b3-aa1f-4676-965b-d0b5107ed69c"
         }
+        after_report_info = {
+            "Student_User_Name": "fr062201",
+            "Student_Password": "12345",
+            "ClassId": "801720"
+        }
     if os.environ["test_env"] == "STG":
         host = "https://e1svc-staging.ef.cn"
         user_info = {
