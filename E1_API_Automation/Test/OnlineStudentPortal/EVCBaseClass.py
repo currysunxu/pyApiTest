@@ -18,11 +18,10 @@ class EVCBase():
 
     '''
     Uncomment the following to run or debugger the automation.
-    
-        os.environ['Teacher_Id'] = "xxxxxxx"
-        os.environ["Start_Time"] = "xxxxxxx"
-        os.environ["End_Time"] = "xxxxxxx"
-        os.environ["test_env"] == "QA"
+    os.environ['Teacher_Id'] = "5888455"
+    os.environ["Start_Time"] = "2018-8-11 1:00:00"
+    os.environ["End_Time"] = "2018-8-11 1:30:00"
+    os.environ["test_env"] = "STG"
     '''
 
     teacher_id = os.environ['Teacher_Id']
@@ -86,7 +85,14 @@ class EVCBase():
             "Platform": 0
         }
         teacher_list = ["10584669", "10427158", "5888455"]
-
+        teacher_profile = {
+            "UserId": "5888455",
+            "Description": "\"Hello, I’m Margaret from Shanghai. Before I worked for EF, I was a high school English teacher and I have experience in English education.\"-\"The aim of education is to inspire students.\"",
+            "UserName": "Margaret Wang",
+            "Gender": 2,
+            "Cellphone": None,
+            "AvatarUrl": "http://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
+        }
 
     def get_different_teacher(teacher_id, teacher_list):
         for teacher in teacher_list:

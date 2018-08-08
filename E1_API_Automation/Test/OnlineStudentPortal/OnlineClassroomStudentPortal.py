@@ -88,6 +88,7 @@ class APITestCases(EVCBase):
         response = self.evc_service.get_OCH_credit(student_id, self.HF_program_code)
         assert_that(response.json(), match_to("[*].StudentId"))
         assert_that(jmespath.search("length([])", response.json()) == 2)
+        assert_that(response.json(), match_to("[*].AvailableOCH"))
         return response
 
     @Test()
