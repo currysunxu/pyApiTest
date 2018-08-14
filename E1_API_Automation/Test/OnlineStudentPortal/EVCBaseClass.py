@@ -19,8 +19,8 @@ class EVCBase():
     '''
     Uncomment the following to run or debugger the automation.
     os.environ['Teacher_Id'] = "5888455"
-    os.environ["Start_Time"] = "2018-8-11 1:00:00"
-    os.environ["End_Time"] = "2018-8-11 1:30:00"
+    os.environ["Start_Time"] = "2018-8-18 1:00:00"
+    os.environ["End_Time"] = "2018-8-18 1:30:00"
     os.environ["test_env"] = "STG"
     '''
 
@@ -67,6 +67,10 @@ class EVCBase():
             "DeviceType": 0,
             "Platform": 0
         }
+        user_with_zero_och = {
+            "UserName" : "c",
+            "Password" : "12345"
+        }
         teacher_list = ["10703777", "10366584", "10366576"]
         teacher_profile = {
             "UserId" : "10703777",
@@ -93,6 +97,10 @@ class EVCBase():
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0
+        }
+        user_with_zero_och = {
+            "UserName" : "CN_osk",
+            "Password" : "12345"
         }
         teacher_list = ["10584669", "10427158", "5888455"]
         teacher_profile = {

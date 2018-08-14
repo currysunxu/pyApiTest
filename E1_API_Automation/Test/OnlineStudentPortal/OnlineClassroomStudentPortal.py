@@ -226,8 +226,90 @@ class APITestCases(EVCBase):
         self.test_login()# This login is used to for after method. we will change it in the future.
         local_evc_service = KidsEVCService(host=self.host)
         local_evc_service.login(self.after_report_info["Student_User_Name"], self.after_report_info["Student_Password"])
-        response = self.evc_service.get_after_class_report(self.after_report_info['ClassId'])
+        response = local_evc_service.get_after_class_report(self.after_report_info['ClassId'])
+        local_evc_service.sign_out()
         assert_that(jmespath.search("ClassId", response.json()) == self.after_report_info['ClassId'])
         assert_that(response.json(), match_to("Comment"))
         assert_that(response.json(), match_to("Improvement"))
         assert_that(response.json(), match_to("Suggestion"))
+
+    @Test()
+    def book_class_error_code_with_not_enough_och(self):
+        self.test_login()
+        local_evc_service = KidsEVCService(host=self.host)
+        response = local_evc_service.login(user_name=self.user_with_zero_och["UserName"], password=self.user_with_zero_och["Password"])
+        student_id = jmespath.search("UserInfo.UserInfo.UserId", response)
+        calendar_response = local_evc_service.get_calendar("HF", ClassType.REGULAR.value,
+                                                          local2utc(self.regular_start_time),
+                                                          local2utc(self.regular_end_time))
+        session_start_time = jmespath.search("BookableSlots[0].StartStamp", calendar_response.json())
+        session_end_time = jmespath.search("BookableSlots[0].EndStamp", calendar_response.json())
+        class_session_response = local_evc_service.get_available_online_class_session(local2utc(self.regular_start_time),
+                                                                                     local2utc(self.regular_end_time),
+                                                                                     self.HF_program_code,
+                                                                                     ClassType.REGULAR.value,
+                                                                                     student_id)
+        teacher_id = jmespath.search("[0].TeacherProfile.UserInfo.UserId", class_session_response.json())
+        class_id = jmespath.search("[0].ClassId", class_session_response.json())
+        program_code = jmespath.search("[0].ProgramCode", class_session_response.json())
+
+        response = local_evc_service.book_class("C", "2", "2", session_start_time, session_end_time, teacher_id,
+                                               program_code,
+                                               ClassType.REGULAR.value,
+                                               class_id,
+                                               True,
+                                               student_id,
+                                               "Begin")
+        local_evc_service.sign_out()
+        assert_that(jmespath.search("Code.Major", response.json()) == 403)
+        assert_that(jmespath.search("Code.Minor", response.json()) == '600')
+
+
+    @Test()
+    def book_class_error_code_with_not_topic(self):
+        student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
+        calendar_response = self.evc_service.get_calendar("HF", ClassType.REGULAR.value,
+                                                          local2utc(self.regular_start_time),
+                                                          local2utc(self.regular_end_time))
+        session_start_time = jmespath.search("BookableSlots[0].StartStamp", calendar_response.json())
+        session_end_time = jmespath.search("BookableSlots[0].EndStamp", calendar_response.json())
+        class_session_response = self.evc_service.get_available_online_class_session(local2utc(self.regular_start_time),
+                                                                                     local2utc(self.regular_end_time),
+                                                                                     self.HF_program_code,
+                                                                                     ClassType.REGULAR.value,
+                                                                                     student_id)
+        teacher_id = jmespath.search("[0].TeacherProfile.UserInfo.UserId", class_session_response.json())
+        class_id = jmespath.search("[0].ClassId", class_session_response.json())
+        program_code = jmespath.search("[0].ProgramCode", class_session_response.json())
+
+        response = self.evc_service.book_class("z", "2", "2", session_start_time, session_end_time, teacher_id,
+                                                program_code,
+                                                ClassType.REGULAR.value,
+                                                class_id,
+                                                True,
+                                                student_id,
+                                                "Begin")
+
+        assert_that(jmespath.search("Code.Major", response.json()) == 403)
+        assert_that(jmespath.search("Code.Minor", response.json()) == '601')
+
+    @Test()
+    def cancel_class_error_code_with_booking_not_found(self):
+        student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
+        class_session_response = self.evc_service.get_available_online_class_session(local2utc(self.regular_start_time),
+                                                                                     local2utc(self.regular_end_time),
+                                                                                     self.HF_program_code,
+                                                                                     ClassType.REGULAR.value,
+                                                                                     student_id)
+        class_id = jmespath.search("[0].ClassId", class_session_response.json())
+        response = self.evc_service.cancel_class(class_id)
+
+        assert_that(jmespath.search("Code.Major", response.json()) == 403)
+        assert_that(jmespath.search("Code.Minor", response.json()) == '200')
+
+    @Test()
+    def cancel_class_error_code_with_wrong_class_id(self):
+        self.test_login()
+        response = self.evc_service.cancel_class("30789")
+
+        assert_that(jmespath.search("Code.Major", response.json()) == 500)
