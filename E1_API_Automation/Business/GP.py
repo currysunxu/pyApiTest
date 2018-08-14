@@ -1,4 +1,6 @@
 from ..Lib.Moutai import Moutai,Token
+import jmespath
+from ..Lib.ResetGPGradeTool import ResetGPGradeTool
 
 
 class GPService():
@@ -50,8 +52,8 @@ class GPService():
     def post_students_lesson_activity(self, module_info):
         return self.mou_tai.post("/api/v2/ActivityEntity/Web/", module_info)
 
-    def get_available_grade(self):
-        return self.mou_tai.get("/api/v2/AvailableGradeList/?regionKey=8ef7ccd2-8c58-4bc6-8a35-b3fcae4d0f0d&cultureCode=zh-CN")
+    def get_available_grade(self, region_key):
+        return self.mou_tai.get("/api/v2/AvailableGradeList/?regionKey=%s&cultureCode=zh-CN" % region_key)
 
     def post_quiz_start(self, lesson_key):
         return self.mou_tai.post("/api/v2/RemediationLesson/Start/", lesson_key)
@@ -70,3 +72,51 @@ class GPService():
 
     def put_profile_save(self, profile):
         return self.mou_tai.put("/api/v2/StudentProfile/Save/", profile)
+
+    def get_sumbit_anwser(self):
+        student_id = jmespath.search('UserId',self.get_student_profile_gp().json())
+
+        reset_dt = ResetGPGradeTool()
+        reset_dt.reset_grade(student_id)
+        question_list = self.put_dt_start().json()
+        print(question_list)
+        dt_key = jmespath.search('DiagnosticTestKey',question_list)
+        submit_data = {}
+        module_list = []
+        submit_data['DiagnosticTestKey'] = dt_key
+        submit_data['Studentid'] = student_id
+        module_activity_answers = []
+        for module in jmespath.search('Modules', question_list):
+            module_key = jmespath.search('ModuleKey', module)
+            module_list.append(module_key)
+            for activity in jmespath.search('Activitys', module):
+                activity_type = jmespath.search('Type', activity)
+                activity_Title = jmespath.search('Title', activity)
+                activity_key = jmespath.search('Key', activity)
+                for question in jmespath.search('Questions', activity):
+                    submit_question = {}
+                    module_activity_answer = {}
+                    question_key = jmespath.search('Key', question)
+                    submit_question['Attempts'] = None
+                    submit_question['Detail'] = {"modelData":None}
+                    submit_question['Duration'] = None
+                    submit_question['key'] = None
+                    submit_question['LocalEndStamp'] = None
+                    submit_question['LocalStartStamp'] = None
+                    submit_question['QuestionKey'] = question_key
+                    submit_question['Score'] = 1
+                    submit_question['Star'] = None
+                    submit_question['TotalScore'] = 1
+                    submit_question['TotalStar'] = None
+                    module_activity_answer['QuestionAnswer'] = submit_question
+                    module_activity_answer['ActivityKey'] = activity_key
+                    module_activity_answer['ModuleKey'] = module_key
+                    module_activity_answer['TemplateType'] = activity_type
+                    module_activity_answers.append(module_activity_answer)
+
+        submit_data['StudentModuleActivityAnswer'] = module_activity_answers
+        print(submit_data)
+        return submit_data
+
+
+
