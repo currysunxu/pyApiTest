@@ -5,24 +5,30 @@ from hamcrest import assert_that, equal_to
 
 from ptest.decorator import TestClass, Test, AfterMethod, BeforeSuite, AfterSuite
 from ...Lib.HamcrestMatcher import match_to
+from ...Lib.ResetGPGradeTool import EducationRegion
 
 from ...Settings import ENVIRONMENT, env_key
 from ...Test.GP.GrammerProBase import GrammarProBaseClass
+
 from .jsondata import JsonData
 import json
 
 GPUsers = {'QA': {'username': 'gptest1', 'password': '12345'},
            'Staging': {'username': 'gp0606cn', 'password': '12345'},
            'Live': {'username': 'gptest3', 'password': '12345'}}
+GPDTUsers = {'QA': {'username': 'gptest1', 'password': '12345'},
+           'Staging': {'username': 'gp0606cn', 'password': '12345'},
+           'Live': {'username': 'gptest3', 'password': '12345'}}
 
 
 @TestClass()
 class GPAPITestCases(GrammarProBaseClass):
-
     @Test()
     def test_student_profile(self):
         self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
         student_profile = self.gptest.get_student_profile()
+
+
         assert_that(student_profile.json(), match_to("Birthday"))
         assert_that(student_profile.json(), match_to("CultureCode"))
         assert_that(student_profile.json(), match_to("EducationGradeKey"))
@@ -35,8 +41,10 @@ class GPAPITestCases(GrammarProBaseClass):
         access_token = self.gptest.post_access_token()
         assert_that(access_token.json(), match_to("Token"))
 
+
     @Test()
     def test_student_profile_gp(self):
+
         self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
         student_profile = self.gptest.get_student_profile_gp()
         assert_that(student_profile.json(), match_to("UserId"))
@@ -74,10 +82,10 @@ class GPAPITestCases(GrammarProBaseClass):
         self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
 
         students_lesson_progress = self.gptest.post_students_lesson_progress(JsonData.module_key)
-        assert_that(students_lesson_progress.status_code==200)
-
+        assert_that(students_lesson_progress.status_code == 200)
 
     '''student report only for real student '''
+
     # @Test()
     # def test_cn_student_report(self):
     #     self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
@@ -100,12 +108,12 @@ class GPAPITestCases(GrammarProBaseClass):
     def test_custom_test(self):
         self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
         custom_test = self.gptest.get_custom_test()
-        assert_that(custom_test.status_code==200)
+        assert_that(custom_test.status_code == 200)
 
     @Test()
     def test_available_grade(self):
         self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
-        available_grade = self.gptest.get_available_grade()
+        available_grade = self.gptest.get_available_grade(EducationRegion.Shanghai)
         assert_that(available_grade.json(), match_to("[*].Grade.Name"))
         assert_that(available_grade.json(), match_to("[*].Modules[*].Name"))
 
@@ -126,34 +134,25 @@ class GPAPITestCases(GrammarProBaseClass):
     def test_quiz_start(self):
         self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
         quiz_start = self.gptest.post_quiz_start(JsonData.lesson_key)
-        assert_that(quiz_start.status_code==200)
-
+        assert_that(quiz_start.status_code == 200)
 
     @Test()
     def test_quiz_save(self):
         self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
         quiz_save = self.gptest.post_quiz_save(json.loads(JsonData.submit_answer))
-        assert_that(quiz_save.status_code==204)
+        assert_that(quiz_save.status_code == 204)
 
 
+        # @Test()
+        # def test_student_profile_save(self):
+        #     self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
+        #     students_profile = self.gptest.put_profile_save(JsonData.student_profile)
+        #     assert_that(students_profile.status_code==204)
+        #
+    @Test()
+    def test_dt_save(self):
+        self.gptest.login(GPDTUsers[env_key]['username'], GPDTUsers[env_key]['password'])
 
-
-
-    # @Test()
-    # def test_student_profile_save(self):
-    #     self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
-    #     students_profile = self.gptest.put_profile_save(JsonData.student_profile)
-    #     assert_that(students_profile.status_code==204)
-    #
-    # @Test()
-    # def test_dt_start(self):
-    #     self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
-    #     dt_start = self.gptest.put_dt_start()
-    #     assert_that(dt_start.json(), match_to("DiagnosticTestKey"))
-    #     assert_that(dt_start.json(), match_to("Modules[*].ModuleKey"))
-    #
-    # @Test()
-    # def test_dt_save(self):
-    #     self.gptest.login(GPUsers[env_key]['username'], GPUsers[env_key]['password'])
-    #     dt_save = self.gptest.put_dt_save(json.loads(JsonData.dt_submit_answer))
-    #     assert_that(dt_save.status_code==204)
+        submit_json = self.gptest.get_sumbit_anwser()
+        dt_save = self.gptest.put_dt_save(submit_json)
+        assert_that(dt_save.status_code == 204)

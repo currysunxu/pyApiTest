@@ -1,7 +1,16 @@
 import E1_API_Automation.Settings
 import requests
 import E1_API_Automation.Lib.Utils
+import jmespath
 
+class EducationRegion:
+    Shanghai = '61AEF09D-AFA0-4FC2-96AD-93C72D390653'
+    Beijing = '8EF7CCD2-8C58-4BC6-8A35-B3FCAE4D0F0D'
+    Shenzhen = '568CD462-C9D5-48FD-84E8-FE07CAE65EBC'
+    Chongqing = 'A1460327-3FEB-4B3B-BC86-DFABA078663F'
+    Foshan = '3120FADB-9800-4394-B272-9F658F7CEA55'
+    Guangzhou = '163B7979-6413-4194-892D-51726D8EFDE5'
+    Fuzhou = '22777B07-1296-4F5A-81FA-D14100EF2FE4'
 
 class ShanghaiGradeKey:
     Gth2 = ['2th', '593f86f2-1e21-48bb-ac12-0d1dfba071c8']
@@ -15,16 +24,6 @@ class ShanghaiGradeKey:
     Gth10 = ['10th', '0f9f5634-d6f4-4428-ab02-7bb81f3c289a']
     Gth11 = ['11th', '5760982d-77bc-42d4-8998-0c072e30a9e6']
     Gth12 = ['12th', 'd3a5cd6d-b791-476c-b77c-6c8aa9c85c52']
-
-
-class EducationRegion:
-    Shanghai = '61AEF09D-AFA0-4FC2-96AD-93C72D390653'
-    Beijing = '8EF7CCD2-8C58-4BC6-8A35-B3FCAE4D0F0D'
-    Shenzhen = '568CD462-C9D5-48FD-84E8-FE07CAE65EBC'
-    Chongqing = 'A1460327-3FEB-4B3B-BC86-DFABA078663F'
-    Foshan = '3120FADB-9800-4394-B272-9F658F7CEA55'
-    Guangzhou = '163B7979-6413-4194-892D-51726D8EFDE5'
-    Fuzhou = '22777B07-1296-4F5A-81FA-D14100EF2FE4'
 
 
 class ResetGPGradeTool:
