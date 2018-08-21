@@ -8,7 +8,7 @@ class Exist(BaseMatcher):
         self.jems_path = jemsPath
 
     def _matches(self, item):
-        if self.jems_path.find('.') >= 0:
+        if len(self.jems_path.split('.')) > 1:
             last_key = self.jems_path.split('.')[-1]
             contains_key = self.jems_path[:self.jems_path.rindex('.')]
             search_value = "contains(keys(%s),'%s')" % (contains_key, last_key)
@@ -28,4 +28,4 @@ def exist(obj):
     return Exist(obj)
 
 
-assert_that({"foo": {"a": None, "c": 2}, "b": None}, exist("foo.c"))
+assert_that({"foo": {"a": None, "c": 2}, "b": None}, exist("b"))
