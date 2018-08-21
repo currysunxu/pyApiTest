@@ -15,10 +15,7 @@ class Exist(BaseMatcher):
         else:
             search_value = "contains(keys(@),'%s')" % self.jems_path
 
-        if jmespath.search(search_value, item):
-            return True
-        else:
-            return False
+        return jmespath.search(search_value, item)
 
     def describe_to(self, description):
         description.append_text("Can't find the expected value with jemspath: " + self.jems_path)
@@ -28,4 +25,4 @@ def exist(obj):
     return Exist(obj)
 
 
-assert_that({"foo": {"a": None, "c": 2}, "b": None}, exist("b"))
+assert_that({"foo": {"a": None, "c": 2}, "b": None}, exist("foo.a"))
