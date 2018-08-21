@@ -1,11 +1,11 @@
-from ...Business.SISEVC import SISEVCService
+from E1_API_Automation.Business.SISEVC import SISEVCService
 from ptest.decorator import TestClass, Test, BeforeClass
-from ...Lib.HamcrestMatcher import match_to
-from ...Lib.HamcrestExister import exist
+from E1_API_Automation.Lib.HamcrestMatcher import match_to
+from E1_API_Automation.Lib.HamcrestExister import exist
 
 from hamcrest import assert_that, equal_to, instance_of
 import jmespath
-from ...Settings import SIS_SERVICE
+from E1_API_Automation.Settings import SIS_SERVICE
 
 test_student_id = 12226094
 test_teacher_ids = [10703777, 10366576]
