@@ -8,36 +8,24 @@ class Exist(BaseMatcher):
         self.jems_path = jemsPath
 
     def _matches(self, item):
-        j = item
-        key_path = self.jems_path.split('.')
-        for key in key_path:
-            flag, result = check_key(j, key)
-            if flag:
-                j = result
-            else:
-                return False
-        print(result)
-        return flag
+        if self.jems_path.find('.') >= 0:
+            last_key = self.jems_path.split('.')[-1]
+            contains_key = self.jems_path[:self.jems_path.rindex('.')]
+            search_value = "contains(keys(%s),'%s')" % (contains_key, last_key)
+        else:
+            search_value = "contains(keys(@),'%s')" % self.jems_path
+
+        if jmespath.search(search_value, item):
+            return True
+        else:
+            return False
 
     def describe_to(self, description):
         description.append_text("Can't find the expected value with jemspath: " + self.jems_path)
 
-def check_key(jdict, key):
-    if isinstance(jdict, list):
-        for ele in jdict:
-            flag, result = check_key(ele, key)
-            if flag:
-                break
-    elif isinstance(jdict, dict):
-        if key in jdict.keys():
-            if jdict[key]:
-                return (True, jdict[key])
-            else:
-                return(True, "None value")
-        else:
-            return (False, None)
 
 def exist(obj):
     return Exist(obj)
 
-assert_that({"foo": {"a": None, "b": 2}}, exist("foo.b"))
+
+assert_that({"foo": {"a": None, "c": 2}, "b": None}, exist("foo.c"))

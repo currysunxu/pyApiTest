@@ -112,11 +112,3 @@ class SISEVCService:
     def get_student_profile(self, student_id):
         url = 'api/v1/students/%s/evc-profile' % student_id
         return self.session.get(url=url, verify=False, headers=self.header)
-
-
-if __name__ == '__main__':
-    s = SISEVCService('https://internal-e1-evc-booking-qa-cn.ef.com')
-    # response = s.post_bookings(796236, 10703777, 12226094, 'HF', 'C', 2, 'Regular')
-    # response = s.get_student_credit_history(12226094)
-    response = s.get_student_book_history(12226094, '2018-06-01 00:00', '2018-09-01 00:00', 'HF', 'Demo')
-    # response = s.get_EF_classroom_app_info()
