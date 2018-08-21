@@ -38,7 +38,7 @@ class TestSisEVCService:
         response = self.service.get_teacher_profiles(test_teacher_ids).json()[0]
         assert_that(response, match_to("teacherId"))
         assert_that(response, match_to("displayName"))
-        assert_that(response, match_to("gender"))
+        assert_that(response, exist("gender"))
         assert_that(response, match_to("avatarUrl"))
         assert_that(response, match_to("selfIntroduction"))
         assert_that(jmespath.search('teacherId', response), equal_to(test_teacher_ids[0]))
