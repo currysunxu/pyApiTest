@@ -305,7 +305,7 @@ class APITestCases(EVCBase):
         response = self.evc_service.cancel_class(class_id)
 
         assert_that(jmespath.search("Code.Major", response.json()) == 403)
-        assert_that(jmespath.search("Code.Minor", response.json()) == '200')
+        assert_that(jmespath.search("Code.Minor", response.json()) == '610')
 
     @Test()
     def cancel_class_error_code_with_wrong_class_id(self):
