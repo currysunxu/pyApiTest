@@ -35,13 +35,14 @@ class TestSisEVCService:
 
     @Test()
     def test_get_teacher_profile_schema(self):
-        response = self.service.get_teacher_profiles(test_teacher_ids).json()[0]
-        assert_that(response, match_to("teacherId"))
-        assert_that(response, match_to("displayName"))
-        assert_that(response, exist("gender"))
-        assert_that(response, match_to("avatarUrl"))
-        assert_that(response, match_to("selfIntroduction"))
-        assert_that(jmespath.search('teacherId', response), equal_to(test_teacher_ids[0]))
+        response = self.service.get_teacher_profiles(test_teacher_ids).json()
+        assert_that(response[0], match_to("teacherId"))
+        assert_that(response[0], match_to("displayName"))
+        assert_that(response[0], exist("gender"))
+        assert_that(response[0], match_to("avatarUrl"))
+        assert_that(response[0], match_to("selfIntroduction"))
+        response_ids = sorted(map(lambda x: x['teacherId'], response))
+        assert_that(response_ids, equal_to(sorted(test_teacher_ids)))
 
     @Test()
     def test_student_credit_status(self):
