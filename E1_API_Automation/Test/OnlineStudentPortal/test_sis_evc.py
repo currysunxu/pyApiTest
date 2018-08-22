@@ -21,7 +21,12 @@ class TestSisEVCService:
     def test_enroll_course(self):
         response = self.service.enroll_course_credits(test_student_id, ["HF"])
         assert_that(response.status_code, equal_to(204))
+        r = self.service.get_student_credits(test_student_id)
+        student_rolled_credts = jmespath.search("[?courseType=='HF']",r.json())
+        enroll_course = jmespath.search("[?classType == 'Demo']", student_rolled_credts)
         assert_that(response.content, equal_to(b''))
+        assert_that(len(enroll_course)==1)
+        assert_that(jmespath.search('available',enroll_course[0])>0)
 
     @Test()
     def test_get_teacher_profile_response_status(self):
