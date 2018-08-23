@@ -73,60 +73,62 @@ class GPService():
     def put_profile_save(self, profile):
         return self.mou_tai.put("/api/v2/StudentProfile/Save/", profile)
 
-    def get_sumbit_anwser(self, failed_module_number):
+    def get_submit_anwser(self, failed_module_number):
         student_id = jmespath.search('UserId',self.get_student_profile_gp().json())
-
-        reset_dt = ResetGPGradeTool()
-        reset_dt.reset_grade(student_id)
+        self.reset_grade(student_id)
         question_list = self.put_dt_start().json()
         print(question_list)
         dt_key = jmespath.search('DiagnosticTestKey',question_list)
+        failed_module_list, module_activity_answers  = [], []
         submit_data = {}
-        module_list = []
-        failed_module_list = []
         submit_data['DiagnosticTestKey'] = dt_key
         submit_data['Studentid'] = student_id
-        module_activity_answers = []
-        module_round = 0
-        for module in jmespath.search('Modules', question_list):
+        for index, module in enumerate(jmespath.search('Modules', question_list)):
             module_key = jmespath.search('ModuleKey', module)
-            module_list.append(module_key)
-            module_round+=1
-            if module_round <= failed_module_number:
-                failed_module_list.append(module_key)
             for activity in jmespath.search('Activitys', module):
                 activity_type = jmespath.search('Type', activity)
-                activity_Title = jmespath.search('Title', activity)
                 activity_key = jmespath.search('Key', activity)
                 for question in jmespath.search('Questions', activity):
-                    submit_question = {}
-                    module_activity_answer = {}
                     question_key = jmespath.search('Key', question)
-                    submit_question['Attempts'] = None
-                    submit_question['Detail'] = {"modelData":None}
-                    submit_question['Duration'] = None
-                    submit_question['key'] = None
-                    submit_question['LocalEndStamp'] = None
-                    submit_question['LocalStartStamp'] = None
-                    submit_question['QuestionKey'] = question_key
-                    if module_round > failed_module_number:
+                    submit_question = self.set_submit_question(question_key)
+                    if index > failed_module_number:
                        submit_question['Score'] = 1
-
                     else:
                         submit_question['Score'] = 0
+                        failed_module_list.append(module_key)
 
-                    submit_question['Star'] = None
-                    submit_question['TotalScore'] = 1
-                    submit_question['TotalStar'] = None
-                    module_activity_answer['QuestionAnswer'] = submit_question
-                    module_activity_answer['ActivityKey'] = activity_key
-                    module_activity_answer['ModuleKey'] = module_key
-                    module_activity_answer['TemplateType'] = activity_type
+                    module_activity_answer = self.set_module_activity_answer(activity_key, activity_type, module_key,
+                                                                             submit_question)
                     module_activity_answers.append(module_activity_answer)
 
         submit_data['StudentModuleActivityAnswer'] = module_activity_answers
         print(submit_data)
         return submit_data, failed_module_list
+
+    def set_submit_question(self, question_key):
+        submit_question = {}
+        submit_question['Attempts'] = None
+        submit_question['Detail'] = {"modelData": None}
+        submit_question['Duration'] = None
+        submit_question['key'] = None
+        submit_question['LocalEndStamp'] = None
+        submit_question['LocalStartStamp'] = None
+        submit_question['QuestionKey'] = question_key
+        submit_question['Star'] = None
+        submit_question['TotalScore'] = 1
+        submit_question['TotalStar'] = None
+        return submit_question
+
+    def set_module_activity_answer(self, activity_key, activity_type, module_key, submit_question):
+        module_activity_answer = {}
+        module_activity_answer['QuestionAnswer'] = submit_question
+        module_activity_answer['ActivityKey'] = activity_key
+        module_activity_answer['ModuleKey'] = module_key
+        module_activity_answer['TemplateType'] = activity_type
+
+    def reset_grade(self, student_id):
+        reset_dt = ResetGPGradeTool()
+        reset_dt.reset_grade(student_id)
 
     def get_lesson_progress_module_key(self):
         student_progress= self.get_student_progress().json()

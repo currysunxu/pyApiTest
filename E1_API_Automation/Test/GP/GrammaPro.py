@@ -134,7 +134,7 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_dt_save_result_pass(self):
         self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
-        submit_json = self.gptest.get_sumbit_anwser(0)
+        submit_json = self.gptest.get_submit_anwser(0)
         dt_save = self.gptest.put_dt_save(submit_json[0])
         assert_that(dt_save.status_code == 204)
 
@@ -142,7 +142,7 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_dt_save_result_failed(self):
         self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
-        submit_json = self.gptest.get_sumbit_anwser(5)
+        submit_json = self.gptest.get_submit_anwser(5)
         dt_save = self.gptest.put_dt_save(submit_json[0])
         assert_that(dt_save.status_code == 204)
         student_progress=self.gptest.get_student_progress()
