@@ -132,17 +132,17 @@ class EVCBase():
         # prepare the class which is assigned to teacher, which will follow the different environment.
         self.create_and_assign_class(self.est_start_time, self.est_end_time, teacher_id=self.teacher_id,
                                      test_env=os.environ['test_env'], subServiceType=ServiceSubTypeCode.KONDemo.value,
-                                     partner_code="Any", level_code="ELE", market_code="Any",
+                                     partner_code="Any", level_code="Any", market_code="Any",
                                      evc_server_code="evccn1")
         self.create_and_assign_class(self.est_regular_start_time, self.est_regular_end_time, teacher_id=self.teacher_id,
-                                     test_env=os.environ['test_env'], level_code="ELE", market_code="Any", partner_code="Any",
+                                     test_env=os.environ['test_env'], level_code="Any", market_code="Any", partner_code="Any",
                                      evc_server_code="evccn1",
                                      subServiceType=ServiceSubTypeCode.KONRegular.value)
 
         #Same time slot with different teacher
         self.create_and_assign_class(self.est_regular_start_time, self.est_regular_end_time,
                                      teacher_id=self.another_teacher,
-                                     test_env=os.environ['test_env'], partner_code="Any", level_code="ELE", market_code="Any",evc_server_code="evccn1",
+                                     test_env=os.environ['test_env'], partner_code="Any", level_code="Any", market_code="Any",evc_server_code="evccn1",
                                      subServiceType=ServiceSubTypeCode.KONRegular.value)
 
 
@@ -153,7 +153,7 @@ class EVCBase():
         return None
 
     def create_and_assign_class(self, start_time, end_time, teacher_id, test_env="QA",
-                                subServiceType=ServiceSubTypeCode.KONDemo.value, partner_code="any", level_code="ELE",
+                                subServiceType=ServiceSubTypeCode.KONDemo.value, partner_code="any", level_code="Any",
                                 market_code="any", evc_server_code = "evccn1",  teaching_item="en"):
         kids_class = KidsClass(start_time, end_time,
                                teacher={"id": teacher_id, "teacher_name": "KON1", "teacher_password": "1"},
