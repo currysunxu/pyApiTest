@@ -73,7 +73,36 @@ class GPService():
     def put_profile_save(self, profile):
         return self.mou_tai.put("/api/v2/StudentProfile/Save/", profile)
 
-    def get_submit_anwser(self, failed_module_number):
+    def put_custom_test_start(self,module_list):
+        return self.mou_tai.put("/api/v2/CustomTest/Start/",module_list)
+
+    def put_custom_test_save(self,test_answer):
+        return self.mou_tai.put("/api/v2/CustomTest/Save/", test_answer)
+
+    def get_custom_test_answer(self):
+        question_list= self.put_custom_test_start(["92fbfc86-1c02-45b0-9f6f-75c57e9b7469","72c9fdd0-b8db-49c7-882d-dcd038bb4ba0","56671778-28a1-4b55-8a39-12d7f8623086","1b36cd77-1ebb-4165-a97a-92589f1e8c83"]).json()
+        ct_key=jmespath.search('CustomTestKey', question_list)
+        submit_data = {}
+        module_activity_answers = []
+        submit_data['CustomTestKey'] = ct_key
+        for module in jmespath.search('Modules', question_list):
+            module_key = jmespath.search('ModuleKey', module)
+            for activity in jmespath.search('Activitys', module):
+                activity_type = jmespath.search('Type', activity)
+                activity_key = jmespath.search('Key', activity)
+                for question in jmespath.search('Questions', activity):
+                    question_key = jmespath.search('Key', question)
+                    submit_question = self.set_submit_question(question_key)
+                    submit_question['Score'] = 0
+                    module_activity_answer = self.set_module_activity_answer(activity_key, activity_type, module_key,submit_question)
+                    module_activity_answers.append(module_activity_answer)
+
+        submit_data['StudentModuleActivityAnswer'] = module_activity_answers
+        print(submit_data)
+        return submit_data
+
+
+    def get_submit_answer(self, failed_module_number):
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         self.reset_grade(student_id)
         question_list = self.put_dt_start().json()
@@ -91,7 +120,7 @@ class GPService():
                 for question in jmespath.search('Questions', activity):
                     question_key = jmespath.search('Key', question)
                     submit_question = self.set_submit_question(question_key)
-                    if index > failed_module_number:
+                    if index+1 > failed_module_number:
                         submit_question['Score'] = 1
                     else:
                         submit_question['Score'] = 0
@@ -131,13 +160,14 @@ class GPService():
         reset_dt = ResetGPGradeTool()
         reset_dt.reset_grade(student_id)
 
-    def get_lesson_progress_module_key(self):
+    def get_all_module_quiz_answer(self):
         student_progress = self.get_student_progress().json()
-        print(student_progress)
         module_key = jmespath.search("DiagnosticTestProgress.NextDiagnosticTest.NeedToBeVerified", student_progress)
-        return module_key
+        for single_module_key in module_key:
+            self.get_submit_quiz_answer(single_module_key)
 
-    def get_quiz_start_info(self, lesson_number):
+
+    def get_quiz_start_info(self):
         student_progress = self.get_student_progress().json()
         print(student_progress)
         module_key = jmespath.search("RemediationProgress.Recommended[0].ModuleKey", student_progress)
@@ -149,36 +179,38 @@ class GPService():
     def get_lesson_activity_key(self):
         student_progress = self.get_student_progress().json()
         print(student_progress)
-        activity_key = jmespath.search("RemediationProgress.Recommended[0].Lessons[2].ActivityKeys", student_progress)
+        activity_key = jmespath.search("RemediationProgress.Recommended[0].Lessons[0].ActivityKeys", student_progress)
         return activity_key
 
-    def get_submit_quiz_anwser(self):
+
+
+    def get_submit_quiz_answer(self, single_module_key):
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
-        student_progress = self.get_student_progress().json()
-        # activity_list =self.get_lesson_activity_key()
-        module_key = jmespath.search("DiagnosticTestProgress.NextDiagnosticTest.NeedToBeVerified[1]", student_progress)
         submit_data = {}
         for lesson_number in range(1, 5):
-            student_progress = self.get_student_progress().json()
+            student_progress=self.get_student_progress().json()
+            module_json = jmespath.search("RemediationProgress.Recommended[?ModuleKey=='" + single_module_key + "']",student_progress)
 
             single_activity_list, single_lesson_key = self.get_lesson_key_and_single_activity_list(lesson_number,
-                                                                                                   student_progress)
-            queston_key_list = self.post_students_lesson_activity(single_activity_list).json()
-            submit_json = {"ModuleKey": module_key, "LessonKey": single_lesson_key}
-            self.set_remediation_key(submit_data, submit_json)
+                                                                                                   module_json)
+            question_key_list = self.post_students_lesson_activity(single_activity_list).json()
+            submit_json = {"ModuleKey": single_module_key, "LessonKey": single_lesson_key}
+            remediation_key=self.set_remediation_key(submit_json)
+            submit_data['StudentRemediationKey'] = remediation_key
             submit_data['StudentId'] = student_id
+
             student_module_lesson_answers = []
             for activity in single_activity_list:
-                activity_type = jmespath.search("Activities[?Key=='" + activity + "'].Type", queston_key_list)[0]
+                activity_type = jmespath.search("Activities[?Key=='" + activity + "'].Type", question_key_list)[0]
 
-                question_key, question_list = self.get_question_key_and_list(activity, queston_key_list)
+                question_key, question_list = self.get_question_key_and_list(activity, question_key_list)
                 questions = [x for x in question_list if x in question_key]
 
                 for question in questions:
                     question_answer = self.set_question_answer(question)
                     student_module_lesson_answer = self.set_student_module_lesson_answer(activity,
                                                                                          activity_type,
-                                                                                         module_key,
+                                                                                         single_module_key,
                                                                                          question_answer,
                                                                                          single_lesson_key)
                     student_module_lesson_answers.append(student_module_lesson_answer)
@@ -186,32 +218,33 @@ class GPService():
             print(submit_data)
             self.post_quiz_save(submit_data)
 
-    def set_remediation_key(self, submit_data, submit_json):
+    def set_remediation_key(self, submit_json):
         remediation_key = self.post_quiz_start(submit_json).json()
-        submit_data['StudentRemediationKey'] = remediation_key
+        return remediation_key
 
-    def get_lesson_key_and_single_activity_list(self, lesson_number, student_progress):
+
+    def get_lesson_key_and_single_activity_list(self, lesson_number, module_json):
         single_lesson_key = jmespath.search(
-            "RemediationProgress.Recommended[1].Lessons[?Sequence==`" + str(lesson_number) + "`].LessonKey",
-            student_progress)[0]
+            "[].Lessons[?Sequence==`" + str(lesson_number) + "`].LessonKey[]",
+            module_json)[0]
         single_activity_list = jmespath.search(
-            "RemediationProgress.Recommended[1].Lessons[?Sequence==`" + str(lesson_number) + "`].ActivityKeys",
-            student_progress)[0]
+            "[].Lessons[?Sequence==`" + str(lesson_number) + "`].ActivityKeys[][]",
+            module_json)
         return single_activity_list, single_lesson_key
 
-    def get_question_key_and_list(self, activity, queston_key_list):
+    def get_question_key_and_list(self, activity, question_key_list):
         question_list = jmespath.search("Activities[?Key=='" + activity + "'].Questions[].Key",
-                                        queston_key_list)
+                                        question_key_list)
         question_key = jmespath.search("Activities[?Body.tags.ActivitySubType=='Review'].Questions[].Key",
-                                       queston_key_list)
+                                       question_key_list)
         return question_key, question_list
 
-    def set_student_module_lesson_answer(self, activity, activity_type, module_key, question_answer,
+    def set_student_module_lesson_answer(self, activity, activity_type, single_module_key, question_answer,
                                          single_lesson_key):
         student_module_lesson_answer = {}
         student_module_lesson_answer['QuestionAnswer'] = question_answer
         student_module_lesson_answer['ActivityKey'] = activity
-        student_module_lesson_answer['ModuleKey'] = module_key
+        student_module_lesson_answer['ModuleKey'] = single_module_key
         student_module_lesson_answer['LessonKey'] = single_lesson_key
         student_module_lesson_answer['TemplateType'] = activity_type
         return student_module_lesson_answer
