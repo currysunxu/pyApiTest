@@ -14,7 +14,7 @@ class GPService():
             "Password": password,  # "12345",
             "Platform": 0
         }
-        return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/OnlineStudentPortal/")
+        return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/GP/")
 
     def get_student_profile(self):
         return self.mou_tai.get("/api/v2/StudentProfile/")
