@@ -14,7 +14,7 @@ class GrammarProBaseClass():
     def create_gp(self):
         self.gptest = GPService(ENVIRONMENT)
 
-    @AfterClass()
+    @AfterMethod()
     def sign_out(self):
         self.gptest.sign_out()
         print("Logout")

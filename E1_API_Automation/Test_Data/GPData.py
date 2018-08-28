@@ -3,7 +3,6 @@ class EducationRegion:
     city_list = {'Shanghai':'61AEF09D-AFA0-4FC2-96AD-93C72D390653',
                  'Beijing':'8EF7CCD2-8C58-4BC6-8A35-B3FCAE4D0F0D',
                  'Shenzhen':'568CD462-C9D5-48FD-84E8-FE07CAE65EBC',
-                 'Chongqing':'A1460327-3FEB-4B3B-BC86-DFABA078663F',
                  'Foshan':'3120FADB-9800-4394-B272-9F658F7CEA55',
                  'Guangzhou':'163B7979-6413-4194-892D-51726D8EFDE5',
                  'Fuzhou':'22777B07-1296-4F5A-81FA-D14100EF2FE4',
@@ -24,9 +23,9 @@ class ShanghaiGradeKey:
 
 
 class GP_user:
-    GPUsers = {'QA': {'username': 'lesson1', 'password': '12345'},
+    GPUsers = {'QA': {'username': 'gpauto', 'password': '12345'},
                'Staging': {'username': 'gptest050', 'password': '12345'},
                'Live': {'username': 'gptest3', 'password': '12345'}}
     GPDTUsers = {'QA': {'username': 'lesson1', 'password': '12345'},
-                 'Staging': {'username': 'gp0606cn', 'password': '12345'},
+                 'Staging': {'username': 'gptest010', 'password': '12345'},
                  'Live': {'username': 'gptest3', 'password': '12345'}}
