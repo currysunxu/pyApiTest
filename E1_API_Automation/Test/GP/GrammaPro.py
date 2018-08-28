@@ -62,18 +62,6 @@ class GPAPITestCases(GrammarProBaseClass):
         assert_that(module_latest.json(), match_to("[*].QuestionAnswer.TotalScore"))
 
     @Test()
-    def test_students_lesson_activity(self):
-        self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        activity_key=self.gptest.get_lesson_activity_key()
-        students_lesson_activity=self.gptest.post_students_lesson_activity(activity_key)
-        assert_that(students_lesson_activity.json(), match_to("Activities[*].Key"))
-        assert_that(students_lesson_activity.json(), match_to("Activities[*].Title"))
-        assert_that(students_lesson_activity.json(), match_to("Resources[*].ResourceId"))
-        assert_that(students_lesson_activity.json(), match_to("Resources[*].Name"))
-
-
-
-    @Test()
     def test_cn_student_report(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
         cn_student_report = self.gptest.get_cn_student_report()
@@ -120,33 +108,46 @@ class GPAPITestCases(GrammarProBaseClass):
         assert_that(region_and_grade.json(), match_to("[*].Grades[*].Grade.Key"))
 
 
-    @Test()
-    def test_quiz_start_and_quiz_save(self):
-        self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        self.gptest.get_all_module_quiz_answer()
-
 
     @Test()
-    def test_dt_save_result_pass(self):
+    def test_dt_save_result_all_pass(self):
         self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
-        submit_json = self.gptest.get_submit_answer(2)
+        submit_json = self.gptest.get_dt_first_time_submit_answer(0)
         dt_save = self.gptest.put_dt_save(submit_json[0])
         assert_that(dt_save.status_code == 204)
 
 
     @Test()
-    def test_dt_save_result_failed(self):
+    def test_finish_all_the_quiz_and_ct(self):
         self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
-        submit_json = self.gptest.get_submit_answer(5)
+        submit_json = self.gptest.get_dt_first_time_submit_answer(5)
         dt_save = self.gptest.put_dt_save(submit_json[0])
+        ct_module=submit_json[1]
         assert_that(dt_save.status_code == 204)
         student_progress=self.gptest.get_student_progress()
         assert_that(student_progress.json(), match_to("DiagnosticTestProgress.NextDiagnosticTest.NeedToBeVerified"))
-
-
+        self.gptest.get_all_module_quiz_answer()
+        self.gptest.finish_not_first_dt()
+        test_answer = self.gptest.get_custom_test_answer(ct_module)
+        ct_save=self.gptest.put_custom_test_save(test_answer)
+        assert_that(ct_save.status_code == 204)
 
     @Test()
-    def test_ct_save_result(self):
-        self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        test_answer= self.gptest.get_custom_test_answer()
-        self.gptest.put_custom_test_save(test_answer)
+    def test_dt_save_result_all_failed(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        submit_json = self.gptest.get_dt_first_time_submit_answer(5)
+        dt_save = self.gptest.put_dt_save(submit_json[0])
+        assert_that(dt_save.status_code == 204)
+
+
+
+
+
+
+
+
+
+
+
+
+

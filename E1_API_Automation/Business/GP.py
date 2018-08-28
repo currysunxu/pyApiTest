@@ -1,6 +1,7 @@
 from ..Lib.Moutai import Moutai, Token
 import jmespath
 from ..Lib.ResetGPGradeTool import ResetGPGradeTool
+from ..Test_Data import GPData
 
 
 class GPService():
@@ -79,8 +80,10 @@ class GPService():
     def put_custom_test_save(self,test_answer):
         return self.mou_tai.put("/api/v2/CustomTest/Save/", test_answer)
 
-    def get_custom_test_answer(self):
-        question_list= self.put_custom_test_start(["92fbfc86-1c02-45b0-9f6f-75c57e9b7469","72c9fdd0-b8db-49c7-882d-dcd038bb4ba0","56671778-28a1-4b55-8a39-12d7f8623086","1b36cd77-1ebb-4165-a97a-92589f1e8c83"]).json()
+    def get_custom_test_answer(self,module_list):
+
+
+        question_list= self.put_custom_test_start(module_list[:4]).json()
         ct_key=jmespath.search('CustomTestKey', question_list)
         submit_data = {}
         module_activity_answers = []
@@ -102,7 +105,7 @@ class GPService():
         return submit_data
 
 
-    def get_submit_answer(self, failed_module_number):
+    def get_dt_first_time_submit_answer(self, failed_module_number):
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         self.reset_grade(student_id)
         question_list = self.put_dt_start().json()
@@ -132,7 +135,41 @@ class GPService():
 
         submit_data['StudentModuleActivityAnswer'] = module_activity_answers
         print(submit_data)
-        return submit_data, failed_module_list
+        failed_module=list(set(failed_module_list))
+        return submit_data, failed_module
+
+    def get_dt_not_first_time_submit_answer(self, failed_module_number):
+        student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
+        question_list = self.put_dt_start().json()
+        print(question_list)
+        dt_key = jmespath.search('DiagnosticTestKey', question_list)
+        failed_module_list, module_activity_answers = [], []
+        submit_data = {}
+        submit_data['DiagnosticTestKey'] = dt_key
+        submit_data['Studentid'] = student_id
+        for index, module in enumerate(jmespath.search('Modules', question_list)):
+            module_key = jmespath.search('ModuleKey', module)
+            for activity in jmespath.search('Activitys', module):
+                activity_type = jmespath.search('Type', activity)
+                activity_key = jmespath.search('Key', activity)
+                for question in jmespath.search('Questions', activity):
+                    question_key = jmespath.search('Key', question)
+                    submit_question = self.set_submit_question(question_key)
+                    if index+1 > failed_module_number:
+                        submit_question['Score'] = 1
+                    else:
+                        submit_question['Score'] = 0
+                        failed_module_list.append(module_key)
+
+                    module_activity_answer = self.set_module_activity_answer(activity_key, activity_type, module_key,
+                                                                             submit_question)
+                    module_activity_answers.append(module_activity_answer)
+
+        submit_data['StudentModuleActivityAnswer'] = module_activity_answers
+        failed_module=[]
+        failed_module = [failed_module.append(i) for i in failed_module_list if not i in failed_module]
+        print(submit_data)
+        return submit_data, failed_module
 
     def set_submit_question(self, question_key):
         submit_question = {}
@@ -263,3 +300,15 @@ class GPService():
         question_answer['TotalScore'] = 1
         question_answer['TotalStar'] = None
         return question_answer
+
+    def finish_first_dt(self,failed_module_number):
+        submit_json = self.get_dt_first_time_submit_answer(failed_module_number)
+        self.put_dt_save(submit_json[0])
+
+    def finish_not_first_dt(self,failed_module_number):
+        submit_json = self.get_dt_not_first_time_submit_answer(failed_module_number)
+        self.put_dt_save(submit_json[0])
+
+    def finish_all_quiz_from_latest_dt(self):
+        submit_answer=self.get_all_module_quiz_answer()
+        self.post_quiz_save(submit_answer)
