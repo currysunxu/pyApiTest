@@ -15,13 +15,15 @@ class EVCBase():
     class_id = None
     user_info = None
     teacher_profile = None
+    sis_test_student = None
+    sis_test_teacher_list = None
 
     '''
     Uncomment the following to run or debugger the automation.
     os.environ['Teacher_Id'] = "5888455"
     os.environ["Start_Time"] = "2018-8-18 1:00:00"
     os.environ["End_Time"] = "2018-8-18 1:30:00"
-    os.environ["test_env"] = "STG"
+    os.environ["test_env"] = "QA"
     '''
 
     teacher_id = os.environ['Teacher_Id']
@@ -85,6 +87,8 @@ class EVCBase():
             "Student_Password": "12345",
             "ClassId": "801720"
         }
+        sis_test_student = 12226094
+        sis_test_teacher_list = [10703777, 10366576]
     if os.environ["test_env"] == "STG":
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
@@ -116,6 +120,8 @@ class EVCBase():
             "Student_Password": "12345",
             "ClassId": "247002"
         }
+        sis_test_student = 43195098
+        sis_test_teacher_list = [10584669, 10427158]
 
     def get_different_teacher(teacher_id, teacher_list):
         for teacher in teacher_list:

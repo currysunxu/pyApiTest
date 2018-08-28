@@ -6,57 +6,55 @@ from E1_API_Automation.Lib.HamcrestExister import exist
 from hamcrest import assert_that, equal_to, instance_of
 import jmespath
 from E1_API_Automation.Settings import SIS_SERVICE
-
-test_student_id = 12226094
-test_teacher_ids = [10703777, 10366576]
+from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
 
 
 @TestClass()
-class TestSisEVCService:
+class TestSisEVCService(EVCBase):
     @BeforeClass()
     def create_service(self):
         self.service = SISEVCService(SIS_SERVICE)
 
     @Test()
     def test_enroll_course(self):
-        response = self.service.enroll_course_credits(test_student_id, ["HF"])
+        response = self.service.enroll_course_credits(self.sis_test_student, ["HF"])
         assert_that(response.status_code, equal_to(204))
-        r = self.service.get_student_credits(test_student_id)
-        student_rolled_credts = jmespath.search("[?courseType=='HF']",r.json())
+        r = self.service.get_student_credits(self.sis_test_student)
+        student_rolled_credts = jmespath.search("[?courseType=='HF']", r.json())
         enroll_course = jmespath.search("[?classType == 'Demo']", student_rolled_credts)
         assert_that(response.content, equal_to(b''))
-        assert_that(len(enroll_course)==1)
-        assert_that(jmespath.search('available',enroll_course[0])>0)
+        assert_that(len(enroll_course) == 1)
+        assert_that(jmespath.search('available', enroll_course[0]) > 0)
 
     @Test()
     def test_get_teacher_profile_response_status(self):
-        response = self.service.get_teacher_profiles(test_teacher_ids)
+        response = self.service.get_teacher_profiles(self.sis_test_teacher_list)
         assert_that(response.status_code, equal_to(200))
 
     @Test()
     def test_get_teacher_profile(self):
-        response = self.service.get_teacher_profiles(test_teacher_ids)
+        response = self.service.get_teacher_profiles(self.sis_test_teacher_list)
         assert_that(len(response.json()), 2)
 
     @Test()
     def test_get_teacher_profile_schema(self):
-        response = self.service.get_teacher_profiles(test_teacher_ids).json()
+        response = self.service.get_teacher_profiles(self.sis_test_teacher_list).json()
         assert_that(response[0], match_to("teacherId"))
         assert_that(response[0], match_to("displayName"))
         assert_that(response[0], exist("gender"))
         assert_that(response[0], match_to("avatarUrl"))
         assert_that(response[0], match_to("selfIntroduction"))
         response_ids = sorted(map(lambda x: x['teacherId'], response))
-        assert_that(response_ids, equal_to(sorted(test_teacher_ids)))
+        assert_that(response_ids, equal_to(sorted(self.sis_test_teacher_list)))
 
     @Test()
     def test_student_credit_status(self):
-        response = self.service.get_student_credits(test_student_id)
+        response = self.service.get_student_credits(self.sis_test_student)
         assert_that(response.status_code, equal_to(200))
 
     @Test()
     def test_student_credit_logic(self):
-        response = self.service.get_student_credits(test_student_id)
+        response = self.service.get_student_credits(self.sis_test_student)
         assert_that(response.json(), instance_of(list))
 
     @Test()
@@ -81,17 +79,17 @@ class TestSisEVCService:
 
     @Test()
     def test_get_available_time_slots_status(self):
-        response = self.service.get_available_time_slot(30, test_student_id, 'HF', 'Regular')
+        response = self.service.get_available_time_slot(30, self.sis_test_student, 'HF', 'Regular')
         assert_that(response.status_code, equal_to(200))
 
     @Test()
     def test_get_available_time_slots_status(self):
-        response = self.service.get_available_time_slot(30, test_student_id, 'HF', 'Regular')
+        response = self.service.get_available_time_slot(30, self.sis_test_student, 'HF', 'Regular')
         assert_that(response.status_code, equal_to(200))
 
     @Test()
     def test_get_available_time_slots_schema(self):
-        response = self.service.get_available_time_slot(30, test_student_id, 'HF', 'Regular').json()[0]
+        response = self.service.get_available_time_slot(30, self.sis_test_student, 'HF', 'Regular').json()[0]
         assert_that(response, match_to("classType"))
         assert_that(response, match_to("courseType"))
         assert_that(response, match_to("startDateTimeUtc"))
@@ -99,19 +97,19 @@ class TestSisEVCService:
 
     @Test()
     def test_get_available_time_slots_logic(self):
-        response = self.service.get_available_time_slot(30, test_student_id, 'HF', 'Regular').json()
+        response = self.service.get_available_time_slot(30, self.sis_test_student, 'HF', 'Regular').json()
         for evc_class in response:
             assert_that(jmespath.search('classType', evc_class), equal_to('Regular'))
             assert_that(jmespath.search('courseType', evc_class), equal_to('HF'))
 
     @Test()
     def test_get_bookable_class_status(self):
-        response = self.service.get_available_class(30, test_student_id, 'HF', 'Regular')
+        response = self.service.get_available_class(30, self.sis_test_student, 'HF', 'Regular')
         assert_that(response.status_code, equal_to(200))
 
     @Test()
     def test_get_bookable_class_schema(self):
-        response = self.service.get_available_class(30, test_student_id, 'HF', 'Regular').json()[0]
+        response = self.service.get_available_class(30, self.sis_test_student, 'HF', 'Regular').json()[0]
         assert_that(response, match_to("classId"))
         assert_that(response, match_to("courseType"))
         assert_that(response, match_to("startDateTimeUtc"))
@@ -127,7 +125,7 @@ class TestSisEVCService:
 
     @Test()
     def test_get_class_info(self):
-        available_class = self.service.get_available_class(30, test_student_id, 'HF', 'Regular').json()[0]
+        available_class = self.service.get_available_class(30, self.sis_test_student, 'HF', 'Regular').json()[0]
         class_id = jmespath.search('classId', available_class)
         class_detail = self.service.get_class_info(class_id)
         print(class_detail.json())
@@ -140,12 +138,12 @@ class TestSisEVCService:
 
     @Test()
     def test_get_student_booking_history_status(self):
-        history = self.service.get_student_book_history(test_student_id, '2018-02-01', 'Hf', "Regular")
+        history = self.service.get_student_book_history(self.sis_test_student, '2018-02-01', 'Hf', "Regular")
         assert_that(history.status_code, equal_to(200))
 
     @Test()
     def test_get_student_booking_history_schema(self):
-        history = self.service.get_student_book_history(test_student_id, '2018-02-01', 'Hf', "Regular").json()
+        history = self.service.get_student_book_history(self.sis_test_student, '2018-02-01', 'Hf', "Regular").json()
         assert_that(history[0], match_to('classId'))
         assert_that(history[0], match_to('classStatus'))
         assert_that(history[0], match_to('classType'))
@@ -162,12 +160,12 @@ class TestSisEVCService:
 
     @Test()
     def test_get_student_credits_history_status(self):
-        response = self.service.get_student_credit_history(test_student_id)
+        response = self.service.get_student_credit_history(self.sis_test_student)
         assert_that(response.status_code, equal_to(200))
 
     @Test()
     def test_get_student_credits_history_schema(self):
-        response = self.service.get_student_credit_history(test_student_id).json()[0]
+        response = self.service.get_student_credit_history(self.sis_test_student).json()[0]
         assert_that(response, match_to("studentId"))
         assert_that(response, match_to("courseType"))
         assert_that(response, match_to("operationType"))
