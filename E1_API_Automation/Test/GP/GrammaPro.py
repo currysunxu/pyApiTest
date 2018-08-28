@@ -65,7 +65,7 @@ class GPAPITestCases(GrammarProBaseClass):
     def test_students_lesson_activity(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
         activity_key=self.gptest.get_lesson_activity_key()
-        students_lesson_activity = self.gptest.post_students_lesson_activity(activity_key)
+        students_lesson_activity=self.gptest.post_students_lesson_activity(activity_key)
         assert_that(students_lesson_activity.json(), match_to("Activities[*].Key"))
         assert_that(students_lesson_activity.json(), match_to("Activities[*].Title"))
         assert_that(students_lesson_activity.json(), match_to("Resources[*].ResourceId"))
@@ -100,10 +100,11 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_available_grade(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        for citylist in EducationRegion.city_list:
-             available_grade = self.gptest.get_available_grade(EducationRegion.city_list[citylist])
-             assert_that(available_grade.json(), match_to("[*].Grade.Name"))
-             assert_that(available_grade.json(), match_to("[*].Modules[*].Name"))
+        for city_list in EducationRegion.city_list:
+             available_grade = self.gptest.get_available_grade(EducationRegion.city_list[city_list])
+             print(available_grade.json())
+             assert_that(available_grade.json(), match_to("[*].Grade.Key"))
+
 
     @Test()
     def test_student_progress(self):
@@ -118,23 +119,17 @@ class GPAPITestCases(GrammarProBaseClass):
         assert_that(region_and_grade.json(), match_to("[*].Region.Name"))
         assert_that(region_and_grade.json(), match_to("[*].Grades[*].Grade.Key"))
 
-    @Test()
-    def test_quiz_start(self):
-        self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        lesson_key=self.gptest.get_quiz_start_info()
-        quiz_start = self.gptest.post_quiz_start(lesson_key)
-        assert_that(quiz_start.status_code == 200)
 
     @Test()
-    def test_quiz_save(self):
+    def test_quiz_start_and_quiz_save(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        self.gptest.get_submit_quiz_anwser()
+        self.gptest.get_all_module_quiz_answer()
 
 
     @Test()
     def test_dt_save_result_pass(self):
         self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
-        submit_json = self.gptest.get_submit_anwser(0)
+        submit_json = self.gptest.get_submit_answer(2)
         dt_save = self.gptest.put_dt_save(submit_json[0])
         assert_that(dt_save.status_code == 204)
 
@@ -142,7 +137,7 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_dt_save_result_failed(self):
         self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
-        submit_json = self.gptest.get_submit_anwser(5)
+        submit_json = self.gptest.get_submit_answer(5)
         dt_save = self.gptest.put_dt_save(submit_json[0])
         assert_that(dt_save.status_code == 204)
         student_progress=self.gptest.get_student_progress()
@@ -151,10 +146,7 @@ class GPAPITestCases(GrammarProBaseClass):
 
 
     @Test()
-    def test_student_lesson_progress(self):
+    def test_ct_save_result(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        module_key= self.gptest.get_lesson_progress_module_key()
-        students_lesson_progress = self.gptest.post_students_lesson_progress(module_key)
-        assert_that(students_lesson_progress.status_code == 200)
-
-
+        test_answer= self.gptest.get_custom_test_answer()
+        self.gptest.put_custom_test_save(test_answer)

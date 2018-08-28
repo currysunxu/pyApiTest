@@ -11,7 +11,7 @@ class EducationRegion:
 
 class ShanghaiGradeKey:
     Gth2 = ['2th', '593f86f2-1e21-48bb-ac12-0d1dfba071c8']
-    Gth3 = ['3th', 'e8fee4e0-c180-4e07-b37a-cf91d12df2b4']
+    Gth3 = ['3rd', 'e8fee4e0-c180-4e07-b37a-cf91d12df2b4']
     Gth4 = ['4th', '0d05b8bc-62f5-422a-a196-719fe8ab4483']
     Gth5 = ['5th', '9459e5bb-1449-4432-b4b6-84c964959b24']
     Gth6 = ['6th', '7e1025c7-8ea5-4942-ab6b-249d01cb844f']
@@ -25,7 +25,7 @@ class ShanghaiGradeKey:
 
 class GP_user:
     GPUsers = {'QA': {'username': 'lesson1', 'password': '12345'},
-               'Staging': {'username': 'gp0606cn', 'password': '12345'},
+               'Staging': {'username': 'gptest050', 'password': '12345'},
                'Live': {'username': 'gptest3', 'password': '12345'}}
     GPDTUsers = {'QA': {'username': 'lesson1', 'password': '12345'},
                  'Staging': {'username': 'gp0606cn', 'password': '12345'},

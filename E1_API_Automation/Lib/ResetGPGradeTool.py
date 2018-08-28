@@ -50,9 +50,9 @@ class ResetGPGradeTool:
         url = self.reset_url
         user_key, current_grade = self.get_user_key(student_id)
         url = url % user_key
-        target_value = ShanghaiGradeKey.Gth3[1]
-        if current_grade == ShanghaiGradeKey.Gth3[0]:
-            target_value = ShanghaiGradeKey.Gth4[1]
+        target_value = ShanghaiGradeKey.Gth4[1]
+        if current_grade == ShanghaiGradeKey.Gth4[0]:
+            target_value = ShanghaiGradeKey.Gth5[1]
         data_info = {
             'Birthday': '12/27/2003 4:00:00 PM',
             'EducationGradeKey': target_value,
