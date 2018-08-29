@@ -63,6 +63,7 @@ class EVCBase():
 
     if os.environ["test_env"] == "QA":
         host = "https://e1svc-qa.ef.cn"
+        SIS_SERVICE = 'https://internal-e1-evc-booking-qa-cn.ef.com'
         user_info = {
             "UserName": "unlock02",#"jenkin0528tb",
             "Password": "12345",
@@ -96,6 +97,7 @@ class EVCBase():
         The code will be changed for STG in the coming day.
         '''
         host = "https://e1svc-staging.ef.cn"
+        SIS_SERVICE = 'http://internal-e1-evc-booking-stg-cn.ef.com'
         user_info = {
             "UserName": "null183",
             "Password": "12345",

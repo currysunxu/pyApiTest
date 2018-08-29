@@ -5,7 +5,6 @@ from E1_API_Automation.Lib.HamcrestExister import exist
 
 from hamcrest import assert_that, equal_to, instance_of
 import jmespath
-from E1_API_Automation.Settings import SIS_SERVICE
 from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
 
 
@@ -13,7 +12,7 @@ from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
 class TestSisEVCService(EVCBase):
     @BeforeClass()
     def create_service(self):
-        self.service = SISEVCService(SIS_SERVICE)
+        self.service = SISEVCService(self.SIS_SERVICE)
 
     @Test()
     def test_enroll_course(self):
