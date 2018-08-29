@@ -109,7 +109,7 @@ class GPService():
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         self.reset_grade(student_id)
         question_list = self.put_dt_start().json()
-        print(question_list)
+        # print(question_list)
         dt_key = jmespath.search('DiagnosticTestKey', question_list)
         failed_module_list, module_activity_answers = [], []
         submit_data = {}
@@ -134,14 +134,14 @@ class GPService():
                     module_activity_answers.append(module_activity_answer)
 
         submit_data['StudentModuleActivityAnswer'] = module_activity_answers
-        print(submit_data)
+        # print(str(submit_data).encode('utf-8'))
         failed_module=list(set(failed_module_list))
         return submit_data, failed_module
 
     def get_dt_not_first_time_submit_answer(self, failed_module_number):
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         question_list = self.put_dt_start().json()
-        print(question_list)
+        # print(question_list)
         dt_key = jmespath.search('DiagnosticTestKey', question_list)
         failed_module_list, module_activity_answers = [], []
         submit_data = {}
@@ -168,7 +168,7 @@ class GPService():
         submit_data['StudentModuleActivityAnswer'] = module_activity_answers
         failed_module=[]
         failed_module = [failed_module.append(i) for i in failed_module_list if not i in failed_module]
-        print(submit_data)
+        print(str(submit_data).encode('utf-8'))
         return submit_data, failed_module
 
     def set_submit_question(self, question_key):
@@ -252,7 +252,7 @@ class GPService():
                                                                                          single_lesson_key)
                     student_module_lesson_answers.append(student_module_lesson_answer)
             submit_data['StudentModuleLessonAnswer'] = student_module_lesson_answers
-            print(submit_data)
+            # print(str(submit_data).encode('utf-8'))
             self.post_quiz_save(submit_data)
 
     def set_remediation_key(self, submit_json):
