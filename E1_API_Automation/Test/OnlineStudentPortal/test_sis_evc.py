@@ -173,7 +173,7 @@ class TestSisEVCService(EVCBase):
         assert_that(response, exist("operatedDateTimeUtc"))
         assert_that(response, exist("operateAmount"))
         assert_that(response, exist("classStartDateTimeUTC"))
-        assert_that(response, match_to("classEndDateTimeUTC"))
+        assert_that(response, exist("classEndDateTimeUTC"))
 
     @Test()
     def test_get_ef_classroom_app_status(self):
