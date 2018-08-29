@@ -14,4 +14,5 @@ if os.environ['environment'] == 'QA':
     env_key = 'QA'
 
 elif os.environ['environment'] == 'STG':
+    ENVIRONMENT = Environment.STAGING
     env_key = 'Staging'
