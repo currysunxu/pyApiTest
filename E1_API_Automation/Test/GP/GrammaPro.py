@@ -90,7 +90,6 @@ class GPAPITestCases(GrammarProBaseClass):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
         for city_list in EducationRegion.city_list:
              available_grade = self.gptest.get_available_grade(EducationRegion.city_list[city_list])
-             print(available_grade.json())
              assert_that(available_grade.json(), match_to("[*].Grade.Key"))
 
 
