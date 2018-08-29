@@ -3,7 +3,7 @@ class Environment(object):
     QA = "http://e1svc-qa.ef.cn"
     STAGING = "https://e1svc-staging.ef.cn"
 
-os.environ['environment'] = 'STG'
+# os.environ['environment'] = 'STG'
 
 
 if os.environ['environment']=='QA':
