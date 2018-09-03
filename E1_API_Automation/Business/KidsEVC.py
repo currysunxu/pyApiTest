@@ -43,7 +43,7 @@ class KidsEVCService():
         }
         return self.mou_tai.post("/api/v2/OCHCreditSummary/", json=body)
 
-    def book_class(self, book_code, lesson_number, unit_number, start_stamp, end_stamp, teacher_id, program_code, class_type,
+    def book_class(self, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id, program_code, class_type,
                    class_id, need_recoder, student_id, state):
         body = {
             "BookCode": book_code,
@@ -87,6 +87,23 @@ class KidsEVCService():
     def get_after_class_report(self, class_id):
         api_url = "/api/v2/AfterClassReport/" + class_id
         return self.mou_tai.get(api_url)
+
+    def change_topic(self, student_id, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id, program_code, class_type,
+                     class_id, need_recoder):
+        body = {
+            "StudentId": student_id,
+            "BookCode": book_code,
+            "UnitNumber": unit_number,
+            "LessonNumber": lesson_number,
+            "StartStamp": start_stamp,
+            "EndStamp": end_stamp,
+            "TeacherId": teacher_id,
+            "ProgramCode": program_code,
+            "ClassType": class_type,
+            "ClassId": class_id,
+            "NeedRecord": need_recoder
+        }
+        return self.mou_tai.post(url="/api/v2/OnlineClassroom/Topic/", json=body)
 
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
