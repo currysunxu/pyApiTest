@@ -31,7 +31,7 @@ class SISEVCService:
         return self.session.get(url=url, verify=False, headers=self.header)
 
     def get_course_lesson_topic(self, course_type, course_level_code):
-        url = self.host + '/api/v1/course-lessons?CourseType=%s&CourseLevelCode=%s' % (course_type, course_level_code)
+        url = self.host + '/api/v1/course-lessons?CourseType={0}&CourseLevelCode={1}'.format(course_type, course_level_code)
         return self.session.get(url=url, verify=False, headers=self.header)
 
     def get_available_time_slot(self, duration_days, student_id, course_type, class_type, region='CN'):
@@ -45,12 +45,12 @@ class SISEVCService:
         return self.session.get(url=url, verify=False, headers=self.header)
 
     def get_available_class(self, duration_days, student_id, course_type, class_type, region='CN'):
-        url = self.host + '/api/v1/available-classes?StartDateTimeUtc=%s&EndDateTimeUtc=%s&StudentId=%s&Region=%s&CourseType=%s&ClassType=%s'
+        url = self.host + '/api/v1/available-classes?StartDateTimeUtc={0}&EndDateTimeUtc={1}&StudentId={2}&Region={3}&CourseType={4}&ClassType={5}'
         utc = arrow.utcnow().shift(days=+1)
         start_time = utc.format('YYYY-MM-DD HH:mm')
         duration_days = duration_days + 1
         end_time = utc.shift(days=+ duration_days).format('YYYY-MM-DD HH:mm')
-        url = url % (start_time, end_time, student_id, region, course_type, class_type)
+        url = url.format(start_time, end_time, student_id, region, course_type, class_type)
         print(url)
         return self.session.get(url=url, verify=False, headers=self.header)
 
@@ -84,22 +84,22 @@ class SISEVCService:
         return self.session.post(url=url, json=json, verify=False, headers=self.header)
 
     def get_class_info(self, evc_booking_classid):
-        url = self.host + '/api/v1/classes/%s' % evc_booking_classid
+        url = self.host + '/api/v1/classes/{0}'.format(evc_booking_classid)
         return self.session.get(url=url, verify=False, headers=self.header)
 
-    def get_student_book_history(self, student_id, start_date, course_type, class_type, end_date = None ):
+    def get_student_book_history(self, student_id, start_date, course_type, class_type, end_date=None):
         if end_date==None:
             end_date = arrow.utcnow().format('YYYY-MM-DD HH:mm')
-        url = self.host + '/api/v1/students/%s/booking-history?StartDateTimeUtc=%s&EndDateTimeUtc=%s&CourseType=%s&ClassTypes=%s'
-        url = url % (student_id, start_date, end_date, course_type, class_type)
+        url = self.host + '/api/v1/students/{0}/booking-history?StartDateTimeUtc={1}&EndDateTimeUtc={2}&CourseType={3}&ClassTypes={4}'
+        url = url.format(student_id, start_date, end_date, course_type, class_type)
         return self.session.get(url=url, verify=False, headers=self.header)
 
     def get_student_credit_history(self, student_id):
-        url = self.host + '/api/v1/students/%s/credits-history' % student_id
+        url = self.host + '/api/v1/students/{0}/credits-history'.format(student_id)
         return self.session.get(url=url, verify=False, headers=self.header)
 
     def get_class_video_record_url(self, class_id):
-        url = self.host + '/api/v1/classes/%s/video-record-url' % class_id
+        url = self.host + '/api/v1/classes/{0}/video-record-url'.format(class_id)
         return self.session.get(url=url, verify=False, headers=self.header)
 
     def get_EF_classroom_app_info(self):
@@ -107,11 +107,12 @@ class SISEVCService:
         return self.session.get(url=url, verify=False, headers=self.header)
 
     def delete_class(self, class_id, student_id):
-        url = self.host + '/api/v1/bookings?ClassId=%s&StudentId=%s' % (class_id, student_id)
+        url = self.host + '/api/v1/bookings?ClassId={0}&StudentId={1}'.format(class_id, student_id)
+
         return self.session.delete(url, verify=False, headers=self.header)
 
     def get_student_profile(self, student_id):
-        url = self.host + 'api/v1/students/%s/evc-profile' % student_id
+        url = self.host + 'api/v1/students/{0}/evc-profile'.format(student_id)
         return self.session.get(url=url, verify=False, headers=self.header)
 
     def edit_class_topic(self, student_id, class_id, course_type, course_level, unit_number, lesson_number):
@@ -129,4 +130,4 @@ class SISEVCService:
                 }
             ]
         }
-        return self.session.post(url = url, json=json, verify=False, headers=self.header)
+        return self.session.post(url=url, json=json, verify=False, headers=self.header)

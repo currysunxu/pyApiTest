@@ -137,13 +137,14 @@ class TestSisEVCService(EVCBase):
 
     @Test()
     def test_get_student_booking_history_status(self):
-        history = self.service.get_student_book_history(self.sis_test_student, '2018-02-01', 'Hf', "Regular")
+        history = self.service.get_student_book_history(self.sis_test_student, '2018-02-01', 'HF', "Regular")
         assert_that(history.status_code, equal_to(200))
 
     @Test()
     def test_get_student_booking_history_schema(self):
         start_date = arrow.utcnow().shift(days=-180).format('YYYY-MM-DD HH:mm')
-        history = self.service.get_student_book_history(self.sis_test_student, start_date, 'Hf', "Regular").json()
+        end_date = arrow.utcnow().shift(days=+2).format('YYYY-MM-DDTHH:mm')
+        history = self.service.get_student_book_history(self.sis_test_student, start_date, 'HF', "regular",end_date).json()
         assert_that(history[0], match_to('classId'))
         assert_that(history[0], match_to('classStatus'))
         assert_that(history[0], match_to('classType'))
@@ -207,13 +208,9 @@ class TestSisEVCService(EVCBase):
         assert_that(class_id in booked_class_ids)
         self.service.edit_class_topic(self.sis_test_student, class_id, 'HF', 'C', 1, 2)
         history = self.service.get_student_book_history(self.sis_test_student, start_date, 'HF', "regular", end_date)
-        flag = False
-        for booked_class in history.json():
-            if jmespath.search('classId', booked_class) == class_id:
-                flag = True
-                assert_that(jmespath.search('lessonNumber', booked_class) == 2)
-                break;
-        if flag == False:
-            assert_that(False, "booked class not found")
+        class_with_id = jmespath.search("@[?classId ==`{0}`]".format(class_id), history.json())
+        assert_that(len(class_with_id) == 1)
+
+        assert_that(jmespath.search('lessonNumber', class_with_id[0]) == 2)
 
         self.service.delete_class(class_id, self.sis_test_student)

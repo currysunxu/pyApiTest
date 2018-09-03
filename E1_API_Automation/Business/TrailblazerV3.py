@@ -36,10 +36,7 @@ class TrailbazerService():
         self.get_student_info()
         activity_contents = self.course_node_synchronize(self.active_book,
                                                          self.course_plan_key).json()
-        level_content_keys = []
-        for activity in activity_contents['Upserts']:
-            if activity['Level'] == level_no:
-                level_content_keys.append(activity)
+        level_content_keys = jmespath.search("Upserts[?Level ==`{0}`]".format(level_no), activity_contents)
         return level_content_keys
 
     def query_school_info(self):
@@ -76,10 +73,10 @@ class TrailbazerService():
         return self.mou_tai.post("/api/v2/CourseNode/Synchronize", json=body)
 
     def course_unlock(self, key):
-        return self.mou_tai.get("/api/v2/CourseUnlock/TB%s") % key
+        return self.mou_tai.get("/api/v2/CourseUnlock/TB{0}").format(key)
 
     def get_homework_motivation_task_info(self, key):
-        return self.mou_tai.get("/api/v2/HomeworkMotivationTaskInfo/%s" % key)
+        return self.mou_tai.get("/api/v2/HomeworkMotivationTaskInfo/{0}".format(key))
 
     def query_motivation_reward_summary(self, scope_key):
         body = {
@@ -96,7 +93,7 @@ class TrailbazerService():
                                  )
 
     def progress_assessment__report_by_unit(self, unit_key):
-        return self.mou_tai.get("/api/v2/ProgressAssessmentReport/ByUnit/%s" % unit_key)
+        return self.mou_tai.get("/api/v2/ProgressAssessmentReport/ByUnit/{0}".format(unit_key))
 
     def acitivity_entity_web(self, activity_list):
         return self.mou_tai.post("/api/v2/ActivityEntity/Web", json=activity_list)
@@ -112,7 +109,7 @@ class TrailbazerService():
         return self.mou_tai.post("/api/v2/HomeworkLessonCorrection", json=body)
 
     def digital_interaction_info(self, book_key):
-        return self.mou_tai.get("/DigitalInteractionInfo/ByBook/%s" % book_key)
+        return self.mou_tai.get("/DigitalInteractionInfo/ByBook/{0}".format(book_key))
 
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
