@@ -2,7 +2,7 @@ from E1_API_Automation.Business.SISEVC import SISEVCService
 from ptest.decorator import TestClass, Test, BeforeClass
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
 from E1_API_Automation.Lib.HamcrestExister import exist
-
+import arrow
 from hamcrest import assert_that, equal_to, instance_of
 import jmespath
 from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
@@ -137,12 +137,14 @@ class TestSisEVCService(EVCBase):
 
     @Test()
     def test_get_student_booking_history_status(self):
-        history = self.service.get_student_book_history(self.sis_test_student, '2018-02-01', 'Hf', "Regular")
+        history = self.service.get_student_book_history(self.sis_test_student, '2018-02-01', 'HF', "Regular")
         assert_that(history.status_code, equal_to(200))
 
     @Test()
     def test_get_student_booking_history_schema(self):
-        history = self.service.get_student_book_history(self.sis_test_student, '2018-02-01', 'Hf', "Regular").json()
+        start_date = arrow.utcnow().shift(days=-180).format('YYYY-MM-DD HH:mm')
+        end_date = arrow.utcnow().shift(days=+2).format('YYYY-MM-DDTHH:mm')
+        history = self.service.get_student_book_history(self.sis_test_student, start_date, 'HF', "regular",end_date).json()
         assert_that(history[0], match_to('classId'))
         assert_that(history[0], match_to('classStatus'))
         assert_that(history[0], match_to('classType'))
@@ -186,3 +188,29 @@ class TestSisEVCService(EVCBase):
         assert_that(response.json(), exist("iOS.downloadLink"))
         assert_that(response.json(), match_to("iOS.appLink"))
         assert_that(response.json(), exist("errorCode"))
+
+    @Test()
+    def test_edit_class_topic(self):
+        response = self.service.get_available_class(30, self.sis_test_student, 'HF', 'Regular').json()[0]
+        class_id = jmespath.search("classId", response)
+        course_type = jmespath.search("courseType", response)
+        class_type = jmespath.search("classType", response)
+        teacher_id = jmespath.search("teacherProfile.teacherId", response)
+        book_response = self.service.post_bookings(class_id=class_id, teacher_id=teacher_id,
+                                                   student_id=self.sis_test_student, course_type=course_type,
+                                                   level_code='C', unit_number=1, lesson_number=1,
+                                                   class_type=class_type)
+        class_status = self.service.get_class_info(class_id)
+        start_date = arrow.utcnow().format('YYYY-MM-DD HH:mm')
+        end_date = jmespath.search('endDateTimeUTC', class_status.json())
+        history = self.service.get_student_book_history(self.sis_test_student, start_date, 'HF', "regular", end_date)
+        booked_class_ids = sorted(map(lambda x: x['classId'], history.json()))
+        assert_that(class_id in booked_class_ids)
+        self.service.edit_class_topic(self.sis_test_student, class_id, 'HF', 'C', 1, 2)
+        history = self.service.get_student_book_history(self.sis_test_student, start_date, 'HF', "regular", end_date)
+        class_with_id = jmespath.search("@[?classId ==`{0}`]".format(class_id), history.json())
+        assert_that(len(class_with_id) == 1)
+
+        assert_that(jmespath.search('lessonNumber', class_with_id[0]) == 2)
+
+        self.service.delete_class(class_id, self.sis_test_student)
