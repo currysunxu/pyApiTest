@@ -105,12 +105,14 @@ class APITestCases(EVCBase):
         * Book class and check class status code
         * Check lesson suggestion
         * Check OCH score
-        * Book the same class to failed it.
+        * Book the same class to failed it
+        * Change topic
+        * Cancel class
         *
         :return:
         '''
 
-        #Get neccessary parameter which will be used at the following API call.
+        # Get necessary parameter which will be used at the following API call.
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         calendar_response = self.evc_service.get_calendar("HF", ClassType.REGULAR.value, local2utc(self.regular_start_time),
                                                           local2utc(self.regular_end_time))
@@ -125,44 +127,44 @@ class APITestCases(EVCBase):
         program_code = jmespath.search("[0].ProgramCode", class_session_response.json())
 
 
-        #Check the lesson suggestion before booking
-        lesson_suggestion = self.evc_service.get_lesson_suggestion(program_code)
-        assert_that(lesson_suggestion.json(), match_to("BookCode"))
-        assert_that(lesson_suggestion.json(), match_to("LessonNumber"))
+        # Check the lesson suggestion before booking
+        lesson_suggestion_response = self.evc_service.get_lesson_suggestion(program_code)
+        assert_that(lesson_suggestion_response.json(), match_to("BookCode"))
+        assert_that(lesson_suggestion_response.json(), match_to("LessonNumber"))
         #assert_that(jmespath.search("LessonNumber", lesson_suggestion.json()) == "3")
 
 
-        # Check the OCH scores before book
-        response = self.evc_service.get_OCH_credit(student_id, program_code)
-        assert_that(response.json(), match_to("[*].StudentId"))
-        assert_that(jmespath.search("length([])", response.json()) == 2)
-        #Verify that the student got 1000 OCH at Regular
-        assert_that(response.json(), match_to("[?ClassType=='Regular'].AvailableOCH"))
-        OCH_number_before_booking = jmespath.search("[?ClassType=='Regular'].AvailableOCH" ,response.json())
+        # Check OCH before book
+        och_response = self.evc_service.get_OCH_credit(student_id, program_code)
+        assert_that(och_response.json(), match_to("[*].StudentId"))
+        assert_that(jmespath.search("length([])", och_response.json()) == 2)
+        # Verify that the student got 1000 OCH at Regular
+        assert_that(och_response.json(), match_to("[?ClassType=='Regular'].AvailableOCH"))
+        OCH_number_before_booking = jmespath.search("[?ClassType=='Regular'].AvailableOCH", och_response.json())
         sleep(2)
         print(class_id)
-        response = self.evc_service.book_class("C", "2", "2", session_start_time, session_end_time, teacher_id, program_code,
+        book_response = self.evc_service.book_class("C", "2", "2", session_start_time, session_end_time, teacher_id, program_code,
                                                ClassType.REGULAR.value,
                                                class_id,
                                                True,
                                                student_id,
                                                "Begin")
-        assert_that(response.json(), match_to("Succeed"))
+        assert_that(book_response.json(), match_to("Succeed"))
 
-        #Check that the student OCH is subtracted with 1.
-        response = self.evc_service.get_OCH_credit(student_id, program_code)
-        assert_that(jmespath.search("[?ClassType=='Regular'].AvailableOCH", response.json())[0] == (OCH_number_before_booking[0] - 1))
+        # Verify 1 available HF credit should be deducted after booking
+        och_response = self.evc_service.get_OCH_credit(student_id, program_code)
+        assert_that(jmespath.search("[?ClassType=='Regular'].AvailableOCH", och_response.json())[0] == (OCH_number_before_booking[0] - 1))
 
-        #Check book failed with the class which is already booked.
-        response = self.evc_service.book_class("C", "2", "2", session_start_time, session_end_time, teacher_id, program_code,
+        # Check book failed with the class which is already booked
+        book_response = self.evc_service.book_class("C", "2", "2", session_start_time, session_end_time, teacher_id, program_code,
                                                ClassType.REGULAR.value,
                                                class_id,
                                                True,
                                                student_id,
                                                "Begin")
-        assert_that("Reason: 207" in jmespath.search("Message", response.json()))
+        assert_that("Reason: 207" in jmespath.search("Message", book_response.json()))
 
-        query_book_response = self.evc_service.query_online_class_booking(local2utc(self.regular_start_time),
+        query_lesson_history_response = self.evc_service.query_online_class_booking(local2utc(self.regular_start_time),
                                                                           local2utc(self.regular_end_time), program_code,
                                                                           ClassType.REGULAR.value)
 
@@ -179,22 +181,27 @@ class APITestCases(EVCBase):
         CanceledByTeacher	6	0x6
         Completed	7	0x7
         '''
+        assert_that(jmespath.search("[?ClassId=='" + class_id + "'].ClassStatus", query_lesson_history_response.json()), "1")
 
-        assert_that(jmespath.search("[0].ClassStatus", query_book_response.json()), "1")
-
-        #Check lesson suggestion after booking class.
+        # Check lesson suggestion after booking class
         lesson_suggestion = self.evc_service.get_lesson_suggestion(program_code)
         assert_that(lesson_suggestion.json(), match_to("BookCode"))
         assert_that(lesson_suggestion.json(), match_to("LessonNumber"))
         ##TODO: there is a bug here for suggestion, after it's fix, will add code here.
 
+        # Change topic
+        change_topic_response = self.evc_service.change_topic(student_id, "C", "6", "1", session_start_time, session_end_time, teacher_id, program_code,
+                                                              ClassType.REGULAR.value, class_id, True)
+        assert_that(change_topic_response.json(), match_to("Succeed"))
+
+        # Cancel class
         cancel_response = self.evc_service.cancel_class(class_id)
         assert_that(cancel_response.json(), match_to("Succeed"))
 
-        query_book_response = self.evc_service.query_online_class_booking(local2utc(self.regular_start_time),
+        query_lesson_history_response = self.evc_service.query_online_class_booking(local2utc(self.regular_start_time),
                                                                           local2utc(self.regular_end_time), program_code,
                                                                           ClassType.REGULAR.value)
-        assert_that(jmespath.search("[0].ClassStatus", query_book_response.json()), "6")
+        assert_that(jmespath.search("[?ClassId=='" + class_id + "'].ClassStatus", query_lesson_history_response.json()), "6")
 
     @Test()
     def test_get_online_student_book_structure(self):
