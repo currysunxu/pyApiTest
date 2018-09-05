@@ -1,5 +1,5 @@
 import jmespath
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, contains_string
 
 from ptest.decorator import TestClass, Test
 from ...Lib.HamcrestMatcher import match_to
@@ -105,3 +105,94 @@ class TBTestCases(TraiblazerBaseClass):
             self.tb_test.student_progress(unlocked_lessons[3], i, len(lesson_activities))
         response = self.tb_test.homework_lesson_answer(unlocked_lessons[3])
         assert_that(response.status_code == 200)
+
+    @Test()
+    def test_homework_motivation_task_info_status(self):
+        response = self.tb_test.get_homework_motivation_task_info(self.tb_test.active_book)
+        assert_that(response.status_code == 200)
+
+    @Test()
+    def test_homework_motivation_task_info_function(self):
+        response = self.tb_test.get_homework_motivation_task_info(self.tb_test.active_book)
+        assert_that(len(response.json()) > 0)
+        assert_that(response.json()[0], exist("CompletedCount"))
+        assert_that(response.json()[0], match_to("Description"))
+        assert_that(response.json()[0], exist("EarnedTotalPointAmount"))
+        assert_that(response.json()[0], match_to("MotivationCode"))
+        assert_that(response.json()[0], exist("MotivationTaskStatus"))
+        assert_that(response.json()[0], match_to("Name"))
+        assert_that(response.json()[0], match_to("Resources"))
+        assert_that(response.json()[0], match_to("ScopeCourseKey"))
+        assert_that(response.json()[0], match_to("TotalCount"))
+        assert_that(response.json()[0], exist("TotalPointAmount"))
+        assert_that(response.json()[0], match_to("TypeKey"))
+
+    @Test()
+    def test_get_all_book(self):
+        response = self.tb_test.get_all_books()
+        assert_that(response.status_code == 200)
+
+    @Test()
+    def test_get_all_book(self):
+        response = self.tb_test.get_all_books()
+        assert_that(len(response.json()) > 0)
+        assert_that(response.json()[0], exist("CreatedBy"))
+        assert_that(response.json()[0], match_to("CreatedStamp"))
+        assert_that(response.json()[0], exist("LastUpdatedBy"))
+        assert_that(response.json()[0], match_to("LastUpdatedStamp"))
+        assert_that(response.json()[0], exist("State"))
+        assert_that(response.json()[0], exist("ActivityKeys"))
+        assert_that(response.json()[0], exist("ContentKey"))
+        assert_that(response.json()[0], match_to("Name"))
+        assert_that(response.json()[0], match_to("ParentNodeKey"))
+        assert_that(response.json()[0], exist("TopNodeKey"))
+        assert_that(response.json()[0], match_to("Code"))
+        assert_that(response.json()[0], exist("Theme"))
+        assert_that(response.json()[0], match_to("Type"))
+        assert_that(response.json()[0], match_to("Level"))
+        assert_that(response.json()[0], exist("CoursePlanKey"))
+        assert_that(response.json()[0], exist("Sequence"))
+        assert_that(response.json()[0], exist("Title"))
+        assert_that(response.json()[0], exist("SubTitle"))
+        assert_that(response.json()[0], exist("Description"))
+        assert_that(response.json()[0], exist("Body"))
+        for book in response.json():
+            assert_that(jmespath.search("Code", book), contains_string('TBv3Bk'))
+
+    @Test()
+    def test_digital_interaction_info_status(self):
+        response = self.tb_test.digital_interaction_info(self.tb_test.active_book)
+        assert_that(response.status_code == 200)
+
+    @Test()
+    def test_digital_interaction_info_status(self):
+        response = self.tb_test.digital_interaction_info(self.tb_test.active_book)
+        assert_that(len(response.json()) > 0)
+        assert_that(response.json()[0], exist("Title"))
+        assert_that(response.json()[0], match_to("Key"))
+
+    @Test()
+    def test_progress_assessment_report(self):
+        unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
+        response = self.tb_test.progress_assessment__report_by_unit(unlocked_lessons[0])
+        assert_that(response.json(), exist("StudentId"))
+        assert_that(response.json(), match_to("UnitCourseKey"))
+        assert_that(jmespath.search("StudentId", response.json()), equal_to(self.tb_test.user_id))
+        assert_that(jmespath.search("UnitCourseKey", response.json()), equal_to(unlocked_lessons[0]))
+
+    @Test()
+    def test_motivation_point_audit_status(self):
+        response = self.tb_test.query_motivation_point_audit(self.tb_test.active_book)
+        assert_that(response.status_code == 200)
+        assert_that(len(response.json()) > 0)
+
+    @Test()
+    def test_motivation_point_audit_status(self):
+        response = self.tb_test.query_motivation_point_audit(self.tb_test.active_book)
+        assert_that(response.status_code == 200)
+
+    @Test()
+    def test_motivation_reward_summary_status(self):
+        response = self.tb_test.query_motivation_reward_summary(self.tb_test.active_book)
+        assert_that(response.status_code == 200)
+        assert_that(len(response.json()) > 0)

@@ -115,7 +115,7 @@ class TrailbazerService():
         return self.mou_tai.post("/api/v2/HomeworkLessonCorrection", json=body)
 
     def digital_interaction_info(self, book_key):
-        return self.mou_tai.get("/DigitalInteractionInfo/ByBook/{0}".format(book_key))
+        return self.mou_tai.get("/api/v2/DigitalInteractionInfo/ByBook/{0}".format(book_key))
 
     def get_child_node(self, parent_key):
         self.course_node_synchronize(self.active_book, self.course_plan_key)
@@ -172,9 +172,6 @@ class TrailbazerService():
     def homework_lesson_answer(self, lesson_key):
         body = self.generate_lesson_answer(lesson_key)
         return self.mou_tai.put(url='/api/v2/HomeworkLessonAnswer', json=body)
-
-
-
 
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
