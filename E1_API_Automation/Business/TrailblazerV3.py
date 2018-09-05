@@ -141,33 +141,43 @@ class TrailbazerService():
         submit_data["LessonKey"] = lesson_key
         activity_answers = []
         for activity in jmespath.search("Activities", detail_activity):
-            activity_answer = {}
-            activity_answer["ActivityKey"] = jmespath.search("Key", activity)
-            activity_answer["ActivityCourseKey"] = jmespath.search("@[?ActivityKeys[0]=='{0}'].Key".format(activity_answer["ActivityKey"]), lesson_activities)[0]
-            answers = []
-            for question in jmespath.search("Questions", activity):
-                question_answer = {}
-                question_answer["Attempts"]= None
-                question_answer["Detail"] = {"modelData": None}
-                question_answer["Duration"] = None
-                question_answer["LocalEndStamp"] = None
-                question_answer["Key"] = None
-                question_answer["Score"] = 8
-                question_answer["TotalScore"] = 8
-                question_answer["Star"] = None
-                question_answer["TotalStar"] = None
-                question_answer["LocalStartStamp"] = None
-                question_answer["LocalEndStamp"] = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
-                question_answer["QuestionKey"] = jmespath.search("Key", question)
-                answers.append(question_answer)
-            activity_answer["Answers"] = answers
-            activity_answer["CompletedQuestionCount"] = None
-            activity_answer["correctQuestionCount"] = 1
-            activity_answer["TotalQuestionCount"] = None
+            # answers = []
+            # for question in jmespath.search("Questions", activity):
+            #     question_answer = self.set_question_anwser(question)
+            #     answers.append(question_answer)
+            answers = [self.set_question_anwser(question) for question in jmespath.search("Questions", activity)]
+            activity_answer = self.set_activity_answer(activity, answers, lesson_activities)
             activity_answers.append(activity_answer)
 
         submit_data["ActivityAnswers"] = activity_answers
         return submit_data
+
+    def set_activity_answer(self, activity, answers, lesson_activities):
+        activity_answer = {}
+        activity_answer["Answers"] = answers
+        activity_answer["CompletedQuestionCount"] = None
+        activity_answer["correctQuestionCount"] = 1
+        activity_answer["TotalQuestionCount"] = None
+        activity_answer["ActivityKey"] = jmespath.search("Key", activity)
+        activity_answer["ActivityCourseKey"] = \
+        jmespath.search("@[?ActivityKeys[0]=='{0}'].Key".format(activity_answer["ActivityKey"]), lesson_activities)[0]
+        return activity_answer
+
+    def set_question_anwser(self, question):
+        question_answer = {}
+        question_answer["Attempts"] = None
+        question_answer["Detail"] = {"modelData": None}
+        question_answer["Duration"] = None
+        question_answer["LocalEndStamp"] = None
+        question_answer["Key"] = None
+        question_answer["Score"] = 8
+        question_answer["TotalScore"] = 8
+        question_answer["Star"] = None
+        question_answer["TotalStar"] = None
+        question_answer["LocalStartStamp"] = None
+        question_answer["LocalEndStamp"] = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
+        question_answer["QuestionKey"] = jmespath.search("Key", question)
+        return question_answer
 
     def homework_lesson_answer(self, lesson_key):
         body = self.generate_lesson_answer(lesson_key)
