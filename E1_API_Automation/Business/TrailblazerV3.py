@@ -141,10 +141,6 @@ class TrailbazerService():
         submit_data["LessonKey"] = lesson_key
         activity_answers = []
         for activity in jmespath.search("Activities", detail_activity):
-            # answers = []
-            # for question in jmespath.search("Questions", activity):
-            #     question_answer = self.set_question_anwser(question)
-            #     answers.append(question_answer)
             answers = [self.set_question_anwser(question) for question in jmespath.search("Questions", activity)]
             activity_answer = self.set_activity_answer(activity, answers, lesson_activities)
             activity_answers.append(activity_answer)
