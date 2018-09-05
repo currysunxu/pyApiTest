@@ -101,24 +101,7 @@ class TBTestCases(TraiblazerBaseClass):
         activity_questions = jmespath.search("[*].ActivityKeys[0]", lesson_activities)
         self.tb_test.acitivity_entity_web(activity_questions)
         lesson_score = self.tb_test.lesson_score_summary([unlocked_lessons[3]]).json()
-        for i in range(1, len(lesson_activities)+1):
+        for i in range(1, len(lesson_activities) + 1):
             self.tb_test.student_progress(unlocked_lessons[3], i, len(lesson_activities))
         response = self.tb_test.homework_lesson_answer(unlocked_lessons[3])
         assert_that(response.status_code == 200)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
