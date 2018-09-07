@@ -26,6 +26,6 @@ class GP_user:
     GPUsers = {'QA': {'username': 'gpauto', 'password': '12345'},
                'Staging': {'username': 'gptest050', 'password': '12345'},
                'Live': {'username': 'gptest3', 'password': '12345'}}
-    GPDTUsers = {'QA': {'username': 'lesson1', 'password': '12345'},
-                 'Staging': {'username': 'gptest010', 'password': '12345'},
+    GPDTUsers = {'QA': {'username': 'gp02', 'password': '12345'},
+                 'Staging': {'username': 'gptest008', 'password': '12345'},
                  'Live': {'username': 'gptest3', 'password': '12345'}}
