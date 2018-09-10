@@ -1,5 +1,3 @@
-from time import sleep
-
 import jmespath
 from ptest.assertion import assert_that
 
@@ -111,9 +109,7 @@ class GPService():
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         if first_time == True:
             self.reset_grade(student_id)
-            sleep(5)
         question_list = self.put_dt_start().json()
-        # print(question_list)
         dt_key = jmespath.search('DiagnosticTestKey', question_list)
         failed_module_list, module_activity_answers = [], []
         submit_data = {}
@@ -139,7 +135,6 @@ class GPService():
                     module_activity_answers.append(module_activity_answer)
 
         submit_data['StudentModuleActivityAnswer'] = module_activity_answers
-        # print(str(submit_data).encode('utf-8'))
         failed_module = list(set(failed_module_list))
         return submit_data, failed_module
 
@@ -187,7 +182,6 @@ class GPService():
         module_key = jmespath.search("RemediationProgress.Recommended[0].ModuleKey", student_progress)
         lesson_key = jmespath.search("RemediationProgress.Recommended[0].Lessons[2].LessonKey", student_progress)
         submit_data = {"ModuleKey": module_key, "LessonKey": lesson_key}
-
         return submit_data
 
     def get_lesson_activity_key(self):
