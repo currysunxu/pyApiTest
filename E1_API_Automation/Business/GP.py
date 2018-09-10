@@ -1,3 +1,5 @@
+from time import sleep
+
 import jmespath
 from ptest.assertion import assert_that
 
@@ -109,6 +111,7 @@ class GPService():
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         if first_time == True:
             self.reset_grade(student_id)
+            sleep(5)
         question_list = self.put_dt_start().json()
         # print(question_list)
         dt_key = jmespath.search('DiagnosticTestKey', question_list)
@@ -140,39 +143,6 @@ class GPService():
         failed_module = list(set(failed_module_list))
         return submit_data, failed_module
 
-    # def get_dt_not_first_time_submit_answer(self, failed_module_number):
-    #     student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
-    #     question_list = self.put_dt_start().json()
-    #     # print(question_list)
-    #     dt_key = jmespath.search('DiagnosticTestKey', question_list)
-    #     failed_module_list, module_activity_answers = [], []
-    #     submit_data = {}
-    #     submit_data['DiagnosticTestKey'] = dt_key
-    #     submit_data['Studentid'] = student_id
-    #     for index, module in enumerate(jmespath.search('Modules', question_list)):
-    #         module_key = jmespath.search('ModuleKey', module)
-    #         for activity in jmespath.search('Activitys', module):
-    #             activity_type = jmespath.search('Type', activity)
-    #             activity_key = jmespath.search('Key', activity)
-    #             for question in jmespath.search('Questions', activity):
-    #                 question_key = jmespath.search('Key', question)
-    #                 submit_question = self.set_submit_question(question_key)
-    #                 if index+1 > failed_module_number:
-    #                     submit_question['Score'] = 1
-    #                 else:
-    #                     submit_question['Score'] = 0
-    #                     failed_module_list.append(module_key)
-    #
-    #                 module_activity_answer = self.set_module_activity_answer(activity_key, activity_type, module_key,
-    #                                                                          submit_question)
-    #                 module_activity_answers.append(module_activity_answer)
-    #
-    #     submit_data['StudentModuleActivityAnswer'] = module_activity_answers
-    #     failed_module=[]
-    #     failed_module = [failed_module.append(i) for i in failed_module_list if not i in failed_module]
-    #     print(str(submit_data).encode('utf-8'))
-    #     return submit_data, failed_module
-
     def set_submit_question(self, question_key):
         submit_question = {}
         submit_question['Attempts'] = None
@@ -199,11 +169,17 @@ class GPService():
         reset_dt = ResetGPGradeTool()
         reset_dt.reset_grade(student_id)
 
-    def get_all_module_quiz_answer(self):
+    def save_all_module_quiz_answer(self):
         student_progress = self.get_student_progress().json()
         module_key = jmespath.search("DiagnosticTestProgress.NextDiagnosticTest.NeedToBeVerified", student_progress)
         for single_module_key in module_key:
-            self.get_submit_quiz_answer(single_module_key)
+            self.save_submit_quiz_answer(single_module_key)
+
+    def save_lower_grade_quiz_answer(self):
+        student_progress = self.get_student_progress().json()
+        module_key = jmespath.search("RemediationProgress.LessThanSelectedGradeModules[].ModuleKey", student_progress)
+        for single_module_key in module_key:
+            self.save_submit_quiz_answer(single_module_key, False)
 
     def get_quiz_start_info(self):
         student_progress = self.get_student_progress().json()
@@ -220,13 +196,19 @@ class GPService():
         activity_key = jmespath.search("RemediationProgress.Recommended[0].Lessons[0].ActivityKeys", student_progress)
         return activity_key
 
-    def get_submit_quiz_answer(self, single_module_key):
+    def save_submit_quiz_answer(self, single_module_key, Remediation=True):
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         submit_data = {}
         for lesson_number in range(1, 5):
             student_progress = self.get_student_progress().json()
-            module_json = jmespath.search("RemediationProgress.Recommended[?ModuleKey=='" + single_module_key + "']",
-                                          student_progress)
+            if Remediation == True:
+                module_json = jmespath.search(
+                    "RemediationProgress.Recommended[?ModuleKey=='" + single_module_key + "']",
+                    student_progress)
+            else:
+                module_json = jmespath.search(
+                    "RemediationProgress.LessThanSelectedGradeModules[?ModuleKey=='" + single_module_key + "']",
+                    student_progress)
 
             single_activity_list, single_lesson_key = self.get_lesson_key_and_single_activity_list(lesson_number,
                                                                                                    module_json)
@@ -305,7 +287,7 @@ class GPService():
         response = self.put_dt_save(submit_json[0])
         assert_that(response.status_code == 204)
         if failed_module_number != 0:
-            self.finish_all_quiz_from_latest_dt()
+            self.save_all_module_quiz_answer()
 
     def finish_not_first_dt(self, failed_module_number, first_time=False, loop=1):
         for times in range(loop):
@@ -313,9 +295,4 @@ class GPService():
             response = self.put_dt_save(submit_json[0])
             assert_that(response.status_code == 204)
             if failed_module_number != 0 and loop % 2 == 0:
-                self.finish_all_quiz_from_latest_dt()
-
-    def finish_all_quiz_from_latest_dt(self):
-        submit_answer = self.get_all_module_quiz_answer()
-        response = self.post_quiz_save(submit_answer)
-        assert_that(response.status_code == 204)
+                self.save_all_module_quiz_answer()
