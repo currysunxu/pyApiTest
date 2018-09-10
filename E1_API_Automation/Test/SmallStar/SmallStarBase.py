@@ -29,6 +29,7 @@ class SmallStarBase():
     def set_context(self):
         self.small_star_service.login('ssv303', '12345')
         response = self.small_star_service.get_student_profile().json()
+        self.user_id = jmespath.search('UserId', response)
         self.current_book_key = jmespath.search("CurrentBookKey", response)
         self.group_key = jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.Key".format(self.current_book_key), response)[0]
         self.product_code = jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.ProductCode".format(self.current_book_key), response)[0]

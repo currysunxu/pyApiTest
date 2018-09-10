@@ -81,7 +81,7 @@ class SmallStarService():
         return self.mou_tai.get("/api/v2/BinaryData/ResourceId/{}".format(resource_id))
 
     def get_small_star_unlock_course_keys(self, book_key):
-        return self.mou_tai.get("/api/v2/CourseUnlock/SmallStar/{}".format(book_key))
+        return self.mou_tai.get("/api/v2/CourseUnlock/{}".format(book_key))
 
     def submit_small_star_student_answers(self, body):
         '''
@@ -129,3 +129,9 @@ class SmallStarService():
 
     def batch_resource(self, resource_id):
         return self.mou_tai.get("/Resource/Batch/{}".format(resource_id))
+
+    def batch_resources(self, resource_id_list: list):
+        parameter = ','.join(resource_id_list)
+        return self.mou_tai.get("/Resource/Batch/{}".format(parameter))
+
+
