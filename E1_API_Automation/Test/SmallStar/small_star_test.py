@@ -62,6 +62,28 @@ class SmallStarTestCases(SmallStarBase):
 
     @Test()
     def synchronize_course_node(self):
-        response = self.small_star_service.synchronize_course_node(self.current_book_key, self.course_plan_key, self.product_code, amount=2147483647)
+        response = self.small_star_service.synchronize_course_node(self.current_book_key, self.course_plan_key, self.product_code, upserts_only=False, amount=2147483647)
+        assert_that(len(jmespath.search('Upserts', response.json())) != 0)
+        assert_that(response.json(), exist('Upserts'))
+        assert_that(len(jmespath.search('Upserts[*].TopNodeKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].ParentNodeKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].CoursePlanKey', response.json())) != 0)
+
+    @Test()
+    def synchronize_activitiy(self):
+        response = self.small_star_service.synchronize_activity(self.current_book_key, self.course_plan_key, self.product_code, amount=2147483647)
+        assert_that(len(jmespath.search('Upserts', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].Title', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].Stimulus', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].Questions', response.json())) != 0)
+
+    @Test()
+    def synchronize_digital_article(self):
+        response = self.small_star_service.synchronize_digital_article(self.current_book_key, self.course_plan_key, self.product_code, upserts_only=False, amount=2147483647)
+        assert_that(len(jmespath.search('Upserts', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].BinaryMeta', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].Body.resources', response.json())) != 0)
+
+
 
 

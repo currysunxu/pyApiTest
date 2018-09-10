@@ -126,3 +126,6 @@ class SmallStarService():
 
     def fetch_content_update_summary(self, body):
         return self.mou_tai.post("/api/v2/Content/", json=body)
+
+    def batch_resource(self, resource_id):
+        return self.mou_tai.get("/Resource/Batch/{}".format(resource_id))
