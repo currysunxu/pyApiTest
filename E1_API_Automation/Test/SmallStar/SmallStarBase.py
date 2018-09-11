@@ -2,7 +2,7 @@ import jmespath
 from ptest.decorator import TestClass, BeforeClass, AfterMethod, BeforeMethod
 
 from E1_API_Automation.Business.SmallStarV3 import SmallStarService
-from E1_API_Automation.Settings import ENVIRONMENT
+from E1_API_Automation.Settings import ENVIRONMENT, Environment
 
 
 @TestClass()
@@ -11,6 +11,14 @@ class SmallStarBase():
     group_key = None
     product_code = None
     course_plan_key = None
+    if ENVIRONMENT == Environment.STAGING:
+        user_name = "ssv303"
+        password = '12345'
+    if ENVIRONMENT == Environment.QA:
+        user_name = "ssv23"
+        password = '12345'
+
+
 
     @BeforeClass()
     def set_up(self):
@@ -24,10 +32,10 @@ class SmallStarBase():
 
     @BeforeMethod()
     def sigin(self):
-        self.small_star_service.login("ssv303", '12345')
+        self.small_star_service.login(self.user_name, self.password)
 
     def set_context(self):
-        self.small_star_service.login('ssv303', '12345')
+        self.small_star_service.login(self.user_name, self.password)
         response = self.small_star_service.get_student_profile().json()
         self.user_id = jmespath.search('UserId', response)
         self.current_book_key = jmespath.search("CurrentBookKey", response)

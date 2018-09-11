@@ -48,7 +48,7 @@ class SmallStarTestCases(SmallStarBase):
         assert_that(response.json(), exist('Upserts'))
         assert_that(len(jmespath.search('Upserts[*].ResourceId', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].Container', response.json())) != 0)
-        assert_that(jmespath.search("Upserts[*].Container", response.json())[0] == 'e1-osp-staging' )
+        assert_that("e1-osp" in jmespath.search("Upserts[*].Container", response.json())[0])
 
     @Test()
     def synchronize_course_node(self):
