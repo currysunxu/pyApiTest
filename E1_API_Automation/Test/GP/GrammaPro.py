@@ -135,3 +135,17 @@ class GPAPITestCases(GrammarProBaseClass):
         region_and_grade = self.gptest.get_region_and_grade()
         assert_that(region_and_grade.json(), match_to("[*].Region.Name"))
         assert_that(region_and_grade.json(), match_to("[*].Grades[*].Grade.Key"))
+
+
+    @Test()
+    def test_no_new_dt_generate(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        submit_json = self.gptest.get_dt_submit_answer(3, True)
+        dt_save = self.gptest.put_dt_save(submit_json[0])
+        assert_that(dt_save.status_code == 204)
+        submit_json=self.gptest.get_dt_submit_answer(0,False)
+        assert_that(submit_json==403)
+
+
+
+
