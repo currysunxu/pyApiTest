@@ -10,18 +10,19 @@ class ResetGPGradeTool:
         search_url = 'http://internal-e1pss-qa.ef.com//User/UserSource/QA?rand=0.14291181323741897&PageId=0'
         reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile?userKey=%s&rand=0.17256526783407744&PageId=0'
         tool_url = 'http://internal-e1pss-qa.ef.com'
-    elif E1_API_Automation.Settings.env_key == 'STG':
-        search_url = 'http://internal-e1pss-qa.ef.com/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
-        reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile/STAGING-CN?userKey=%s&rand=0.17256526783407744&PageId=0'
-        tool_url = 'http://internal-e1pss-qa.ef.com'
+    elif E1_API_Automation.Settings.env_key == 'Staging':
+            search_url = 'http://internal-e1pss-qa.ef.com/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
+            reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile/STAGING-CN?userKey=%s&rand=0.17256526783407744&PageId=0'
+            tool_url = 'http://internal-e1pss-qa.ef.com'
     elif E1_API_Automation.Settings.env_key == 'Live':
-        search_url = 'https://pssportal.ef.cn/User/UserSource/PROD?rand=0.9001314632136694&PageId=0'
-        reset_url = 'https://pssportal.ef.cn/User/SaveStudentProfile/PROD-CN?userKey=%s&rand=0.36498686749677756&PageId=0'
-        tool_url = 'https://pssportal.ef.cn'
+            search_url = 'https://pssportal.ef.cn/User/UserSource/PROD?rand=0.9001314632136694&PageId=0'
+            reset_url = 'https://pssportal.ef.cn/User/SaveStudentProfile/PROD-CN?userKey=%s&rand=0.36498686749677756&PageId=0'
+            tool_url = 'https://pssportal.ef.cn'
 
     login_user = ("qa.testauto@ef.com", "test@456")
 
     def __init__(self):
+
         self.cookie = self.login(self.login_user[0], self.login_user[1])
 
     def login(self, username, password):
