@@ -219,8 +219,6 @@ class GPService():
         activity_key = jmespath.search("RemediationProgress.Recommended[0].Lessons[0].ActivityKeys", student_progress)
         return activity_key
 
-
-
     def get_submit_quiz_answer(self, single_module_key):
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         submit_data = {}
