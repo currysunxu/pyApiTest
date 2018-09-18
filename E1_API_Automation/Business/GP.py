@@ -110,33 +110,37 @@ class GPService():
         if first_time == True:
             self.reset_grade(student_id)
         question_list = self.put_dt_start().json()
-        dt_key = jmespath.search('DiagnosticTestKey', question_list)
-        failed_module_list, module_activity_answers = [], []
-        submit_data = {}
-        submit_data['DiagnosticTestKey'] = dt_key
-        submit_data['Studentid'] = student_id
+        response_code= self.put_dt_start()
+        if response_code.status_code==200:
+            dt_key = jmespath.search('DiagnosticTestKey', question_list)
+            failed_module_list, module_activity_answers = [], []
+            submit_data = {}
+            submit_data['DiagnosticTestKey'] = dt_key
+            submit_data['Studentid'] = student_id
 
-        for index, module in enumerate(jmespath.search('Modules', question_list)):
-            module_key = jmespath.search('ModuleKey', module)
-            for activity in jmespath.search('Activitys', module):
-                activity_type = jmespath.search('Type', activity)
-                activity_key = jmespath.search('Key', activity)
-                for question in jmespath.search('Questions', activity):
-                    question_key = jmespath.search('Key', question)
-                    submit_question = self.set_submit_question(question_key)
-                    if index + 1 > failed_module_number:
-                        submit_question['Score'] = 1
-                    else:
-                        submit_question['Score'] = 0
-                        failed_module_list.append(module_key)
+            for index, module in enumerate(jmespath.search('Modules', question_list)):
+                module_key = jmespath.search('ModuleKey', module)
+                for activity in jmespath.search('Activitys', module):
+                    activity_type = jmespath.search('Type', activity)
+                    activity_key = jmespath.search('Key', activity)
+                    for question in jmespath.search('Questions', activity):
+                        question_key = jmespath.search('Key', question)
+                        submit_question = self.set_submit_question(question_key)
+                        if index + 1 > failed_module_number:
+                            submit_question['Score'] = 1
+                        else:
+                            submit_question['Score'] = 0
+                            failed_module_list.append(module_key)
 
-                    module_activity_answer = self.set_module_activity_answer(activity_key, activity_type, module_key,
-                                                                             submit_question)
-                    module_activity_answers.append(module_activity_answer)
+                        module_activity_answer = self.set_module_activity_answer(activity_key, activity_type, module_key,
+                                                                                 submit_question)
+                        module_activity_answers.append(module_activity_answer)
 
-        submit_data['StudentModuleActivityAnswer'] = module_activity_answers
-        failed_module = list(set(failed_module_list))
-        return submit_data, failed_module
+            submit_data['StudentModuleActivityAnswer'] = module_activity_answers
+            failed_module = list(set(failed_module_list))
+            return submit_data, failed_module, response_code.status_code
+        else:
+            return response_code.status_code
 
     def set_submit_question(self, question_key):
         submit_question = {}
