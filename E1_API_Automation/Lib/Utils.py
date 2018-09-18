@@ -23,9 +23,10 @@ def get_html_tagvalues(source, tagpath):
     parser = MyHTMLParser()
     parser.feed(source)
     userdata = []
+
     for item in datatag:
         for key, value in item.items():
             if key == tagpath:
                 userdata.append(value)
-    userdata.clear()
+    datatag.clear()
     return userdata
