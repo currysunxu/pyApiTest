@@ -83,10 +83,7 @@ class TBTestCases(TraiblazerBaseClass):
         response = self.tb_test.course_unlock(self.tb_test.active_book)
         assert_that(response.status_code == 200)
 
-    @Test()
-    def test_homework_motivation_task_info_status(self):
-        response = self.tb_test.get_homework_motivation_task_info(self.tb_test.active_book)
-        assert_that(response.status_code == 200)
+
 
     @Test()
     def test_reward_summary_status(self):
@@ -96,15 +93,30 @@ class TBTestCases(TraiblazerBaseClass):
     @Test()
     def test_student_progress(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
-
-        lesson_activities = self.tb_test.get_child_node(unlocked_lessons[3].lower())
+        picked_lesson = unlocked_lessons[0]
+        lesson_activities = self.tb_test.get_child_node(picked_lesson)
         activity_questions = jmespath.search("[*].ActivityKeys[0]", lesson_activities)
         self.tb_test.acitivity_entity_web(activity_questions)
-        lesson_score = self.tb_test.lesson_score_summary([unlocked_lessons[3]]).json()
+        lesson_score = self.tb_test.lesson_score_summary([picked_lesson]).json()
         for i in range(1, len(lesson_activities) + 1):
             self.tb_test.student_progress(unlocked_lessons[3], i, len(lesson_activities))
-        response = self.tb_test.homework_lesson_answer(unlocked_lessons[3])
+        response = self.tb_test.homework_lesson_answer(picked_lesson)
         assert_that(response.status_code == 200)
+
+    @Test()
+    def test_homework_lesson_correction(self):
+        unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
+        picked_lesson =  unlocked_lessons[0]
+        lesson_activities = self.tb_test.get_child_node(picked_lesson)
+        activity_questions = jmespath.search("[*].ActivityKeys[0]", lesson_activities)
+        self.tb_test.acitivity_entity_web(activity_questions)
+        lesson_score = self.tb_test.lesson_score_summary([picked_lesson]).json()
+        for i in range(1, len(lesson_activities) + 1):
+            self.tb_test.student_progress(unlocked_lessons[3], i, len(lesson_activities))
+        response = self.tb_test.homework_lesson_answer(picked_lesson, correct=False)
+        correction = self.tb_test.homework_lesson_correction(picked_lesson)
+        assert_that(correction.status_code == 200)
+
 
     @Test()
     def test_homework_motivation_task_info_status(self):
@@ -133,7 +145,7 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(response.status_code == 200)
 
     @Test()
-    def test_get_all_book(self):
+    def test_get_all_book_schema(self):
         response = self.tb_test.get_all_books()
         assert_that(len(response.json()) > 0)
         assert_that(response.json()[0], exist("CreatedBy"))
@@ -165,7 +177,7 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(response.status_code == 200)
 
     @Test()
-    def test_digital_interaction_info_status(self):
+    def test_digital_interaction_info_schema(self):
         response = self.tb_test.digital_interaction_info(self.tb_test.active_book)
         assert_that(len(response.json()) > 0)
         assert_that(response.json()[0], exist("Title"))
@@ -186,10 +198,6 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(response.status_code == 200)
         assert_that(len(response.json()) > 0)
 
-    @Test()
-    def test_motivation_point_audit_status(self):
-        response = self.tb_test.query_motivation_point_audit(self.tb_test.active_book)
-        assert_that(response.status_code == 200)
 
     @Test()
     def test_motivation_reward_summary_status(self):
