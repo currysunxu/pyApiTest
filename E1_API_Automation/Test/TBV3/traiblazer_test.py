@@ -145,7 +145,7 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(response.status_code == 200)
 
     @Test()
-    def test_get_all_book(self):
+    def test_get_all_book_schema(self):
         response = self.tb_test.get_all_books()
         assert_that(len(response.json()) > 0)
         assert_that(response.json()[0], exist("CreatedBy"))
@@ -177,7 +177,7 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(response.status_code == 200)
 
     @Test()
-    def test_digital_interaction_info_status(self):
+    def test_digital_interaction_info_schema(self):
         response = self.tb_test.digital_interaction_info(self.tb_test.active_book)
         assert_that(len(response.json()) > 0)
         assert_that(response.json()[0], exist("Title"))

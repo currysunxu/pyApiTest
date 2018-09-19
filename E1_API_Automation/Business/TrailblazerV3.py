@@ -182,10 +182,8 @@ class TrailbazerService:
         lesson_activities = self.get_child_node(lesson_key.lower())
         activity_key = jmespath.search("[*].ActivityKeys[0]", lesson_activities)
         detail_activity = self.acitivity_entity_web(activity_key).json()
-        a = jmespath.search("Activities", detail_activity)
-        b = Activity().create_activity(a[0]).total_question_count
         total_question_count = reduce(lambda x, y: x + y,
-                                      map(lambda x: Activity().create_activity(x).total_question_count, a))
+                                      map(lambda x: Activity().create_activity(x).total_question_count, jmespath.search("Activities", detail_activity)))
         print(total_question_count)
         body = {
             'CorrectedAmount': total_question_count,
