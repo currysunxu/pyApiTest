@@ -4,7 +4,8 @@ import jmespath
 import arrow
 from functools import reduce
 
-class TrailbazerService():
+
+class TrailbazerService:
     def __init__(self, host, user_name, password):
         self.host = host
         self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
@@ -107,8 +108,6 @@ class TrailbazerService():
     def lesson_score_summary(self, lesson_key_list):
         return self.mou_tai.post("/api/v2/lessonScoreSummary", json=lesson_key_list)
 
-
-
     def digital_interaction_info(self, book_key):
         return self.mou_tai.get("/api/v2/DigitalInteractionInfo/ByBook/{0}".format(book_key))
 
@@ -121,10 +120,10 @@ class TrailbazerService():
         body = {"key": None,
                 "CourseKey": course_key,
                 "StudentId": self.user_id,
-                 "LastUpdatedStamp":  arrow.utcnow().format('YYYY-MM-DDTHH:mm'),
+                "LastUpdatedStamp": arrow.utcnow().format('YYYY-MM-DDTHH:mm'),
                 "CompletedValue": completed_value,
                 "TotalValue": total_value,
-                "Percentage": round(completed_value/total_value, 3)}
+                "Percentage": round(completed_value / total_value, 3)}
         return self.mou_tai.post("/api/v2/StudentProgress", json=body)
 
     def generate_lesson_answer(self, lesson_key, correct):
@@ -137,7 +136,8 @@ class TrailbazerService():
         activity_answers = []
         for activity_json in jmespath.search("Activities", detail_activity):
             activity = Activity().create_activity(activity_json)
-            answers = [self.set_question_anwser(correct,activity.get_question_score(question), question) for question in activity.question_key_list]
+            answers = [self.set_question_anwser(correct, activity.get_question_score(question), question) for question
+                       in activity.question_key_list]
             activity_answer = self.set_activity_answer(activity, answers, lesson_activities)
             activity_answers.append(activity_answer)
 
@@ -152,7 +152,7 @@ class TrailbazerService():
         activity_answer["TotalQuestionCount"] = None
         activity_answer["ActivityKey"] = activity.key
         activity_answer["ActivityCourseKey"] = \
-        jmespath.search("@[?ActivityKeys[0]=='{0}'].Key".format(activity.key), lesson_activities)[0]
+            jmespath.search("@[?ActivityKeys[0]=='{0}'].Key".format(activity.key), lesson_activities)[0]
         return activity_answer
 
     def set_question_anwser(self, correct, total_score, question_key):
@@ -174,8 +174,8 @@ class TrailbazerService():
         question_answer["QuestionKey"] = question_key
         return question_answer
 
-    def homework_lesson_answer(self, lesson_key, correct = True):
-        body = self.generate_lesson_answer(lesson_key,correct)
+    def homework_lesson_answer(self, lesson_key, correct=True):
+        body = self.generate_lesson_answer(lesson_key, correct)
         return self.mou_tai.put(url='/api/v2/HomeworkLessonAnswer', json=body)
 
     def homework_lesson_correction(self, lesson_key):
@@ -184,15 +184,15 @@ class TrailbazerService():
         detail_activity = self.acitivity_entity_web(activity_key).json()
         a = jmespath.search("Activities", detail_activity)
         b = Activity().create_activity(a[0]).total_question_count
-        total_question_count = reduce(lambda x,y:x+y,map(lambda x: Activity().create_activity(x).total_question_count, a))
+        total_question_count = reduce(lambda x, y: x + y,
+                                      map(lambda x: Activity().create_activity(x).total_question_count, a))
         print(total_question_count)
         body = {
             'CorrectedAmount': total_question_count,
-            'CourseKey':lesson_key,
-            'MistakeAmount':total_question_count
+            'CourseKey': lesson_key,
+            'MistakeAmount': total_question_count
         }
         return self.mou_tai.put(url='/api/v2/HomeworkLessonCorrection', json=body)
 
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
-
