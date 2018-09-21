@@ -6,6 +6,7 @@ class Environment(object):
     STAGING = "https://e1svc-staging.ef.cn"
     LIVE = "https://e1svc.ef.cn"
     STAGING_SG = "https://e1svc-staging.ef.com"
+    LIVE_SG = "https://e1svc.ef.com"
 
 
 # os.environ['environment'] = 'STG'
@@ -27,3 +28,7 @@ elif os.environ['environment'] == 'STG_SG':
 elif os.environ['environment'] == 'LIVE':
     ENVIRONMENT = Environment.LIVE
     env_key = 'Live'
+
+elif os.environ['environment'] == 'LIVE_SG':
+    ENVIRONMENT = Environment.LIVE_SG
+    env_key = 'Live_SG'

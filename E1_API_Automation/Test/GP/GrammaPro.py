@@ -77,13 +77,13 @@ class GPAPITestCases(GrammarProBaseClass):
         assert_that(student_profile.json(), match_to("UserStatus"))
 
     @Test()
-    def test_cn_privacy_policy(self):
+    def test_local_privacy_policy(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        cn_privacy_policy = self.gptest.get_cn_privacy_policy()
-        assert_that(cn_privacy_policy.json(), match_to("StudentId"))
-        assert_that(cn_privacy_policy.json(), match_to("ProductId"))
-        assert_that(cn_privacy_policy.json(), match_to("LatestPrivacyPolicyDocumentResult.Id"))
-        assert_that(cn_privacy_policy.json(), match_to("LatestPrivacyPolicyDocumentResult.Url"))
+        local_privacy_policy = self.gptest.get_local_privacy_policy(env_key)
+        assert_that(local_privacy_policy.json(), match_to("StudentId"))
+        assert_that(local_privacy_policy.json(), match_to("ProductId"))
+        assert_that(local_privacy_policy.json(), match_to("LatestPrivacyPolicyDocumentResult.Id"))
+        assert_that(local_privacy_policy.json(), match_to("LatestPrivacyPolicyDocumentResult.Url"))
 
     @Test()
     def test_module_latest(self):
@@ -95,12 +95,12 @@ class GPAPITestCases(GrammarProBaseClass):
         assert_that(module_latest.json(), match_to("[*].QuestionAnswer.TotalScore"))
 
     @Test()
-    def test_cn_student_report(self):
+    def test_local_language_student_report(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        cn_student_report = self.gptest.get_cn_student_report()
-        assert_that(cn_student_report.json(), exist("IsRead"))
-        assert_that(cn_student_report.json(), exist("Key"))
-        assert_that(cn_student_report.json(), exist("Url"))
+        local_language_student_report = self.gptest.get_local_language_student_report(env_key)
+        assert_that(local_language_student_report.json(), exist("IsRead"))
+        assert_that(local_language_student_report.json(), exist("Key"))
+        assert_that(local_language_student_report.json(), exist("Url"))
 
     @Test()
     def test_en_student_report(self):
