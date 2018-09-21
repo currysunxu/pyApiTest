@@ -31,10 +31,10 @@ class GPService():
         return self.mou_tai.post("/api/v2/xAPI/AccessToken/")
 
     def get_local_privacy_policy(self, culture_code):
-        return self.mou_tai.get("/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement/?product=7&cultureCode=%s" % culture_code)
+        return self.mou_tai.get("/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement/?product=7&cultureCode={}".format(culture_code))
 
     def get_local_language_student_report(self, culture_code):
-        return self.mou_tai.get("/api/v2/StudentReport/%s" % culture_code)
+        return self.mou_tai.get("/api/v2/StudentReport/{}".format(culture_code))
 
     def get_en_student_report(self):
         return self.mou_tai.get("/api/v2/StudentReport/en-US")
