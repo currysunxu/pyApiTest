@@ -228,7 +228,7 @@ class APITestCases(EVCBase):
         assert_that(response.status_code == 401)
 
 
-    # @Test()
+    @Test()
     def get_after_class_report(self):
         self.test_login()# This login is used to for after method. we will change it in the future.
         local_evc_service = KidsEVCService(host=self.host)
