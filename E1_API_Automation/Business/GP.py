@@ -30,19 +30,10 @@ class GPService():
     def post_access_token(self):
         return self.mou_tai.post("/api/v2/xAPI/AccessToken/")
 
-    def get_local_privacy_policy(self, env_key):
-        if env_key in ('QA','Staging','Live'):
-            culture_code='zh-CN'
-        else:
-            culture_code='id-ID'
-
+    def get_local_privacy_policy(self, culture_code):
         return self.mou_tai.get("/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement/?product=7&cultureCode=%s" % culture_code)
 
-    def get_local_language_student_report(self, env_key):
-        if env_key in ('QA','Staging','Live'):
-            culture_code='zh-CN'
-        else:
-            culture_code='id-ID'
+    def get_local_language_student_report(self, culture_code):
         return self.mou_tai.get("/api/v2/StudentReport/%s" % culture_code)
 
     def get_en_student_report(self):

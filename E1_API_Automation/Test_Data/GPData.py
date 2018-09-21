@@ -23,13 +23,13 @@ class ShanghaiGradeKey:
 
 
 class GP_user:
-    GPUsers = {'QA': {'username': 'gpauto', 'password': '12345'},
-               'Staging': {'username': 'gptest050', 'password': '12345'},
-               'Live': {'username': 'gptest_02', 'password': '12345'},
-               'Staging_SG': {'username': 'GP0606addGroup.wu', 'password': '12345'},
-               'Live_SG': {'username': 'GP0606addGroup.wu', 'password': '12345'}}
+    GPUsers = {'QA': {'username': 'gpauto', 'password': '12345','culture_code':'zh-CN'},
+               'Staging': {'username': 'gptest050', 'password': '12345','culture_code':'zh-CN'},
+               'Live': {'username': 'gptest_02', 'password': '12345','culture_code':'zh-CN'},
+               'Staging_SG': {'username': 'id.grampro', 'password': '12345','culture_code':'id-ID'},
+               'Live_SG': {'username': 'id.grampro', 'password': '12345','culture_code':'id-ID'}}
     GPDTUsers = {'QA': {'username': 'gp02', 'password': '12345'},
                  'Staging': {'username': 'gptest009', 'password': '12345'},
                  'Live': {'username': 'gptest_03', 'password': '12345'},
-                 'Staging_SG': {'username': 'id.grampro', 'password': '12345'},
-                 'Live_SG': {'username': 'id.grampro', 'password': '12345'}}
+                 'Staging_SG': {'username': 'GP0606addGroup.wu', 'password': '12345'},
+                 'Live_SG': {'username': 'GP0606addGroup.wu', 'password': '12345'}}

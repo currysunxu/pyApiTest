@@ -79,7 +79,7 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_local_privacy_policy(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        local_privacy_policy = self.gptest.get_local_privacy_policy(env_key)
+        local_privacy_policy = self.gptest.get_local_privacy_policy(GP_user.GPUsers[env_key]['culture_code'])
         assert_that(local_privacy_policy.json(), match_to("StudentId"))
         assert_that(local_privacy_policy.json(), match_to("ProductId"))
         assert_that(local_privacy_policy.json(), match_to("LatestPrivacyPolicyDocumentResult.Id"))
@@ -97,7 +97,7 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_local_language_student_report(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        local_language_student_report = self.gptest.get_local_language_student_report(env_key)
+        local_language_student_report = self.gptest.get_local_language_student_report(GP_user.GPUsers[env_key]['culture_code'])
         assert_that(local_language_student_report.json(), exist("IsRead"))
         assert_that(local_language_student_report.json(), exist("Key"))
         assert_that(local_language_student_report.json(), exist("Url"))
