@@ -6,9 +6,14 @@ from ..Test_Data.GPData import EducationRegion, ShanghaiGradeKey
 
 
 class ResetGPGradeTool:
-    if E1_API_Automation.Settings.env_key in ('QA','Staging','Staging_SG'):
+    if E1_API_Automation.Settings.env_key == 'QA':
         search_url = 'http://internal-e1pss-qa.ef.com//User/UserSource/QA?rand=0.14291181323741897&PageId=0'
         reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile?userKey=%s&rand=0.17256526783407744&PageId=0'
+        tool_url = 'http://internal-e1pss-qa.ef.com'
+
+    elif E1_API_Automation.Settings.env_key in ('Staging','Staging_SG'):
+        search_url = 'http://internal-e1pss-qa.ef.com/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
+        reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile/STAGING-CN?userKey=%s&rand=0.17256526783407744&PageId=0'
         tool_url = 'http://internal-e1pss-qa.ef.com'
 
     elif E1_API_Automation.Settings.env_key in ('Live','Live_SG'):
