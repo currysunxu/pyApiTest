@@ -118,9 +118,9 @@ class EVCBase():
             "AvatarUrl": "http://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
         }
         after_report_info = {
-            "Student_User_Name": "addison",
+            "Student_User_Name": "osk08",
             "Student_Password": "12345",
-            "ClassId": "247002"
+            "ClassId": "248427"
         }
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
