@@ -119,9 +119,16 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_available_grade(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        for city_list in EducationRegion.city_list:
-            available_grade = self.gptest.get_available_grade(EducationRegion.city_list[city_list])
+        city_list={}
+        if  GP_user.GPUsers[env_key]['culture_code']=='zh_CN':
+            city_list= EducationRegion.cn_city_list
+        elif GP_user.GPUsers[env_key]['culture_code']=='id_ID':
+            city_list= EducationRegion.id_city_list
+
+        for city_name in city_list:
+            available_grade = self.gptest.get_available_grade(city_list[city_name])
             assert_that(available_grade.json(), match_to("[*].Grade.Key"))
+
 
     @Test()
     def test_student_progress(self):
