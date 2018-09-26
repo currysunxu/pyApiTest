@@ -53,7 +53,7 @@ class TBTestCases(TraiblazerBaseClass):
     def test_course_node_synchronize_function(self):
         activity_contents = self.tb_test.course_node_synchronize(self.tb_test.active_book,
                                                                  self.tb_test.course_plan_key).json()
-        assert_that(len(self.tb_test.book_contents) > 0)
+        assert_that(len(activity_contents) > 0)
 
     @Test()
     def test_activity_entity_status(self):
