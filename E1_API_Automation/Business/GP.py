@@ -1,6 +1,7 @@
 import jmespath
 from ptest.assertion import assert_that
 
+from E1_API_Automation.Settings import env_key
 from ..Lib.Moutai import Moutai, Token
 from ..Lib.ResetGPGradeTool import ResetGPGradeTool
 
@@ -81,6 +82,9 @@ class GPService():
     def put_custom_test_save(self, test_answer):
         return self.mou_tai.put("/api/v2/CustomTest/Save/", test_answer)
 
+    def put_student_profile_save(self,grade_id):
+        return  self.mou_tai.put("/api/v2/profile/Save",grade_id)
+
     def get_custom_test_answer(self, module_list):
 
         question_list = self.put_custom_test_start(module_list[:4]).json()
@@ -108,7 +112,7 @@ class GPService():
     def get_dt_submit_answer(self, failed_module_number, first_time=True):
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         if first_time == True:
-            self.reset_grade(student_id)
+            self.reset_grade(student_id,env_key)
         question_list = self.put_dt_start().json()
         response_code= self.put_dt_start()
         if response_code.status_code==200:
@@ -164,9 +168,9 @@ class GPService():
         module_activity_answer['TemplateType'] = activity_type
         return module_activity_answer
 
-    def reset_grade(self, student_id):
+    def reset_grade(self, student_id, env_key):
         reset_dt = ResetGPGradeTool()
-        reset_dt.reset_grade(student_id)
+        reset_dt.reset_grade(student_id, env_key)
 
     def save_all_module_quiz_answer(self):
         student_progress = self.get_student_progress().json()
