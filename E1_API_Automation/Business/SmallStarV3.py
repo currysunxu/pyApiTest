@@ -1,6 +1,4 @@
 from ..Lib.Moutai import Moutai, Token
-import jmespath
-from ..Lib.ResetGPGradeTool import ResetGPGradeTool
 
 
 class SmallStarService():
@@ -10,8 +8,8 @@ class SmallStarService():
 
     def login(self, user_name, password):
         user_info = {
-            "UserName": user_name,  # "jenkin0528tb",
-            "Password": password,  # "12345",
+            "UserName": user_name,
+            "Password": password,
             "DeviceId":"",
             "DeviceType":"",
             "Platform": 0
