@@ -1,3 +1,4 @@
+from E1_API_Automation.Business.SchoolCourse import CourseBook
 from E1_API_Automation.Business.template.create_acitivty import Activity
 from ..Lib.Moutai import Moutai, Token
 import jmespath
@@ -14,13 +15,13 @@ class TrailbazerService:
         self.course_plan_key = None
         self.user_id = None
         self.group_id = None
-        self.book_contents = None
         self.get_student_info()
+        self.book_contents = CourseBook(self.mou_tai, "TBV3", self.active_book, self.course_plan_key)
 
     def login(self, user_name, password):
         user_info = {
-            "UserName": user_name,  # "jenkin0528tb",
-            "Password": password,  # "12345",
+            "UserName": user_name,
+            "Password": password,
             "DeviceId": "",
             "DeviceType": "",
             "Platform": 0
@@ -37,12 +38,6 @@ class TrailbazerService:
         self.user_id = jmespath.search('UserId', profile)
         self.group_id = jmespath.search('CourseGroups[0].Group.OdinId', profile)
 
-    def filter_activity_keys(self, level_no):
-        self.get_student_info()
-        activity_contents = self.course_node_synchronize(self.active_book,
-                                                         self.course_plan_key).json()
-        level_content_keys = jmespath.search("Upserts[?Level ==`{0}`]".format(level_no), activity_contents)
-        return level_content_keys
 
     def query_school_info(self):
         body = {
@@ -76,7 +71,6 @@ class TrailbazerService:
                 }
 
         response = self.mou_tai.post("/api/v2/CourseNode/Synchronize", json=body)
-        self.book_contents = jmespath.search("Upserts", response.json())
         return response
 
     def course_unlock(self, key):
@@ -112,6 +106,8 @@ class TrailbazerService:
         return self.mou_tai.get("/api/v2/DigitalInteractionInfo/ByBook/{0}".format(book_key))
 
     def get_child_node(self, parent_key):
+        book = CourseBook(self.mou_tai, "TBV3",self.active_book,self.course_plan_key)
+        book.content_nodes
         self.course_node_synchronize(self.active_book, self.course_plan_key)
         child_node = jmespath.search("@[?ParentNodeKey=='{0}']".format(parent_key), self.book_contents)
         return child_node
@@ -126,65 +122,16 @@ class TrailbazerService:
                 "Percentage": round(completed_value / total_value, 3)}
         return self.mou_tai.post("/api/v2/StudentProgress", json=body)
 
-    def generate_lesson_answer(self, lesson_key, correct):
-        lesson_activities = self.get_child_node(lesson_key.lower())
-        activity_key = jmespath.search("[*].ActivityKeys[0]", lesson_activities)
-        detail_activity = self.acitivity_entity_web(activity_key).json()
-        submit_data = {}
-        submit_data["GroupId"] = self.group_id
-        submit_data["LessonKey"] = lesson_key
-        activity_answers = []
-        for activity_json in jmespath.search("Activities", detail_activity):
-            activity = Activity().create_activity(activity_json)
-            answers = [self.set_question_anwser(correct, activity.get_question_score(question), question) for question
-                       in activity.question_key_list]
-            activity_answer = self.set_activity_answer(activity, answers, lesson_activities)
-            activity_answers.append(activity_answer)
-
-        submit_data["ActivityAnswers"] = activity_answers
-        return submit_data
-
-    def set_activity_answer(self, activity, answers, lesson_activities):
-        activity_answer = {}
-        activity_answer["Answers"] = answers
-        activity_answer["CompletedQuestionCount"] = None
-        activity_answer["correctQuestionCount"] = activity.total_question_count
-        activity_answer["TotalQuestionCount"] = None
-        activity_answer["ActivityKey"] = activity.key
-        activity_answer["ActivityCourseKey"] = \
-            jmespath.search("@[?ActivityKeys[0]=='{0}'].Key".format(activity.key), lesson_activities)[0]
-        return activity_answer
-
-    def set_question_anwser(self, correct, total_score, question_key):
-        question_answer = {}
-        question_answer["Attempts"] = None
-        question_answer["Detail"] = {"modelData": None}
-        question_answer["Duration"] = None
-        question_answer["LocalEndStamp"] = None
-        question_answer["Key"] = None
-        if correct:
-            question_answer["Score"] = total_score
-        else:
-            question_answer["Score"] = 0
-        question_answer["TotalScore"] = total_score
-        question_answer["Star"] = None
-        question_answer["TotalStar"] = None
-        question_answer["LocalStartStamp"] = None
-        question_answer["LocalEndStamp"] = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
-        question_answer["QuestionKey"] = question_key
-        return question_answer
-
-    def homework_lesson_answer(self, lesson_key, correct=True):
-        body = self.generate_lesson_answer(lesson_key, correct)
+    def homework_lesson_answer(self, lesson_key, pass_lesson=True):
+        body = self.book_contents.generate_submit_answer(lesson_key, self.group_id, pass_lesson)
         return self.mou_tai.put(url='/api/v2/HomeworkLessonAnswer', json=body)
 
     def homework_lesson_correction(self, lesson_key):
-        lesson_activities = self.get_child_node(lesson_key.lower())
-        activity_key = jmespath.search("[*].ActivityKeys[0]", lesson_activities)
-        detail_activity = self.acitivity_entity_web(activity_key).json()
+        activity_nodes= self.book_contents.get_child_nodes_by_parent_key(lesson_key.lower())
+        activity_keys = self.book_contents.get_activity_keys(activity_nodes)
+        detail_activities = self.book_contents.get_activity_json_by_activity_key(activity_keys)
         total_question_count = reduce(lambda x, y: x + y,
-                                      map(lambda x: Activity().create_activity(x).total_question_count, jmespath.search("Activities", detail_activity)))
-        print(total_question_count)
+                                      map(lambda x: Activity().create_activity(x).total_question_count, detail_activities))
         body = {
             'CorrectedAmount': total_question_count,
             'CourseKey': lesson_key,
