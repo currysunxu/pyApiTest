@@ -57,7 +57,6 @@ class TBTestCases(TraiblazerBaseClass):
 
     @Test()
     def test_activity_entity_status(self):
-
         response = self.tb_test.acitivity_entity_web(self.tb_test.book_contents.get_activity_keys())
         assert_that(response.json(), match_to("Activities"))
         assert_that(response.json(), match_to("Resources"))

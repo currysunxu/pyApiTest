@@ -40,6 +40,7 @@ class SmallStarBase():
         self.user_id = jmespath.search('UserId', response)
         self.current_book_key = jmespath.search("CurrentBookKey", response)
         self.group_key = jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.Key".format(self.current_book_key), response)[0]
+        self.group_id = jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.OdinId".format(self.current_book_key), response)[0]
         self.product_code = jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.ProductCode".format(self.current_book_key), response)[0]
         self.course_plan_key =jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.CoursePlanKey".format(self.current_book_key), response)[0]
         self.small_star_service.sign_out()

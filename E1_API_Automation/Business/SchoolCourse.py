@@ -43,6 +43,13 @@ class CourseBook:
             activity_nodes = jmespath.search("@[?Level ==`16`]", self.content_nodes)
             return jmespath.search("@[*].ActivityKeys[0]", activity_nodes)
 
+    def get_activity_course_keys(self, node_list=None):
+        if node_list:
+            return jmespath.search("@[*].Key", node_list)
+        else:
+            activity_nodes = jmespath.search("@[?Level ==`16`]", self.content_nodes)
+            return jmespath.search("@[*].Key", activity_nodes)
+
     def get_lesson_nodes(self):
         return jmespath.search("Upserts[?Level ==`8`]", self.content_nodes)
 
@@ -50,7 +57,7 @@ class CourseBook:
 
         return jmespath.search("Upserts[?Level ==`4`]", self.content_nodes)
 
-    def generate_submit_answer(self, lesson_key, group_id, pass_lesson):
+    def generate_lesson_submit_answer(self, lesson_key, group_id, pass_lesson):
         activities_nodes = self.get_child_nodes_by_parent_key(lesson_key.lower())
         activity_keys = self.get_activity_keys(activities_nodes)
         detail_activity = self.get_activity_json_by_activity_key(activity_keys)
@@ -77,20 +84,36 @@ class CourseBook:
                                                lesson_activities)[0]}
         return activity_answer
 
-    def set_question_anwser(self, pass_lesson, total_score, question_key):
+    def set_question_anwser(self, pass_lesson, total_score, question_key, total_star = None):
         question_answer = {"Attempts": None,
                            "Detail": {"modelData": None},
                            "Duration": 1.3,
-                           "LocalEndStamp": None,
                            "Key": None}
         if pass_lesson:
             question_answer["Score"] = total_score
+            if self.product_code == 'SS':
+                question_answer["Star"] = total_star
+            else:
+                question_answer["Star"] = None
         else:
             question_answer["Score"] = 0
+            question_answer["Star"] = None
         question_answer["TotalScore"] = total_score
-        question_answer["Star"] = None
-        question_answer["TotalStar"] = None
+
+        question_answer["TotalStar"] = total_star
         question_answer["LocalStartStamp"] = None
         question_answer["LocalEndStamp"] = arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ')
         question_answer["QuestionKey"] = question_key
         return question_answer
+
+    def generate_activity_submit_answer(self, activity_course_key_node, pass_activity):
+        activity_key = self.get_activity_keys([activity_course_key_node])
+        activity_course_key = self.get_activity_course_keys([activity_course_key_node])
+        activity_json = self.get_activity_json_by_activity_key(activity_key)
+        activity = Activity().create_activity(activity_json[0])
+        submit_data = { "ActivityCourseKey": activity_course_key[0],"ActivityKey": activity.key}
+        answers = [self.set_question_anwser(pass_activity, activity.get_question_score(question), question, activity.get_question_score(question)) for
+                   question
+                   in activity.question_key_list]
+        submit_data["Answers"] = answers
+        return submit_data

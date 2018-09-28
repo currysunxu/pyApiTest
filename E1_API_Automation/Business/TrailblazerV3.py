@@ -123,7 +123,7 @@ class TrailbazerService:
         return self.mou_tai.post("/api/v2/StudentProgress", json=body)
 
     def homework_lesson_answer(self, lesson_key, pass_lesson=True):
-        body = self.book_contents.generate_submit_answer(lesson_key, self.group_id, pass_lesson)
+        body = self.book_contents.generate_lesson_submit_answer(lesson_key, self.group_id, pass_lesson)
         return self.mou_tai.put(url='/api/v2/HomeworkLessonAnswer', json=body)
 
     def homework_lesson_correction(self, lesson_key):
