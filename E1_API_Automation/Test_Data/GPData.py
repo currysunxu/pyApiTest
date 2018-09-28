@@ -46,8 +46,8 @@ class GP_user:
                'Live': {'username': 'gptest_02', 'password': '12345','culture_code':'zh-CN'},
                'Staging_SG': {'username': 'id.grampro', 'password': '12345','culture_code':'id-ID'},
                'Live_SG': {'username': 'id.grampro', 'password': '12345','culture_code':'id-ID'}}
-    GPDTUsers = {'QA': {'username': 'gp02', 'password': '12345'},
-                 'Staging': {'username': 'gptest009', 'password': '12345'},
-                 'Live': {'username': 'gptest_03', 'password': '12345'},
-                 'Staging_SG': {'username': 'null386', 'password': '12345'},
-                 'Live_SG': {'username': 'GP0606addGroup.wu', 'password': '12345'}}
+    GPDTUsers = {'QA': {'username': 'gp02', 'password': '12345','culture_code':'zh-CN'},
+                 'Staging': {'username': 'gptest008', 'password': '12345','culture_code':'zh-CN'},
+                 'Live': {'username': 'gptest_03', 'password': '12345','culture_code':'zh-CN'},
+                 'Staging_SG': {'username': 'GP0606addGroup.wu', 'password': '12345','culture_code':'ru-RU'},
+                 'Live_SG': {'username': 'GP0606addGroup.wu', 'password': '12345','culture_code':'ru-RU'}}

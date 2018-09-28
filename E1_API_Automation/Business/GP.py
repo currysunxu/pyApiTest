@@ -1,7 +1,7 @@
 import jmespath
 from ptest.assertion import assert_that
 
-from E1_API_Automation.Settings import env_key
+from E1_API_Automation.Test_Data.GPData import ShanghaiGradeKey, MoscowGradeKey
 from ..Lib.Moutai import Moutai, Token
 from ..Lib.ResetGPGradeTool import ResetGPGradeTool
 
@@ -13,8 +13,8 @@ class GPService():
 
     def login(self, user_name, password):
         user_info = {
-            "UserName": user_name,  # "jenkin0528tb",
-            "Password": password,  # "12345",
+            "UserName": user_name,
+            "Password": password,
             "Platform": 0
         }
         return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/GP/")
@@ -32,7 +32,8 @@ class GPService():
         return self.mou_tai.post("/api/v2/xAPI/AccessToken/")
 
     def get_local_privacy_policy(self, culture_code):
-        return self.mou_tai.get("/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement/?product=7&cultureCode={}".format(culture_code))
+        return self.mou_tai.get(
+            "/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement/?product=7&cultureCode={}".format(culture_code))
 
     def get_local_language_student_report(self, culture_code):
         return self.mou_tai.get("/api/v2/StudentReport/{}".format(culture_code))
@@ -73,17 +74,44 @@ class GPService():
     def get_region_and_grade(self):
         return self.mou_tai.get("/api/v2/RegionAndGrade/?marketRegion=1&cultureCode=zh-CN")
 
-    def put_profile_save(self, profile):
-        return self.mou_tai.put("/api/v2/StudentProfile/Save/", profile)
-
     def put_custom_test_start(self, module_list):
         return self.mou_tai.put("/api/v2/CustomTest/Start/", module_list)
 
     def put_custom_test_save(self, test_answer):
         return self.mou_tai.put("/api/v2/CustomTest/Save/", test_answer)
 
-    def put_student_profile_save(self,grade_id):
-        return  self.mou_tai.put("/api/v2/profile/Save",grade_id)
+    def put_student_profile_save(self, submit_data):
+        return self.mou_tai.put("/api/v2/StudentProfile/Save/", submit_data)
+
+    def setup_student_profile(self, grade_number, culture_code):
+        student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
+        self.reset_grade(student_id)
+        submit_data = {}
+        if culture_code == 'zh-CN':
+            shanghai_key = (getattr(ShanghaiGradeKey, grade_number))[1]
+            submit_data = {"Birthday": "2003-12-30T16:00:00.340Z",
+                           "EducationRegionKey": '61AEF09D-AFA0-4FC2-96AD-93C72D390653',
+                           "EducationGradeKey": shanghai_key,
+                           "CultureCode": "en-US",
+                           "StartPointGradeKey": shanghai_key,
+                           "PreferLanguageCode": "en-US"}
+        elif culture_code == 'ru-RU':
+            moscow_key = (getattr(MoscowGradeKey, grade_number))[1]
+            submit_data = {"Birthday": "2003-12-30T16:00:00.340Z",
+                           "EducationRegionKey": '045E22BB-E9AB-4BB8-A4FA-F59A7C0A8CDC',
+                           "EducationGradeKey": moscow_key,
+                           "CultureCode": "en-US",
+                           "StartPointGradeKey": moscow_key,
+                           "PreferLanguageCode": "en-US"}
+
+        profile_save = self.put_student_profile_save(submit_data)
+        assert_that(profile_save.status_code == 204)
+
+    def get_new_recommend_module(self):
+        student_progress = self.get_student_progress().json()
+        new_module_list = jmespath.search("DiagnosticTestProgress.NextDiagnosticTest.New",
+                                          student_progress)
+        return new_module_list
 
     def get_custom_test_answer(self, module_list):
 
@@ -112,10 +140,10 @@ class GPService():
     def get_dt_submit_answer(self, failed_module_number, first_time=True):
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         if first_time == True:
-            self.reset_grade(student_id,env_key)
+            self.reset_grade(student_id)
         question_list = self.put_dt_start().json()
-        response_code= self.put_dt_start()
-        if response_code.status_code==200:
+        response_code = self.put_dt_start()
+        if response_code.status_code == 200:
             dt_key = jmespath.search('DiagnosticTestKey', question_list)
             failed_module_list, module_activity_answers = [], []
             submit_data = {}
@@ -136,7 +164,8 @@ class GPService():
                             submit_question['Score'] = 0
                             failed_module_list.append(module_key)
 
-                        module_activity_answer = self.set_module_activity_answer(activity_key, activity_type, module_key,
+                        module_activity_answer = self.set_module_activity_answer(activity_key, activity_type,
+                                                                                 module_key,
                                                                                  submit_question)
                         module_activity_answers.append(module_activity_answer)
 
@@ -168,9 +197,9 @@ class GPService():
         module_activity_answer['TemplateType'] = activity_type
         return module_activity_answer
 
-    def reset_grade(self, student_id, env_key):
+    def reset_grade(self, student_id):
         reset_dt = ResetGPGradeTool()
-        reset_dt.reset_grade(student_id, env_key)
+        reset_dt.reset_grade(student_id)
 
     def save_all_module_quiz_answer(self):
         student_progress = self.get_student_progress().json()

@@ -97,7 +97,8 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_local_language_student_report(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        local_language_student_report = self.gptest.get_local_language_student_report(GP_user.GPUsers[env_key]['culture_code'])
+        local_language_student_report = self.gptest.get_local_language_student_report(
+            GP_user.GPUsers[env_key]['culture_code'])
         assert_that(local_language_student_report.json(), exist("IsRead"))
         assert_that(local_language_student_report.json(), exist("Key"))
         assert_that(local_language_student_report.json(), exist("Url"))
@@ -119,16 +120,15 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_available_grade(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        city_list={}
-        if  GP_user.GPUsers[env_key]['culture_code']=='zh_CN':
-            city_list= EducationRegion.cn_city_list
-        elif GP_user.GPUsers[env_key]['culture_code']=='id_ID':
-            city_list= EducationRegion.id_city_list
+        city_list = {}
+        if GP_user.GPUsers[env_key]['culture_code'] == 'zh_CN':
+            city_list = EducationRegion.cn_city_list
+        elif GP_user.GPUsers[env_key]['culture_code'] == 'id_ID':
+            city_list = EducationRegion.id_city_list
 
         for city_name in city_list:
             available_grade = self.gptest.get_available_grade(city_list[city_name])
             assert_that(available_grade.json(), match_to("[*].Grade.Key"))
-
 
     @Test()
     def test_student_progress(self):
@@ -143,16 +143,104 @@ class GPAPITestCases(GrammarProBaseClass):
         assert_that(region_and_grade.json(), match_to("[*].Region.Name"))
         assert_that(region_and_grade.json(), match_to("[*].Grades[*].Grade.Key"))
 
-
     @Test()
     def test_no_new_dt_generate(self):
         self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
         submit_json = self.gptest.get_dt_submit_answer(3, True)
         dt_save = self.gptest.put_dt_save(submit_json[0])
         assert_that(dt_save.status_code == 204)
-        submit_json=self.gptest.get_dt_submit_answer(0,False)
-        assert_that(submit_json==403)
+        submit_json = self.gptest.get_dt_submit_answer(0, False)
+        assert_that(submit_json == 403)
 
+    @Test()
+    def test_dt_start_lowest_grade_and_average_score_above_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth3', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(2)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['92fbfc86-1c02-45b0-9f6f-75c57e9b7469', '72c9fdd0-b8db-49c7-882d-dcd038bb4ba0',
+                                        '56671778-28a1-4b55-8a39-12d7f8623086']
+            assert new_module_list == expected_new_module_list
 
+    @Test()
+    def test_dt_start_lowest_grade_and_average_score_equal_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth3', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(3)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['92fbfc86-1c02-45b0-9f6f-75c57e9b7469', '72c9fdd0-b8db-49c7-882d-dcd038bb4ba0']
+            assert new_module_list == expected_new_module_list
 
+    @Test()
+    def test_dt_start_lowest_grade_and_average_score_below_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth3', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(4)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['92fbfc86-1c02-45b0-9f6f-75c57e9b7469']
+            assert new_module_list == expected_new_module_list
 
+    @Test()
+    def test_dt_start_middle_grade_and_average_score_above_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth6', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(2)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['1977ddb2-6893-4465-b04f-2d99dc1b5034', 'f059e0ca-c18f-4311-81dc-1684df1f9f14',
+                                        '43afbc30-009d-42d3-abe0-76d3fcc34346']
+            assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_middle_grade_and_average_score_equal_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth6', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(3)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['db8690f3-c23e-41a8-a250-9c26c3f04b4a', 'f80a2f97-e5d1-460e-b369-7a22bce62299']
+            assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_middle_grade_and_average_score_below_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth6', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(4)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['db8690f3-c23e-41a8-a250-9c26c3f04b4a']
+            assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_highest_grade_and_average_score_above_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth11', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(2)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['ad396530-1bc6-40cc-a319-cdde84494ca1', '2184342a-33a6-4689-a084-23e27e215680',
+                                        'faad9567-4f72-4e3b-8914-85d724ce01fa']
+            assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_highest_grade_and_average_score_equal_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth11', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(3)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['ad396530-1bc6-40cc-a319-cdde84494ca1', '2184342a-33a6-4689-a084-23e27e215680']
+            assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_highest_grade_and_average_score_below_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        if env_key in ('Staging', 'Live'):
+            self.gptest.setup_student_profile('Gth11', GP_user.GPDTUsers[env_key]['culture_code'])
+            self.gptest.finish_not_first_dt(4)
+            new_module_list = self.gptest.get_new_recommend_module()
+            expected_new_module_list = ['ad396530-1bc6-40cc-a319-cdde84494ca1']
+            assert new_module_list == expected_new_module_list

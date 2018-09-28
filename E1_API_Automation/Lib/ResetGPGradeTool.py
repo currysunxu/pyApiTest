@@ -11,24 +11,24 @@ class ResetGPGradeTool:
         reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile?userKey=%s&rand=0.17256526783407744&PageId=0'
         tool_url = 'http://internal-e1pss-qa.ef.com'
 
-    elif E1_API_Automation.Settings.env_key=='Staging':
+    elif E1_API_Automation.Settings.env_key == 'Staging':
         search_url = 'http://internal-e1pss-qa.ef.com/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
         reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile/STAGING-CN?userKey=%s&rand=0.17256526783407744&PageId=0'
         tool_url = 'http://internal-e1pss-qa.ef.com'
 
-    elif E1_API_Automation.Settings.env_key=='Staging_SG':
+    elif E1_API_Automation.Settings.env_key == 'Staging_SG':
         search_url = 'http://internal-e1pss-qa.ef.com/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
         reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile/STAGING-SG?userKey=%s&rand=0.17256526783407744&PageId=0'
         tool_url = 'http://internal-e1pss-qa.ef.com'
 
 
 
-    elif E1_API_Automation.Settings.env_key =='Live':
+    elif E1_API_Automation.Settings.env_key == 'Live':
         search_url = 'https://pssportal.ef.cn/User/UserSource/PROD?rand=0.9001314632136694&PageId=0'
         reset_url = 'https://pssportal.ef.cn/User/SaveStudentProfile/PROD-CN?userKey=%s&rand=0.36498686749677756&PageId=0'
         tool_url = 'https://pssportal.ef.cn'
 
-    elif E1_API_Automation.Settings.env_key =='Live_SG':
+    elif E1_API_Automation.Settings.env_key == 'Live_SG':
         search_url = 'https://pssportal.ef.cn/User/UserSource/PROD?rand=0.9001314632136694&PageId=0'
         reset_url = 'https://pssportal.ef.cn/User/SaveStudentProfile/PROD-SG?userKey=%s&rand=0.36498686749677756&PageId=0'
         tool_url = 'https://pssportal.ef.cn'
@@ -36,7 +36,6 @@ class ResetGPGradeTool:
     login_user = ("qa.testauto@ef.com", "test@456")
 
     def __init__(self):
-
         self.cookie = self.login(self.login_user[0], self.login_user[1])
 
     def login(self, username, password):
@@ -67,12 +66,12 @@ class ResetGPGradeTool:
         print(user_current_grade)
         return user_key, user_current_grade
 
-    def reset_grade(self, student_id, env_key):
+    def reset_grade(self, student_id):
         url = self.reset_url
         user_key, current_grade = self.get_user_key(student_id)
         url = url % user_key
-        data_info={}
-        if env_key in ('QA', 'Staging', 'Live'):
+        data_info = {}
+        if E1_API_Automation.Settings.env_key in ('QA', 'Staging', 'Live'):
             target_value = ShanghaiGradeKey.Gth4[1]
             if current_grade == ShanghaiGradeKey.Gth4[0]:
                 target_value = ShanghaiGradeKey.Gth5[1]
@@ -82,7 +81,7 @@ class ResetGPGradeTool:
                 'EducationRegionKey': EducationRegion.cn_city_list['Shanghai'],
                 'StartPointGradeKey': target_value
             }
-        elif env_key in ('Staging_SG', 'Live_SG'):
+        elif E1_API_Automation.Settings.env_key in ('Staging_SG', 'Live_SG'):
             target_value = MoscowGradeKey.Gth4[1]
             if current_grade == MoscowGradeKey.Gth4[0]:
                 target_value = MoscowGradeKey.Gth5[1]
@@ -95,3 +94,4 @@ class ResetGPGradeTool:
 
         s = requests.session()
         data = s.post(url=url, data=data_info, cookies=self.cookie).content.decode('utf-8')
+        s.keep_live = False
