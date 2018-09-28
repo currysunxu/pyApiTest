@@ -29,7 +29,7 @@ class SmallStarService():
             "CoursePlanKey": course_plan_key,
             "ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
         return self.mou_tai.post("/api/v2/BinaryData/Synchronize/", json=body)
 
@@ -39,7 +39,7 @@ class SmallStarService():
             "CoursePlanKey": course_plan_key,
             "ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
         return self.mou_tai.post("/api/v2/CourseNode/Synchronize/", json=body)
 
@@ -49,10 +49,9 @@ class SmallStarService():
             "CoursePlanKey": course_plan_key,
             "ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
         return self.mou_tai.post("/api/v2/Activity/Synchronize/", json=body)
-
 
     def synchronize_digital_article(self, book_key, course_plan_key, product_code, upserts_only=True, amount=123):
         body = {
@@ -60,18 +59,18 @@ class SmallStarService():
             "CoursePlanKey": course_plan_key,
             "ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
         return self.mou_tai.post("/api/v2/DigitalArticle/Synchronize/", json=body)
 
-
-    def synchronize_small_star_student_activity_answer(self, book_key, course_plan_key, product_code, upserts_only=True, amount=123):
+    def synchronize_small_star_student_activity_answer(self, book_key, course_plan_key, product_code, upserts_only=True,
+                                                       amount=123):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
             "ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
         return self.mou_tai.post("/api/v2/HistoricalActivityAnswer/SynchronizeAll/", json=body)
 
@@ -101,5 +100,3 @@ class SmallStarService():
     def batch_resources(self, resource_id_list: list):
         parameter = ','.join(resource_id_list)
         return self.mou_tai.get("/Resource/Batch/{}".format(parameter))
-
-

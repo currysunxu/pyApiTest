@@ -17,7 +17,6 @@ class BaseTemplate:
     def question_key_list(self):
         return jmespath.search("Questions[*].Key", self.json)
 
-
     @property
     def activity_type(self):
         return jmespath.search("Type", self.json)
