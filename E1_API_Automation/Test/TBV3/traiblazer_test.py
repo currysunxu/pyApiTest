@@ -90,24 +90,30 @@ class TBTestCases(TraiblazerBaseClass):
     @Test()
     def test_student_progress(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
-        picked_lesson = unlocked_lessons[0]
-        activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(picked_lesson)
-        lesson_score = self.tb_test.lesson_score_summary([picked_lesson]).json()
+        self.picked_lesson = unlocked_lessons[0]
+        activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(self.picked_lesson)
+        lesson_score = jmespath.search('StudentScore',
+                                       self.tb_test.lesson_score_summary([self.picked_lesson]).json()[0])
         for i in range(1, len(activity_nodes) + 1):
-            self.tb_test.student_progress(unlocked_lessons[3], i, len(activity_nodes))
-        response = self.tb_test.homework_lesson_answer(picked_lesson)
+            self.tb_test.student_progress(self.picked_lesson, i, len(activity_nodes))
+        response = self.tb_test.homework_lesson_answer(self.picked_lesson)
+
         assert_that(response.status_code == 200)
+
+        after_lesson_score = jmespath.search('StudentScore',
+                                         self.tb_test.lesson_score_summary([self.picked_lesson]).json()[0])
+        assert_that((after_lesson_score - lesson_score) > 0)
 
     @Test()
     def test_homework_lesson_correction(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
-        picked_lesson = unlocked_lessons[0]
-        activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(picked_lesson)
-        lesson_score = self.tb_test.lesson_score_summary([picked_lesson]).json()
+        self.picked_lesson = unlocked_lessons[0]
+        activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(self.picked_lesson)
+        lesson_score = jmespath.search('StudentScore', self.tb_test.lesson_score_summary([self.picked_lesson]).json()[0])
         for i in range(1, len(activity_nodes) + 1):
             self.tb_test.student_progress(unlocked_lessons[3], i, len(activity_nodes))
-        response = self.tb_test.homework_lesson_answer(picked_lesson, pass_lesson=False)
-        correction = self.tb_test.homework_lesson_correction(picked_lesson)
+        response = self.tb_test.homework_lesson_answer(self.picked_lesson, pass_lesson=False)
+        correction = self.tb_test.homework_lesson_correction(self.picked_lesson)
         assert_that(correction.status_code == 200)
 
     @Test()
