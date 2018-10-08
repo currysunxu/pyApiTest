@@ -65,7 +65,7 @@ class EVCBase():
         host = "https://e1svc-qa.ef.cn"
         SIS_SERVICE = 'https://internal-e1-evc-booking-qa-cn.ef.com'
         user_info = {
-            "UserName": "unlock02",#"jenkin0528tb",
+            "UserName": "jimmy",#unlock02
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0
