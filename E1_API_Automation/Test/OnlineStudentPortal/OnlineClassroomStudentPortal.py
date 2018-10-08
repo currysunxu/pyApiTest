@@ -19,7 +19,7 @@ class ClassType(Enum):
 @TestClass()
 class APITestCases(EVCBase):
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_login(self):
         #Login failed was also verified at the lower layer.
         response = self.evc_service.login(user_name=self.user_info["UserName"], password=self.user_info["Password"])
@@ -27,7 +27,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("UserInfo.UserInfo.UserId"))
         return response
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_get_calendar_demo_class(self):
         self.test_login()
         response = self.evc_service.get_calendar(self.HF_program_code, ClassType.DEMO.value, local2utc(self.start_time),
@@ -35,7 +35,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("BookableSlots"))
         return response
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_get_calendar_regular_class(self):
         self.test_login()
         response = self.evc_service.get_calendar(self.HF_program_code, ClassType.REGULAR.value, local2utc(self.regular_start_time),
@@ -43,7 +43,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("BookableSlots"))
         return response
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_get_calendar_non_class(self):
         self.test_login()
         response = self.evc_service.get_calendar(self.HF_program_code, ClassType.REGULAR.value, "2017-10-10T01:00:00.000000Z",
@@ -51,7 +51,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("BookableSlots", response.json()), equal_to(None))
         return response
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_get_available_online_class_session(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         response = self.evc_service.get_available_online_class_session(local2utc(self.start_time),
@@ -60,7 +60,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("[0].TeacherProfile"))
         return response
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_get_available_online_class_session_multiple_teacher(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
 
@@ -83,7 +83,7 @@ class APITestCases(EVCBase):
                                     response.json())[0] == self.teacher_profile["AvatarUrl"])
         return response
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_get_OCH_credit(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         response = self.evc_service.get_OCH_credit(student_id, self.HF_program_code)
@@ -92,7 +92,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("[*].AvailableOCH"))
         return response
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_workflow(self):
         '''
         This workflow will run the following process:
@@ -203,7 +203,7 @@ class APITestCases(EVCBase):
                                                                           ClassType.REGULAR.value)
         assert_that(jmespath.search("[?ClassId=='" + class_id + "'].ClassStatus", query_lesson_history_response.json()), "6")
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_get_online_student_book_structure(self):
         self.test_login()
         lesson_structure_response = self.evc_service.get_online_student_book_structure(self.HF_program_code)
@@ -220,7 +220,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("length([].Lessons[])", lesson_structure_response.json()) == 192)
 
 
-    @Test()
+    @Test(tags='qa, stg')
     def test_verify_token_expired(self):
         self.test_login()
         self.evc_service.sign_out()
@@ -228,7 +228,7 @@ class APITestCases(EVCBase):
         assert_that(response.status_code == 401)
 
 
-    @Test()
+    @Test(tags='qa')
     def get_after_class_report(self):
         self.test_login()# This login is used to for after method. we will change it in the future.
         local_evc_service = KidsEVCService(host=self.host)
@@ -240,7 +240,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("Improvement"))
         assert_that(response.json(), match_to("Suggestion"))
 
-    @Test()
+    @Test(tags='qa, stg')
     def book_class_error_code_with_not_enough_och(self):
         self.test_login()
         local_evc_service = KidsEVCService(host=self.host)
@@ -272,7 +272,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("Code.Minor", response.json()) == '600')
 
 
-    @Test()
+    @Test(tags='qa, stg')
     def book_class_error_code_with_not_topic(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         calendar_response = self.evc_service.get_calendar("HF", ClassType.REGULAR.value,
@@ -300,7 +300,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("Code.Major", response.json()) == 403)
         assert_that(jmespath.search("Code.Minor", response.json()) == '601')
 
-    @Test()
+    @Test(tags='qa, stg')
     def cancel_class_error_code_with_booking_not_found(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         class_session_response = self.evc_service.get_available_online_class_session(local2utc(self.regular_start_time),
@@ -314,7 +314,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("Code.Major", response.json()) == 403)
         assert_that(jmespath.search("Code.Minor", response.json()) == '610')
 
-    @Test()
+    @Test(tags='qa, stg')
     def cancel_class_error_code_with_wrong_class_id(self):
         self.test_login()
         response = self.evc_service.cancel_class("30789")
