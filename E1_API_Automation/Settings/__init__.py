@@ -9,7 +9,6 @@ class Environment(object):
     LIVE_SG = "https://e1svc.ef.com"
 
 
-# os.environ['environment'] = 'QA'
 
 
 if os.environ['environment'] == 'QA':
@@ -20,6 +19,7 @@ if os.environ['environment'] == 'QA':
         "User": "SchoolUser",
         "Password": "#Bugsfor$!"
     }
+
 
 elif os.environ['environment'] == 'STG':
     ENVIRONMENT = Environment.STAGING

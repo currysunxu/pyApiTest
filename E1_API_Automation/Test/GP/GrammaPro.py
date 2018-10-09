@@ -97,7 +97,8 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_local_language_student_report(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        local_language_student_report = self.gptest.get_local_language_student_report(GP_user.GPUsers[env_key]['culture_code'])
+        local_language_student_report = self.gptest.get_local_language_student_report(
+            GP_user.GPUsers[env_key]['culture_code'])
         assert_that(local_language_student_report.json(), exist("IsRead"))
         assert_that(local_language_student_report.json(), exist("Key"))
         assert_that(local_language_student_report.json(), exist("Url"))
@@ -119,16 +120,15 @@ class GPAPITestCases(GrammarProBaseClass):
     @Test()
     def test_available_grade(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
-        city_list={}
-        if  GP_user.GPUsers[env_key]['culture_code']=='zh_CN':
-            city_list= EducationRegion.cn_city_list
-        elif GP_user.GPUsers[env_key]['culture_code']=='id_ID':
-            city_list= EducationRegion.id_city_list
+        city_list = {}
+        if GP_user.GPUsers[env_key]['culture_code'] == 'zh-CN':
+            city_list = EducationRegion.cn_city_list
+        elif GP_user.GPUsers[env_key]['culture_code'] == 'id-ID':
+            city_list = EducationRegion.id_city_list
 
         for city_name in city_list:
             available_grade = self.gptest.get_available_grade(city_list[city_name])
             assert_that(available_grade.json(), match_to("[*].Grade.Key"))
-
 
     @Test()
     def test_student_progress(self):
@@ -143,16 +143,98 @@ class GPAPITestCases(GrammarProBaseClass):
         assert_that(region_and_grade.json(), match_to("[*].Region.Name"))
         assert_that(region_and_grade.json(), match_to("[*].Grades[*].Grade.Key"))
 
-
     @Test()
     def test_no_new_dt_generate(self):
         self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
         submit_json = self.gptest.get_dt_submit_answer(3, True)
         dt_save = self.gptest.put_dt_save(submit_json[0])
         assert_that(dt_save.status_code == 204)
-        submit_json=self.gptest.get_dt_submit_answer(0,False)
-        assert_that(submit_json==403)
+        submit_json = self.gptest.get_dt_submit_answer(0, False)
+        assert_that(submit_json == 403)
 
+    @Test()
+    def test_dt_start_lowest_grade_and_average_score_above_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile(GP_user.GradeList[env_key]['lowest_grade'],
+                                          GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(2)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(2)
+        assert new_module_list == expected_new_module_list
 
+    @Test()
+    def test_dt_start_lowest_grade_and_average_score_equal_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile(GP_user.GradeList[env_key]['lowest_grade'],
+                                          GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(3)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(3)
+        assert new_module_list == expected_new_module_list
 
+    @Test()
+    def test_dt_start_lowest_grade_and_average_score_below_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile(GP_user.GradeList[env_key]['lowest_grade'],
+                                          GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(4)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(4)
+        assert new_module_list == expected_new_module_list
 
+    @Test()
+    def test_dt_start_middle_grade_and_average_score_above_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile('Gth6', GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(2)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(2)
+        assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_middle_grade_and_average_score_equal_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile('Gth6', GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(3)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(3)
+        assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_middle_grade_and_average_score_below_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile('Gth6', GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(4)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(4)
+        assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_highest_grade_and_average_score_above_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile(GP_user.GradeList[env_key]['highest_grade'],
+                                          GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(2)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(2)
+        assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_highest_grade_and_average_score_equal_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile(GP_user.GradeList[env_key]['highest_grade'],
+                                          GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(3)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(3)
+        assert new_module_list == expected_new_module_list
+
+    @Test()
+    def test_dt_start_highest_grade_and_average_score_below_40(self):
+        self.gptest.login(GP_user.GPDTUsers[env_key]['username'], GP_user.GPDTUsers[env_key]['password'])
+        self.gptest.setup_student_profile(GP_user.GradeList[env_key]['highest_grade'],
+                                          GP_user.GPDTUsers[env_key]['culture_code'])
+        self.gptest.finish_not_first_dt(4)
+        new_module_list = self.gptest.get_new_recommend_module()
+        expected_new_module_list = self.gptest.get_new_recommended_module(4)
+        assert new_module_list == expected_new_module_list
