@@ -9,12 +9,17 @@ class Environment(object):
     LIVE_SG = "https://e1svc.ef.com"
 
 
-# os.environ['environment'] = 'STG_SG'
+# os.environ['environment'] = 'QA'
 
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
     env_key = 'QA'
+    DATABASE = {
+        "Server": "10.163.24.105,1433",
+        "User": "SchoolUser",
+        "Password": "#Bugsfor$!"
+    }
 
 elif os.environ['environment'] == 'STG':
     ENVIRONMENT = Environment.STAGING

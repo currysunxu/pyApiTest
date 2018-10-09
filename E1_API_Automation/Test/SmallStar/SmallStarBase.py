@@ -31,7 +31,7 @@ class SmallStarBase():
         self.small_star_service.sign_out()
 
     @BeforeMethod()
-    def sigin(self):
+    def sign_in(self):
         self.small_star_service.login(self.user_name, self.password)
 
     def set_context(self):

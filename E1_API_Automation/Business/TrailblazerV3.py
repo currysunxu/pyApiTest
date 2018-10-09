@@ -79,16 +79,16 @@ class TrailbazerService:
     def get_homework_motivation_task_info(self, key):
         return self.mou_tai.get("/api/v2/HomeworkMotivationTaskInfo/{0}".format(key))
 
-    def query_motivation_reward_summary(self, scope_key):
+    def query_motivation_reward_summary(self):
         body = {
-            "ScopeKey": scope_key
+            "ScopeKey": self.active_book
         }
         return self.mou_tai.post("/api/v2/MotivationRewardSummary/", json=body
                                  )
 
-    def query_motivation_point_audit(self, scope_key):
+    def query_motivation_point_audit(self):
         body = {
-            "ScopeKey": scope_key
+            "ScopeKey": self.active_book
         }
         return self.mou_tai.post("/api/v2/MotivationPointAudit", json=body
                                  )
