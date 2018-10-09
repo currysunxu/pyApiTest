@@ -1,7 +1,7 @@
 import jmespath
 from ptest.assertion import assert_that
 
-from E1_API_Automation.Test_Data.GPData import ShanghaiGradeKey, MoscowGradeKey
+from E1_API_Automation.Test_Data.GPData import ShanghaiGradeKey, MoscowGradeKey, EducationRegion
 from ..Lib.Moutai import Moutai, Token
 from ..Lib.ResetGPGradeTool import ResetGPGradeTool
 
@@ -327,3 +327,119 @@ class GPService():
             assert_that(response.status_code == 204)
             if failed_module_number != 0 and loop % 2 == 0:
                 self.save_all_module_quiz_answer()
+
+    def get_mapping(self):
+        all_module_info = self.get_available_grade(EducationRegion.cn_city_list['Shanghai']).json()
+        grade_id = jmespath.search("[*].GradeOrdinal", all_module_info)
+        mapping = []
+        for grade_id in grade_id:
+            module_key_list = jmespath.search("[?GradeOrdinal==`" + str(grade_id) + "`].Modules[].Key",
+                                              all_module_info)
+            for module_key in module_key_list:
+                difficulty_level = jmespath.search("[*].Modules[?Key=='" + module_key + "'].DifficultyLevel[]",
+                                                   all_module_info)
+                list = (grade_id, difficulty_level[0], module_key,)
+                mapping.append(list)
+
+        return mapping
+
+    def search_mapping(self, search_value, expected_output, mapping):
+        for single_mapping in mapping:
+            if search_value in (single_mapping[0], single_mapping[1], single_mapping[2]):
+                if expected_output == 'key':
+                    return single_mapping[2]
+                elif expected_output == 'grade_id':
+                    return single_mapping[0]
+                elif expected_output == 'level':
+                    return single_mapping[1]
+                continue
+
+            else:
+                continue
+
+    def search_module_key_by_gradeid(self, lists, module_info):
+        if type(lists) == int:
+            module_key_list = jmespath.search("[?GradeOrdinal==`" + str(lists) + "`].Modules[].Key", module_info)
+            return module_key_list
+        if type(lists) == list:
+            all_first_module_keys = []
+            for grade_id in lists:
+                module_key_list = jmespath.search("[?GradeOrdinal==`" + str(grade_id) + "`].Modules[].Key", module_info)
+                all_first_module_keys = all_first_module_keys + module_key_list
+
+            return all_first_module_keys
+
+    def get_mapping_result_set(self, lists, expected_output, mapping):
+        results = []
+        for search_value in lists:
+            result = self.search_mapping(search_value, expected_output, mapping)
+            results.append(result)
+        if expected_output == 'key':
+            return results
+        else:
+            results_list = list(set(results))
+            return results_list
+
+    def get_new_recommended_module(self, failed_module_number):
+        student_progress = self.get_student_progress().json()
+        latest_dt_modules = jmespath.search("DiagnosticTestProgress.UserDiagnosticTestScoreSummary[*].ModuleKey",
+                                            student_progress)
+        mapping = self.get_mapping()
+        all_module_info = self.get_available_grade(EducationRegion.cn_city_list['Shanghai']).json()
+        dt_included_grade = self.get_mapping_result_set(latest_dt_modules, 'grade_id', mapping)
+
+        dt_included_grade_key = self.search_module_key_by_gradeid(dt_included_grade, all_module_info)
+        new_list = [x for x in dt_included_grade_key if x not in latest_dt_modules]
+
+        if len(new_list) < (5 - failed_module_number):
+            if failed_module_number < 3:
+                return self.get_higher_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
+                                                    new_list)
+
+            else:
+                return self.get_lower_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
+                                                   new_list)
+        if len(new_list) >= (5 - failed_module_number):
+            return self.get_same_grade_modules(failed_module_number, mapping, new_list, dt_included_grade)
+
+    def get_same_grade_modules(self, failed_module_number, mapping, new_list, dt_included_grade):
+        new_list_diff_level = self.get_mapping_result_set(new_list, 'level', mapping)
+        grade = self.get_mapping_result_set(new_list, 'grade_id', mapping)
+        start_grade = [x for x in dt_included_grade if x not in grade]
+        if grade < start_grade:
+            new_list_diff_level.sort()
+            new_list_diff_level.reverse()
+        else:
+            new_list_diff_level.sort()
+        recommend_modules_level = new_list_diff_level[:(5 - failed_module_number)]
+        recommend_modules = self.get_mapping_result_set(recommend_modules_level, 'key', mapping)
+        return recommend_modules
+
+    def get_lower_grade_module(self, all_module_info, dt_included_grade, failed_module_number, mapping, new_list):
+        next_grade = dt_included_grade[0] - 1
+        next_grade_module_key_list = self.search_module_key_by_gradeid(next_grade, all_module_info)
+        if next_grade_module_key_list == []:
+            return self.get_higher_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
+                                                new_list)
+        else:
+            next_grade_difficulty_level = self.get_mapping_result_set(next_grade_module_key_list, 'level', mapping)
+            next_grade_difficulty_level.sort()
+            next_grade_difficulty_level.reverse()
+            next_grade_real_level = next_grade_difficulty_level[:(5 - failed_module_number - len(new_list))]
+            next_grade_module_id = self.get_mapping_result_set(next_grade_real_level, 'key', mapping)
+            expected_new_module_key = new_list + next_grade_module_id
+            return expected_new_module_key
+
+    def get_higher_grade_module(self, all_module_info, dt_included_grade, failed_module_number, mapping, new_list):
+        next_grade = dt_included_grade[-1] + 1
+        next_grade_module_key_list = self.search_module_key_by_gradeid(next_grade, all_module_info)
+        if next_grade_module_key_list == []:
+            return self.get_higher_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
+                                                new_list)
+        else:
+            next_grade_difficulty_level = self.get_mapping_result_set(next_grade_module_key_list, 'level', mapping)
+            next_grade_difficulty_level.sort()
+            next_grade_real_level = next_grade_difficulty_level[:(5 - failed_module_number - len(new_list))]
+            next_grade_module_id = self.get_mapping_result_set(next_grade_real_level, 'key', mapping)
+            expected_new_module_key = new_list + next_grade_module_id
+            return expected_new_module_key
