@@ -15,6 +15,11 @@ class Environment(object):
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
     env_key = 'QA'
+    DATABASE = {
+        "Server": "10.163.24.105,1433",
+        "User": "SchoolUser",
+        "Password": "#Bugsfor$!"
+    }
 
 
 elif os.environ['environment'] == 'STG':
