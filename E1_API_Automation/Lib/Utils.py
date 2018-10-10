@@ -44,13 +44,13 @@ def open_anything(source):
     import urllib.request, urllib.parse, urllib.error
     try:
         return urllib.request.urlopen(source)
-    except (IOError, OSError):
+    except Exception:
         pass
 
     # try to open with native open function (if source is pathname)
     try:
         return open(source)
-    except (IOError, OSError):
+    except Exception:
         pass
 
     # treat source as string
