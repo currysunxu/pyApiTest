@@ -3,11 +3,11 @@ import os
 from ptest.decorator import AfterMethod, BeforeSuite, AfterSuite, BeforeClass, AfterClass
 from ...Business.TrailblazerV3 import TrailbazerService
 
-from ...Settings import ENVIRONMENT, env_key
+from ...Settings import ENVIRONMENT, env_key, DATABASE
 from ...Test_Data.TBData import TBUsers, TBSQLString
 from ...Lib.db_mssql import MSSQLHelper
 from ...Lib.Utils import *
-from ...Settings import DATABASE
+
 
 class TraiblazerBaseClass():
     @BeforeClass()
