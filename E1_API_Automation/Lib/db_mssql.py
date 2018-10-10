@@ -1,13 +1,12 @@
 import pymssql
-from  E1_API_Automation.Settings import DATABASE
 
 
 class MSSQLHelper(object):
-    def __init__(self, db_engine):
-        self.server, self.port = DATABASE["Server"].split(',')
+    def __init__(self, database, db_engine):
+        self.server, self.port = database["Server"].split(',')
 
-        self.user = DATABASE["User"]
-        self.password = DATABASE["Password"]
+        self.user = database["User"]
+        self.password = database["Password"]
         self.db_engine = db_engine
 
     def __get_connect(self):

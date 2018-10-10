@@ -7,6 +7,7 @@ from ...Settings import ENVIRONMENT, env_key
 from ...Test_Data.TBData import TBUsers, TBSQLString
 from ...Lib.db_mssql import MSSQLHelper
 from ...Lib.Utils import *
+from ...Settings import DATABASE
 
 class TraiblazerBaseClass():
     @BeforeClass()
@@ -22,7 +23,7 @@ class TraiblazerBaseClass():
 
     def clean_motivation_audit(self, user_id):
 
-        ms_sql_server = MSSQLHelper('OnlineSchoolPlatform')
+        ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')
         max_audit_sql_path = os.path.join(os.path.dirname(__file__), 'sql', 'tb_get_max_balance.sql')
         max_audit = open_anything(max_audit_sql_path).read().replace('${user_id}', str(self.tb_test.user_id))
         query_audit = ms_sql_server.exec_query(max_audit)
@@ -40,7 +41,7 @@ class TraiblazerBaseClass():
 
     def update_motivation_audit_summary(self, user_id, balance):
         update_summary_sql = TBSQLString.update_motivation_audit_summary.format(user_id, balance)
-        ms_sql_server = MSSQLHelper('OnlineSchoolPlatform')
+        ms_sql_server = MSSQLHelper(DATABASE,'OnlineSchoolPlatform')
         ms_sql_server.exec_non_query(update_summary_sql)
         return balance
 
