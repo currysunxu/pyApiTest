@@ -9,9 +9,6 @@ class Environment(object):
     LIVE_SG = "https://e1svc.ef.com"
 
 
-os.environ['environment'] = 'QA'
-
-
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
     env_key = 'QA'
