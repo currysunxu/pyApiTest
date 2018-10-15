@@ -102,14 +102,14 @@ class SmallStarService():
 
     def submit_small_star_student_answers(self, product_key, group_id, book_key, lesson_key, course_plan_key, user_id, pass_activity=True):
         book_content = CourseBook(self.mou_tai, product_key, book_key, course_plan_key)
-        body = self.generate_activity_submit_content_by_lesson_key(book_content, lesson_key, pass_activity=pass_activity)
+        body, submit_activity_key = self.generate_activity_submit_content_by_lesson_key(book_content, lesson_key, pass_activity=pass_activity)
         body["StudentId"] = user_id
         body["GroupId"] = group_id
-        return self.mou_tai.post("/api/v2/ActivityAnswer/SmallStar/", json=body)
+        return self.mou_tai.post("/api/v2/ActivityAnswer/SmallStar/", json=body), submit_activity_key
 
     def generate_activity_submit_content_by_lesson_key(self, book_content, lesson_key, pass_activity, activity_index=0):
         activities = book_content.get_child_nodes_by_parent_key(lesson_key)
-        return book_content.generate_activity_submit_answer(activities[activity_index], pass_activity)
+        return book_content.generate_activity_submit_answer(activities[activity_index], pass_activity), activities[activity_index]['ActivityKeys']
 
     def fetch_content_update_summary(self, body):
         return self.mou_tai.post("/api/v2/Content/", json=body)

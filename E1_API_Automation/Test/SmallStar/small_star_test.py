@@ -127,7 +127,7 @@ class SmallStarTestCases(SmallStarBase):
     @Test()
     def activity_answer(self):
         un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(self.current_book_key).json()
-        response = self.small_star_service.submit_small_star_student_answers(self.product_code, self.group_id,
+        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code, self.group_id,
                                                                              self.current_book_key,
                                                                              un_lock_lesson_keys[0],
                                                                              self.course_plan_key, self.user_id, True)
@@ -136,7 +136,7 @@ class SmallStarTestCases(SmallStarBase):
         self.reset_activity_anwser(un_lock_lesson_keys[0])
 
     def reset_activity_anwser(self, lesson_key):
-        response = self.small_star_service.submit_small_star_student_answers(self.product_code, self.group_id,
+        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code, self.group_id,
                                                                              self.current_book_key,
                                                                              lesson_key,
                                                                              self.course_plan_key, self.user_id, False)
