@@ -29,7 +29,7 @@ class SmallStarBase():
 
     @AfterMethod()
     def sign_out(self):
-        if self.self.un_lock_lesson_keys:
+        if self.un_lock_lesson_keys:
             self.reset_activity_answer(self.un_lock_lesson_keys[0])
 
         self.small_star_service.sign_out()
