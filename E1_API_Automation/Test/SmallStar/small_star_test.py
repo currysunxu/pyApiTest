@@ -129,7 +129,7 @@ class SmallStarTestCases(SmallStarBase):
                                                                              self.course_plan_key, self.user_id, True)
         assert_that(response.json(), exist("SubmitIdentifier"))
         assert_that(response.json(), exist("AnswerKeys"))
-        self.un_lock_lesson_keys = None
+
 
 
 
