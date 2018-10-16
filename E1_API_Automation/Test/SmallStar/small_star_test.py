@@ -138,24 +138,17 @@ class SmallStarTestCases(SmallStarBase):
                                                                                                       0],
                                                                                                   self.course_plan_key,
                                                                                                   self.user_id, True)
-        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(self.current_book_key).json()
-        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code, self.group_id,
-                                                                             self.current_book_key,
-                                                                             self.un_lock_lesson_keys[0],
-                                                                             self.course_plan_key, self.user_id, True)
-        assert_that(response.json(), exist("SubmitIdentifier"))
-        assert_that(response.json(), exist("AnswerKeys"))
-
-
-
-
-    def reset_activity_anwser(self, lesson_key):
+        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
+            self.current_book_key).json()
         response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code,
                                                                                                   self.group_id,
                                                                                                   self.current_book_key,
-                                                                                                  lesson_key,
+                                                                                                  self.un_lock_lesson_keys[
+                                                                                                      0],
                                                                                                   self.course_plan_key,
-                                                                                                  self.user_id, False)
+                                                                                                  self.user_id, True)
+        assert_that(response.json(), exist("SubmitIdentifier"))
+        assert_that(response.json(), exist("AnswerKeys"))
 
     def check_content_with_last_stamp_and_key(self, response, synchronize_function, item_to_be_checked):
         last_key, last_stamp = self.get_last_stamp_and_key(response)
