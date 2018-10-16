@@ -31,6 +31,7 @@ class SmallStarBase():
     def sign_out(self):
         if self.un_lock_lesson_keys:
             self.reset_activity_answer(self.un_lock_lesson_keys[0])
+            self.un_lock_lesson_keys = None
 
         self.small_star_service.sign_out()
 
