@@ -81,7 +81,7 @@ class EVCBase():
             "UserName": "chris b.",
             "Gender": 2,
             "Cellphone": None,
-            "AvatarUrl": "http://qa.englishtown.cn/opt-media/?id=b54fe1b3-aa1f-4676-965b-d0b5107ed69c"
+            "AvatarUrl": "http://qa.englishtown.cn/opt-media/?id=e9e4d04d-e15a-460d-af0a-5fd91c10b226"
         }
         after_report_info = {
             "Student_User_Name": "fr062201",
