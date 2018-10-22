@@ -2,7 +2,6 @@ from enum import Enum
 from time import sleep
 
 import jmespath
-import requests
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
@@ -10,8 +9,6 @@ from E1_API_Automation.Business.KidsEVC import KidsEVCService
 from ...Lib.HamcrestMatcher import match_to
 from ...Lib.ScheduleClassTool import local2utc
 from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class ClassType(Enum):
