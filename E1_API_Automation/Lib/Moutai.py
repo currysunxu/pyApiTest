@@ -3,7 +3,8 @@ import jmespath
 from hamcrest import assert_that, equal_to
 
 from .HamcrestMatcher import match_to
-
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class Token():
     def __init__(self, name, jemspath):
