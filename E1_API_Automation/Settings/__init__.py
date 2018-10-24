@@ -9,27 +9,54 @@ class Environment(object):
     LIVE_SG = "https://e1svc.ef.com"
 
 
-# os.environ['environment'] = 'LIVE'
+
+#os.environ['environment'] = 'QA'
+
 
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
     env_key = 'QA'
+    DATABASE = {
+        "Server": "10.163.24.105,1433",
+        "User": "SchoolUser",
+        "Password": "#Bugsfor$!"
+    }
 
 
 elif os.environ['environment'] == 'STG':
     ENVIRONMENT = Environment.STAGING
     env_key = 'Staging'
+    DATABASE = {
+        "Server": "",
+        "User": "",
+        "Password": ""
+    }
 
 elif os.environ['environment'] == 'STG_SG':
     ENVIRONMENT = Environment.STAGING_SG
     env_key = 'Staging_SG'
+    DATABASE = {
+        "Server": "",
+        "User": "",
+        "Password": ""
+    }
 
 
 elif os.environ['environment'] == 'LIVE':
     ENVIRONMENT = Environment.LIVE
     env_key = 'Live'
+    DATABASE = {
+        "Server": "",
+        "User": "",
+        "Password": ""
+    }
 
 elif os.environ['environment'] == 'LIVE_SG':
     ENVIRONMENT = Environment.LIVE_SG
     env_key = 'Live_SG'
+    DATABASE = {
+        "Server": "",
+        "User": "",
+        "Password": ""
+    }
