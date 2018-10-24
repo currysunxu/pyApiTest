@@ -2,11 +2,12 @@ import jmespath
 from hamcrest import assert_that
 from ptest.decorator import TestClass, Test
 
+from E1_API_Automation.Business.SchoolCourse import CourseBook
 from E1_API_Automation.Lib.HamcrestExister import exist
 from E1_API_Automation.Settings import ENVIRONMENT, Environment
 from E1_API_Automation.Test.SmallStar.SmallStarBase import SmallStarBase
 
-AMOUNT = 2147483617
+AMOUNT = 500  # 210000#2147483617
 
 
 @TestClass()
@@ -43,46 +44,52 @@ class SmallStarTestCases(SmallStarBase):
     @Test()
     def synchronize_binary_data(self):
         response = self.small_star_service.synchronize_binary_data(self.current_book_key, self.course_plan_key,
-                                                                   self.product_code,
                                                                    amount=AMOUNT)
         assert_that(len(jmespath.search('Upserts', response.json())) != 0)
         assert_that(response.json(), exist('Upserts'))
         assert_that(len(jmespath.search('Upserts[*].ResourceId', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].Container', response.json())) != 0)
         assert_that("e1-osp" in jmespath.search("Upserts[*].Container", response.json())[0])
+        self.check_content_with_last_stamp_and_key(response, self.small_star_service.synchronize_binary_data,
+                                                   'ResourceId')
 
     @Test()
     def synchronize_course_node(self):
         response = self.small_star_service.synchronize_course_node(self.current_book_key, self.course_plan_key,
-                                                                   self.product_code, upserts_only=False, amount=AMOUNT)
+                                                                   upserts_only=False, amount=AMOUNT)
         assert_that(len(jmespath.search('Upserts', response.json())) != 0)
         assert_that(response.json(), exist('Upserts'))
         assert_that(len(jmespath.search('Upserts[*].TopNodeKey', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].ParentNodeKey', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].CoursePlanKey', response.json())) != 0)
+        self.check_content_with_last_stamp_and_key(response, self.small_star_service.synchronize_course_node, "Key")
 
     @Test()
-    def synchronize_activitiy(self):
+    def synchronize_activity(self):
         response = self.small_star_service.synchronize_activity(self.current_book_key, self.course_plan_key,
-                                                                self.product_code, amount=AMOUNT)
+                                                                amount=AMOUNT)
         assert_that(len(jmespath.search('Upserts', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].Title', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].Stimulus', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].Questions', response.json())) != 0)
+        self.check_content_with_last_stamp_and_key(response, self.small_star_service.synchronize_activity,
+                                                   "Stimulus[0].Key")
 
     @Test()
     def synchronize_digital_article(self):
         response = self.small_star_service.synchronize_digital_article(self.current_book_key, self.course_plan_key,
-                                                                       self.product_code, upserts_only=False,
+                                                                       upserts_only=False,
                                                                        amount=AMOUNT)
         assert_that(len(jmespath.search('Upserts', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].BinaryMeta', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].Body.resources', response.json())) != 0)
+        self.check_content_with_last_stamp_and_key(response, self.small_star_service.synchronize_digital_article,
+                                                   'BinaryMeta', )
 
     @Test()
     def batch_resource(self):
         binary_response = self.small_star_service.synchronize_binary_data(self.current_book_key, self.course_plan_key,
-                                                                          self.product_code, amount=AMOUNT)
+                                                                          amount=AMOUNT)
         resource_ids = jmespath.search('Upserts[*].ResourceId', binary_response.json())
         assert_that(len(resource_ids) != 0)
         batch_resource_response = self.small_star_service.batch_resource(resource_ids[0])
@@ -94,7 +101,7 @@ class SmallStarTestCases(SmallStarBase):
     @Test()
     def batch_resources(self):
         binary_response = self.small_star_service.synchronize_binary_data(self.current_book_key, self.course_plan_key,
-                                                                          self.product_code, amount=AMOUNT)
+                                                                          amount=AMOUNT)
         resource_ids = jmespath.search('Upserts[*].ResourceId', binary_response.json())
         assert_that(len(resource_ids) != 0)
         batch_response = self.small_star_service.batch_resources(resource_ids[:5])
@@ -102,10 +109,9 @@ class SmallStarTestCases(SmallStarBase):
         assert_that(len(jmespath.search('[*]', batch_response.json())) == 5)
 
     @Test()
-    def syncronize_all_historical_activity_answer(self):
+    def synchronize_all_historical_activity_answer(self):
         response = self.small_star_service.synchronize_small_star_student_activity_answer(self.current_book_key,
                                                                                           self.course_plan_key,
-                                                                                          self.product_code,
                                                                                           amount=AMOUNT)
         assert_that(len(jmespath.search('Upserts', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].ActivityCourseKey', response.json())) != 0)
@@ -113,6 +119,9 @@ class SmallStarTestCases(SmallStarBase):
         assert_that(len(jmespath.search('Upserts[*].QuestionKey', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].SubmitIdentifier', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].Key', response.json())) != 0)
+        self.check_content_with_last_stamp_and_key(response,
+                                                   self.small_star_service.synchronize_small_star_student_activity_answer,
+                                                   'Key')
 
     @Test()
     def course_unlock(self):
@@ -121,208 +130,52 @@ class SmallStarTestCases(SmallStarBase):
 
     @Test()
     def activity_answer(self):
-        if ENVIRONMENT == Environment.STAGING:
-            body = {
-                "GroupId": "687498",
-                "ActivityCourseKey": "7aa1a5fa-83b1-44c4-b2df-b710a5113a7f",
-                "StudentId": "43240092",
-                "ActivityKey": "2e4a418e-68a7-4681-b725-1441d77390cd",
-                "Answers": [
-                    {
-                        "Detail": {
-                            "correctAnswers": [
-                                {
-                                    "test": "0",
-                                    "option": "0"
-                                }
-                            ],
-                            "studentAnswers": {
-                                "optionSelectionFull": [
-                                    {
-                                        "test": "0",
-                                        "option": "0"
-                                    }
-                                ],
-                                "optionSelection": [
-                                    {
-                                        "test": "0",
-                                        "option": "0"
-                                    }
-                                ]
-                            }
-                        },
-                        "TotalStar": 1,
-                        "Duration": 1.1333333333333333,
-                        "QuestionKey": "3c3ced73-d97a-4407-94e5-eaf63b6aae30",
-                        "Score": 1,
-                        "LocalStartStamp": "2018-09-12T06:46:22.398Z",
-                        "LocalEndStamp": "2018-09-12T06:46:23.774Z",
-                        "TotalScore": 1,
-                        "Star": 1
-                    },
-                    {
-                        "Detail": {
-                            "correctAnswers": [
-                                {
-                                    "test": "0",
-                                    "option": "0"
-                                }
-                            ],
-                            "studentAnswers": {
-                                "optionSelectionFull": [
-                                    {
-                                        "test": "0",
-                                        "option": "0"
-                                    }
-                                ],
-                                "optionSelection": [
-                                    {
-                                        "test": "0",
-                                        "option": "0"
-                                    }
-                                ]
-                            }
-                        },
-                        "TotalStar": 1,
-                        "Duration": 4.4333333333333336,
-                        "QuestionKey": "39147a2e-255a-442c-91de-03a20e4e5fe5",
-                        "Score": 1,
-                        "LocalStartStamp": "2018-09-12T06:46:24.680Z",
-                        "LocalEndStamp": "2018-09-12T06:46:29.141Z",
-                        "TotalScore": 1,
-                        "Star": 1
-                    },
-                    {
-                        "Detail": {
-                            "correctAnswers": [
-                                {
-                                    "test": "0",
-                                    "option": "0"
-                                }
-                            ],
-                            "studentAnswers": {
-                                "optionSelectionFull": [
-                                    {
-                                        "test": "0",
-                                        "option": "0"
-                                    }
-                                ],
-                                "optionSelection": [
-                                    {
-                                        "test": "0",
-                                        "option": "0"
-                                    }
-                                ]
-                            }
-                        },
-                        "TotalStar": 1,
-                        "Duration": 4.5,
-                        "QuestionKey": "565737c4-0564-414f-92e0-56d9553a2fc9",
-                        "Score": 1,
-                        "LocalStartStamp": "2018-09-12T06:46:30.099Z",
-                        "LocalEndStamp": "2018-09-12T06:46:34.645Z",
-                        "TotalScore": 1,
-                        "Star": 1
-                    }
-                ]
-            }
-        else:
-            body = {
-                "GroupId": "370566",
-                "ActivityCourseKey": "60330b7a-a14a-4ea6-8a3d-7a202ea85047",
-                "StudentId": "12226010",
-                "ActivityKey": "b31bd7ef-c99f-43b4-b493-5df1d9b1cca4",
-                "Answers": [
-                    {
-                        "Detail": {
-                            "correctAnswers": [
-                                {
-                                    "test": "0",
-                                    "option": "0"
-                                },
-                                {
-                                    "test": "0",
-                                    "option": "1"
-                                },
-                                {
-                                    "test": "1",
-                                    "option": "2"
-                                },
-                                {
-                                    "test": "1",
-                                    "option": "3"
-                                },
-                                {
-                                    "test": "1",
-                                    "option": "4"
-                                }
-                            ],
-                            "studentAnswers": {
-                                "optionSelectionFull": [
-                                    {
-                                        "test": "0",
-                                        "option": "4"
-                                    },
-                                    {
-                                        "test": "1",
-                                        "option": "0"
-                                    },
-                                    {
-                                        "test": "0",
-                                        "option": "1"
-                                    },
-                                    {
-                                        "test": "0",
-                                        "option": "0"
-                                    },
-                                    {
-                                        "test": "1",
-                                        "option": "4"
-                                    },
-                                    {
-                                        "test": "1",
-                                        "option": "3"
-                                    },
-                                    {
-                                        "test": "1",
-                                        "option": "2"
-                                    }
-                                ],
-                                "optionSelection": [
-                                    {
-                                        "test": "1",
-                                        "option": "3"
-                                    },
-                                    {
-                                        "test": "0",
-                                        "option": "1"
-                                    },
-                                    {
-                                        "test": "1",
-                                        "option": "4"
-                                    },
-                                    {
-                                        "test": "1",
-                                        "option": "2"
-                                    },
-                                    {
-                                        "test": "0",
-                                        "option": "0"
-                                    }
-                                ]
-                            }
-                        },
-                        "TotalStar": 5,
-                        "Duration": 9.9000000000000004,
-                        "QuestionKey": "6db055d2-5b25-4def-89bc-834716b0d6dd",
-                        "Score": 4,
-                        "LocalStartStamp": "2018-09-11T06:47:22.747Z",
-                        "LocalEndStamp": "2018-09-11T06:47:33.150Z",
-                        "TotalScore": 5,
-                        "Star": 3
-                    }
-                ]
-            }
-        response = self.small_star_service.submit_small_star_student_answers(body)
+        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
+            self.current_book_key).json()
+        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code,
+                                                                                                  self.group_id,
+                                                                                                  self.current_book_key,
+                                                                                                  self.un_lock_lesson_keys[
+                                                                                                      0],
+                                                                                                  self.course_plan_key,
+                                                                                                  self.user_id, True)
         assert_that(response.json(), exist("SubmitIdentifier"))
         assert_that(response.json(), exist("AnswerKeys"))
+
+    def check_content_with_last_stamp_and_key(self, response, synchronize_function, item_to_be_checked):
+        last_key, last_stamp = self.get_last_stamp_and_key(response)
+        second_response = synchronize_function(self.current_book_key, self.course_plan_key,
+                                               amount=AMOUNT,
+                                               last_synchronized_key=last_key,
+                                               last_Synchronized_Stamp=last_stamp)
+        assert_that(len(jmespath.search('Upserts[*].%s' % item_to_be_checked, second_response.json())) != 0)
+
+    def get_last_stamp_and_key(self, response):
+        last_stamp = jmespath.search('LastStamp', response.json())
+        last_key = jmespath.search('LastKey', response.json())
+        return last_key, last_stamp
+
+    @Test()
+    def synchronize_activity_answer(self):
+        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(self.current_book_key).json()
+        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code,
+                                                                                                  self.group_id,
+                                                                                                  self.current_book_key,
+                                                                                                  self.un_lock_lesson_keys[
+                                                                                                      0],
+                                                                                                  self.course_plan_key,
+                                                                                                  self.user_id, True)
+
+        historical_activity_answer = self.small_star_service.synchronize_small_star_student_activity_answer(
+            self.current_book_key,
+            self.course_plan_key,
+            amount=2147483617)
+
+        activity_keys = jmespath.search('Upserts[*].ActivityKey', historical_activity_answer.json())
+
+        assert_that(submit_activity_key[0] in activity_keys)
+
+        result = jmespath.search("Upserts[?ActivityKey=='{}']".format(submit_activity_key[0]),
+                                 historical_activity_answer.json())[-1]
+
+        assert_that(result['TotalScore'] == result['Score'])

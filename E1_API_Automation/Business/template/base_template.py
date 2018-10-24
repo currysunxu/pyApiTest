@@ -25,5 +25,5 @@ class BaseTemplate:
         question_json = jmespath.search("Questions[?Key=='{0}']".format(question_key), self.json)[0]
         answer_ids = jmespath.search("Body.answers[]", question_json)
         answers = list(map(lambda x: {"id": x, "{0}".format(type):
-            jmespath.search("Body.options[?id=='{0}'].{1}".format(x, type), question_json)[0]}, answer_ids))
+            jmespath.search("Body.options[?id=='{0}'].{1}".format(x, type), question_json)}, answer_ids))
         return answers
