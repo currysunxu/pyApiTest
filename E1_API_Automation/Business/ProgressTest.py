@@ -22,18 +22,13 @@ class PTService():
         return self.mou_tai.get('/api/v2/ProgressTestWebSocket/CND')
 
     def get_books_info(self, product_name):
-        if product_name == "tb":
-            return self.mou_tai.get('/api/v2/ProgressTestBooks/1')
-        elif product_name == "ss":
+
+        if product_name == "ss":
             return self.mou_tai.get('/api/v2/ProgressTestBooks/SmallStar')
+        else:
+            return self.mou_tai.get('/api/v2/ProgressTestBooks/1')
 
-    def post_content_info(self, book_key_list, product_name):
-        global product_code
-        if product_name == "tb":
-            product_code = "PT"
-        elif product_name == "ss":
-            product_code = "SSPT"
-
+    def post_content_info(self, book_key_list, product_code):
         data = {"BookKeys": book_key_list,
                 "ProductCode": product_code
                 }
@@ -42,7 +37,7 @@ class PTService():
     def get_book_key_list(self, product_name):
         book_info = self.get_books_info(product_name)
         book_key_list = jmespath.search("[].Key", book_info.json())
-        return book_key_list, product_name
+        return book_key_list
 
     def query_school_info(self, region_key):
         data = {"Region": region_key}

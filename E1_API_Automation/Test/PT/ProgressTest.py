@@ -68,19 +68,19 @@ class PTAPITestCases(ProgressTestClass):
     @Test()
     def test_tb_content_info(self):
         book_key_list = self.PTService.get_book_key_list("tb")
-        content_info = self.PTService.post_content_info(book_key_list[0], book_key_list[1])
+        content_info = self.PTService.post_content_info(book_key_list, "PT")
         assert_that(content_info.status_code == 200)
 
     @Test()
     def test_ss_content_info(self):
         book_key_list = self.PTService.get_book_key_list("ss")
-        content_info = self.PTService.post_content_info(book_key_list[0], book_key_list[1])
+        content_info = self.PTService.post_content_info(book_key_list, "SSPT")
         assert_that(content_info.status_code == 200)
 
     @Test()
     def test_tb_synchronize(self):
         book_list = self.PTService.get_book_key_list("tb")
-        for book_key in book_list[0]:
+        for book_key in book_list:
             course_node = self.PTService.post_courseNode_sync(book_key)
             assert_that(course_node.json(), exist("LastStamp"))
             assert_that(course_node.json(), exist("LastKey"))
@@ -94,7 +94,7 @@ class PTAPITestCases(ProgressTestClass):
     @Test()
     def test_ss_synchronize(self):
         book_list = self.PTService.get_book_key_list("ss")
-        for book_key in book_list[0]:
+        for book_key in book_list:
             course_node = self.PTService.post_courseNode_sync(book_key)
             assert_that(course_node.json(), exist("LastStamp"))
             assert_that(course_node.json(), exist("LastKey"))
