@@ -99,13 +99,13 @@ class EVCBase():
         host = "https://e1svc-staging.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-stg-cn.ef.com'
         user_info = {
-            "UserName": "null183",
+            "UserName": "ahab",
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0
         }
         user_with_zero_och = {
-            "UserName" : "CN_osk",
+            "UserName" : "Xander",
             "Password" : "12345"
         }
         teacher_list = ["10584669", "10427158", "5888455"]
