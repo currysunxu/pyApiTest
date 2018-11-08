@@ -209,15 +209,16 @@ class APITestCases(EVCBase):
         lesson_structure_response = self.evc_service.get_online_student_book_structure(self.HF_program_code)
         assert_that(lesson_structure_response.json(), match_to("[0].Lessons"))
         #Check that there are 8 books
-        assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 8)
+        assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 9)
         #Check the book name
-        assert_that(set(jmespath.search("[].BookCode", lesson_structure_response.json())) == set(["C", "D", "E", "F", "G", "H", "I", "J"]))
+        assert_that(set(jmespath.search("[].BookCode", lesson_structure_response.json())) == set(["X", "C", "D", "E", "F", "G", "H", "I", "J"]))
         #Check the lesson number, each should be 24
         lessons_content = jmespath.search("[].Lessons", lesson_structure_response.json())
-        for lesson in lessons_content:
+        assert_that(len(lessons_content[0]) == 1)
+        for lesson in lessons_content[1:]:
             assert_that(len(lesson) == 24)
-        #Check every book got 24 lessons, so the total will be 24 x 8 = 192
-        assert_that(jmespath.search("length([].Lessons[])", lesson_structure_response.json()) == 192)
+        # Total lessons should be 1 + 24 x 8 = 193
+        assert_that(jmespath.search("length([].Lessons[])", lesson_structure_response.json()) == 193)
 
 
     @Test(tags='qa, stg')
