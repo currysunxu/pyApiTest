@@ -75,7 +75,7 @@ class APITestCases(EVCBase):
                                     response.json())[0] == self.teacher_profile["Description"])
         assert_that(jmespath.search(filter + ".TeacherProfile.UserInfo.UserId", response.json())[0] == self.teacher_profile["UserId"])
         assert_that(jmespath.search(filter + ".TeacherProfile.UserInfo.Name", response.json())[0] == self.teacher_profile["UserName"])
-        assert_that(jmespath.search(filter + ".TeacherProfile.UserInfo.Gender", response.json())[0] == 2)
+        assert_that(jmespath.search(filter + ".TeacherProfile.UserInfo.Gender", response.json())[0] == self.teacher_profile["Gender"])
         assert_that(jmespath.search(filter + ".ProgramCode", response.json())[0] == self.HF_program_code)
         assert_that(jmespath.search(filter + ".ClassType", response.json())[0] == "Regular")
         assert_that(len(jmespath.search(filter + ".TeacherProfile.UserInfo.Cellphone", response.json())) == 0)
