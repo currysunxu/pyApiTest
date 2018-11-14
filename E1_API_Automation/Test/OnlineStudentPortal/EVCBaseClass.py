@@ -79,7 +79,7 @@ class EVCBase():
             "UserId" : "10703777",
             "Description": "\"\"Hey everyone, I'm chris b.teacher.\"\"-chris b.",
             "UserName": "chris b.",
-            "Gender": 2,
+            "Gender": 1,
             "Cellphone": None,
             "AvatarUrl": "http://qa.englishtown.cn/opt-media/?id=e9e4d04d-e15a-460d-af0a-5fd91c10b226"
         }
