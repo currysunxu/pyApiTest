@@ -216,6 +216,7 @@ class ScheduleClassTool:
     def __get_classIds(self, response):
         pattern = re.compile(r'ClassIds: (\d.*\d)</span>')
         match_result = pattern.findall(response)
+        print("match classes: ", match_result)
         if len(match_result) == 0:
             print("Failed to assign class. It's might be already booked.")
         if len(match_result) == 1:

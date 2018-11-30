@@ -20,11 +20,12 @@ class EVCBase():
 
     '''
     Uncomment the following to run or debugger the automation.
-    os.environ['Teacher_Id'] = "5888455"
-    os.environ["Start_Time"] = "2018-8-18 1:00:00"
-    os.environ["End_Time"] = "2018-8-18 1:30:00"
+    
+    os.environ['Teacher_Id'] = "10703777"
+    os.environ["Start_Time"] = "2018-11-29 2:00:00"
+    os.environ["End_Time"] = "2018-11-29 2:30:00"
     os.environ["test_env"] = "QA"
-    '''
+'''
 
     teacher_id = os.environ['Teacher_Id']
     host = None
@@ -174,8 +175,8 @@ class EVCBase():
             school_service = get_UAT_schedule_tool()
         if "STG" == test_env:
             school_service = get_STG_schedule_tool()
-        print(school_service.schedule_kids_class(kids_class))
         sleep(2)
+        return school_service.schedule_kids_class(kids_class)
 
     @AfterMethod()
     def sign_out(self):
