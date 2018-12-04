@@ -1,5 +1,4 @@
 import datetime
-import os
 from enum import Enum
 
 import re
@@ -9,9 +8,6 @@ import time
 import pytz
 import requests
 from hamcrest import assert_that, equal_to
-from ptest.decorator import TestClass, Test
-
-
 
 est = pytz.timezone('US/Eastern')
 utc = pytz.utc
@@ -64,7 +60,6 @@ class HeaderContentType(Enum):
 
 
 class ScheduleClassTool:
-
     def __init__(self, admin, password, host):
         self.admin = admin
         self.password = password
@@ -191,18 +186,22 @@ class ScheduleClassTool:
             raise Exception("Need to update regular expression. Too many result. It basically should be one.")
         return -1
 
+
 def get_UAT_schedule_tool():
     return ScheduleClassTool(admin="lliu17846", password="1", host="http://lolita.englishtown.com")
+
 
 def get_QA_schedule_tool():
     return ScheduleClassTool(admin="KONSA", password="1", host="http://qa.englishtown.com")
 
+
 def get_STG_schedule_tool():
     return ScheduleClassTool(admin="BBroekmann1", password="mail", host="http://staging.englishtown.com")
 
+
 def create_and_assign_class(start_time, end_time, teacher_id, test_env="QA",
                             subServiceType=ServiceSubTypeCode.KONDemo.value, partner_code="any", level_code="Any",
-                            market_code="any", evc_server_code = "evccn1",  teaching_item="en"):
+                            market_code="any", evc_server_code="evccn1", teaching_item="en"):
     kids_class = KidsClass(start_time, end_time,
                            teacher={"id": teacher_id, "teacher_name": "KON1", "teacher_password": "1"},
                            serverSubTypeCode=subServiceType, evcServerCode=evc_server_code, partnerCode=partner_code,
@@ -225,25 +224,13 @@ def local2utc_datetime(local_st):
     utc_st = datetime.datetime.utcfromtimestamp(time_struct)
     return utc_st
 
+
 def local2est_datetime(local_st):
     return local2utc_datetime(local_st).replace(tzinfo=utc).astimezone(est)
 
+
 def local2est(local_st):
     return local2est_datetime(local_st).strftime("%Y-%m-%d %H:%M:%S")
-
-
-class BaseClass():
-
-    os.environ['test_env'] = "QA"
-    os.environ['teacher_id'] = "10274591"
-    os.environ['student_id'] = "12226258"
-    os.environ['start_time'] = "2018-12-04 11:00:00"
-    os.environ['end_time'] = "2018-12-04 11:30:00"
-
-    if os.environ["test_env"] == "QA":
-        host = 'http://internal-e1-evc-booking-qa-cn.ef.com'
-    elif os.environ["test_env"] == "STG":
-        host = 'http://internal-e1-evc-booking-stg-cn.ef.com'
 
 
 class SISService():
@@ -277,38 +264,47 @@ class SISService():
 
 
 
-@TestClass()
-class QuickBook(BaseClass):
+if __name__ == '__main__':
+    test_env = "QA"
+    teacher_id = "10274591"
+    student_id = "12226258"
+    start_time = "2018-12-04 13:00:00"
+    end_time = "2018-12-04 13:30:00"
+    course_type = "HF"
+    level_code = "C"
+    unit_number = "1"
+    lesson_number = "1"
+    class_type = "Regular"
 
-    est_start_time = local2est(os.environ['start_time'])
-    est_end_time = local2est(os.environ['end_time'])
 
+    if test_env == "QA":
+        host = 'http://internal-e1-evc-booking-qa-cn.ef.com'
+    elif test_env == "STG":
+        host = 'http://internal-e1-evc-booking-stg-cn.ef.com'
+    service = SISService(host)
 
-    def assign_class(self):
-        class_list = create_and_assign_class(self.est_start_time, self.est_end_time,
-                                                      teacher_id=os.environ['teacher_id'],
-                                                      test_env=os.environ['test_env'],
-                                                      subServiceType=ServiceSubTypeCode.KONRegular.value,
-                                                      partner_code="Any", level_code="Any", market_code="Any",
-                                                      evc_server_code="evccn1")
-        return class_list
+    class_list = create_and_assign_class(local2est(start_time), local2est(end_time),
+                                         teacher_id=teacher_id,
+                                         test_env=test_env,
+                                         subServiceType=ServiceSubTypeCode.KONRegular.value,
+                                         partner_code="Any",
+                                         level_code="Any",
+                                         market_code="Any",
+                                         evc_server_code="evccn1",
+                                         teaching_item="en")
 
-    @Test()
-    def test_book_class(self):
-        class_list = self.assign_class()
-        self.service = SISService(self.host)
+    if type(class_list) == list:
+        for class_id in class_list:
+            book_response = service.post_bookings(class_id=class_id, teacher_id=teacher_id,
+                                                  student_id=student_id, course_type=course_type, level_code=level_code,
+                                                  unit_number=unit_number, lesson_number=lesson_number,
+                                                  class_type=class_type)
+            assert_that(book_response.status_code, equal_to(204))
 
-        if type(class_list) == list:
-            for class_id in class_list:
-                book_response = self.service.post_bookings(class_id=class_id, teacher_id=os.environ['teacher_id'],
-                                                      student_id=os.environ['student_id'], course_type="HF", level_code="C",
-                                                      unit_number="1", lesson_number="1", class_type="Regular")
-                assert_that(book_response.status_code, equal_to(204))
-
-        elif type(class_list) == int:
-                book_response = self.service.post_bookings(class_id=str(class_list), teacher_id=os.environ['teacher_id'],
-                                                               student_id=os.environ['student_id'], course_type="HF",
-                                                               level_code="C",
-                                                               unit_number="1", lesson_number="1", class_type="Regular")
-                assert_that(book_response.status_code, equal_to(204))
-
+    elif type(class_list) == int:
+        book_response = service.post_bookings(class_id=str(class_list), teacher_id=teacher_id,
+                                              student_id=student_id, course_type=course_type,
+                                              level_code=level_code,
+                                              unit_number=unit_number, lesson_number=lesson_number,
+                                              class_type=class_type)
+        assert_that(book_response.status_code, equal_to(204))
