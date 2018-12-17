@@ -82,7 +82,7 @@ class EVCBase():
             "UserName": "chris b.",
             "Gender": 1,
             "Cellphone": None,
-            "AvatarUrl": "http://qa.englishtown.cn/opt-media/?id=e9e4d04d-e15a-460d-af0a-5fd91c10b226"
+            "AvatarUrl": "https://qa.englishtown.cn/opt-media/?id=e9e4d04d-e15a-460d-af0a-5fd91c10b226"
         }
         after_report_info = {
             "Student_User_Name": "fr062201",
@@ -116,7 +116,7 @@ class EVCBase():
             "UserName": "Margaret Wang",
             "Gender": 2,
             "Cellphone": None,
-            "AvatarUrl": "http://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
+            "AvatarUrl": "https://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
         }
         after_report_info = {
             "Student_User_Name": "osk08",
