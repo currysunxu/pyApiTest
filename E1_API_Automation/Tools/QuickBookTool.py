@@ -8,6 +8,7 @@ import time
 import pytz
 import requests
 from hamcrest import assert_that, equal_to
+from E1_API_Automation.Lib.Moutai import Moutai, Token
 
 est = pytz.timezone('US/Eastern')
 utc = pytz.utc
@@ -237,6 +238,36 @@ class SISService():
     def __init__(self, host):
         self.host = host
         self.session = requests.session()
+        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+
+    def login(self, user_name, password):
+        user_info = {
+            "UserName": user_name,  # "jenkin0528tb",
+            "Password": password,  # "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
+        return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/OnlineStudentPortal/")
+
+    def book_class(self, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id, program_code,
+                   class_type,
+                   class_id, need_recoder, student_id, state):
+        body = {
+            "BookCode": book_code,
+            "UnitNumber": unit_number,
+            "LessonNumber": lesson_number,
+            "StartStamp": start_stamp,
+            "EndStamp": end_stamp,
+            "TeacherId": teacher_id,
+            "ProgramCode": program_code,
+            "ClassType": class_type,
+            "ClassId": class_id,
+            "NeedRecord": need_recoder,
+            "UserId": student_id,
+            "State": state
+        }
+
+        return self.mou_tai.put("/api/v2/OnlineClassBooking/", json=body)
 
     def post_bookings(self, class_id, teacher_id, student_id, course_type, level_code, unit_number, lesson_number,
                       class_type):
@@ -261,26 +292,37 @@ class SISService():
         return self.session.post(url=url, json=json, verify=False, headers=header)
 
 
-
-
-
 if __name__ == '__main__':
-    test_env = "QA"
-    teacher_id = "10274591"
+    test_env = "UAT"
+    teacher_id = "23684608"  # QA "10274591"
+    student_name = 'bl001'
     student_id = "12226258"
-    start_time = "2018-12-04 13:00:00"
-    end_time = "2018-12-04 13:30:00"
+    start_time = "2018-12-20 17:00:00"
+    end_time = "2018-12-20 18:00:00"
     course_type = "HF"
     level_code = "C"
     unit_number = "1"
     lesson_number = "1"
     class_type = "Regular"
 
+    Book_by = 'KSD'
 
-    if test_env == "QA":
-        host = 'http://internal-e1-evc-booking-qa-cn.ef.com'
-    elif test_env == "STG":
-        host = 'http://internal-e1-evc-booking-stg-cn.ef.com'
+    if Book_by == 'KSD':
+
+        if test_env == "QA":
+            host = 'https://e1svc-qa.ef.cn'
+        elif test_env == "STG":
+            host = 'https://e1svc-staging.ef.cn'
+        elif test_env == "UAT":
+            host = 'http://e1svc-uat.englishtown.com'
+    else:
+        if test_env == "QA":
+            host = 'http://internal-e1-evc-booking-qa-cn.ef.com'
+        elif test_env == "STG":
+            host = 'http://internal-e1-evc-booking-stg-cn.ef.com'
+        elif test_env == "UAT":
+            host = 'http://e1svc-uat.englishtown.com'
+
     service = SISService(host)
 
     class_list = create_and_assign_class(local2est(start_time), local2est(end_time),
@@ -295,16 +337,41 @@ if __name__ == '__main__':
 
     if type(class_list) == list:
         for class_id in class_list:
-            book_response = service.post_bookings(class_id=class_id, teacher_id=teacher_id,
-                                                  student_id=student_id, course_type=course_type, level_code=level_code,
+            if Book_by != 'KSD':
+
+                book_response = service.post_bookings(class_id=class_id, teacher_id=teacher_id,
+                                                      student_id=student_id, course_type=course_type,
+                                                      level_code=level_code,
+                                                      unit_number=unit_number, lesson_number=lesson_number,
+                                                      class_type=class_type)
+                assert_that(book_response.status_code, equal_to(204))
+            else:
+                service.login(student_name, '12345')
+                book_response = service.book_class(level_code, unit_number, lesson_number, '', '', teacher_id,
+                                                   course_type,
+                                                   class_type,
+                                                   class_id,
+                                                   True,
+                                                   student_id,
+                                                   "Begin")
+                assert_that(book_response.status_code, equal_to(200))
+
+    elif type(class_list) == int:
+
+        if Book_by != 'KSD':
+            book_response = service.post_bookings(class_id=str(class_list), teacher_id=teacher_id,
+                                                  student_id=student_id, course_type=course_type,
+                                                  level_code=level_code,
                                                   unit_number=unit_number, lesson_number=lesson_number,
                                                   class_type=class_type)
             assert_that(book_response.status_code, equal_to(204))
-
-    elif type(class_list) == int:
-        book_response = service.post_bookings(class_id=str(class_list), teacher_id=teacher_id,
-                                              student_id=student_id, course_type=course_type,
-                                              level_code=level_code,
-                                              unit_number=unit_number, lesson_number=lesson_number,
-                                              class_type=class_type)
-        assert_that(book_response.status_code, equal_to(204))
+        else:
+            service.login(student_name, '12345')
+            book_response = service.book_class(level_code, unit_number, lesson_number, '', '', teacher_id,
+                                               course_type,
+                                               class_type,
+                                               str(class_list),
+                                               True,
+                                               student_id,
+                                               "Begin")
+            assert_that(book_response.status_code, equal_to(200))
