@@ -20,11 +20,12 @@ class EVCBase():
 
     '''
     Uncomment the following to run or debugger the automation.
-    os.environ['Teacher_Id'] = "5888455"
-    os.environ["Start_Time"] = "2018-8-18 1:00:00"
-    os.environ["End_Time"] = "2018-8-18 1:30:00"
+    
+    os.environ['Teacher_Id'] = "10703777"
+    os.environ["Start_Time"] = "2018-11-29 2:00:00"
+    os.environ["End_Time"] = "2018-11-29 2:30:00"
     os.environ["test_env"] = "QA"
-    '''
+'''
 
     teacher_id = os.environ['Teacher_Id']
     host = None
@@ -65,7 +66,7 @@ class EVCBase():
         host = "https://e1svc-qa.ef.cn"
         SIS_SERVICE = 'https://internal-e1-evc-booking-qa-cn.ef.com'
         user_info = {
-            "UserName": "unlock02",#"jenkin0528tb",
+            "UserName": "jimmy",#unlock02
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0
@@ -79,9 +80,9 @@ class EVCBase():
             "UserId" : "10703777",
             "Description": "\"\"Hey everyone, I'm chris b.teacher.\"\"-chris b.",
             "UserName": "chris b.",
-            "Gender": 2,
+            "Gender": 1,
             "Cellphone": None,
-            "AvatarUrl": "http://qa.englishtown.cn/opt-media/?id=b54fe1b3-aa1f-4676-965b-d0b5107ed69c"
+            "AvatarUrl": "https://qa.englishtown.cn/opt-media/?id=e9e4d04d-e15a-460d-af0a-5fd91c10b226"
         }
         after_report_info = {
             "Student_User_Name": "fr062201",
@@ -99,13 +100,13 @@ class EVCBase():
         host = "https://e1svc-staging.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-stg-cn.ef.com'
         user_info = {
-            "UserName": "null183",
+            "UserName": "ahab",
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0
         }
         user_with_zero_och = {
-            "UserName" : "CN_osk",
+            "UserName" : "Xander",
             "Password" : "12345"
         }
         teacher_list = ["10584669", "10427158", "5888455"]
@@ -115,12 +116,12 @@ class EVCBase():
             "UserName": "Margaret Wang",
             "Gender": 2,
             "Cellphone": None,
-            "AvatarUrl": "http://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
+            "AvatarUrl": "https://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
         }
         after_report_info = {
-            "Student_User_Name": "addison",
+            "Student_User_Name": "osk08",
             "Student_Password": "12345",
-            "ClassId": "247002"
+            "ClassId": "248427"
         }
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
@@ -174,8 +175,8 @@ class EVCBase():
             school_service = get_UAT_schedule_tool()
         if "STG" == test_env:
             school_service = get_STG_schedule_tool()
-        print(school_service.schedule_kids_class(kids_class))
         sleep(2)
+        return school_service.schedule_kids_class(kids_class)
 
     @AfterMethod()
     def sign_out(self):

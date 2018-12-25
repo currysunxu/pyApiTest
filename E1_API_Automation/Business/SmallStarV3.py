@@ -1,6 +1,5 @@
+from E1_API_Automation.Business.SchoolCourse import CourseBook
 from ..Lib.Moutai import Moutai, Token
-import jmespath
-from ..Lib.ResetGPGradeTool import ResetGPGradeTool
 
 
 class SmallStarService():
@@ -10,10 +9,10 @@ class SmallStarService():
 
     def login(self, user_name, password):
         user_info = {
-            "UserName": user_name,  # "jenkin0528tb",
-            "Password": password,  # "12345",
-            "DeviceId":"",
-            "DeviceType":"",
+            "UserName": user_name,
+            "Password": password,
+            "DeviceId": "",
+            "DeviceType": "",
             "Platform": 0
         }
         return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/SS/")
@@ -24,57 +23,75 @@ class SmallStarService():
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
 
-    def synchronize_binary_data(self, book_key, course_plan_key, product_code, upserts_only=True, amount=123):
+    def synchronize_binary_data(self, book_key, course_plan_key, upserts_only=True, amount=123,
+                                last_synchronized_key=None, last_Synchronized_Stamp=None):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
-            "ProductCode": product_code,
+            #"ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
+        if last_synchronized_key and last_synchronized_key is not None:
+            body['LastSynchronizedStamp'] = last_Synchronized_Stamp
+            body['LastSynchronizeKey'] = last_synchronized_key
         return self.mou_tai.post("/api/v2/BinaryData/Synchronize/", json=body)
 
-
-    def synchronize_course_node(self, book_key, course_plan_key, product_code, upserts_only=True, amount=123):
+    def synchronize_course_node(self, book_key, course_plan_key,  upserts_only=True, amount=123,
+                                last_synchronized_key=None, last_Synchronized_Stamp=None):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
-            "ProductCode": product_code,
+            #"ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
+        if last_synchronized_key and last_synchronized_key is not None:
+            body['LastSynchronizedStamp'] = last_Synchronized_Stamp
+            body['LastSynchronizeKey'] = last_synchronized_key
         return self.mou_tai.post("/api/v2/CourseNode/Synchronize/", json=body)
 
-    def synchronize_activity(self, book_key, course_plan_key, product_code, upserts_only=True, amount=123):
+    def synchronize_activity(self, book_key, course_plan_key, upserts_only=True, amount=123,
+                             last_synchronized_key=None, last_Synchronized_Stamp=None):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
-            "ProductCode": product_code,
+            #"ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
+        if last_synchronized_key and last_synchronized_key is not None:
+            body['LastSynchronizedStamp'] = last_Synchronized_Stamp
+            body['LastSynchronizeKey'] = last_synchronized_key
         return self.mou_tai.post("/api/v2/Activity/Synchronize/", json=body)
 
-
-    def synchronize_digital_article(self, book_key, course_plan_key, product_code, upserts_only=True, amount=123):
+    def synchronize_digital_article(self, book_key, course_plan_key, upserts_only=True, amount=123,
+                                    last_synchronized_key=None, last_Synchronized_Stamp=None):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
-            "ProductCode": product_code,
+            #"ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
+        if last_synchronized_key and last_synchronized_key is not None:
+            body['LastSynchronizedStamp'] = last_Synchronized_Stamp
+            body['LastSynchronizeKey'] = last_synchronized_key
         return self.mou_tai.post("/api/v2/DigitalArticle/Synchronize/", json=body)
 
-
-    def synchronize_small_star_student_activity_answer(self, book_key, course_plan_key, product_code, upserts_only=True, amount=123):
+    def synchronize_small_star_student_activity_answer(self, book_key, course_plan_key, upserts_only=True,
+                                                       amount=123, last_Synchronized_Stamp=None, last_synchronized_key=None):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
-            "ProductCode": product_code,
+            #"ProductCode": product_code,
             "UpsertsOnly": upserts_only,
-            "Amount" : amount
+            "Amount": amount
         }
+
+        if last_synchronized_key and last_synchronized_key is not None:
+            body['LastSynchronizedStamp'] = last_Synchronized_Stamp
+            body['LastSynchronizeKey'] = last_synchronized_key
         return self.mou_tai.post("/api/v2/HistoricalActivityAnswer/SynchronizeAll/", json=body)
 
     def get_binary_storage_by_resource_id(self, resource_id):
@@ -83,46 +100,16 @@ class SmallStarService():
     def get_small_star_unlock_course_keys(self, book_key):
         return self.mou_tai.get("/api/v2/CourseUnlock/{}".format(book_key))
 
-    def submit_small_star_student_answers(self, body):
-        '''
-        body format:
-         {
-        "ActivityCourseKey": "f1dddbcb-11ac-49c7-9e7a-167f8a53f0e7",
-        "ActivityKey": "3f22da06-88bd-45ec-ad35-13ecdbbe31fa",
-        "StudentId": "Student Id String",
-        "GroupId": "Group Id String",
-        "Answers": [
-        {
-            "Detail": { Any JSON },
-            "Key": "0ee7b8a8-a2d7-4f6f-8631-e9833ca5522f",
-            "QuestionKey": "4feec5d1-985b-44e5-98ab-651a768275e2",
-            "TotalScore": 1.5,
-            "Score": 1.5,
-            "Attempts": 123,
-            "TotalStar": 123,
-            "Star": 123,
-            "Duration": 123,
-            "LocalStartStamp": "2018-08-24T02:38:21.318Z",
-            "LocalEndStamp": "2018-08-24T02:38:21.318Z"
-        },
-        {
-            "Detail": { Any JSON },
-            "Key": "ac5741cb-da59-4b4a-a13a-ad3b7776a8e4",
-            "QuestionKey": "c7cd3c74-489f-4ef9-95ed-16d0d565d47a",
-            "TotalScore": 1.5,
-            "Score": 1.5,
-            "Attempts": 123,
-            "TotalStar": 123,
-            "Star": 123,
-            "Duration": 123,
-            "LocalStartStamp": "2018-08-24T02:38:21.318Z",
-            "LocalEndStamp": "2018-08-24T02:38:21.318Z"
-        }
+    def submit_small_star_student_answers(self, product_key, group_id, book_key, lesson_key, course_plan_key, user_id, pass_activity=True):
+        book_content = CourseBook(self.mou_tai, product_key, book_key, course_plan_key)
+        body, submit_activity_key = self.generate_activity_submit_content_by_lesson_key(book_content, lesson_key, pass_activity=pass_activity)
+        body["StudentId"] = user_id
+        body["GroupId"] = group_id
+        return self.mou_tai.post("/api/v2/ActivityAnswer/SmallStar/", json=body), submit_activity_key
 
-    ]
-}
-        '''
-        return self.mou_tai.post("/api/v2/ActivityAnswer/SmallStar/", json=body)
+    def generate_activity_submit_content_by_lesson_key(self, book_content, lesson_key, pass_activity, activity_index=0):
+        activities = book_content.get_child_nodes_by_parent_key(lesson_key)
+        return book_content.generate_activity_submit_answer(activities[activity_index], pass_activity), activities[activity_index]['ActivityKeys']
 
     def fetch_content_update_summary(self, body):
         return self.mou_tai.post("/api/v2/Content/", json=body)
@@ -133,5 +120,3 @@ class SmallStarService():
     def batch_resources(self, resource_id_list: list):
         parameter = ','.join(resource_id_list)
         return self.mou_tai.get("/Resource/Batch/{}".format(parameter))
-
-

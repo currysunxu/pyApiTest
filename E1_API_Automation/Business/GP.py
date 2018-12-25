@@ -1,6 +1,7 @@
 import jmespath
 from ptest.assertion import assert_that
 
+from E1_API_Automation.Test_Data.GPData import ShanghaiGradeKey, MoscowGradeKey, EducationRegion
 from ..Lib.Moutai import Moutai, Token
 from ..Lib.ResetGPGradeTool import ResetGPGradeTool
 
@@ -12,8 +13,8 @@ class GPService():
 
     def login(self, user_name, password):
         user_info = {
-            "UserName": user_name,  # "jenkin0528tb",
-            "Password": password,  # "12345",
+            "UserName": user_name,
+            "Password": password,
             "Platform": 0
         }
         return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/GP/")
@@ -30,11 +31,12 @@ class GPService():
     def post_access_token(self):
         return self.mou_tai.post("/api/v2/xAPI/AccessToken/")
 
-    def get_cn_privacy_policy(self):
-        return self.mou_tai.get("/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement/?product=7&cultureCode=zh-CN")
+    def get_local_privacy_policy(self, culture_code):
+        return self.mou_tai.get(
+            "/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement/?product=7&cultureCode={}".format(culture_code))
 
-    def get_cn_student_report(self):
-        return self.mou_tai.get("/api/v2/StudentReport/zh-CN")
+    def get_local_language_student_report(self, culture_code):
+        return self.mou_tai.get("/api/v2/StudentReport/{}".format(culture_code))
 
     def get_en_student_report(self):
         return self.mou_tai.get("/api/v2/StudentReport/en-US")
@@ -72,14 +74,44 @@ class GPService():
     def get_region_and_grade(self):
         return self.mou_tai.get("/api/v2/RegionAndGrade/?marketRegion=1&cultureCode=zh-CN")
 
-    def put_profile_save(self, profile):
-        return self.mou_tai.put("/api/v2/StudentProfile/Save/", profile)
-
     def put_custom_test_start(self, module_list):
         return self.mou_tai.put("/api/v2/CustomTest/Start/", module_list)
 
     def put_custom_test_save(self, test_answer):
         return self.mou_tai.put("/api/v2/CustomTest/Save/", test_answer)
+
+    def put_student_profile_save(self, submit_data):
+        return self.mou_tai.put("/api/v2/StudentProfile/Save/", submit_data)
+
+    def setup_student_profile(self, grade_number, culture_code):
+        student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
+        self.reset_grade(student_id)
+        submit_data = {}
+        if culture_code == 'zh-CN':
+            shanghai_key = (getattr(ShanghaiGradeKey, grade_number))[1]
+            submit_data = {"Birthday": "2003-12-30T16:00:00.340Z",
+                           "EducationRegionKey": '61AEF09D-AFA0-4FC2-96AD-93C72D390653',
+                           "EducationGradeKey": shanghai_key,
+                           "CultureCode": "en-US",
+                           "StartPointGradeKey": shanghai_key,
+                           "PreferLanguageCode": "en-US"}
+        elif culture_code == 'ru-RU':
+            moscow_key = (getattr(MoscowGradeKey, grade_number))[1]
+            submit_data = {"Birthday": "2003-12-30T16:00:00.340Z",
+                           "EducationRegionKey": '045E22BB-E9AB-4BB8-A4FA-F59A7C0A8CDC',
+                           "EducationGradeKey": moscow_key,
+                           "CultureCode": "en-US",
+                           "StartPointGradeKey": moscow_key,
+                           "PreferLanguageCode": "en-US"}
+
+        profile_save = self.put_student_profile_save(submit_data)
+        assert_that(profile_save.status_code == 204)
+
+    def get_new_recommend_module(self):
+        student_progress = self.get_student_progress().json()
+        new_module_list = jmespath.search("DiagnosticTestProgress.NextDiagnosticTest.New",
+                                          student_progress)
+        return new_module_list
 
     def get_custom_test_answer(self, module_list):
 
@@ -110,33 +142,38 @@ class GPService():
         if first_time == True:
             self.reset_grade(student_id)
         question_list = self.put_dt_start().json()
-        dt_key = jmespath.search('DiagnosticTestKey', question_list)
-        failed_module_list, module_activity_answers = [], []
-        submit_data = {}
-        submit_data['DiagnosticTestKey'] = dt_key
-        submit_data['Studentid'] = student_id
+        response_code = self.put_dt_start()
+        if response_code.status_code == 200:
+            dt_key = jmespath.search('DiagnosticTestKey', question_list)
+            failed_module_list, module_activity_answers = [], []
+            submit_data = {}
+            submit_data['DiagnosticTestKey'] = dt_key
+            submit_data['Studentid'] = student_id
 
-        for index, module in enumerate(jmespath.search('Modules', question_list)):
-            module_key = jmespath.search('ModuleKey', module)
-            for activity in jmespath.search('Activitys', module):
-                activity_type = jmespath.search('Type', activity)
-                activity_key = jmespath.search('Key', activity)
-                for question in jmespath.search('Questions', activity):
-                    question_key = jmespath.search('Key', question)
-                    submit_question = self.set_submit_question(question_key)
-                    if index + 1 > failed_module_number:
-                        submit_question['Score'] = 1
-                    else:
-                        submit_question['Score'] = 0
-                        failed_module_list.append(module_key)
+            for index, module in enumerate(jmespath.search('Modules', question_list)):
+                module_key = jmespath.search('ModuleKey', module)
+                for activity in jmespath.search('Activitys', module):
+                    activity_type = jmespath.search('Type', activity)
+                    activity_key = jmespath.search('Key', activity)
+                    for question in jmespath.search('Questions', activity):
+                        question_key = jmespath.search('Key', question)
+                        submit_question = self.set_submit_question(question_key)
+                        if index + 1 > failed_module_number:
+                            submit_question['Score'] = 1
+                        else:
+                            submit_question['Score'] = 0
+                            failed_module_list.append(module_key)
 
-                    module_activity_answer = self.set_module_activity_answer(activity_key, activity_type, module_key,
-                                                                             submit_question)
-                    module_activity_answers.append(module_activity_answer)
+                        module_activity_answer = self.set_module_activity_answer(activity_key, activity_type,
+                                                                                 module_key,
+                                                                                 submit_question)
+                        module_activity_answers.append(module_activity_answer)
 
-        submit_data['StudentModuleActivityAnswer'] = module_activity_answers
-        failed_module = list(set(failed_module_list))
-        return submit_data, failed_module
+            submit_data['StudentModuleActivityAnswer'] = module_activity_answers
+            failed_module = list(set(failed_module_list))
+            return submit_data, failed_module, response_code.status_code
+        else:
+            return response_code.status_code
 
     def set_submit_question(self, question_key):
         submit_question = {}
@@ -290,3 +327,119 @@ class GPService():
             assert_that(response.status_code == 204)
             if failed_module_number != 0 and loop % 2 == 0:
                 self.save_all_module_quiz_answer()
+
+    def get_mapping(self):
+        all_module_info = self.get_available_grade(EducationRegion.cn_city_list['Shanghai']).json()
+        grade_id = jmespath.search("[*].GradeOrdinal", all_module_info)
+        mapping = []
+        for grade_id in grade_id:
+            module_key_list = jmespath.search("[?GradeOrdinal==`" + str(grade_id) + "`].Modules[].Key",
+                                              all_module_info)
+            for module_key in module_key_list:
+                difficulty_level = jmespath.search("[*].Modules[?Key=='" + module_key + "'].DifficultyLevel[]",
+                                                   all_module_info)
+                list = (grade_id, difficulty_level[0], module_key,)
+                mapping.append(list)
+
+        return mapping
+
+    def search_mapping(self, search_value, expected_output, mapping):
+        for single_mapping in mapping:
+            if search_value in (single_mapping[0], single_mapping[1], single_mapping[2]):
+                if expected_output == 'key':
+                    return single_mapping[2]
+                elif expected_output == 'grade_id':
+                    return single_mapping[0]
+                elif expected_output == 'level':
+                    return single_mapping[1]
+                continue
+
+            else:
+                continue
+
+    def search_module_key_by_gradeid(self, lists, module_info):
+        if type(lists) == int:
+            module_key_list = jmespath.search("[?GradeOrdinal==`" + str(lists) + "`].Modules[].Key", module_info)
+            return module_key_list
+        if type(lists) == list:
+            all_first_module_keys = []
+            for grade_id in lists:
+                module_key_list = jmespath.search("[?GradeOrdinal==`" + str(grade_id) + "`].Modules[].Key", module_info)
+                all_first_module_keys = all_first_module_keys + module_key_list
+
+            return all_first_module_keys
+
+    def get_mapping_result_set(self, lists, expected_output, mapping):
+        results = []
+        for search_value in lists:
+            result = self.search_mapping(search_value, expected_output, mapping)
+            results.append(result)
+        if expected_output == 'key':
+            return results
+        else:
+            results_list = list(set(results))
+            return results_list
+
+    def get_new_recommended_module(self, failed_module_number):
+        student_progress = self.get_student_progress().json()
+        latest_dt_modules = jmespath.search("DiagnosticTestProgress.UserDiagnosticTestScoreSummary[*].ModuleKey",
+                                            student_progress)
+        mapping = self.get_mapping()
+        all_module_info = self.get_available_grade(EducationRegion.cn_city_list['Shanghai']).json()
+        dt_included_grade = self.get_mapping_result_set(latest_dt_modules, 'grade_id', mapping)
+
+        dt_included_grade_key = self.search_module_key_by_gradeid(dt_included_grade, all_module_info)
+        new_list = [x for x in dt_included_grade_key if x not in latest_dt_modules]
+
+        if len(new_list) < (5 - failed_module_number):
+            if failed_module_number < 3:
+                return self.get_higher_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
+                                                    new_list)
+
+            else:
+                return self.get_lower_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
+                                                   new_list)
+        if len(new_list) >= (5 - failed_module_number):
+            return self.get_same_grade_modules(failed_module_number, mapping, new_list, dt_included_grade)
+
+    def get_same_grade_modules(self, failed_module_number, mapping, new_list, dt_included_grade):
+        new_list_diff_level = self.get_mapping_result_set(new_list, 'level', mapping)
+        grade = self.get_mapping_result_set(new_list, 'grade_id', mapping)
+        start_grade = [x for x in dt_included_grade if x not in grade]
+        if grade < start_grade:
+            new_list_diff_level.sort()
+            new_list_diff_level.reverse()
+        else:
+            new_list_diff_level.sort()
+        recommend_modules_level = new_list_diff_level[:(5 - failed_module_number)]
+        recommend_modules = self.get_mapping_result_set(recommend_modules_level, 'key', mapping)
+        return recommend_modules
+
+    def get_lower_grade_module(self, all_module_info, dt_included_grade, failed_module_number, mapping, new_list):
+        next_grade = dt_included_grade[0] - 1
+        next_grade_module_key_list = self.search_module_key_by_gradeid(next_grade, all_module_info)
+        if next_grade_module_key_list == []:
+            return self.get_higher_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
+                                                new_list)
+        else:
+            next_grade_difficulty_level = self.get_mapping_result_set(next_grade_module_key_list, 'level', mapping)
+            next_grade_difficulty_level.sort()
+            next_grade_difficulty_level.reverse()
+            next_grade_real_level = next_grade_difficulty_level[:(5 - failed_module_number - len(new_list))]
+            next_grade_module_id = self.get_mapping_result_set(next_grade_real_level, 'key', mapping)
+            expected_new_module_key = new_list + next_grade_module_id
+            return expected_new_module_key
+
+    def get_higher_grade_module(self, all_module_info, dt_included_grade, failed_module_number, mapping, new_list):
+        next_grade = dt_included_grade[-1] + 1
+        next_grade_module_key_list = self.search_module_key_by_gradeid(next_grade, all_module_info)
+        if next_grade_module_key_list == []:
+            return self.get_higher_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
+                                                new_list)
+        else:
+            next_grade_difficulty_level = self.get_mapping_result_set(next_grade_module_key_list, 'level', mapping)
+            next_grade_difficulty_level.sort()
+            next_grade_real_level = next_grade_difficulty_level[:(5 - failed_module_number - len(new_list))]
+            next_grade_module_id = self.get_mapping_result_set(next_grade_real_level, 'key', mapping)
+            expected_new_module_key = new_list + next_grade_module_id
+            return expected_new_module_key
