@@ -249,25 +249,28 @@ class SISService():
         }
         return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/OnlineStudentPortal/")
 
-    def book_class(self, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id, program_code,
-                   class_type,
-                   class_id, need_recoder, student_id, state):
-        body = {
-            "BookCode": book_code,
-            "UnitNumber": unit_number,
-            "LessonNumber": lesson_number,
-            "StartStamp": start_stamp,
-            "EndStamp": end_stamp,
-            "TeacherId": teacher_id,
-            "ProgramCode": program_code,
-            "ClassType": class_type,
-            "ClassId": class_id,
-            "NeedRecord": need_recoder,
-            "UserId": student_id,
-            "State": state
+    def book_class(self, class_id, class_start_time, class_end_time, teacher_id, course_type, package_type,
+                      level_code, unit_number, lesson_number,
+                      class_type):
+        json = {
+            "classId": class_id,
+            "bookCode": level_code,
+            "endStamp": class_end_time,
+            "startStamp": class_start_time,
+            "teacherId": teacher_id,
+            "packageType": package_type,
+            "programCode" : course_type,
+            "unitNumber": unit_number,
+            "lessonNumber": lesson_number,
+            "classType": class_type,
+            "needRecord": True
         }
+        url = '/ksdsvc/api/v2/onlineclassbooking/'
+        header = {"Content-Type": "application/json",
+                  "Accept": "text/plain"
+                  }
+        return self.mou_tai.post(url=url, json=json)
 
-        return self.mou_tai.put("/api/v2/OnlineClassBooking/", json=body)
 
     def post_bookings(self, class_id, teacher_id, student_id, course_type, level_code, unit_number, lesson_number,
                       class_type):
@@ -294,15 +297,16 @@ class SISService():
 
 if __name__ == '__main__':
     test_env = "UAT"
-    teacher_id = "23684608"  # QA "10274591"
-    student_name = 'bl001'
+    teacher_id = "23965471"  # staging"10584669"  # QA "10274591" uat "23659223"
+    student_name = 'w01'
     student_id = "12226258"
-    start_time = "2018-12-20 17:00:00"
-    end_time = "2018-12-20 18:00:00"
+    start_time = "2019-01-14 19:30:00"
+    end_time = "2019-01-14 20:00:00"
     course_type = "HF"
     level_code = "C"
     unit_number = "1"
     lesson_number = "1"
+    package_type = '24'
     class_type = "Regular"
 
     Book_by = 'KSD'
@@ -314,7 +318,8 @@ if __name__ == '__main__':
         elif test_env == "STG":
             host = 'https://e1svc-staging.ef.cn'
         elif test_env == "UAT":
-            host = 'http://e1svc-uat.englishtown.com'
+            login_host = 'http://e1svc-uat.englishtown.com'
+            host = 'http://internal-oap-uat-cn.englishtown.com'
     else:
         if test_env == "QA":
             host = 'http://internal-e1-evc-booking-qa-cn.ef.com'
@@ -324,7 +329,6 @@ if __name__ == '__main__':
             host = 'http://e1svc-uat.englishtown.com'
 
     service = SISService(host)
-
     class_list = create_and_assign_class(local2est(start_time), local2est(end_time),
                                          teacher_id=teacher_id,
                                          test_env=test_env,
@@ -346,15 +350,16 @@ if __name__ == '__main__':
                                                       class_type=class_type)
                 assert_that(book_response.status_code, equal_to(204))
             else:
+                service = SISService(login_host)
                 service.login(student_name, '12345')
-                book_response = service.book_class(level_code, unit_number, lesson_number, '', '', teacher_id,
-                                                   course_type,
-                                                   class_type,
-                                                   class_id,
-                                                   True,
-                                                   student_id,
-                                                   "Begin")
-                assert_that(book_response.status_code, equal_to(200))
+                service.host=host
+                book_response = service.book_class(class_id=class_id, teacher_id=teacher_id,
+                                                      course_type=course_type, class_start_time = local2est(start_time),class_end_time=local2est(end_time),
+                                                      level_code=level_code, package_type=package_type,
+                                                      unit_number=unit_number, lesson_number=lesson_number,
+                                                      class_type=class_type)
+
+                assert_that(book_response.status_code, equal_to(204))
 
     elif type(class_list) == int:
 
@@ -366,12 +371,14 @@ if __name__ == '__main__':
                                                   class_type=class_type)
             assert_that(book_response.status_code, equal_to(204))
         else:
+            service = SISService(login_host)
             service.login(student_name, '12345')
-            book_response = service.book_class(level_code, unit_number, lesson_number, '', '', teacher_id,
-                                               course_type,
-                                               class_type,
-                                               str(class_list),
-                                               True,
-                                               student_id,
-                                               "Begin")
-            assert_that(book_response.status_code, equal_to(200))
+            service.host = host
+            book_response = service.book_class(class_id=str(class_list), teacher_id=teacher_id,
+                                               course_type=course_type, class_start_time=local2est(start_time),
+                                               class_end_time=local2est(end_time),
+                                               level_code=level_code, package_type=package_type,
+                                               unit_number=unit_number, lesson_number=lesson_number,
+                                               class_type=class_type)
+
+            assert_that(book_response.status_code, equal_to(204))
