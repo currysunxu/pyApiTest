@@ -5,10 +5,11 @@ import re
 from time import sleep
 import time
 
+import jmespath
 import pytz
 import requests
 from hamcrest import assert_that, equal_to
-from E1_API_Automation.Lib.Moutai import Moutai, Token
+
 
 est = pytz.timezone('US/Eastern')
 utc = pytz.utc
@@ -49,6 +50,53 @@ class KidsClass():
         self.levelCode = levelCode
         self.marketCode = marketCode
 
+class Moutai():
+    def __init__(self, host, token=None, headers={"Content-Type": "application/json"}):
+        self.token = token
+        self.host = host
+        self.headers = headers
+        self.request_session = None
+
+    def get_headers(self):
+        return self.headers
+
+    def set_header(self, headers):
+        self.headers = headers
+
+    def set_request_context(self, method, user_info, url, **kwargs):
+        url_combined = self.host + url
+        if self.token is None:
+            self.request_session = requests.session()
+            result = self.request_session.request(method, url_combined, json=user_info, verify=False, headers=self.headers, **kwargs)
+            assert_that(result.status_code, equal_to(200))
+            return result
+        else:
+            athentication_result = requests.request(method, url=url_combined, json=user_info,verify=False,
+                                                 headers=self.headers, **kwargs)
+            assert_that(athentication_result.status_code, equal_to(200), "Status code is not 200!")
+            self.headers[self.token.get_name()] = self.__extract_token_value(self.token, athentication_result)
+            return athentication_result
+
+    def __extract_token_value(self, token, response):
+        return jmespath.search(token.get_token_jemspath(), response.json())
+
+    def post(self, url, json=None, **kwargs):
+        url_combined = self.host + url
+        if self.token is None:
+            return self.request_session.post(url_combined, json=json,verify=False, headers=self.headers, **kwargs)
+        else:
+            return requests.post(url_combined, json=json,verify=False, headers=self.headers, **kwargs)
+
+class Token():
+    def __init__(self, name, jemspath):
+        self.name = name
+        self.token_jemspath = jemspath
+
+    def get_name(self):
+        return self.name
+
+    def get_token_jemspath(self):
+        return self.token_jemspath
 
 class HeaderContentType(Enum):
     FORM_HEAD = {
@@ -234,7 +282,7 @@ def local2est(local_st):
     return local2est_datetime(local_st).strftime("%Y-%m-%d %H:%M:%S")
 
 
-class SISService():
+class BookClassService():
     def __init__(self, host):
         self.host = host
         self.session = requests.session()
@@ -247,7 +295,9 @@ class SISService():
             "DeviceType": 0,
             "Platform": 0
         }
-        return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/OnlineStudentPortal/")
+        response = self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/OnlineStudentPortal/")
+        return jmespath.search('UserInfo.UserInfo.UserId',response.json())
+
 
     def book_class(self, class_id, class_start_time, class_end_time, teacher_id, course_type, package_type,
                       level_code, unit_number, lesson_number,
@@ -296,12 +346,11 @@ class SISService():
 
 
 if __name__ == '__main__':
-    test_env = "UAT"
-    teacher_id = "23965471"  # staging"10584669"  # QA "10274591" uat "23659223"
-    student_name = 'w01'
-    student_id = "12226258"
-    start_time = "2019-01-14 19:30:00"
-    end_time = "2019-01-14 20:00:00"
+    test_env = "STG"
+    teacher_id = "10584669"  # staging"10584669"  # QA "10274591" uat "23659223"
+    student_name = 'osk01'
+    start_time = "2019-01-15 16:00:00"
+    end_time = "2019-01-15 16:30:00"
     course_type = "HF"
     level_code = "C"
     unit_number = "1"
@@ -310,7 +359,10 @@ if __name__ == '__main__':
     class_type = "Regular"
 
     Book_by = 'KSD'
-
+    # UAT didn't support book_by = SIS, can book class any time you need
+    # QA support both, can book class any time you need
+    # STG book_by= 'KSD'  only can book class  time > 24H,  use book_by= 'SIS' can book the class time < 24H
+    # book_by = 'KSD' can support course_type = 'HF' or 'HFV3Plus', book_by  'SIS' only can support course_type = 'HF'
     if Book_by == 'KSD':
 
         if test_env == "QA":
@@ -318,17 +370,20 @@ if __name__ == '__main__':
         elif test_env == "STG":
             host = 'https://e1svc-staging.ef.cn'
         elif test_env == "UAT":
-            login_host = 'http://e1svc-uat.englishtown.com'
-            host = 'http://internal-oap-uat-cn.englishtown.com'
-    else:
-        if test_env == "QA":
-            host = 'http://internal-e1-evc-booking-qa-cn.ef.com'
-        elif test_env == "STG":
-            host = 'http://internal-e1-evc-booking-stg-cn.ef.com'
-        elif test_env == "UAT":
             host = 'http://e1svc-uat.englishtown.com'
 
-    service = SISService(host)
+    else:
+        if test_env == "QA":
+            host =  'https://e1svc-qa.ef.cn'
+            book_host = 'http://internal-e1-evc-booking-qa-cn.ef.com'
+        elif test_env == "STG":
+            host =  'https://e1svc-staging.ef.cn'
+            book_host = 'http://internal-e1-evc-booking-stg-cn.ef.com'
+        elif test_env == "UAT":
+            host = 'http://e1svc-uat.englishtown.com'
+            book_host = 'N/A' # uat didn't support
+
+    service = BookClassService(host)
     class_list = create_and_assign_class(local2est(start_time), local2est(end_time),
                                          teacher_id=teacher_id,
                                          test_env=test_env,
@@ -339,10 +394,11 @@ if __name__ == '__main__':
                                          evc_server_code="evccn1",
                                          teaching_item="en")
 
+    student_id = service.login(student_name, '12345')
     if type(class_list) == list:
         for class_id in class_list:
             if Book_by != 'KSD':
-
+                service.host = book_host
                 book_response = service.post_bookings(class_id=class_id, teacher_id=teacher_id,
                                                       student_id=student_id, course_type=course_type,
                                                       level_code=level_code,
@@ -350,9 +406,7 @@ if __name__ == '__main__':
                                                       class_type=class_type)
                 assert_that(book_response.status_code, equal_to(204))
             else:
-                service = SISService(login_host)
-                service.login(student_name, '12345')
-                service.host=host
+                service = BookClassService(host)
                 book_response = service.book_class(class_id=class_id, teacher_id=teacher_id,
                                                       course_type=course_type, class_start_time = local2est(start_time),class_end_time=local2est(end_time),
                                                       level_code=level_code, package_type=package_type,
@@ -364,6 +418,7 @@ if __name__ == '__main__':
     elif type(class_list) == int:
 
         if Book_by != 'KSD':
+            service.host = book_host
             book_response = service.post_bookings(class_id=str(class_list), teacher_id=teacher_id,
                                                   student_id=student_id, course_type=course_type,
                                                   level_code=level_code,
@@ -371,9 +426,7 @@ if __name__ == '__main__':
                                                   class_type=class_type)
             assert_that(book_response.status_code, equal_to(204))
         else:
-            service = SISService(login_host)
-            service.login(student_name, '12345')
-            service.host = host
+            service = BookClassService(host)
             book_response = service.book_class(class_id=str(class_list), teacher_id=teacher_id,
                                                course_type=course_type, class_start_time=local2est(start_time),
                                                class_end_time=local2est(end_time),
