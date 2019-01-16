@@ -15,7 +15,7 @@ class TestBlockBooking():
     end_time_date = datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + timedelta(days=1)
     UTC_start_date = datetime.strftime(start_time_date, '%Y-%m-%dT%H:%M:%S.000Z')
     UTC_end_date = datetime.strftime(end_time_date, '%Y-%m-%dT%H:%M:%S.000Z')
-    os.environ["test_env"] = "QA"
+    # os.environ["test_env"] = "QA"
 
     if os.environ["test_env"] == "QA":
         host = "https://e1svc-qa.ef.cn"
