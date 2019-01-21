@@ -1,3 +1,5 @@
+import random
+
 from ..Lib.Moutai import Moutai, Token
 
 
@@ -6,7 +8,6 @@ class KidsEVCService():
     def __init__(self, host):
         self.host = host
         self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
-
     def login(self, user_name, password):
         user_info = {
             "UserName": user_name,  # "jenkin0528tb",
@@ -43,7 +44,8 @@ class KidsEVCService():
         }
         return self.mou_tai.post("/api/v2/OCHCreditSummary/", json=body)
 
-    def book_class(self, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id, program_code, class_type,
+    def book_class(self, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id, program_code,
+                   class_type,
                    class_id, need_recoder, student_id, state):
         body = {
             "BookCode": book_code,
@@ -88,7 +90,8 @@ class KidsEVCService():
         api_url = "/api/v2/AfterClassReport/" + class_id
         return self.mou_tai.get(api_url)
 
-    def change_topic(self, student_id, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id, program_code, class_type,
+    def change_topic(self, student_id, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id,
+                     program_code, class_type,
                      class_id, need_recoder):
         body = {
             "StudentId": student_id,
@@ -108,4 +111,42 @@ class KidsEVCService():
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
 
+    def block_booking_teacher_search(self, start_date_time, end_date_time, course_type, package_type, unit_number, lesson_number):
+        random_num = random.randint(0, 23)
+        params = {
+            'StartDateTimeUtc': start_date_time,
+            'EndDateTimeUtc': end_date_time,
+            'StartTime': str(random_num) + ":00",
+            'EndTime': str(random_num) + ":30",
+            'CourseLesson.BookCode': 'C',
+            'CourseLesson.ClassType': 'Regular',
+            'CourseLesson.CourseType': course_type,
+            'CourseLesson.LessonNumber': lesson_number,
+            'CourseLesson.PackageType': package_type,
+            'CourseLesson.RegionCode': 'CN',
+            'CourseLesson.UnitNumber': unit_number,
+        }
+        return self.mou_tai.get(url="/ksdsvc/api/v2/block-booking/teachers", params=params)
 
+    def block_booking(self, start_data_time, end_date_time, course_type, package_type):
+        random_num = random.randint(0, 23)
+        json = {
+            "teacherMemberId": 10274591,
+            "startDateTimeUtc": start_data_time,
+            "endDateTimeUtc": end_date_time,
+            "startTime": str(random_num) + ":00",
+            "endTime": str(random_num) + ":30",
+            "courseLesson": {
+                "courseType": course_type,
+                "packageType": package_type,
+                "bookCode": "C",
+                "unitNumber": "1",
+                "lessonNumber": "1",
+                "classType": "Regular",
+                "regionCode": "CN"
+            }
+        }
+        return self.mou_tai.post(url="/ksdsvc/api/v2/block-booking", json=json), json
+
+    def duplicate_block_booking(self, json):
+        return self.mou_tai.post(url="/ksdsvc/api/v2/block-booking", json=json)
