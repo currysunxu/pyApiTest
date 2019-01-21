@@ -8,7 +8,6 @@ class KidsEVCService():
     def __init__(self, host):
         self.host = host
         self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
-
     def login(self, user_name, password):
         user_info = {
             "UserName": user_name,  # "jenkin0528tb",
@@ -112,7 +111,7 @@ class KidsEVCService():
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
 
-    def block_booking_teacher_search(self, start_date_time, end_date_time):
+    def block_booking_teacher_search(self, start_date_time, end_date_time, course_type, package_type, unit_number, lesson_number):
         random_num = random.randint(0, 23)
         params = {
             'StartDateTimeUtc': start_date_time,
@@ -121,15 +120,15 @@ class KidsEVCService():
             'EndTime': str(random_num) + ":30",
             'CourseLesson.BookCode': 'C',
             'CourseLesson.ClassType': 'Regular',
-            'CourseLesson.CourseType': 'HF',
-            'CourseLesson.LessonNumber': '1',
-            'CourseLesson.PackageType': '24',
+            'CourseLesson.CourseType': course_type,
+            'CourseLesson.LessonNumber': lesson_number,
+            'CourseLesson.PackageType': package_type,
             'CourseLesson.RegionCode': 'CN',
-            'CourseLesson.UnitNumber': '1',
+            'CourseLesson.UnitNumber': unit_number,
         }
         return self.mou_tai.get(url="/ksdsvc/api/v2/block-booking/teachers", params=params)
 
-    def block_booking(self, start_data_time, end_date_time):
+    def block_booking(self, start_data_time, end_date_time, course_type, package_type):
         random_num = random.randint(0, 23)
         json = {
             "teacherMemberId": 10274591,
@@ -138,8 +137,8 @@ class KidsEVCService():
             "startTime": str(random_num) + ":00",
             "endTime": str(random_num) + ":30",
             "courseLesson": {
-                "courseType": "HF",
-                "packageType": "24",
+                "courseType": course_type,
+                "packageType": package_type,
                 "bookCode": "C",
                 "unitNumber": "1",
                 "lessonNumber": "1",
