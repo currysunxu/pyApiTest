@@ -20,12 +20,12 @@ class EVCBase():
 
     '''
     Uncomment the following to run or debugger the automation.
-    '''
+   
     os.environ['Teacher_Id'] = "10703777"
     os.environ["Start_Time"] = "2019-02-22 2:00:00"
     os.environ["End_Time"] = "2019-02-22 2:30:00"
 
-
+ '''
     teacher_id = os.environ['Teacher_Id']
     host = None
     start_time = None
