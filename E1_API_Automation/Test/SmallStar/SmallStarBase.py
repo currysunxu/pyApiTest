@@ -19,6 +19,10 @@ class SmallStarBase():
         user_name = "ssv23"
         password = '12345'
 
+    if ENVIRONMENT == Environment.LIVE:
+        user_name = "belle.ma"
+        password = '12345'
+
 
 
     @BeforeClass()

@@ -346,11 +346,11 @@ class BookClassService():
 
 
 if __name__ == '__main__':
-    test_env = "STG"
-    teacher_id = "10584669"  # staging"10584669"  # QA "10274591" uat "23659223"
-    student_name = 'osk01'
-    start_time = "2019-01-15 16:00:00"
-    end_time = "2019-01-15 16:30:00"
+    test_env = "QA"
+    teacher_id = "10274591"  # staging"10584669"  # QA "10274591" uat "23659223"
+    student_name = 'ios0001'
+    start_time = "2019-01-28 14:30:00"
+    end_time = "2019-01-28 15:00:00"
     course_type = "HF"
     level_code = "C"
     unit_number = "1"
