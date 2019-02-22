@@ -10,7 +10,7 @@ class Environment(object):
 
 
 
-os.environ['environment'] = 'QA'
+#os.environ['environment'] = 'QA'
 
 
 
