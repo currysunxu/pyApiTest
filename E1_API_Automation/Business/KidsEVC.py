@@ -8,6 +8,7 @@ class KidsEVCService():
     def __init__(self, host):
         self.host = host
         self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+
     def login(self, user_name, password):
         user_info = {
             "UserName": user_name,  # "jenkin0528tb",
@@ -16,6 +17,9 @@ class KidsEVCService():
             "Platform": 0
         }
         return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/OnlineStudentPortal/")
+
+    def get_user_profile(self):
+        return self.mou_tai.get("/ksdsvc/api/v2/student/profile/")
 
     def get_calendar(self, program_code, class_type, start_stamp, end_stamp):
         body = {
@@ -75,6 +79,9 @@ class KidsEVCService():
     def get_online_student_book_structure(self, program_code):
         api_url = "/api/v2/OnlineBookStructure/" + program_code
         return self.mou_tai.get(api_url)
+
+    def get_course_lesson_structure(self,class_type, course_type, package_type):
+        return self.mou_tai.get("/ksdsvc/api/v2/course-lessons?classType={0}&courseType={1}&packageType={2}".format(class_type, course_type, package_type))
 
     def query_online_class_booking(self, start_stamp, end_stamp, program_code, class_type):
         body = {

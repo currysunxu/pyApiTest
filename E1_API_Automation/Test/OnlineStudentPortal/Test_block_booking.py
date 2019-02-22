@@ -8,6 +8,7 @@ from ptest.decorator import BeforeClass, Test, TestClass
 from E1_API_Automation.Business.KidsEVC import KidsEVCService
 from E1_API_Automation.Lib.HamcrestExister import exist
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
+from E1_API_Automation.Settings import ENVIRONMENT, Environment
 
 
 @TestClass()
@@ -22,7 +23,7 @@ class TestBlockBooking():
     UTC_end_date_multiple = datetime.strftime(end_time_date_multiple, '%Y-%m-%dT%H:%M:%S.000Z')
     # os.environ["test_env"] = "QA"
 
-    if os.environ["test_env"] == "QA":
+    if ENVIRONMENT == Environment.QA:
         host = "https://e1svc-qa.ef.cn"
         user_info_HF = {
             "UserName": "w01",  # unlock02
@@ -46,24 +47,24 @@ class TestBlockBooking():
         }
 
 
-    if os.environ["test_env"] == "STG":
+    if ENVIRONMENT == Environment.STAGING:
         host = "https://e1svc-staging.ef.cn"
         user_info_HF = {
-            "UserName": "osk01",  # unlock02
+            "UserName": "hf2.cn.01",  # unlock02
             "Password": "12345",
             "course_type": 'HF',
             "package_type": 24
         }
 
         user_info_HFV3 = {
-            "UserName": "Lucy8476415",  # unlock02
+            "UserName": "hf3.cn.01",  # unlock02
             "Password": "12345",
             "course_type": 'HFV3Plus',
             "package_type": 20
         }
 
         user_info_credits = {
-            "UserName": "gp.test",  # unlock02
+            "UserName": "hf2.cn.02",  # unlock02
             "Password": "12345",
             "course_type": 'HF',
             "package_type": 24
