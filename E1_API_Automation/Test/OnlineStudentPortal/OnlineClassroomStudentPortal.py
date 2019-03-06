@@ -27,7 +27,6 @@ class APITestCases(EVCBase):
         response = self.evc_service.login(user_name=self.user_info["UserName"], password=self.user_info["Password"])
         assert_that(response.json(), match_to("Token"))
         assert_that(response.json(), match_to("UserInfo.UserInfo.UserId"))
-        assert_that(response.json(), match_to("UserInfo.StudentOrientationInfo"))
         return response
 
     @Test(tags='qa,stg')
@@ -76,7 +75,7 @@ class APITestCases(EVCBase):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         response = self.evc_service.get_available_online_class_session(local2utc(self.start_time),
                                                                        local2utc(self.end_time), self.HF_program_code,
-                                                                       ClassType.DEMO.value, student_id)
+                                                                       ClassType.REGULAR.value, student_id)
         assert_that(response.json(), match_to("[0].TeacherProfile"))
         return response
 
@@ -112,7 +111,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("[*].AvailableOCH"))
         return response
 
-    @Test(tags='qa, stg')
+    @Test(tags='retired')
     def test_workflow(self):
         '''
         This workflow will run the following process:
@@ -293,7 +292,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("Improvement"))
         assert_that(response.json(), match_to("Suggestion"))
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa')
     def book_class_error_code_with_not_enough_och(self):
         self.test_login()
         local_evc_service = KidsEVCService(host=self.host)
@@ -325,7 +324,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("Code.Minor", response.json()) == '600')
 
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa')
     def book_class_error_code_with_not_topic(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         calendar_response = self.evc_service.get_calendar("HF", ClassType.REGULAR.value,
@@ -353,7 +352,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("Code.Major", response.json()) == 403)
         assert_that(jmespath.search("Code.Minor", response.json()) == '601')
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa')
     def cancel_class_error_code_with_booking_not_found(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         class_session_response = self.evc_service.get_available_online_class_session(local2utc(self.regular_start_time),
@@ -367,7 +366,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("Code.Major", response.json()) == 403)
         assert_that(jmespath.search("Code.Minor", response.json()) == '610')
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa')
     def cancel_class_error_code_with_wrong_class_id(self):
         self.test_login()
         response = self.evc_service.cancel_class("30789")

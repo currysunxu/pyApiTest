@@ -20,12 +20,12 @@ class EVCBase():
 
     '''
     Uncomment the following to run or debugger the automation.
-   
-    os.environ['Teacher_Id'] = "10703777"
-    os.environ["Start_Time"] = "2019-02-22 2:00:00"
-    os.environ["End_Time"] = "2019-02-22 2:30:00"
 
- '''
+    os.environ['Teacher_Id'] = "10703777"
+    os.environ["Start_Time"] = "2019-02-28 3:00:00"
+    os.environ["End_Time"] = "2019-02-28 3:30:00"
+'''
+
     teacher_id = os.environ['Teacher_Id']
     host = None
     start_time = None
@@ -33,6 +33,7 @@ class EVCBase():
     HF_program_code = "HF"
 
     teacher_list = {}
+
 
     if os.environ["Start_Time"] == "Default":
         start_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 21:00:00"
@@ -112,7 +113,7 @@ class EVCBase():
             "Platform": 0
         }
         user_with_zero_och = {
-            "UserName" : "Xander",
+            "UserName" : "hf3.cn.auto2",
             "Password" : "12345"
         }
         teacher_list = ["10584669", "10427158", "5888455"]

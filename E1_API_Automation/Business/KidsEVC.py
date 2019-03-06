@@ -32,11 +32,11 @@ class KidsEVCService():
 
     def get_available_online_class_session(self, start_stamp, end_stamp, program_code, class_type, student_id):
         body = {
-            "StartStamp": start_stamp,
-            "EndStamp": end_stamp,
-            "ProgramCode": program_code,
-            "ClassType": class_type,
-            "StudentId": student_id
+            "startStamp": start_stamp,
+            "endStamp": end_stamp,
+            "programCode": program_code,
+            "classType": class_type,
+            "studentId": student_id
         }
 
         return self.mou_tai.post("/api/v2/OnlineClassSession/", json=body)
