@@ -348,9 +348,9 @@ class BookClassService():
 if __name__ == '__main__':
     test_env = "STG"
     teacher_id = "10584669"  # staging"10584669"  # QA "10274591" uat "23659223"
-    student_name = 'osk01'
-    start_time = "2019-01-15 16:00:00"
-    end_time = "2019-01-15 16:30:00"
+    student_name = 'hf2.cn.01'
+    start_time = "2019-03-06 13:00:00"
+    end_time = "2019-03-06 13:30:00"
     course_type = "HF"
     level_code = "C"
     unit_number = "1"
@@ -358,7 +358,7 @@ if __name__ == '__main__':
     package_type = '24'
     class_type = "Regular"
 
-    Book_by = 'KSD'
+    Book_by = ''
     # UAT didn't support book_by = SIS, can book class any time you need
     # QA support both, can book class any time you need
     # STG book_by= 'KSD'  only can book class  time > 24H,  use book_by= 'SIS' can book the class time < 24H
@@ -384,15 +384,16 @@ if __name__ == '__main__':
             book_host = 'N/A' # uat didn't support
 
     service = BookClassService(host)
-    class_list = create_and_assign_class(local2est(start_time), local2est(end_time),
-                                         teacher_id=teacher_id,
-                                         test_env=test_env,
-                                         subServiceType=ServiceSubTypeCode.KONRegular.value,
-                                         partner_code="Any",
-                                         level_code="Any",
-                                         market_code="Any",
-                                         evc_server_code="evccn1",
-                                         teaching_item="en")
+    class_list = ['264246']
+    # class_list = create_and_assign_class(local2est(start_time), local2est(end_time),
+    #                                      teacher_id=teacher_id,
+    #                                      test_env=test_env,
+    #                                      subServiceType=ServiceSubTypeCode.KONRegular.value,
+    #                                      partner_code="Any",
+    #                                      level_code="Any",
+    #                                      market_code="Any",
+    #                                      evc_server_code="evccn1",
+    #                                      teaching_item="en")
 
     student_id = service.login(student_name, '12345')
     if type(class_list) == list:

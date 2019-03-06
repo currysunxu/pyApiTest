@@ -8,7 +8,7 @@ from ...Business.KidsEVC import KidsEVCService
 from ...Lib.ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2est, \
     ServiceSubTypeCode, get_UAT_schedule_tool, get_STG_schedule_tool
 from ...Lib.Moutai import Token
-
+from E1_API_Automation.Settings import ENVIRONMENT, Environment,env_key
 
 class EVCBase():
     token_pattern = Token("X-BA-TOKEN", "Token")
@@ -20,11 +20,10 @@ class EVCBase():
 
     '''
     Uncomment the following to run or debugger the automation.
-    
+
     os.environ['Teacher_Id'] = "10703777"
-    os.environ["Start_Time"] = "2018-11-29 2:00:00"
-    os.environ["End_Time"] = "2018-11-29 2:30:00"
-    os.environ["test_env"] = "QA"
+    os.environ["Start_Time"] = "2019-02-28 3:00:00"
+    os.environ["End_Time"] = "2019-02-28 3:30:00"
 '''
 
     teacher_id = os.environ['Teacher_Id']
@@ -34,6 +33,7 @@ class EVCBase():
     HF_program_code = "HF"
 
     teacher_list = {}
+
 
     if os.environ["Start_Time"] == "Default":
         start_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 21:00:00"
@@ -54,7 +54,7 @@ class EVCBase():
     regular_start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(hours=2)
     regular_start_time = regular_start_time_date.strftime("%Y-%m-%d %H:%M:%S")
 
-    regular_end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(hours=2)
+    regular_end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=30)
     regular_end_time = regular_end_time_date.strftime("%Y-%m-%d %H:%M:%S")
 
     # "2018-6-24 7:00:00"
@@ -62,7 +62,7 @@ class EVCBase():
     est_regular_start_time = local2est(regular_start_time)
     est_regular_end_time = local2est(regular_end_time)
 
-    if os.environ["test_env"] == "QA":
+    if ENVIRONMENT == Environment.QA:
         host = "https://e1svc-qa.ef.cn"
         SIS_SERVICE = 'https://internal-e1-evc-booking-qa-cn.ef.com'
         user_info = {
@@ -91,7 +91,7 @@ class EVCBase():
         }
         sis_test_student = 12226094
         sis_test_teacher_list = [10703777, 10366576]
-    if os.environ["test_env"] == "STG":
+    if ENVIRONMENT == Environment.STAGING:
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
         Caroline is working on this data.
@@ -100,13 +100,20 @@ class EVCBase():
         host = "https://e1svc-staging.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-stg-cn.ef.com'
         user_info = {
-            "UserName": "ahab",
+            "UserName": "hf2.cn.auto1",
+            "Password": "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
+
+        user_info_v3 = {
+            "UserName": "hf3.cn.auto1",
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0
         }
         user_with_zero_och = {
-            "UserName" : "Xander",
+            "UserName" : "hf3.cn.auto2",
             "Password" : "12345"
         }
         teacher_list = ["10584669", "10427158", "5888455"]
@@ -119,7 +126,7 @@ class EVCBase():
             "AvatarUrl": "https://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
         }
         after_report_info = {
-            "Student_User_Name": "osk08",
+            "Student_User_Name": "hf2.cn.auto2",
             "Student_Password": "12345",
             "ClassId": "248427"
         }
@@ -140,18 +147,18 @@ class EVCBase():
 
         # prepare the class which is assigned to teacher, which will follow the different environment.
         self.create_and_assign_class(self.est_start_time, self.est_end_time, teacher_id=self.teacher_id,
-                                     test_env=os.environ['test_env'], subServiceType=ServiceSubTypeCode.KONDemo.value,
+                                     test_env=env_key, subServiceType=ServiceSubTypeCode.KONDemo.value,
                                      partner_code="Any", level_code="Any", market_code="Any",
                                      evc_server_code="evccn1")
         self.create_and_assign_class(self.est_regular_start_time, self.est_regular_end_time, teacher_id=self.teacher_id,
-                                     test_env=os.environ['test_env'], level_code="Any", market_code="Any", partner_code="Any",
+                                     test_env=env_key, level_code="Any", market_code="Any", partner_code="Any",
                                      evc_server_code="evccn1",
                                      subServiceType=ServiceSubTypeCode.KONRegular.value)
 
         #Same time slot with different teacher
         self.create_and_assign_class(self.est_regular_start_time, self.est_regular_end_time,
                                      teacher_id=self.another_teacher,
-                                     test_env=os.environ['test_env'], partner_code="Any", level_code="Any", market_code="Any",evc_server_code="evccn1",
+                                     test_env=env_key, partner_code="Any", level_code="Any", market_code="Any",evc_server_code="evccn1",
                                      subServiceType=ServiceSubTypeCode.KONRegular.value)
 
 
@@ -173,7 +180,7 @@ class EVCBase():
             school_service = get_QA_schedule_tool()
         if "UAT" == test_env:
             school_service = get_UAT_schedule_tool()
-        if "STG" == test_env:
+        if "Staging" == test_env:
             school_service = get_STG_schedule_tool()
         sleep(2)
         return school_service.schedule_kids_class(kids_class)
