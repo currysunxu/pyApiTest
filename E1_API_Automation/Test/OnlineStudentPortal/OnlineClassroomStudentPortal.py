@@ -79,7 +79,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("[0].TeacherProfile"))
         return response
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa')
     def test_get_available_online_class_session_multiple_teacher(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
 
@@ -272,7 +272,7 @@ class APITestCases(EVCBase):
         assert_that(set(jmespath.search("[].bookCode", lesson_structure_response_hf.json())) == set(
             ["X"]))
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa')
     def test_verify_token_expired(self):
         self.test_login()
         self.evc_service.sign_out()
