@@ -41,18 +41,18 @@ class MoscowGradeKey:
 
 class GP_user:
     GPUsers = {'QA': {'username': 'gpauto', 'password': '12345', 'culture_code': 'zh-CN'},
-               'Staging': {'username': 'gp.cn.01', 'password': '12345', 'culture_code': 'zh-CN'},
-               'Live': {'username': 'gptest_02', 'password': '12345', 'culture_code': 'zh-CN'},
-               'Staging_SG': {'username': 'gp.id.01', 'password': '12345', 'culture_code': 'id-ID'},
-               'Live_SG': {'username': 'id.grampro', 'password': '12345', 'culture_code': 'id-ID'}}
+               'Staging': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
+               'Live': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
+               'Staging_SG': {'username': 'gp.id.auto1', 'password': '12345', 'culture_code': 'id-ID'},
+               'Live_SG': {'username': 'gp.id.auto1', 'password': '12345', 'culture_code': 'id-ID'}}
     GPDTUsers = {'QA': {'username': 'gp02', 'password': '12345', 'culture_code': 'zh-CN'},
-                 'Staging': {'username': 'gp.cn.02', 'password': '12345', 'culture_code': 'zh-CN'},
-                 'Live': {'username': 'gptest_03', 'password': '12345', 'culture_code': 'zh-CN'},
-                 'Staging_SG': {'username': 'gp.ru.01', 'password': '12345', 'culture_code': 'ru-RU'},
-                 'Live_SG': {'username': 'GP0606addGroup.wu', 'password': '12345', 'culture_code': 'ru-RU'}}
+                 'Staging': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
+                 'Live': {'username': 'gp.cn.auto2', 'password': '12345', 'culture_code': 'zh-CN'},
+                 'Staging_SG': {'username': 'gp.ru.auto1', 'password': '12345', 'culture_code': 'ru-RU'},
+                 'Live_SG': {'username': 'gp.ru.auto1', 'password': '12345', 'culture_code': 'ru-RU'}}
 
     GradeList = {'QA': {'lowest_grade': 'Gth2', 'highest_grade': 'Gth12'},
-                 'Staging': {'lowest_grade': 'gp.cn.02', 'highest_grade': 'Gth11'},
+                 'Staging': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth11'},
                  'Live': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth11'},
-                 'Staging_SG': {'lowest_grade': 'gp.id.01', 'highest_grade': 'Gth10'},
+                 'Staging_SG': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth10'},
                  'Live_SG': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth10'}}
