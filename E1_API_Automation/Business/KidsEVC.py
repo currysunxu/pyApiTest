@@ -30,13 +30,12 @@ class KidsEVCService():
         }
         return self.mou_tai.post("/api/v2/OnlineClassroomCalendar/", json=body)
 
-    def get_available_online_class_session(self, start_stamp, end_stamp, program_code, class_type, student_id):
+    def get_available_online_class_session(self, start_stamp, end_stamp, program_code):
         body = {
             "startStamp": start_stamp,
             "endStamp": end_stamp,
             "programCode": program_code,
-            "classType": class_type,
-            "studentId": student_id
+
         }
 
         return self.mou_tai.post("/api/v2/OnlineClassSession/", json=body)
@@ -83,12 +82,11 @@ class KidsEVCService():
     def get_course_lesson_structure(self,class_type, course_type, package_type):
         return self.mou_tai.get("/ksdsvc/api/v2/course-lessons?classType={0}&courseType={1}&packageType={2}".format(class_type, course_type, package_type))
 
-    def query_online_class_booking(self, start_stamp, end_stamp, program_code, class_type):
+    def query_online_class_booking(self, start_stamp, end_stamp, program_code):
         body = {
             "StartStamp": start_stamp,
             "EndStamp": end_stamp,
-            "ProgramCode": program_code,
-            "ClassType": class_type
+            "ProgramCode": program_code
         }
 
         return self.mou_tai.post(url="/api/v2/OnlineClassBooking/", json=body)
@@ -157,3 +155,11 @@ class KidsEVCService():
 
     def duplicate_block_booking(self, json):
         return self.mou_tai.post(url="/ksdsvc/api/v2/block-booking", json=json)
+
+    def save_policy_agreement(self):
+        json = {"product":"8","privacyDocumentId":3}
+        return self.mou_tai.post(url = "/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement", json = json)
+
+    def update_orientation_info(self, update_orientation_info):
+        json = update_orientation_info
+        return self.mou_tai.put(url = '/ksdsvc/api/v2/student/orientation-info/', json = json)

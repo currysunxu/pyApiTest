@@ -9,9 +9,10 @@ class Environment(object):
     LIVE_SG = "https://e1svc.ef.com"
 
 
-
-#os.environ['environment'] = 'STG'
-
+try:
+    print(os.environ['environment'])
+except:
+    os.environ['environment'] = 'STG'
 
 
 if os.environ['environment'] == 'QA':
