@@ -18,11 +18,11 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(response, exist("Email"))
         assert_that(response, match_to("Name"))
         assert_that(response, match_to("FunctionalRole"))
-        assert_that(response, match_to("FirstName"))
-        assert_that(response, match_to("LastName"))
-        assert_that(response, match_to("EnglishFirstName"))
+        assert_that(response, exist("FirstName"))
+        assert_that(response, exist("LastName"))
+        assert_that(response, exist("EnglishFirstName"))
         assert_that(response, exist("EnglishMiddleName"))
-        assert_that(response, match_to("EnglishLastName"))
+        assert_that(response, exist("EnglishLastName"))
         assert_that(response, exist("Gender"))
         assert_that(response, match_to("MarketRegion"))
         assert_that(response, match_to("CurrentBookKey"))
@@ -135,6 +135,7 @@ class TBTestCases(TraiblazerBaseClass):
     def test_homework_lesson_correction(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
         self.picked_lesson = unlocked_lessons[0]
+        print(self.picked_lesson)
         activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(self.picked_lesson)
         for i in range(1, len(activity_nodes) + 1):
             self.tb_test.student_progress(unlocked_lessons[3], i, len(activity_nodes))

@@ -2,6 +2,7 @@ import datetime
 import os
 from time import sleep
 
+import arrow
 from ptest.decorator import AfterMethod, BeforeSuite
 
 from ...Business.KidsEVC import KidsEVCService
@@ -18,15 +19,6 @@ class EVCBase():
     sis_test_student = None
     sis_test_teacher_list = None
 
-    '''
-    Uncomment the following to run or debugger the automation.
-
-    os.environ['Teacher_Id'] = "10703777"
-    os.environ["Start_Time"] = "2019-02-28 3:00:00"
-    os.environ["End_Time"] = "2019-02-28 3:30:00"
-'''
-
-    teacher_id = os.environ['Teacher_Id']
     host = None
     start_time = None
     end_time = None
@@ -34,35 +26,44 @@ class EVCBase():
 
     teacher_list = {}
 
+    try:
+        print(os.environ["Start_Time"])
+        print(os.environ["End_Time"])
+    except:
+        os.environ["Start_Time"] = "Default"
+        os.environ["End_Time"] = "Default"
 
     if os.environ["Start_Time"] == "Default":
-        start_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 21:00:00"
-        start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=1)
-        start_time = start_time_date.strftime("%Y-%m-%d %H:%M:%S")
+        a = arrow.now()
+        start_time = arrow.now().shift(days=1, hours=1).format('YYYY-MM-DD hh:00:00')
+
     else:
         start_time = os.environ["Start_Time"]
 
     if os.environ["End_Time"] == "Default":
-        end_time = datetime.datetime.now().date().strftime('%Y-%m-%d') + " 21:30:00"
-        end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=1)
-        end_time = end_time_date.strftime("%Y-%m-%d %H:%M:%S")
+        end_time = arrow.now().shift(days=1, hours=1).format('YYYY-MM-DD hh:30:00')
+
     else:
         end_time = os.environ["End_Time"]
     est_start_time = local2est(start_time)
     est_end_time = local2est(end_time)
 
-    regular_start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(hours=2)
+    regular_start_time_date = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(hours=1)
     regular_start_time = regular_start_time_date.strftime("%Y-%m-%d %H:%M:%S")
 
-    regular_end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(days=30)
+    regular_end_time_date = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M:%S") + datetime.timedelta(hours=1)
     regular_end_time = regular_end_time_date.strftime("%Y-%m-%d %H:%M:%S")
 
-    # "2018-6-24 7:00:00"
+
 
     est_regular_start_time = local2est(regular_start_time)
     est_regular_end_time = local2est(regular_end_time)
 
     if ENVIRONMENT == Environment.QA:
+        try:
+            teacher_id = os.environ['Teacher_Id']
+        except:
+            teacher_id = "10703777"
         host = "https://e1svc-qa.ef.cn"
         SIS_SERVICE = 'https://internal-e1-evc-booking-qa-cn.ef.com'
         user_info = {
@@ -97,6 +98,11 @@ class EVCBase():
         Caroline is working on this data.
         The code will be changed for STG in the coming day.
         '''
+        try:
+            teacher_id = os.environ['Teacher_Id']
+        except:
+
+            teacher_id = "10369666"
         host = "https://e1svc-staging.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-stg-cn.ef.com'
         user_info = {
@@ -141,26 +147,34 @@ class EVCBase():
 
     evc_service = None
     another_teacher = get_different_teacher(teacher_id, teacher_list)
+
     @BeforeSuite()
     def create_class(self):
         self.evc_service = KidsEVCService(host=self.host)
 
         # prepare the class which is assigned to teacher, which will follow the different environment.
-        self.create_and_assign_class(self.est_start_time, self.est_end_time, teacher_id=self.teacher_id,
-                                     test_env=env_key, subServiceType=ServiceSubTypeCode.KONDemo.value,
-                                     partner_code="Any", level_code="Any", market_code="Any",
-                                     evc_server_code="evccn1")
-        self.create_and_assign_class(self.est_regular_start_time, self.est_regular_end_time, teacher_id=self.teacher_id,
-                                     test_env=env_key, level_code="Any", market_code="Any", partner_code="Any",
-                                     evc_server_code="evccn1",
-                                     subServiceType=ServiceSubTypeCode.KONRegular.value)
+        schedule_class, schedule_class_regular = (-1, -1)
+        try_time = 0
+        while schedule_class == -1 and try_time < 3:
+            schedule_class = self.create_and_assign_class(self.est_start_time, self.est_end_time,
+                                                          teacher_id=self.teacher_id,
+                                                          test_env=env_key,
+                                                          subServiceType=ServiceSubTypeCode.KONDemo.value,
+                                                          partner_code="Any", level_code="Any", market_code="Any", evc_server_code="EvcCN2")
+            try_time = try_time + 1
+        try_time = 0
+        while schedule_class_regular == -1 and try_time < 3:
+            schedule_class_regular = self.create_and_assign_class(self.est_regular_start_time, self.est_regular_end_time, teacher_id=self.teacher_id,
+                                         test_env=env_key, level_code="Any", market_code="Any", partner_code="Any",
+                                         evc_server_code="EvcCN2",
+                                         subServiceType=ServiceSubTypeCode.KONRegular.value)
+            try_time = try_time + 1
 
-        #Same time slot with different teacher
-        self.create_and_assign_class(self.est_regular_start_time, self.est_regular_end_time,
-                                     teacher_id=self.another_teacher,
-                                     test_env=env_key, partner_code="Any", level_code="Any", market_code="Any",evc_server_code="evccn1",
-                                     subServiceType=ServiceSubTypeCode.KONRegular.value)
-
+            #Same time slot with different teacher
+            self.create_and_assign_class(self.est_regular_start_time, self.est_regular_end_time,
+                                         teacher_id=self.another_teacher,
+                                         test_env=env_key, partner_code="Any", level_code="Any", market_code="Any",evc_server_code="EvcCN2",
+                                         subServiceType=ServiceSubTypeCode.KONRegular.value)
 
     def get_different_teacher(self, teacher_id, teacher_list):
         for teacher in teacher_list:
@@ -170,12 +184,14 @@ class EVCBase():
 
     def create_and_assign_class(self, start_time, end_time, teacher_id, test_env="QA",
                                 subServiceType=ServiceSubTypeCode.KONDemo.value, partner_code="any", level_code="Any",
-                                market_code="any", evc_server_code = "evccn1",  teaching_item="en"):
+                                market_code="any", evc_server_code = "EvcCN2",  teaching_item="en"):
+
+        school_service = None
         kids_class = KidsClass(start_time, end_time,
                                teacher={"id": teacher_id, "teacher_name": "KON1", "teacher_password": "1"},
-                               serverSubTypeCode=subServiceType, evcServerCode=evc_server_code, partnerCode=partner_code,
+                               serverSubTypeCode=subServiceType, evcServerCode=evc_server_code,
+                               partnerCode=partner_code,
                                levelCode=level_code, marketCode=market_code, teachingItem=teaching_item)
-        school_service = None
         if "QA" == test_env:
             school_service = get_QA_schedule_tool()
         if "UAT" == test_env:
@@ -183,7 +199,9 @@ class EVCBase():
         if "Staging" == test_env:
             school_service = get_STG_schedule_tool()
         sleep(2)
-        return school_service.schedule_kids_class(kids_class)
+
+        schedule_class = school_service.schedule_kids_class(kids_class)
+        return schedule_class
 
     @AfterMethod()
     def sign_out(self):
