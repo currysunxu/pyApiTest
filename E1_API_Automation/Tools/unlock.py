@@ -44,7 +44,7 @@ def read_excel_key(file, sheet_id, col_id):
 
 def ss_unlock_service(student_id, keys, env):
     urlcn = 'http://internal-tpi-staging.ef.cn/api/v2/SmallStarUnlock/'
-    urlsg = 'http://internal-tpi-staging.ef.cn/api/v2/SmallStarUnlock/'
+    urlsg = 'http://internal-tpi-staging.ef.com/api/v2/SmallStarUnlock/'
     header = {'Content-Type': 'application/json', "X-BA-TOKEN": "97096cec-091a-486a-9cef-4c1097a33a46"}
     data = {"StudentIdCollection": student_id,
             "CourseKeys": keys
@@ -57,7 +57,7 @@ def ss_unlock_service(student_id, keys, env):
 
 def tb_unlock_service(student_id, keys, env):
     urlcn = 'http://internal-tpi-staging-cn.ef.cn/api/v2/TrailblazerUnlock/'
-    urlsg = 'http://internal-tpi-staging-cn.ef.cn/api/v2/TrailblazerUnlock/'
+    urlsg = 'http://internal-tpi-staging-cn.ef.com/api/v2/TrailblazerUnlock/'
     header = {'Content-Type': 'application/json', "X-BA-TOKEN": "97096cec-091a-486a-9cef-4c1097a33a46"}
     data = {"StudentIdCollection": student_id,
             "CourseKeys": keys
