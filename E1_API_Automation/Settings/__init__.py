@@ -12,7 +12,7 @@ class Environment(object):
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'STG'
+    os.environ['environment'] = 'LIVE'
 
 
 if os.environ['environment'] == 'QA':

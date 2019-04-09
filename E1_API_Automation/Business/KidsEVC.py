@@ -7,6 +7,7 @@ class KidsEVCService():
 
     def __init__(self, host):
         self.host = host
+        print(self.host)
         self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
 
     def login(self, user_name, password):

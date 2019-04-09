@@ -42,12 +42,12 @@ class MoscowGradeKey:
 class GP_user:
     GPUsers = {'QA': {'username': 'gpauto', 'password': '12345', 'culture_code': 'zh-CN'},
                'Staging': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
-               'Live': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
+               'Live': {'username': 'gp.cn.auto2', 'password': '12345', 'culture_code': 'zh-CN'},
                'Staging_SG': {'username': 'gp.id.auto1', 'password': '12345', 'culture_code': 'id-ID'},
                'Live_SG': {'username': 'gp.id.auto1', 'password': '12345', 'culture_code': 'id-ID'}}
     GPDTUsers = {'QA': {'username': 'gp02', 'password': '12345', 'culture_code': 'zh-CN'},
                  'Staging': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
-                 'Live': {'username': 'gp.cn.auto2', 'password': '12345', 'culture_code': 'zh-CN'},
+                 'Live': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
                  'Staging_SG': {'username': 'gp.ru.auto1', 'password': '12345', 'culture_code': 'ru-RU'},
                  'Live_SG': {'username': 'gp.ru.auto1', 'password': '12345', 'culture_code': 'ru-RU'}}
 

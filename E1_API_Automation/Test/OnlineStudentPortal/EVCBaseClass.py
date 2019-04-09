@@ -138,6 +138,52 @@ class EVCBase():
         }
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
+    if ENVIRONMENT == Environment.LIVE:
+        '''
+        STG data will be flesh out when SF team to migrate the Live data every 28 days.
+        Caroline is working on this data.
+        The code will be changed for STG in the coming day.
+        '''
+        try:
+            teacher_id = os.environ['Teacher_Id']
+        except:
+
+            teacher_id = "10369666"
+        host = "https://e1svc.ef.cn"
+        SIS_SERVICE = 'http://internal-e1-evc-booking-cn.ef.com'
+        user_info = {
+            "UserName": "hf2.cn.auto1",
+            "Password": "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
+
+        user_info_v3 = {
+            "UserName": "hf3.cn.auto1",
+            "Password": "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
+        user_with_zero_och = {
+            "UserName" : "hf3.cn.auto2",
+            "Password" : "12345"
+        }
+        teacher_list = ["10584669", "10427158", "5888455"]
+        teacher_profile = {
+            "UserId": "5888455",
+            "Description": "\"Hello, I’m Margaret from Shanghai. Before I worked for EF, I was a high school English teacher and I have experience in English education.\"-\"The aim of education is to inspire students.\"",
+            "UserName": "Margaret Wang",
+            "Gender": 2,
+            "Cellphone": None,
+            "AvatarUrl": "https://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
+        }
+        after_report_info = {
+            "Student_User_Name": "hf2.cn.auto2",
+            "Student_Password": "12345",
+            "ClassId": "248427"
+        }
+        sis_test_student = 43195098
+        sis_test_teacher_list = [10584669, 10427158]
 
     def get_different_teacher(teacher_id, teacher_list):
         for teacher in teacher_list:
@@ -198,10 +244,13 @@ class EVCBase():
             school_service = get_UAT_schedule_tool()
         if "Staging" == test_env:
             school_service = get_STG_schedule_tool()
+        if "Live" == test_env:
+            school_service = None
         sleep(2)
-
-        schedule_class = school_service.schedule_kids_class(kids_class)
-        return schedule_class
+        if school_service is not None:
+            schedule_class = school_service.schedule_kids_class(kids_class)
+            return schedule_class
+        return None
 
     @AfterMethod()
     def sign_out(self):

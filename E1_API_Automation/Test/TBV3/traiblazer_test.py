@@ -10,7 +10,7 @@ from .traiblazer_base import TraiblazerBaseClass
 
 @TestClass()
 class TBTestCases(TraiblazerBaseClass):
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_student_profile(self):
         response = self.tb_test.get_student_profile().json()
 
@@ -33,12 +33,12 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(response, exist("IsExpired"))
         assert_that(response, match_to("Key"))
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_course_node_synchronize_status(self):
         activity_contents = self.tb_test.course_node_synchronize(self.tb_test.active_book, self.tb_test.course_plan_key)
         assert_that(activity_contents.status_code == 200)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_course_node_synchronize_schema(self):
         activity_contents = self.tb_test.course_node_synchronize(self.tb_test.active_book,
                                                                  self.tb_test.course_plan_key).json()
@@ -47,20 +47,20 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(activity_contents, match_to("Upserts"))
         assert_that(activity_contents, exist("Removals"))
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_course_node_synchronize_function(self):
         activity_contents = self.tb_test.course_node_synchronize(self.tb_test.active_book,
                                                                  self.tb_test.course_plan_key).json()
         assert_that(len(activity_contents) > 0)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_activity_entity_status(self):
         response = self.tb_test.acitivity_entity_web(self.tb_test.book_contents.get_activity_keys())
         assert_that(response.json(), match_to("Activities"))
         assert_that(response.json(), match_to("Resources"))
         assert_that(response.status_code == 200)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_activity_entity_function(self):
         response = self.tb_test.acitivity_entity_web(self.tb_test.book_contents.get_activity_keys())
         assert_that(
@@ -75,17 +75,17 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(jmespath.search('Activities', response.json())[0], exist("ContentKey"))
         assert_that(jmespath.search('Activities', response.json())[0], match_to("Questions"))
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_course_unlock_status(self):
         response = self.tb_test.course_unlock(self.tb_test.active_book)
         assert_that(response.status_code == 200)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_reward_summary_status(self):
         response = self.tb_test.query_motivation_reward_summary()
         assert_that(response.status_code == 200)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_student_progress(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
         self.picked_lesson = unlocked_lessons[0]
@@ -131,7 +131,7 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(self.picked_lesson ==
                     jmespath.search("@[?Balance==`{0}`].Identifier".format(new_added_points[0]), point_audit.json())[0])
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_homework_lesson_correction(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
         self.picked_lesson = unlocked_lessons[0]
@@ -143,12 +143,12 @@ class TBTestCases(TraiblazerBaseClass):
         correction = self.tb_test.homework_lesson_correction(self.picked_lesson)
         assert_that(correction.status_code == 200)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_homework_motivation_task_info_status(self):
         response = self.tb_test.get_homework_motivation_task_info(self.tb_test.active_book)
         assert_that(response.status_code == 200)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_homework_motivation_task_info_function(self):
         response = self.tb_test.get_homework_motivation_task_info(self.tb_test.active_book)
         assert_that(len(response.json()) > 0)
@@ -164,12 +164,12 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(response.json()[0], exist("TotalPointAmount"))
         assert_that(response.json()[0], match_to("TypeKey"))
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_get_all_book(self):
         response = self.tb_test.get_all_books()
         assert_that(response.status_code == 200)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_get_all_book_schema(self):
         response = self.tb_test.get_all_books()
         assert_that(len(response.json()) > 0)
@@ -196,19 +196,19 @@ class TBTestCases(TraiblazerBaseClass):
         for book in response.json():
             assert_that(jmespath.search("Code", book), contains_string('TBv3Bk'))
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_digital_interaction_info_status(self):
         response = self.tb_test.digital_interaction_info(self.tb_test.active_book)
         assert_that(response.status_code == 200)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_digital_interaction_info_schema(self):
         response = self.tb_test.digital_interaction_info(self.tb_test.active_book)
         assert_that(len(response.json()) > 0)
         assert_that(response.json()[0], exist("Title"))
         assert_that(response.json()[0], match_to("Key"))
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_progress_assessment_report(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
         response = self.tb_test.progress_assessment__report_by_unit(unlocked_lessons[0])
@@ -217,13 +217,13 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(jmespath.search("StudentId", response.json()), equal_to(self.tb_test.user_id))
         assert_that(jmespath.search("UnitCourseKey", response.json()), equal_to(unlocked_lessons[0]))
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_motivation_point_audit_status(self):
         response = self.tb_test.query_motivation_point_audit()
         assert_that(response.status_code == 200)
         assert_that(len(response.json()) > 0)
 
-    @Test(tags="qa, stg")
+    @Test(tags="qa,  stg, live")
     def test_motivation_reward_summary_status(self):
         response = self.tb_test.query_motivation_reward_summary()
         assert_that(response.status_code == 200)

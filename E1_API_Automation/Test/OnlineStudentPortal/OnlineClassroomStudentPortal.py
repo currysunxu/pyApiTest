@@ -21,7 +21,7 @@ class ClassType(Enum):
 @TestClass()
 class APITestCases(EVCBase):
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg,live')
     def test_login(self):
         # Login failed was also verified at the lower layer.
         response = self.evc_service.login(user_name=self.user_info["UserName"], password=self.user_info["Password"])
@@ -29,7 +29,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("UserInfo.UserInfo.UserId"))
         return response
 
-    @Test(tags='qa,stg')
+    @Test(tags='qa,stg.live')
     def test_student_profile(self):
         self.test_login()
         response = self.evc_service.get_user_profile()
@@ -42,7 +42,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("studentOrientationInfo[0].unitNumber"))
         assert_that(response.json(), match_to("userInfo"))
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg,live')
     def test_get_calendar_demo_class(self):
         self.test_login()
         response = self.evc_service.get_calendar(self.HF_program_code, ClassType.DEMO.value, local2utc(self.start_time),
@@ -50,7 +50,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), exist("BookableSlots"))
         return response
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg,live')
     def test_get_calendar_regular_class(self):
         self.test_login()
         start_date = arrow.utcnow().shift().format('YYYY-MM-DDTHH:mm;sssZ')
@@ -61,7 +61,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), exist("BookableSlots"))
         return response
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg,live')
     def test_get_calendar_non_class(self):
         self.test_login()
 
@@ -71,7 +71,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("BookableSlots", response.json()), equal_to(None))
         return response
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg.live')
     def test_get_online_class_booking(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         response = self.evc_service.query_online_class_booking(None, None, self.HF_program_code)
@@ -232,7 +232,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("[?ClassId=='" + class_id + "'].ClassStatus", query_lesson_history_response.json()),
                     "6")
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg,live')
     def test_get_online_student_book_structure(self):
         self.test_login()
         response = self.evc_service.get_user_profile()
@@ -249,7 +249,7 @@ class APITestCases(EVCBase):
         assert_that(set(jmespath.search("[].bookCode", lesson_structure_response.json())) == set(
             ["C", "D", "E", "F", "G", "H", "I", "J"]))
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg,live')
     def test_get_online_student_book_structure_hfv3plus(self):
         self.test_login()
         lesson_structure_response = self.evc_service.get_course_lesson_structure('Regular', 'hfv3plus',
@@ -262,7 +262,7 @@ class APITestCases(EVCBase):
         assert_that(set(jmespath.search("[].bookCode", lesson_structure_response.json())) == set(
             ["C", "D", "E", "F", "G", "H", "I", "J"]))
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg,live')
     def test_get_online_student_book_structure_demo(self):
         self.test_login()
         lesson_structure_response = self.evc_service.get_course_lesson_structure('demo', 'hfv3plus',
@@ -284,7 +284,7 @@ class APITestCases(EVCBase):
         assert_that(set(jmespath.search("[].bookCode", lesson_structure_response_hf.json())) == set(
             ["X"]))
 
-    @Test(tags='qa,stg')
+    @Test(tags='qa,stg,live')
     def test_verify_token_expired(self):
         self.test_login()
         self.evc_service.sign_out()
@@ -380,13 +380,13 @@ class APITestCases(EVCBase):
 
         assert_that(jmespath.search("Code.Major", response.json()) == 500)
 
-    @Test(tags='qa,stg')
+    @Test(tags='qa,stg,live')
     def save_policy_agreement(self):
         self.test_login()
         response = self.evc_service.save_policy_agreement()
         assert_that(response.status_code == 204)
 
-    @Test(tags='qa,stg')
+    @Test(tags='qa,stg,live')
     def save_orientation_info(self):
         self.test_login()
         orientation_info = [
