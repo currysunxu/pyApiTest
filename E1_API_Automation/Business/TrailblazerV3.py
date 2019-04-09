@@ -9,6 +9,7 @@ from functools import reduce
 class TrailbazerService:
     def __init__(self, host, user_name, password):
         self.host = host
+        print(self.host)
         self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
         self.login(user_name, password)
         self.active_book = None

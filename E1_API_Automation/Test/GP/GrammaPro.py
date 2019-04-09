@@ -134,7 +134,8 @@ class GPAPITestCases(GrammarProBaseClass):
     def test_student_progress(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
         students_progress = self.gptest.get_student_progress()
-        assert_that(students_progress.json(), match_to("DiagnosticTestProgress.DiagnosticTestNumber"))
+        assert_that(students_progress.json(), exist("DiagnosticTestProgress.DiagnosticTestNumber"))
+        assert_that(students_progress.json(), exist("RemediationProgress.RemediationModulesResult"))
 
     @Test()
     def test_region_and_grade(self):
