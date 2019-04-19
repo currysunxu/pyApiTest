@@ -34,7 +34,8 @@ class APITestCases(EVCBase):
         self.test_login()
         response = self.evc_service.get_user_profile()
         assert_that(response.status_code == 200)
-        assert_that(response.json(), match_to("studentOrientationInfo[0].bookCode"))
+        assert_that(response.json(), match_to("studentOrientationInfo[0].courseTypeLevelCode"))
+        assert_that(response.json(), match_to("studentOrientationInfo[0].courseType"))
         assert_that(response.json(), exist("studentOrientationInfo[0].hasWatchedVideo"))
         assert_that(response.json(), exist("studentOrientationInfo[0].isInvisible"))
         assert_that(response.json(), match_to("studentOrientationInfo[0].lessonNumber"))
@@ -236,7 +237,7 @@ class APITestCases(EVCBase):
     def test_get_online_student_book_structure(self):
         self.test_login()
         response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].programCode', response.json())
+        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', response.json())
         package_type = jmespath.search('studentOrientationInfo[0].packageType', response.json())
 
         lesson_structure_response = self.evc_service.get_course_lesson_structure('Regular', hf_program_code,
@@ -246,7 +247,7 @@ class APITestCases(EVCBase):
         # Check that there are 192 lessons
         assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 192)
         # Check the book name
-        assert_that(set(jmespath.search("[].bookCode", lesson_structure_response.json())) == set(
+        assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
             ["C", "D", "E", "F", "G", "H", "I", "J"]))
 
     @Test(tags='qa, stg,live')
@@ -259,7 +260,7 @@ class APITestCases(EVCBase):
 
         assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 160)
         # Check the book name
-        assert_that(set(jmespath.search("[].bookCode", lesson_structure_response.json())) == set(
+        assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
             ["C", "D", "E", "F", "G", "H", "I", "J"]))
 
     @Test(tags='qa, stg,live')
@@ -272,7 +273,7 @@ class APITestCases(EVCBase):
 
         assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 1)
         # Check the book name
-        assert_that(set(jmespath.search("[].bookCode", lesson_structure_response.json())) == set(
+        assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
             ["X"]))
         lesson_structure_response_hf = self.evc_service.get_course_lesson_structure('demo', 'hf',
                                                                                     '24')
@@ -281,7 +282,7 @@ class APITestCases(EVCBase):
 
         assert_that(jmespath.search("length([])", lesson_structure_response_hf.json()) == 1)
         # Check the book name
-        assert_that(set(jmespath.search("[].bookCode", lesson_structure_response_hf.json())) == set(
+        assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response_hf.json())) == set(
             ["X"]))
 
     @Test(tags='qa,stg,live')
@@ -390,6 +391,6 @@ class APITestCases(EVCBase):
     def save_orientation_info(self):
         self.test_login()
         orientation_info = [
-            {"programCode": "HF", "packageType": "24", "bookCode": "C", "unitNumber": "1", "lessonNumber": "1"}]
+            {"courseType": "HF", "packageType": "24", "courseTypeLevelCode": "C", "isActive": True, "unitNumber": "1", "lessonNumber": "1"}]
         response = self.evc_service.update_orientation_info(orientation_info)
         assert_that(response.status_code == 200)
