@@ -43,6 +43,60 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("studentOrientationInfo[0].unitNumber"))
         assert_that(response.json(), match_to("userInfo"))
 
+    # Testing V2 api - get_credits
+    @Test(tags='qa,stg.live')
+    def test_get_credits(self):
+        self.test_login()
+        response = self.evc_service.get_credits()
+        assert_that(response.status_code == 200)
+        assert_that(jmespath.search("length([])", response.json()) >= 1)
+        assert_that(response.json()[0]["classType"] == "Demo")
+        assert_that(response.json()[0]["courseType"] == "HF" or "HFV3Plus")
+
+    # Testing V2 api - get_available_regular_timeSlot
+    @Test(tags='qa, stg,live')
+    def test_get_availble_regular_class(self):
+        self.test_login()
+        response = self.evc_service.get_available_online_class_session(self.HF_region,self.HF_course_type,ClassType.REGULAR.value)
+        assert_that(response.status_code == 200)
+        try:
+            assert_that(response.json()[0]["classType"] == "Regular")
+            assert_that(response.json()[0]["courseType"] == "HF" or "HFV3Plus")
+            assert_that(response.json(),exist("endDateTimeUtc"))
+            assert_that(response.json(), exist("startDateTimeUtc"))
+        except:
+            return None
+
+
+    # Testing V2 api - get_available_demo_timeSlot
+    @Test(tags='qa, stg,live')
+    def test_get_available_demo_class(self):
+        self.test_login()
+        response = self.evc_service.get_available_online_class_session(self.HF_region,self.HF_course_type,ClassType.DEMO.value)
+        assert_that(response.status_code == 200)
+        try:
+            assert_that(response.json()[0]["classType"] == "Demo")
+            assert_that(response.json()[0]["courseType"] == "HF" or "HFV3Plus")
+            assert_that(response.json(),exist("endDateTimeUtc"))
+            assert_that(response.json(), exist("startDateTimeUtc"))
+        except:
+            return None
+
+    # Testing V2 api - get_recommended_lesson
+    @Test(tags='qa, stg,live')
+    def test_get_recommended_lesson(self):
+        self.test_login()
+        response = self.evc_service.get_recommended_class(self.HF_course_type,self.HF_package_type)
+        assert_that(response.status_code == 200)
+        assert_that(response.json()["classType"] == "Regular")
+        assert_that(response.json()["courseType"] == "HF" or "HFV3Plus")
+        assert_that(response.json(), exist("courseTypeLevelCode"))
+        assert_that(response.json(), exist("lessonNumber"))
+        assert_that(response.json(), exist("packageType"))
+        assert_that(response.json(),exist("topicId"))
+        assert_that(response.json(), exist("topicStatement"))
+        assert_that(response.json(), exist("unitNumber"))
+
     @Test(tags='qa, stg,live')
     def test_get_calendar_demo_class(self):
         self.test_login()
@@ -72,12 +126,11 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("BookableSlots", response.json()), equal_to(None))
         return response
 
-    @Test(tags='qa, stg.live')
+    @Test(tags='qa, stg, live')
     def test_get_online_class_booking(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         response = self.evc_service.query_online_class_booking(None, None, self.HF_program_code)
         assert_that(response.status_code == 200)
-
 
     @Test(tags='qa')
     def test_get_available_online_class_session_multiple_teacher(self):
@@ -285,11 +338,12 @@ class APITestCases(EVCBase):
         assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response_hf.json())) == set(
             ["X"]))
 
+    # change V1 api to V2
     @Test(tags='qa,stg,live')
     def test_verify_token_expired(self):
         self.test_login()
         self.evc_service.sign_out()
-        response = self.evc_service.get_lesson_suggestion(self.HF_program_code)
+        response = self.evc_service.get_recommended_class(self.HF_course_type,self.HF_package_type)
         assert_that(response.status_code == 401)
 
     @Test(tags='qa')
@@ -303,6 +357,17 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("Comment"))
         assert_that(response.json(), match_to("Improvement"))
         assert_that(response.json(), match_to("Suggestion"))
+
+    # Testing V2 api - get_acr
+    @Test(tags='qa,stg,live')
+    def test_get_after_class_report(self):
+        self.test_login()
+        class_id = self.after_report_info['ClassId']
+        response = self.evc_service.get_after_class_report(class_id)
+        assert_that(response.status_code == 200)
+        assert_that(response.json(), match_to("improvement"))
+        assert_that(response.json(), match_to("strengths"))
+        assert_that(response.json(), match_to("suggestion"))
 
     @Test(tags='qa')
     def book_class_error_code_with_not_enough_och(self):
@@ -374,12 +439,12 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("Code.Major", response.json()) == 403)
         assert_that(jmespath.search("Code.Minor", response.json()) == '610')
 
-    @Test(tags='qa')
+    # change v1 api to v2
+    @Test(tags='qa,stg,live')
     def cancel_class_error_code_with_wrong_class_id(self):
         self.test_login()
         response = self.evc_service.cancel_class("30789")
-
-        assert_that(jmespath.search("Code.Major", response.json()) == 500)
+        assert_that(jmespath.search("status", response.json()) == 404)
 
     @Test(tags='qa,stg,live')
     def save_policy_agreement(self):
