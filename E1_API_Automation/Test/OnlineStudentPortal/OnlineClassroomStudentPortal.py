@@ -29,7 +29,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("UserInfo.UserInfo.UserId"))
         return response
 
-    @Test(tags='qa,stg.live')
+    @Test(tags='qa,stg,live')
     def test_student_profile(self):
         self.test_login()
         response = self.evc_service.get_user_profile()
@@ -44,7 +44,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("userInfo"))
 
     # Testing V2 api - get_credits
-    @Test(tags='qa,stg.live')
+    @Test(tags='qa,stg,live')
     def test_get_credits(self):
         self.test_login()
         response = self.evc_service.get_credits()
@@ -160,7 +160,7 @@ class APITestCases(EVCBase):
                                     response.json())[0] == self.teacher_profile["AvatarUrl"])
         return response
 
-    @Test(tags='qa, stg')
+    @Test(tags='qa, stg,live')
     def test_get_OCH_credit(self):
         student_id = jmespath.search("UserInfo.UserInfo.UserId", self.test_login().json())
         response = self.evc_service.get_OCH_credit(student_id, self.HF_program_code)
