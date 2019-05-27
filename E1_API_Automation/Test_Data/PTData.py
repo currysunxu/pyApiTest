@@ -1,7 +1,7 @@
 class PTUsers:
-    pt_user = {'QA': {'username': 'Unlock_Test01', 'password': '12345', 'school': "CND"},
-               'Staging': {'username': 'ptdemo1@ef.com', 'password': 'test', 'school': "CND"},
-               'Live': {'username': 'ptdemo1@ef.com', 'password': 'test', 'school': "CND"}
+    pt_user = {'QA': {'username': 'pdcc.cn@ef.com', 'password': '12345', 'school': "DCNBJS21"},
+               'Staging': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNBJS21"},
+               'Live': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNTES01"}
                }
 
     RootCourseKey = {"HF": "0fd4253a-7727-491a-9a68-cf9f8d88179f",
