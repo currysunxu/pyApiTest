@@ -31,15 +31,18 @@ class KidsEVCService():
         }
         return self.mou_tai.post("/api/v2/OnlineClassroomCalendar/", json=body)
 
-    def get_available_online_class_session(self, start_stamp, end_stamp, program_code):
-        body = {
-            "startStamp": start_stamp,
-            "endStamp": end_stamp,
-            "programCode": program_code,
+    # change v1 to v2 api
+    def get_available_online_class_session(self,region,course_type,class_type):
+        return self.mou_tai.get("/ksdsvc/api/v2/student/time-slots/available?Region={0}&CourseType={1}&ClassType={2}".format(region,course_type,class_type))
 
-        }
+    # v2 api
+    def get_recommended_class(self,course_type,package_type):
+        return self.mou_tai.get("/ksdsvc/api/v2/lessons/recommended/?courseType={0}&packageType={1}".format(course_type,package_type))
 
-        return self.mou_tai.post("/api/v2/OnlineClassSession/", json=body)
+    # v2 api
+    def get_credits(self):
+        return self.mou_tai.get("/ksdsvc/api/v2/student/credits")
+
 
     def get_OCH_credit(self, student_id, program_code):
         body = {
@@ -68,8 +71,9 @@ class KidsEVCService():
 
         return self.mou_tai.put("/api/v2/OnlineClassBooking/", json=body)
 
+    # change v1 to v2 api
     def cancel_class(self, class_id):
-        api_url = "/api/v2/OnlineClassBooking/" + class_id
+        api_url = "/ksdsvc/api/v2/classes/" + class_id
         return self.mou_tai.delete(api_url)
 
     def get_lesson_suggestion(self, program_code):
@@ -92,8 +96,9 @@ class KidsEVCService():
 
         return self.mou_tai.post(url="/api/v2/OnlineClassBooking/", json=body)
 
+    # change v1 api to v2
     def get_after_class_report(self, class_id):
-        api_url = "/api/v2/AfterClassReport/" + class_id
+        api_url = "/ksdsvc/api/v2/classes/{0}/acr".format(class_id)
         return self.mou_tai.get(api_url)
 
     def change_topic(self, student_id, book_code, unit_number, lesson_number, start_stamp, end_stamp, teacher_id,
@@ -115,7 +120,7 @@ class KidsEVCService():
         return self.mou_tai.post(url="/api/v2/OnlineClassroom/Topic/", json=body)
 
     def sign_out(self):
-        return self.mou_tai.delete(url="/api/v2/Token/")
+        return self.mou_tai.delete(url="/api/v1/Token/")
 
     def block_booking_teacher_search(self, start_date_time, end_date_time, course_type, package_type, unit_number, lesson_number):
         random_num = random.randint(0, 23)
