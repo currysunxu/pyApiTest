@@ -60,7 +60,10 @@ class Moutai():
     def get(self, url, params=None, **kwargs):
         url_combined = self.host + url
         if self.token is None:
-            return self.request_session.get(url_combined, verify=False,headers=self.headers, **kwargs,)
+            if self.request_session is None:
+                return requests.get(url_combined, verify=False, headers=self.headers, **kwargs, )
+            else:
+                return self.request_session.get(url_combined, verify=False,headers=self.headers, **kwargs,)
         else:
             return requests.get(url_combined, params, verify=False,headers=self.headers, **kwargs)
 

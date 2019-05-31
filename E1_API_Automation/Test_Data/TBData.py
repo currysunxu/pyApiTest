@@ -1,5 +1,5 @@
 class TBUsers:
-    tb_user = {'QA': {'username': 'Unlock_Test01', 'password': '12345'},
+    tb_user = {'QA': {'username': 'tb3.cn.auto1', 'password': '12345'},
                'Staging': {'username': 'tb3.cn.auto1', 'password': '12345'},
                'Staging_SG': {'username': 'tb3.id.auto1', 'password': '12345'},
                'Live':{'username': 'tb.cnlive.1', 'password': '12345'}
