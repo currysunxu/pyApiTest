@@ -17,6 +17,12 @@ class OSPEnvironment(object):
     LIVE_SG = "http://internal-osp.ef.com"
 
 
+class TPIEnvironment(object):
+    QA = "http://internal-e1tpi-qa.ef.com"
+    STAGING = "http://internal-tpi-staging-cn.ef.com"
+    STAGING_SG = "internal-tpi-staging.ef.com"
+
+
 try:
     print(os.environ['environment'])
 except:
@@ -26,6 +32,7 @@ except:
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
     OSP_ENVIRONMENT = OSPEnvironment.QA
+    TPI_ENVIRONMENT = TPIEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -37,6 +44,7 @@ if os.environ['environment'] == 'QA':
 elif os.environ['environment'] == 'STG':
     ENVIRONMENT = Environment.STAGING
     OSP_ENVIRONMENT = OSPEnvironment.STAGING
+    TPI_ENVIRONMENT = TPIEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
@@ -47,6 +55,7 @@ elif os.environ['environment'] == 'STG':
 elif os.environ['environment'] == 'STG_SG':
     ENVIRONMENT = Environment.STAGING_SG
     OSP_ENVIRONMENT = OSPEnvironment.STAGING_SG
+    TPI_ENVIRONMENT = TPIEnvironment.STAGING_SG
     env_key = 'Staging_SG'
     DATABASE = {
         "Server": "SGE1STGDB01.e1ef.com,1434",
