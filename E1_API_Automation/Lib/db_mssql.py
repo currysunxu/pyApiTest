@@ -1,4 +1,4 @@
-import pymssql
+#import pymssql
 
 
 class MSSQLHelper(object):

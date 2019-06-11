@@ -53,6 +53,16 @@ class PTService():
             "Month": date[0]["month"]
         }
         return self.mou_tai.post('/api/v2/CourseSchedule/', data)
+    
+    def get_sspt_course_schedule(self, teacher_id, school_code, date):
+        data = {
+            "Day": date[0]["day"],
+            "TeacherId": teacher_id,
+            "Year": date[0]["year"],
+            "SchoolCode": school_code,
+            "Month": date[0]["month"]
+        }
+        return self.mou_tai.post('/api/v2/CourseSchedule/BookCoursePlan', data)
 
     def get_root_course_info(self, key):
         data = {"RootCourseKey": key}

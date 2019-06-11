@@ -38,6 +38,17 @@ class TBTestCases(TraiblazerBaseClass):
         activity_contents = self.tb_test.course_node_synchronize(self.tb_test.active_book, self.tb_test.course_plan_key)
         assert_that(activity_contents.status_code == 200)
 
+    @Test(tags="qa, stg, live" )
+    def test_get_privacy_policy(self):
+        privacy_content = self.tb_test.get_privacy_content()
+        assert_that(privacy_content.status_code == 200)
+        assert_that(privacy_content.json(), exist("LatestPrivacyPolicyDocumentResult"))
+
+    @Test(tags="qa, stg, live" )
+    def test_save_privacy(self):
+        save_result = self.tb_test.save_privacy(2, 3)
+        assert_that(save_result.status_code == 204)
+
     @Test(tags="qa, stg, live")
     def test_course_node_synchronize_schema(self):
         activity_contents = self.tb_test.course_node_synchronize(self.tb_test.active_book,
@@ -108,28 +119,28 @@ class TBTestCases(TraiblazerBaseClass):
                                              self.tb_test.lesson_score_summary([self.picked_lesson]).json()[0])
         assert_that((after_lesson_score - lesson_score) > 0)
 
-    @Test(tags="qa")
-    def test_student_motivation_points(self):
-        # get the cleaned point lesson key and balance value
-        self.picked_lesson, updated_balance = self.clean_motivation_audit(self.tb_test.user_id)
-        if self.picked_lesson == None:
-            self.picked_lesson = self.tb_test.course_unlock(self.tb_test.active_book).json()[0]
-        activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(self.picked_lesson)
-
-        for i in range(1, len(activity_nodes) + 1):
-            self.tb_test.student_progress(self.picked_lesson, i, len(activity_nodes))
-        response = self.tb_test.homework_lesson_answer(self.picked_lesson)
-
-        assert_that(len(response.json()) > 0)
-
-        # verify the balance valued added
-        new_added_points = jmespath.search("[*].Balance", response.json())
-        lambda x: assert_that(x > updated_balance), new_added_points
-
-        point_audit = self.tb_test.query_motivation_point_audit()
-        lambda x: assert_that(x in jmespath.search("[*].Balance", point_audit.json())), new_added_points
-        assert_that(self.picked_lesson ==
-                    jmespath.search("@[?Balance==`{0}`].Identifier".format(new_added_points[0]), point_audit.json())[0])
+    # @Test(tags="qa")
+    # def test_student_motivation_points(self):
+    #     # get the cleaned point lesson key and balance value
+    #     self.picked_lesson, updated_balance = self.clean_motivation_audit(self.tb_test.user_id)
+    #     if self.picked_lesson == None:
+    #         self.picked_lesson = self.tb_test.course_unlock(self.tb_test.active_book).json()[0]
+    #     activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(self.picked_lesson)
+    # 
+    #     for i in range(1, len(activity_nodes) + 1):
+    #         self.tb_test.student_progress(self.picked_lesson, i, len(activity_nodes))
+    #     response = self.tb_test.homework_lesson_answer(self.picked_lesson)
+    # 
+    #     assert_that(len(response.json()) > 0)
+    # 
+    #     # verify the balance valued added
+    #     new_added_points = jmespath.search("[*].Balance", response.json())
+    #     lambda x: assert_that(x > updated_balance), new_added_points
+    # 
+    #     point_audit = self.tb_test.query_motivation_point_audit()
+    #     lambda x: assert_that(x in jmespath.search("[*].Balance", point_audit.json())), new_added_points
+    #     assert_that(self.picked_lesson ==
+    #                 jmespath.search("@[?Balance==`{0}`].Identifier".format(new_added_points[0]), point_audit.json())[0])
 
     @Test(tags="qa, stg, live")
     def test_homework_lesson_correction(self):
