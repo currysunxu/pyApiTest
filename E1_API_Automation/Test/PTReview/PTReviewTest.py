@@ -4,6 +4,7 @@ from E1_API_Automation.Business.Utils.PTReviewUtils import PTReviewUtils
 from E1_API_Automation.Business.TPIService import TPIService
 from ...Settings import OSP_ENVIRONMENT, TPI_ENVIRONMENT, env_key
 from ...Test_Data.PTReviewData import PTReviewData
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from hamcrest import assert_that
 import jmespath
 import json
@@ -12,7 +13,7 @@ import json
 @TestClass()
 class PTReviewTestCases:
 
-    @Test()
+    @Test(tags="qa, stg, live")
     def test_get_hf_all_books(self):
         pt_review_service = PTReviewService(OSP_ENVIRONMENT)
         response = pt_review_service.get_hf_all_books_url()
@@ -23,7 +24,7 @@ class PTReviewTestCases:
         assert_that(code_list == expected_code_list, "Code returned is not as expected.")
 
         # if it's not Live environment, then do the rest verification with DB
-        if not env_key.startswith('Live'):
+        if not EnvUtils.is_env_live():
             # get the result from DB
             db_query_result = pt_review_service.get_hf_all_books_from_db()
 
