@@ -1,7 +1,7 @@
 class PTUsers:
     pt_user = {'QA': {'username': 'pdcc.cn@ef.com', 'password': '12345', 'school': "DCNBJS21"},
-               'Staging': {'username': 'pdcc.cn@ef.com', 'password': 'test', 'school': "CND"},
-               'Live': {'username': 'pdcc.cn@ef.com', 'password': 'EDtech@246', 'school': "CND"}
+               'Staging': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNBJS21"},
+               'Live': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNTES01"}
                }
 
     RootCourseKey = {"HF": "0fd4253a-7727-491a-9a68-cf9f8d88179f",
@@ -10,4 +10,4 @@ class PTUsers:
 
     region_key = {"cn": 1, "ru": 2, "id": 4}
 
-    date = [{"day": 19, "month": 5, "year": 2019}]
+    date = [{"day": 2, "month": 10, "year": 2018}]

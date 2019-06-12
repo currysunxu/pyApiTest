@@ -52,7 +52,7 @@ class Moutai():
 
     def post(self, url, json=None, **kwargs):
         url_combined = self.host + url
-        if self.token is None:
+        if self.token is None and self.request_session is not None:
             return self.request_session.post(url_combined, json=json,verify=False, headers=self.headers, **kwargs)
         else:
             return requests.post(url_combined, json=json,verify=False, headers=self.headers, **kwargs)
@@ -60,7 +60,10 @@ class Moutai():
     def get(self, url, params=None, **kwargs):
         url_combined = self.host + url
         if self.token is None:
-            return self.request_session.get(url_combined, verify=False,headers=self.headers, **kwargs,)
+            if self.request_session is None:
+                return requests.get(url_combined, verify=False, headers=self.headers, **kwargs, )
+            else:
+                return self.request_session.get(url_combined, verify=False,headers=self.headers, **kwargs,)
         else:
             return requests.get(url_combined, params, verify=False,headers=self.headers, **kwargs)
 
@@ -94,7 +97,7 @@ class Moutai():
 
     def put(self, url, json=None, **kwargs):
         url_combined = self.host + url
-        if self.token is None:
+        if self.token is None and self.request_session is not None:
             return self.request_session.request("put", url_combined, verify=False,json=json, headers=self.headers, **kwargs)
         else:
             return requests.put(url_combined, json=json, verify=False, headers=self.headers, **kwargs)

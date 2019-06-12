@@ -22,7 +22,9 @@ class EVCBase():
     host = None
     start_time = None
     end_time = None
-    HF_program_code = "HF"
+    HF_course_type = "HF"
+    HF_region = "CN"
+    HF_package_type = 24
 
     teacher_list = {}
 
@@ -67,13 +69,19 @@ class EVCBase():
         host = "https://e1svc-qa.ef.cn"
         SIS_SERVICE = 'https://internal-e1-evc-booking-qa-cn.ef.com'
         user_info = {
-            "UserName": "jimmy",#unlock02
+            "UserName": "hf2.cn.auto1",#unlock02
+            "Password": "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
+        user_info_v3 = {
+            "UserName": "hf3.cn.auto1",
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0
         }
         user_with_zero_och = {
-            "UserName" : "c",
+            "UserName" : "hf3.cn.auto2",
             "Password" : "12345"
         }
         teacher_list = ["10703777", "10366584", "10366576"]
@@ -86,9 +94,9 @@ class EVCBase():
             "AvatarUrl": "https://qa.englishtown.cn/opt-media/?id=e9e4d04d-e15a-460d-af0a-5fd91c10b226"
         }
         after_report_info = {
-            "Student_User_Name": "fr062201",
+            "Student_User_Name": "hf2.cn.auto1",
             "Student_Password": "12345",
-            "ClassId": "801720"
+            "ClassId": "1104231"
         }
         sis_test_student = 12226094
         sis_test_teacher_list = [10703777, 10366576]
@@ -134,7 +142,7 @@ class EVCBase():
         after_report_info = {
             "Student_User_Name": "hf2.cn.auto2",
             "Student_Password": "12345",
-            "ClassId": "248427"
+            "ClassId": "343793"
         }
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
@@ -152,7 +160,7 @@ class EVCBase():
         host = "https://e1svc.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-cn.ef.com'
         user_info = {
-            "UserName": "hftest.1113",
+            "UserName": "hf2.cn.01",
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0
@@ -178,9 +186,9 @@ class EVCBase():
             "AvatarUrl": "https://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
         }
         after_report_info = {
-            "Student_User_Name": "hf2.cn.auto2",
+            "Student_User_Name": "hf2.cn.01",
             "Student_Password": "12345",
-            "ClassId": "248427"
+            "ClassId": "15656608"
         }
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
@@ -198,7 +206,7 @@ class EVCBase():
     def create_class(self):
         self.evc_service = KidsEVCService(host=self.host)
 
-        # prepare the class which is assigned to teacher, which will follow the different environment.
+        #prepare the class which is assigned to teacher, which will follow the different environment.
         schedule_class, schedule_class_regular = (-1, -1)
         try_time = 0
         while schedule_class == -1 and try_time < 3:
