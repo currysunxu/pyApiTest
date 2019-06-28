@@ -237,4 +237,4 @@ class TBTestCases(TraiblazerBaseClass):
     def test_motivation_reward_summary_status(self):
         response = self.tb_test.query_motivation_reward_summary()
         assert_that(response.status_code == 200)
-        assert_that(len(response.json()) > 0)
+        assert_that(isinstance(response.json(), list))
