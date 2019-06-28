@@ -26,7 +26,17 @@ class PTAPITestCases(ProgressTestClass):
                                                PTUsers.pt_user[env_key]['password'])
         teacher_id = jmespath.search('UserInfo.UserId', user_info.json())
         course_schedule = self.PTService.get_course_schedule(teacher_id, PTUsers.pt_user[env_key]['school'],
-                                                             PTUsers.date)
+                                                             PTUsers.pt_user[env_key]['hf_scheduledDate'])
+        assert_that(course_schedule.json(), match_to("[].ProgressTestCollection[].Key"))
+        assert_that(course_schedule.json(), match_to("[].ProgressTestCollection[].CourseKey"))
+
+    @Test()
+    def test_sspt_course_schedule(self):
+        user_info = self.PTService.stuff_login(PTUsers.pt_user[env_key]['username'],
+                                               PTUsers.pt_user[env_key]['password'])
+        teacher_id = jmespath.search('UserInfo.UserId', user_info.json())
+        course_schedule = self.PTService.get_sspt_course_schedule(teacher_id, PTUsers.pt_user[env_key]['school'],
+                                                                  PTUsers.pt_user[env_key]['ss_scheduledDate'])
         assert_that(course_schedule.json(), match_to("[].ProgressTestCollection[].Key"))
         assert_that(course_schedule.json(), match_to("[].ProgressTestCollection[].CourseKey"))
 

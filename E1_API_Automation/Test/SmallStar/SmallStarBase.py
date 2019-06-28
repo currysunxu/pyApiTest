@@ -16,11 +16,11 @@ class SmallStarBase():
         user_name = "ss3.cn.01"
         password = '12345'
     if ENVIRONMENT == Environment.QA:
-        user_name = "ssv23"
+        user_name = "ss3.cn.01"
         password = '12345'
 
     if ENVIRONMENT == Environment.LIVE:
-        user_name = "belle.ma"
+        user_name = "ss3.cnlive.1"
         password = '12345'
 
 

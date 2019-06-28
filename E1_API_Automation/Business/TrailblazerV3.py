@@ -29,6 +29,17 @@ class TrailbazerService:
         }
         return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/TBV3/")
 
+    def get_privacy_content(self):
+        return self.mou_tai.get('/api/v2/PrivacyPolicy/studentPrivacyPolicyAgreement/?cultureCode=zh-CN&product=2')
+    
+    def save_privacy(self,privacy_document_id, product_id):
+        privacy_content ={
+            "privacyDocumentId":privacy_document_id,
+            "product":product_id
+        }
+        return self.mou_tai.post('/api/v2/PrivacyPolicy/studentPrivacyPolicyAgreement/',json=privacy_content)
+        
+    
     def get_student_profile(self):
         return self.mou_tai.get("/api/v2/StudentProfile/TBV3")
 

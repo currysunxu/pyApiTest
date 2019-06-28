@@ -13,7 +13,6 @@ class TBTestCases(TraiblazerBaseClass):
     @Test(tags="qa, stg, live")
     def test_student_profile(self):
         response = self.tb_test.get_student_profile().json()
-
         assert_that(response, match_to("UserId"))
         assert_that(response, exist("Email"))
         assert_that(response, match_to("Name"))
@@ -37,6 +36,17 @@ class TBTestCases(TraiblazerBaseClass):
     def test_course_node_synchronize_status(self):
         activity_contents = self.tb_test.course_node_synchronize(self.tb_test.active_book, self.tb_test.course_plan_key)
         assert_that(activity_contents.status_code == 200)
+
+    @Test(tags="qa, stg, live" )
+    def test_get_privacy_policy(self):
+        privacy_content = self.tb_test.get_privacy_content()
+        assert_that(privacy_content.status_code == 200)
+        assert_that(privacy_content.json(), exist("LatestPrivacyPolicyDocumentResult"))
+
+    @Test(tags="qa, stg, live" )
+    def test_save_privacy(self):
+        save_result = self.tb_test.save_privacy(2, 3)
+        assert_that(save_result.status_code == 204)
 
     @Test(tags="qa, stg, live")
     def test_course_node_synchronize_schema(self):
@@ -227,4 +237,4 @@ class TBTestCases(TraiblazerBaseClass):
     def test_motivation_reward_summary_status(self):
         response = self.tb_test.query_motivation_reward_summary()
         assert_that(response.status_code == 200)
-        assert_that(len(response.json()) > 0)
+        assert_that(isinstance(response.json(), list))

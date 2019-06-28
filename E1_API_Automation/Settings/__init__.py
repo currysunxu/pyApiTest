@@ -35,12 +35,11 @@ class OMNIEnvironment(object):
     LIVE = "http://omni-apigateway-tccn.ef.com"
 
 
-os.environ['environment'] = 'STG'
 
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'LIVE'
+    os.environ['environment'] = 'QA'
 
 
 if os.environ['environment'] == 'QA':

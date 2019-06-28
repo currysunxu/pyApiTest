@@ -26,21 +26,21 @@ class TestBlockBooking():
     if ENVIRONMENT == Environment.QA:
         host = "https://e1svc-qa.ef.cn"
         user_info_HF = {
-            "UserName": "w01",  # unlock02
+            "UserName": "hf2.cn.01",  # unlock02
             "Password": "12345",
             "course_type": 'HF',
             "package_type": 24
         }
 
         user_info_HFV3 = {
-            "UserName": "abby12",  # unlock02
+            "UserName": "hf3.cn.01",  # unlock02
             "Password": "12345",
             "course_type": 'HFV3Plus',
             "package_type": 20
         }
 
         user_info_credits = {
-            "UserName": "gpt1",  # unlock02
+            "UserName": "hf2.cn.01",  # unlock02
             "Password": "12345",
             "course_type": 'HF',
             "package_type": 24
