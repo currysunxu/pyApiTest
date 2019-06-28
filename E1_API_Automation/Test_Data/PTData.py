@@ -1,7 +1,10 @@
 class PTUsers:
-    pt_user = {'QA': {'username': 'pdcc.cn@ef.com', 'password': '12345', 'school': "DCNBJS21"},
-               'Staging': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNBJS21"},
-               'Live': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNTES01"}
+    pt_user = {'QA': {'username': 'pdcc.cn@ef.com', 'password': '12345', 'school': "DCNBJS21",
+                      'ss_scheduledDate': [{"day": 19, "month": 5, "year": 2019}],'hf_scheduledDate': [{"day": 16, "month": 5, "year": 2019}]},
+               'Staging': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNBJS21",
+                           'ss_scheduledDate': [{"day": 12, "month": 6, "year": 2019}],'hf_scheduledDate': [{"day": 19, "month": 5, "year": 2019}]},
+               'Live': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNTES01",
+                        'scheduledDate': [{"day": 12, "month": 6, "year": 2019}]}
                }
 
     RootCourseKey = {"HF": "0fd4253a-7727-491a-9a68-cf9f8d88179f",
@@ -10,4 +13,4 @@ class PTUsers:
 
     region_key = {"cn": 1, "ru": 2, "id": 4}
 
-    date = [{"day": 2, "month": 10, "year": 2018}]
+    date = [{"day": 6, "month": 6, "year": 2019}]
