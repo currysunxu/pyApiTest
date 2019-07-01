@@ -5,19 +5,40 @@ class PTReviewSQLString:
                                "from [OnlineSchoolPlatform].[dbo].[view_CourseNodeV2] " \
                                "where parentNodeKey = (select courseKey from [OnlineSchoolPlatform].[dbo].CourseNodeSnapshot where [name] = 'High Flyers' ) order by [sequence]"
 
+    hf_pt_assessment_sql = "select a.StudentId, a.Code, a.TestInstanceKey,a.OriginalScore,a.OverwrittenScore, " \
+                                "a.TotalScore,b.BookKey, b.BookCode, b. BookName, b.UnitKey, b.UnitCode, b.UnitName " \
+                                "from OnlineSchoolPlatform.dbo.TestAssessmentMeta a " \
+                                "inner join OnlineSchoolPlatform.dbo.ProgressTestUnitIndexBookIndex b " \
+                                "on a.TestPrimaryKey = b.TestPrimaryKey " \
+                                "where a.StudentId = {0} " \
+                                "and b.BookKey = '{1}'"
+
+    update_pt_score_sql = "update OnlineSchoolPlatform.dbo.TestAssessmentMeta set {0} " \
+                          "where StudentId = {1} and TestPrimaryKey = '{2}'"
+
 
 class PTReviewData:
     pt_hf_user_key_book_unit = {
+        # key is student_id
         'QA': {
-            'StudentId': 12214889,
-            'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
-            'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
-            'UnitKey': '30E54D73-C793-4F00-AD61-59CBF0423A0F'
-        },
+                '12214889': {
+                    'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
+                    'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
+                    'UnitKey': '30E54D73-C793-4F00-AD61-59CBF0423A0F'
+                }
+              },
         'Staging': {
-            'StudentId': 100362513,  # user ilab is: connie.test
-            'TestPrimaryKey': 'D27608E2-0914-4BCE-9E76-9D4E6A0F05A7',
-            'BookKey': '8605C95C-9CF8-418C-8C67-B7A3122C5445',
-            'UnitKey': '22CFB67B-1CA2-4E71-A1EE-4FE8B0223FBA'
+                '100360697': {
+                    'TestPrimaryKey': '30FF9C24-DEB4-49B2-9363-3C433D0B627F',
+                    'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
+                    'UnitKey': '1EC56EC1-A123-4B47-9057-96BE3EE7534D'
+                    }
+                },
+        'Live': {
+            '100201088': {
+                'TestPrimaryKey': '', # no need to set TestPrimaryKey for live data
+                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
+            }
         }
     }
