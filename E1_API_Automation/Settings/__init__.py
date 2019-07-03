@@ -21,6 +21,8 @@ class TPIEnvironment(object):
     QA = "http://internal-e1tpi-qa.ef.com"
     STAGING = "http://internal-tpi-staging-cn.ef.com"
     STAGING_SG = "http://internal-tpi-staging.ef.com"
+    LIVE = "http://internal-tpi-cn.ef.com"
+    LIVE_SG = "http://internal-tpi.ef.com"
 
 
 class AuthEnvironment(object):
@@ -33,8 +35,6 @@ class OMNIEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/omni/apigateway"
     STAGING = "http://omni-apigateway-staging-tccn.ef.com"
     LIVE = "http://omni-apigateway-tccn.ef.com"
-
-
 
 try:
     print(os.environ['environment'])
@@ -84,6 +84,7 @@ elif os.environ['environment'] == 'STG_SG':
 elif os.environ['environment'] == 'LIVE':
     ENVIRONMENT = Environment.LIVE
     OSP_ENVIRONMENT = OSPEnvironment.LIVE
+    TPI_ENVIRONMENT = TPIEnvironment.LIVE
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
     env_key = 'Live'
