@@ -100,6 +100,7 @@ class EVCBase():
         }
         sis_test_student = 12226094
         sis_test_teacher_list = [10703777, 10366576]
+        evc_profile_host='https://e1-evc-booking-integration-qa.ef.com'
     if ENVIRONMENT == Environment.STAGING:
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
@@ -146,6 +147,7 @@ class EVCBase():
         }
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
+        evc_profile_host='https://e1-evc-booking-integration-stg.ef.com'
     if ENVIRONMENT == Environment.LIVE:
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
@@ -192,6 +194,7 @@ class EVCBase():
         }
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
+        evc_profile_host='https://e1-evc-booking-integration.ef.com'
 
     def get_different_teacher(teacher_id, teacher_list):
         for teacher in teacher_list:
