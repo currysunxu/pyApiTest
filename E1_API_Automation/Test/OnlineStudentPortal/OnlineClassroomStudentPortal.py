@@ -459,3 +459,11 @@ class APITestCases(EVCBase):
             {"courseType": "HF", "packageType": "24", "courseTypeLevelCode": "C", "isActive": True, "unitNumber": "1", "lessonNumber": "1"}]
         response = self.evc_service.update_orientation_info(orientation_info)
         assert_that(response.status_code == 200)
+    
+    @Test(tags='qa,stg,live')
+    def test_evc_student_profile(self):
+        self.test_login()
+        response = self.evc_service.student_evc_profile(host= self.evc_profile_host)
+        assert_that((response.status_code == 200))
+        assert_that(response.json(), match_to('studentId'))
+

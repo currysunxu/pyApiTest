@@ -1,6 +1,8 @@
 import random
 
 from ..Lib.Moutai import Moutai, Token
+import jmespath
+import requests
 
 
 class KidsEVCService():
@@ -169,3 +171,8 @@ class KidsEVCService():
     def update_orientation_info(self, update_orientation_info):
         json = update_orientation_info
         return self.mou_tai.put(url = '/ksdsvc/api/v2/student/orientation-info/', json = json)
+    
+    def student_evc_profile(self, host):
+        student_id = jmespath.search('userInfo.userId',self.get_user_profile().json())
+        response = requests.get(url=host +'/api/v1/students/Kids_{0}/evc-profile'.format(student_id), verify=False, headers={"Content-Type": "application/json"})
+        return response
