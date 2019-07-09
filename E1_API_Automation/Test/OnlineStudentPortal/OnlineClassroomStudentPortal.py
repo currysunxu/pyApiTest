@@ -108,7 +108,7 @@ class APITestCases(EVCBase):
                                                                                 ClassType.REGULAR.value)
         assert_that(query_booking_history_response.status_code == 200)
 
-    @Test(tags='retired')
+    @Test(tags='qa,stg,live')
     def test_workflow(self):
         '''
         This workflow will run the following process:
@@ -270,7 +270,7 @@ class APITestCases(EVCBase):
         response = self.evc_service.get_recommended_class(hf_program_code, package_type)
         assert_that(response.status_code == 401)
 
-    @Test(tags='qa')
+    @Test(tags='qa,stg,live')
     def test_get_after_class_report(self):
         self.test_login()  # This login is used to for after method. we will change it in the future.
         self.evc_service.login(self.after_report_info["Student_User_Name"], self.after_report_info["Student_Password"])
@@ -281,7 +281,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("strengths"))
         assert_that(response.json(), match_to("suggestion"))
 
-    @Test(tags='qa')
+    @Test(tags='qa,stg,live')
     def test_book_class_error_code_with_not_enough_och(self):
         self.test_login()
         self.evc_service.login(user_name=self.user_with_zero_och["UserName"],
@@ -308,7 +308,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("status", book_response.json()) == 409)
         assert_that(jmespath.search("subStatus", book_response.json()) == 600)
 
-    @Test(tags='qa')
+    @Test(tags='qa,stg,live')
     def test_book_class_error_code_with_topic_not_found(self):
         self.test_login()
 
