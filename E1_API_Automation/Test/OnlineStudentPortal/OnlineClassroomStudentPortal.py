@@ -98,7 +98,7 @@ class APITestCases(EVCBase):
         assert_that(available_teachers_response.json(), match_to("[0].teacherId"))
 
     @Test(tags='qa, stg, live')
-    def test_get_online_class_booking(self):
+    def test_get_online_class_booking_history(self):
         self.test_login()
 
         student_profile_response = self.evc_service.get_user_profile()
@@ -207,7 +207,7 @@ class APITestCases(EVCBase):
         assert_that(query_booking_history_response.json(), match_to("[*].classStatus"))
 
     @Test(tags='qa, stg,live')
-    def test_get_online_student_book_structure(self):
+    def test_get_online_student_book_structure_hf_regular(self):
         self.test_login()
         response = self.evc_service.get_user_profile()
         hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', response.json())
@@ -224,7 +224,7 @@ class APITestCases(EVCBase):
             ["C", "D", "E", "F", "G", "H", "I", "J"]))
 
     @Test(tags='qa, stg,live')
-    def test_get_online_student_book_structure_hfv3plus(self):
+    def test_get_online_student_book_structure_hfv3plus_regular(self):
         self.test_login()
         lesson_structure_response = self.evc_service.get_course_lesson_structure('Regular', 'hfv3plus',
                                                                                  '20')
@@ -271,7 +271,7 @@ class APITestCases(EVCBase):
         assert_that(response.status_code == 401)
 
     @Test(tags='qa')
-    def get_after_class_report(self):
+    def test_get_after_class_report(self):
         self.test_login()  # This login is used to for after method. we will change it in the future.
         self.evc_service.login(self.after_report_info["Student_User_Name"], self.after_report_info["Student_Password"])
         response = self.evc_service.get_after_class_report(self.after_report_info['ClassId'])
@@ -279,19 +279,10 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("classId", response.json()) == int(self.after_report_info['ClassId']))
         assert_that(response.json(), match_to("improvement"))
         assert_that(response.json(), match_to("strengths"))
-
-    @Test(tags='qa,stg,live')
-    def test_get_after_class_report(self):
-        self.test_login()
-        class_id = self.after_report_info['ClassId']
-        response = self.evc_service.get_after_class_report(class_id)
-        assert_that(response.status_code == 200)
-        assert_that(response.json(), match_to("improvement"))
-        assert_that(response.json(), match_to("strengths"))
         assert_that(response.json(), match_to("suggestion"))
 
     @Test(tags='qa')
-    def book_class_error_code_with_not_enough_och(self):
+    def test_book_class_error_code_with_not_enough_och(self):
         self.test_login()
         self.evc_service.login(user_name=self.user_with_zero_och["UserName"],
                                 password=self.user_with_zero_och["Password"])
@@ -318,7 +309,7 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("subStatus", book_response.json()) == 600)
 
     @Test(tags='qa')
-    def book_class_error_code_with_not_topic(self):
+    def test_book_class_error_code_with_topic_not_found(self):
         self.test_login()
 
         student_profile_response = self.evc_service.get_user_profile()
@@ -342,21 +333,21 @@ class APITestCases(EVCBase):
         assert_that(jmespath.search("subStatus", book_response.json()) == 601)
 
     @Test(tags='qa,stg,live')
-    def cancel_class_error_code_with_wrong_class_id(self):
+    def test_cancel_class_error_code_with_class_id_not_found(self):
         self.test_login()
 
         response = self.evc_service.cancel_class("30789")
         assert_that(jmespath.search("status", response.json()) == 404)
 
     @Test(tags='qa,stg,live')
-    def save_policy_agreement(self):
+    def test_save_policy_agreement(self):
         self.test_login()
 
         response = self.evc_service.save_policy_agreement()
         assert_that(response.status_code == 204)
 
     @Test(tags='qa,stg,live')
-    def save_orientation_info(self):
+    def test_save_orientation_info(self):
         self.test_login()
         orientation_info = [
             {"courseType": "HF", "packageType": "24", "courseTypeLevelCode": "C", "isActive": True, "unitNumber": "1",
