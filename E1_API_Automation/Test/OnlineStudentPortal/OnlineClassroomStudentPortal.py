@@ -108,7 +108,7 @@ class APITestCases(EVCBase):
                                                                                 ClassType.REGULAR.value)
         assert_that(query_booking_history_response.status_code == 200)
 
-    @Test(tags='qa,stg,live')
+    @Test(tags='qa,stg')
     def test_workflow(self):
         '''
         This workflow will run the following process:
