@@ -37,13 +37,13 @@ class EVCBase():
 
     if os.environ["Start_Time"] == "Default":
         a = arrow.now()
-        start_time = arrow.now().shift(days=1, hours=1).format('YYYY-MM-DD hh:00:00')
+        start_time = arrow.now().shift(days=1, hours=1).format('YYYY-MM-DD HH:00:00')
 
     else:
         start_time = os.environ["Start_Time"]
 
     if os.environ["End_Time"] == "Default":
-        end_time = arrow.now().shift(days=1, hours=1).format('YYYY-MM-DD hh:30:00')
+        end_time = arrow.now().shift(days=1, hours=1).format('YYYY-MM-DD HH:30:00')
 
     else:
         end_time = os.environ["End_Time"]
