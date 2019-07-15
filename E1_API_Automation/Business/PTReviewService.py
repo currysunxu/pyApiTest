@@ -9,8 +9,9 @@ class PTReviewService:
         self.host = host
         self.mou_tai = Moutai(host=self.host)
 
-    def get_hf_all_books_url(self):
-        return self.mou_tai.get('/api/v2/HighflyersAllBooks')
+    def get_all_books_by_course(self, course_code):
+        # return self.mou_tai.get('/api/v2/HighflyersAllBooks')
+        return self.mou_tai.get('/api/v2/AllBooksByCourse/{0}'.format(course_code))
 
     def post_hf_student_pt_assess_metas(self, student_id, book_key):
         pt_user = {
@@ -34,9 +35,9 @@ class PTReviewService:
         }
         return self.mou_tai.post("/api/v2/StudentProgressTestAssessmentMetasGroupBySkill", pt_user)
 
-    def get_hf_all_books_from_db(self):
+    def get_all_books_by_course_from_db(self, course_code):
         ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')
-        return ms_sql_server.exec_query_return_dict_list(PTReviewSQLString.highflyers_all_books_sql)
+        return ms_sql_server.exec_query_return_dict_list(PTReviewSQLString.all_books_by_course_sql.format(course_code))
 
     def get_hf_pt_assessment_by_book_from_db(self, student_id, book_key):
         ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')

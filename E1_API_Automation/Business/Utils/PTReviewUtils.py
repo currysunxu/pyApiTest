@@ -1,15 +1,17 @@
 from E1_API_Automation.Business.PTSkillScore import PTSkillScore, SkillCode, SubSkillCode
 from hamcrest import assert_that
 from E1_API_Automation.Business.TPIService import TPIService
+from E1_API_Automation.Business.OMNIService import CourseGroupStatus, CourseGroupInfo
 from ...Settings import TPI_ENVIRONMENT
 import jmespath
 import datetime
 import random
+import json
 
 
 class PTReviewUtils:
     @staticmethod
-    def verify_hf_allbooks_api_db_result(api_response_json, db_query_result):
+    def verify_allbooks_by_course_api_db_result(api_response_json, db_query_result):
         # check if all the data return from API is consistent with DB
         error_message = ''
         time_format = '%Y-%m-%d %H:%M:%S.%f'
@@ -30,6 +32,9 @@ class PTReviewUtils:
                     actual_result = datetime.datetime.strptime(actual_result, '%Y-%m-%dT%H:%M:%S.%fZ')
                     actual_result = actual_result.strftime(time_format)
                     expected_result = expected_result.strftime(time_format)
+                elif key in ('Body'):
+                    if expected_result != '':
+                        expected_result = json.loads(expected_result)
 
                 if str(actual_result) != str(expected_result):
                     error_message = error_message + "List[" + i + "].key:" + key + \
@@ -186,7 +191,7 @@ class PTReviewUtils:
     '''
     @staticmethod
     def get_expected_pt_assessment_by_skill(student_pt_assessment_dict_list, from_db):
-        expected_pt_assessment_by_skill_list = []
+        expected_skill_score_list = []
         speaking_list = []
         writing_list = []
         speaking_code = SkillCode.Speaking.value
@@ -224,12 +229,8 @@ class PTReviewUtils:
                 else:
                     total_score = int(total_score)
 
-                expected_skill_pt_score_dict = PTReviewUtils.construct_expected_skill_pt_score_dict(skill_code, score,
-                                                                                                    total_score,
-                                                                                                    skill_pt_score,
-                                                                                                    from_db)
-
-                expected_pt_assessment_by_skill_list.append(expected_skill_pt_score_dict)
+                expected_skill_score = PTReviewUtils.construct_expected_skill_score(skill_code, score, total_score)
+                expected_skill_score_list.append(expected_skill_score)
 
         # get the expected pt assessment for speaking skill
         expected_speaking_pt_score_dict = PTReviewUtils.get_expected_pt_assessment_by_subskill(speaking_code,
@@ -239,7 +240,7 @@ class PTReviewUtils:
         if expected_speaking_pt_score_dict is None:
             return None
         else:
-            expected_pt_assessment_by_skill_list.append(expected_speaking_pt_score_dict)
+            expected_skill_score_list.append(expected_speaking_pt_score_dict)
 
         # get the expected pt assessment for writing skill
         expected_writing_pt_score_dict = PTReviewUtils.get_expected_pt_assessment_by_subskill(writing_code,
@@ -249,13 +250,14 @@ class PTReviewUtils:
         if expected_writing_pt_score_dict is None:
             return None
         else:
-            expected_pt_assessment_by_skill_list.append(expected_writing_pt_score_dict)
+            expected_skill_score_list.append(expected_writing_pt_score_dict)
 
-        # expected list should include all the enum codes
-        if len(expected_pt_assessment_by_skill_list) != SkillCode.__len__():
+        if len(expected_skill_score_list) != SkillCode.__len__():
             return None
         else:
-            return expected_pt_assessment_by_skill_list
+            return PTReviewUtils.construct_expected_skill_pt_score_result(student_pt_assessment_dict_list[0],
+                                                                          expected_skill_score_list,
+                                                                          from_db)
 
     '''
     get the expected pt assessment score by sub skill, for speaking and writing, the score and total score should be the 
@@ -294,18 +296,23 @@ class PTReviewUtils:
 
                 total_score = total_score + sub_total_score
 
-            one_sub_skill_dict = sub_skill_list[0]
-            expected_skill_pt_score_dict = PTReviewUtils.construct_expected_skill_pt_score_dict(skill_code, score,
-                                                                                                total_score,
-                                                                                                one_sub_skill_dict,
-                                                                                                from_db)
+            expected_skill_pt_score_dict = PTReviewUtils.construct_expected_skill_score(skill_code, score, total_score)
 
             return expected_skill_pt_score_dict
         else:
             return None
 
     @staticmethod
-    def construct_expected_skill_pt_score_dict(skill_code, score, total_score, skill_pt_score_dict, from_db):
+    def construct_expected_skill_score(skill_code, score, total_score):
+        expected_skill_score = {}
+        expected_skill_score["Code"] = skill_code
+        expected_skill_score["Score"] = score
+        expected_skill_score["TotalScore"] = total_score
+
+        return expected_skill_score
+
+    @staticmethod
+    def construct_expected_skill_pt_score_result(skill_pt_score_dict, expected_skill_score_list, from_db):
         expected_skill_pt_score_dict = {}
 
         if from_db:
@@ -317,9 +324,6 @@ class PTReviewUtils:
             pt_test_by = skill_pt_score_dict["PTTestBy"]
 
         expected_skill_pt_score_dict["StudentId"] = skill_pt_score_dict["StudentId"]
-        expected_skill_pt_score_dict["Code"] = skill_code
-        expected_skill_pt_score_dict["Score"] = score
-        expected_skill_pt_score_dict["TotalScore"] = total_score
         expected_skill_pt_score_dict["BookKey"] = skill_pt_score_dict["BookKey"]
         expected_skill_pt_score_dict["BookCode"] = skill_pt_score_dict["BookCode"]
         expected_skill_pt_score_dict["BookName"] = skill_pt_score_dict["BookName"]
@@ -328,6 +332,27 @@ class PTReviewUtils:
         expected_skill_pt_score_dict["UnitName"] = skill_pt_score_dict["UnitName"]
         expected_skill_pt_score_dict["PTTestBy"] = pt_test_by
 
+        # calculate the PTTotalScore
+        unit_total_accuracy = 0
+        unit_skill_count = 0
+        '''
+            calculate the unit total score, the formula is:
+            a. Accuracy of each skill = round((result * 100) / total)
+            b. PT total =  avg(accuracy of each skill)
+            check ticket E1SP-201 for the detailed info
+        '''
+        for expected_skill_score in expected_skill_score_list:
+            skill_score = expected_skill_score["Score"]
+            skill_total_score = expected_skill_score["TotalScore"]
+            skill_accuracy = PTReviewUtils.round_up((skill_score * 100) / skill_total_score)
+            unit_total_accuracy = unit_total_accuracy + skill_accuracy
+            unit_skill_count = unit_skill_count + 1
+
+        unit_total_score = PTReviewUtils.round_up(unit_total_accuracy / unit_skill_count)
+
+        expected_skill_pt_score_dict["PTTotalScore"] = unit_total_score
+        expected_skill_pt_score_dict["SkillScores"] = expected_skill_score_list
+
         return expected_skill_pt_score_dict
 
     @staticmethod
@@ -335,34 +360,53 @@ class PTReviewUtils:
         # check if all the data return from API is consistent with DB
         error_message = ''
 
-        # the API return skill length should be same as the expected enum length
-        if len(api_pt_assess_by_skill_json) != SkillCode.__len__():
-            error_message = "API skill list length not as expected;"
-            return error_message
+        for key in api_pt_assess_by_skill_json.keys():
+            if key != 'SkillScores':
+                actual_value = api_pt_assess_by_skill_json[key]
+                expected_value = expected_pt_assess_by_skill[key]
 
-        code_list = jmespath.search('[].Code', api_pt_assess_by_skill_json)
+                if str(actual_value) != str(expected_value):
+                    error_message = error_message + "key:" + key + \
+                                    "'s api value not equal to expected value, the value in API is:" \
+                                    + str(actual_value) + ", but the value expected is:" \
+                                    + str(expected_value) + ";"
+            else:
+                # the API return skill length should be same as the expected enum length
+                if len(api_pt_assess_by_skill_json["SkillScores"]) != SkillCode.__len__():
+                    error_message = "API SkillScores length not as expected;"
+                    return error_message
 
-        # skill code must be in the expected enum list
-        for skill_code in code_list:
-            if skill_code.capitalize() not in SkillCode._value2member_map_:
-                error_message = error_message + skill_code + " not in the expected skill code list;"
+                code_list = jmespath.search('SkillScores[].Code', api_pt_assess_by_skill_json)
 
-        if error_message != '':
-            return error_message
+                expected_code_list = [SkillCode.Grammar.value, SkillCode.Vocabulary.value, SkillCode.Listening.value,
+                                      SkillCode.Reading.value, SkillCode.Writing.value, SkillCode.Speaking.value]
 
-        for skill_pt_assess in api_pt_assess_by_skill_json:
-            for expected_skill_pt_assess in expected_pt_assess_by_skill:
-                if skill_pt_assess["Code"] == expected_skill_pt_assess["Code"]:
-                    for key in expected_skill_pt_assess.keys():
-                        actual_result = skill_pt_assess[key]
-                        expected_result = expected_skill_pt_assess[key]
+                # skill code must be in the expected enum list, and with order like E1SP-300 mentioned
+                for i in range(len(code_list)):
+                    actual_skill_code = code_list[i].capitalize()
+                    expected_skill_code = expected_code_list[i]
+                    if actual_skill_code != expected_skill_code:
+                        error_message = error_message + actual_skill_code \
+                                        + " not consistent with the expected skill code order or not " \
+                                          "in the expected code list;"
 
-                        if str(actual_result) != str(expected_result):
-                            error_message = error_message + "Code" + skill_pt_assess["Code"] + "'s key:" + key + \
-                                            "'s api result not equal to expected value, the result return in API is:" \
-                                            + str(actual_result) + ", but the value expected is:" \
-                                            + str(expected_result) + ";"
-                    break
+                if error_message != '':
+                    return error_message
+
+                for skill_score in api_pt_assess_by_skill_json["SkillScores"]:
+                    for expected_skill_score in expected_pt_assess_by_skill["SkillScores"]:
+                        if skill_score["Code"] == expected_skill_score["Code"]:
+                            for skill_score_key in expected_skill_score.keys():
+                                actual_result = skill_score[skill_score_key]
+                                expected_result = expected_skill_score[skill_score_key]
+
+                                if str(actual_result) != str(expected_result):
+                                    error_message = error_message + "Code" + skill_score["Code"] + "'s key:" + \
+                                                    skill_score_key + "'s api result not equal to expected value, " \
+                                                                      "the result return in API is:" \
+                                                    + str(actual_result) + ", but the value expected is:" \
+                                                    + str(expected_result) + ";"
+                            break
 
         return error_message
 
@@ -400,22 +444,7 @@ class PTReviewUtils:
             if unit_expected_pt_assessment_by_skill is None:
                 unit_total_score = None
             else:
-                unit_total_accuracy = 0
-                unit_skill_count = 0
-                '''
-                    calculate the unit total score, the formula is:
-                    a. Accuracy of each skill = round((result * 100) / total)
-                    b. PT total =  avg(accuracy of each skill)
-                    check ticket E1SP-201 for the detailed info
-                '''
-                for expected_pt_assessment_by_skill in unit_expected_pt_assessment_by_skill:
-                    skill_score = expected_pt_assessment_by_skill["Score"]
-                    skill_total_score = expected_pt_assessment_by_skill["TotalScore"]
-                    skill_accuracy = PTReviewUtils.round_up((skill_score * 100) / skill_total_score)
-                    unit_total_accuracy = unit_total_accuracy + skill_accuracy
-                    unit_skill_count = unit_skill_count + 1
-
-                unit_total_score = PTReviewUtils.round_up(unit_total_accuracy/unit_skill_count)
+                unit_total_score = unit_expected_pt_assessment_by_skill["PTTotalScore"]
 
             expected_pt_score_by_unit_dict = \
                 PTReviewUtils.construct_expected_pt_score_by_unit_dict(unit_total_score,
@@ -485,3 +514,92 @@ class PTReviewUtils:
                 error_message = error_message + "UnitKey" + actual_unit_key + " not exist in the expected list!"
 
         return error_message
+
+    @staticmethod
+    def get_expected_default_available_books(inprogress_groups_json):
+        hf_course_groups = jmespath.search("[?CourseType.Code == 'HF']", inprogress_groups_json)
+
+        hf_course_status_map = {}
+        all_course_list = []
+        for hf_course_group in hf_course_groups:
+            course_type_code = hf_course_group["CourseTypeLevel"]["Code"]
+            course_group_status = hf_course_group["GroupStatus"]["Name"]
+            is_current_group = hf_course_group["IsCurrentGroup"]
+
+            if course_group_status != CourseGroupStatus.Cancelled.value:
+                course_group = CourseGroupInfo(course_type_code, course_group_status, is_current_group)
+
+                if course_group_status in (CourseGroupStatus.Created.value, CourseGroupStatus.Pending.value):
+                    key = str(is_current_group) + "_" + CourseGroupStatus.Created.value + "_" \
+                          + CourseGroupStatus.Pending.value
+                else:
+                    key = str(is_current_group) + "_" + course_group_status
+
+                hf_course_status_map.setdefault(key, []).append(course_group)
+                all_course_list.append(course_group)
+
+        priority_first_key = str(True) + "_" + CourseGroupStatus.Activated.value
+        priority_second_key = str(True) + "_" + CourseGroupStatus.Completed.value
+        priority_third_key = str(False) + "_" + CourseGroupStatus.Activated.value
+        priority_forth_key = str(False) + "_" + CourseGroupStatus.Completed.value
+        priority_fifth_key = str(True) + "_" + CourseGroupStatus.Created.value + "_" \
+                             + CourseGroupStatus.Pending.value
+        priority_sixth_key = str(False) + "_" + CourseGroupStatus.Created.value + "_" \
+                             + CourseGroupStatus.Pending.value
+
+        default_course = None
+        if priority_first_key in hf_course_status_map.keys():
+            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_first_key], True)
+        elif priority_second_key in hf_course_status_map.keys():
+            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_second_key], True)
+        elif priority_third_key in hf_course_status_map.keys():
+            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_third_key], True)
+        elif priority_forth_key in hf_course_status_map.keys():
+            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_forth_key], True)
+        elif priority_fifth_key in hf_course_status_map.keys():
+            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_fifth_key], False)
+        elif priority_sixth_key in hf_course_status_map.keys():
+            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_sixth_key], False)
+
+        if default_course is not None:
+            default_course.set_is_default_course(True)
+
+        return all_course_list
+
+    @staticmethod
+    def get_default_course(course_group_list, is_get_highest):
+        default_course = course_group_list[0]
+        for i in range(1, len(course_group_list)):
+            if is_get_highest:
+                if default_course.courseTypeCode < course_group_list[i].courseTypeCode:
+                    default_course = course_group_list[i]
+            else:
+                if default_course.courseTypeCode > course_group_list[i].courseTypeCode:
+                    default_course = course_group_list[i]
+        return default_course
+
+    @staticmethod
+    def verify_enrolled_groups_with_state(default_available_course_api_json, expected_course_list):
+        error_message = ''
+
+        if len(default_available_course_api_json) != len(expected_course_list):
+            error_message = "the actual result list length return from EnrolledGroupsWithState API are not expected!"
+
+        for actual_course in default_available_course_api_json:
+            product_code = actual_course["ProductLevelCode"]
+            is_default = actual_course["IsDefaultProductLevel"]
+            is_course_exist = False
+            for expected_course in expected_course_list:
+                expected_course_code = expected_course.courseTypeCode
+                if product_code == expected_course_code:
+                    is_course_exist = True
+                    if str(is_default) != str(expected_course.isDefaultCourse):
+                        error_message = error_message + product_code + "'s IsDefaultProductLevel value not as expected!"
+
+                    break
+
+            if not is_course_exist:
+                error_message = error_message + product_code + " not exist in the expected list!"
+
+        return error_message
+
