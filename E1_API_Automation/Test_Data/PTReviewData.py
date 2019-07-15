@@ -1,9 +1,17 @@
 class PTReviewSQLString:
-    highflyers_all_books_sql = "select CreatedBy, CreatedStamp, LastUpdatedBy, LastUpdatedStamp, [State], ActivityKeys, " \
-                               "[Key], ContentKey, [Name], ParentNodeKey, TopNodeKey, Code, Theme, [Type], [Level], " \
-                               "CoursePlanKey, [Sequence], Title, SubTitle, [Description], Body " \
-                               "from [OnlineSchoolPlatform].[dbo].[view_CourseNodeV2] " \
-                               "where parentNodeKey = (select courseKey from [OnlineSchoolPlatform].[dbo].CourseNodeSnapshot where [name] = 'High Flyers' ) order by [sequence]"
+    # highflyers_all_books_sql = "select CreatedBy, CreatedStamp, LastUpdatedBy, LastUpdatedStamp, [State], ActivityKeys, " \
+    #                            "[Key], ContentKey, [Name], ParentNodeKey, TopNodeKey, Code, Theme, [Type], [Level], " \
+    #                            "CoursePlanKey, [Sequence], Title, SubTitle, [Description], Body " \
+    #                            "from [OnlineSchoolPlatform].[dbo].[view_CourseNodeV2] " \
+    #                            "where parentNodeKey = (select courseKey from [OnlineSchoolPlatform].[dbo].CourseNodeSnapshot where [name] = 'High Flyers' ) order by [sequence]"
+
+    all_books_by_course_sql = "select CreatedBy, CreatedStamp, LastUpdatedBy, LastUpdatedStamp, [State], ActivityKeys, " \
+                              "[Key], ContentKey, [Name], ParentNodeKey, TopNodeKey, Code, Theme, [Type], [Level], " \
+                              "CoursePlanKey, [Sequence], Title, SubTitle, [Description], Body " \
+                              "from [OnlineSchoolPlatform].[dbo].[view_CourseNodeV2] " \
+                              "where parentNodeKey = (select courseKey from [OnlineSchoolPlatform].[dbo].CourseNodeSnapshot where [Code] = '{0}') " \
+                              "and level =2 " \
+                              "order by [sequence]"
 
     hf_pt_assessment_sql = "select a.StudentId, a.Code, a.TestInstanceKey,a.OriginalScore,a.OverwrittenScore, " \
                                 "a.TotalScore,b.BookKey, b.BookCode, b. BookName, b.UnitKey, b.UnitCode, b.UnitName " \
@@ -41,4 +49,25 @@ class PTReviewData:
                 'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
             }
         }
+    }
+
+    ptr_hf_user = {
+        'QA':
+            [{'username': 'hfDefBKTest.Mul.Activated', 'password': '12345'},
+             {'username': 'hfDefBKTest.Mul.Completed', 'password': '12345'},
+             {'username': 'hfDefBKTest.false.Mul.Activated', 'password': '12345'},
+             {'username': 'hfDefBKTest.false.Mul.Completed', 'password': '12345'},
+             {'username': 'hfDefBKTest.Mul.Created', 'password': '12345'},
+             {'username': 'hfDefBKTest.false.Mul.Created', 'password': '12345'},
+             {'username': 'hfDefBKTest.Sig.Created', 'password': '12345'},
+             {'username': 'hfDefBKTest.false.Sig.Activated', 'password': '12345'},
+             {'username': 'hfDefBKTest.false.Sig.Completed', 'password': '12345'},
+             {'username': 'hfDefBKTest.false.Sig.Created', 'password': '12345'},
+             {'username': 'hfDefBKTest.false.Sig.Pending', 'password': '12345'},
+             {'username': 'hfDefBKTest.Cancelled', 'password': '12345'},
+             {'username': 'hfDefBKTest.Mix.Pending', 'password': '12345'},
+             {'username': 'hfDefBKTest.false.Mix.Pending', 'password': '12345'},
+             {'username': 'ptReviewTest02', 'password': '12345'},
+             {'username': 'hf2.cn.02', 'password': '12345'}
+            ]
     }

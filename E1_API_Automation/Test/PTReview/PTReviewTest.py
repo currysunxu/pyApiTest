@@ -2,7 +2,8 @@ from ptest.decorator import TestClass, Test
 from E1_API_Automation.Business.PTReviewService import PTReviewService
 from E1_API_Automation.Business.Utils.PTReviewUtils import PTReviewUtils
 from E1_API_Automation.Business.TPIService import TPIService
-from ...Settings import OSP_ENVIRONMENT, TPI_ENVIRONMENT, env_key
+from E1_API_Automation.Business.OMNIService import OMNIService
+from ...Settings import OSP_ENVIRONMENT, TPI_ENVIRONMENT, OMNI_ENVIRONMENT, env_key
 from ...Test_Data.PTReviewData import PTReviewData
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Business.PTSkillScore import SkillCode, SubSkillCode
@@ -15,26 +16,38 @@ import json
 class PTReviewTestCases:
 
     @Test(tags="qa, stg, live")
-    def test_get_hf_all_books(self):
+    def test_get_all_books_by_course(self):
         pt_review_service = PTReviewService(OSP_ENVIRONMENT)
-        response = pt_review_service.get_hf_all_books_url()
-        api_response_json = response.json()
-        code_list = jmespath.search('[].Code', api_response_json)
+        # verify all the three courses
+        course_code_list = ['highflyers', 'frontrunner', 'TB']
+        for course_code in course_code_list:
+            print("Verify course:" + course_code)
+            response = pt_review_service.get_all_books_by_course(course_code)
+            assert_that(response.status_code == 200)
+            api_response_json = response.json()
+            code_list = jmespath.search('[].Code', api_response_json)
 
-        expected_code_list = ['HFC', 'HFD', 'HFE', 'HFF', 'HFG', 'HFH', 'HFI', 'HFJ']
-        assert_that(code_list == expected_code_list, "Code returned is not as expected.")
+            if course_code == 'highflyers':
+                expected_code_list = ['HFC', 'HFD', 'HFE', 'HFF', 'HFG', 'HFH', 'HFI', 'HFJ']
+                assert_that(code_list == expected_code_list, "HF code returned is not as expected.")
+            elif course_code == 'frontrunner':
+                assert_that(len(api_response_json) == 16, "frontrunner return list length should be 16")
+            elif course_code == 'TB':
+                expected_code_list = ['TBv3Bk1', 'TBv3Bk2', 'TBv3Bk3', 'TBv3Bk4', 'TBv3Bk5', 'TBv3Bk6', 'TBv3Bk7',
+                                      'TBv3Bk8']
+                assert_that(code_list == expected_code_list, "TB code returned is not as expected.")
 
-        # if it's not Live environment, then do the rest verification with DB
-        if not EnvUtils.is_env_live():
-            # get the result from DB
-            db_query_result = pt_review_service.get_hf_all_books_from_db()
+            # if it's not Live environment, then do the rest verification with DB
+            if not EnvUtils.is_env_live():
+                # get the result from DB
+                db_query_result = pt_review_service.get_all_books_by_course_from_db(course_code)
 
-            # the list length should be equal for the response list and DB list
-            assert_that(len(api_response_json) == len(db_query_result))
+                # the list length should be equal for the response list and DB list
+                assert_that(len(api_response_json) == len(db_query_result))
 
-            # check if all the data return from API is consistent with DB
-            error_message = PTReviewUtils.verify_hf_allbooks_api_db_result(api_response_json, db_query_result)
-            assert_that(error_message == '', error_message)
+                # check if all the data return from API is consistent with DB
+                error_message = PTReviewUtils.verify_allbooks_by_course_api_db_result(api_response_json, db_query_result)
+                assert_that(error_message == '', error_message)
 
     '''
     test the OmniProgressTestAssessment API, verify if the score have been saved correctly
@@ -249,5 +262,26 @@ class PTReviewTestCases:
 
         # make all the data valid after test
         PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
+
+    @Test(tags="qa, stg")
+    def test_enrolled_groups_with_state_api(self):
+        omni_service = OMNIService(OMNI_ENVIRONMENT)
+        tpi_service = TPIService(TPI_ENVIRONMENT)
+        customer_list = PTReviewData.ptr_hf_user[env_key]
+        for customer in customer_list:
+            user_name = customer["username"]
+            password = customer["password"]
+            print("Verify user:" + user_name)
+            customer_id = omni_service.get_customer_id(user_name, password)
+            inprogressgroups_response = omni_service.get_customer_inprogressgroups(customer_id)
+            expected_course_list = PTReviewUtils.get_expected_default_available_books(inprogressgroups_response.json())
+            actual_default_available_course_result = tpi_service.get_enrolled_groups_with_state(customer_id)
+            assert_that(actual_default_available_course_result.status_code == 200)
+            error_message = \
+                PTReviewUtils.verify_enrolled_groups_with_state(actual_default_available_course_result.json(),
+                                                                expected_course_list)
+            assert_that(error_message == '', user_name + "'s verification failed:" + error_message)
+
+
 
 
