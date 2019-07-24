@@ -121,13 +121,14 @@ class GPAPITestCases(GrammarProBaseClass):
     def test_available_grade(self):
         self.gptest.login(GP_user.GPUsers[env_key]['username'], GP_user.GPUsers[env_key]['password'])
         city_list = {}
-        if GP_user.GPUsers[env_key]['culture_code'] == 'zh-CN':
+        culture_code = GP_user.GPUsers[env_key]['culture_code']
+        if culture_code == 'zh-CN':
             city_list = EducationRegion.cn_city_list
-        elif GP_user.GPUsers[env_key]['culture_code'] == 'id-ID':
+        elif culture_code == 'id-ID':
             city_list = EducationRegion.id_city_list
 
         for city_name in city_list:
-            available_grade = self.gptest.get_available_grade(city_list[city_name])
+            available_grade = self.gptest.get_available_grade(city_list[city_name], culture_code)
             assert_that(available_grade.json(), match_to("[*].Grade.Key"))
 
     @Test()
@@ -190,6 +191,8 @@ class GPAPITestCases(GrammarProBaseClass):
         self.gptest.finish_not_first_dt(2)
         new_module_list = self.gptest.get_new_recommend_module()
         expected_new_module_list = self.gptest.get_new_recommended_module(2)
+        new_module_list.sort()
+        expected_new_module_list.sort()
         assert new_module_list == expected_new_module_list
 
     @Test()
