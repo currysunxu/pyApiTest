@@ -36,6 +36,13 @@ class PTReviewData:
                     'UnitKey': '1EC56EC1-A123-4B47-9057-96BE3EE7534D'
                     }
                 },
+        'Staging_SG': {
+            '10106831': {
+                'TestPrimaryKey': '1B026C66-6ED0-440D-99BF-998507061E28',
+                'BookKey': '0A5BF162-8FEA-4A22-80B5-9D18C704AD80',
+                'UnitKey': '994AFEC8-F395-4FDC-83E4-5CFF2F22F28C'
+            }
+        },
         'Live': {
             '100201088': {
                 'TestPrimaryKey': '', # no need to set TestPrimaryKey for live data

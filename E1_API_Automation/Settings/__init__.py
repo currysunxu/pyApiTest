@@ -28,6 +28,7 @@ class TPIEnvironment(object):
 class AuthEnvironment(object):
     QA = "https://auth-svc-qa.ef.cn"
     STAGING = "https://auth-svc-stg.ef.cn"
+    STAGING_SG = "https://auth-svc-stg.ef.com"
     LIVE = "https://auth-svc.ef.cn"
 
 
@@ -73,6 +74,8 @@ elif os.environ['environment'] == 'STG_SG':
     ENVIRONMENT = Environment.STAGING_SG
     OSP_ENVIRONMENT = OSPEnvironment.STAGING_SG
     TPI_ENVIRONMENT = TPIEnvironment.STAGING_SG
+    AUTH_ENVIRONMENT = AuthEnvironment.STAGING_SG
+    OMNI_ENVIRONMENT = OMNIEnvironment.STAGING
     env_key = 'Staging_SG'
     DATABASE = {
         "Server": "SGE1STGDB01.e1ef.com,1434",
