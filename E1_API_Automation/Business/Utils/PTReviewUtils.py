@@ -316,12 +316,16 @@ class PTReviewUtils:
         expected_skill_pt_score_dict = {}
 
         if from_db:
+            pt_key = skill_pt_score_dict["TestPrimaryKey"]
             if skill_pt_score_dict["TestInstanceKey"] is None:
                 pt_test_by = 0
             else:
                 pt_test_by = 1
         else:
             pt_test_by = skill_pt_score_dict["PTTestBy"]
+            # if it's live env, there's no such field in the StudentPaperDigitalProgressTestAssessmentMetas API,
+            # so, can't get this value for verification
+            pt_key = ""
 
         expected_skill_pt_score_dict["StudentId"] = skill_pt_score_dict["StudentId"]
         expected_skill_pt_score_dict["BookKey"] = skill_pt_score_dict["BookKey"]
@@ -330,6 +334,7 @@ class PTReviewUtils:
         expected_skill_pt_score_dict["UnitKey"] = skill_pt_score_dict["UnitKey"]
         expected_skill_pt_score_dict["UnitCode"] = skill_pt_score_dict["UnitCode"]
         expected_skill_pt_score_dict["UnitName"] = skill_pt_score_dict["UnitName"]
+        expected_skill_pt_score_dict["PTKey"] = pt_key
         expected_skill_pt_score_dict["PTTestBy"] = pt_test_by
 
         # calculate the PTTotalScore
@@ -365,11 +370,15 @@ class PTReviewUtils:
                 actual_value = api_pt_assess_by_skill_json[key]
                 expected_value = expected_pt_assess_by_skill[key]
 
-                if str(actual_value) != str(expected_value):
-                    error_message = error_message + "key:" + key + \
-                                    "'s api value not equal to expected value, the value in API is:" \
-                                    + str(actual_value) + ", but the value expected is:" \
-                                    + str(expected_value) + ";"
+                if key == 'PTKey' and expected_value == '':
+                    if str(actual_value) is None or str(actual_value) == '':
+                        error_message = error_message + "PTKey's value in Live Env should not be None;"
+                else:
+                    if str(actual_value) != str(expected_value):
+                        error_message = error_message + "key:" + key + \
+                                        "'s api value not equal to expected value, the value in API is:" \
+                                        + str(actual_value) + ", but the value expected is:" \
+                                        + str(expected_value) + ";"
             else:
                 # the API return skill length should be same as the expected enum length
                 if len(api_pt_assess_by_skill_json["SkillScores"]) != SkillCode.__len__():

@@ -3,6 +3,7 @@ from enum import Enum
 from E1_API_Automation.Settings import DATABASE
 from ..Lib.db_mssql import MSSQLHelper
 from E1_API_Automation.Test_Data.AuthData import AuthSQLString
+import jmespath
 
 
 class AuthService:
@@ -19,7 +20,8 @@ class AuthService:
         }
 
         athentication_result = self.mou_tai.set_request_context("post", user_info, "/api/v1/auth/login")
-        self.mou_tai.headers['X-EF-TOKEN'] = athentication_result.text
+        idToken = jmespath.search('idToken', athentication_result.json())
+        self.mou_tai.headers['X-EF-TOKEN'] = idToken
         return athentication_result
 
     def sign_out(self):
