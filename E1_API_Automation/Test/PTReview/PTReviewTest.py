@@ -19,7 +19,7 @@ class PTReviewTestCases:
     def test_get_all_books_by_course(self):
         pt_review_service = PTReviewService(OSP_ENVIRONMENT)
         # verify all the three courses
-        course_code_list = ['highflyers', 'frontrunner', 'TB']
+        course_code_list = ['highflyers', 'frontrunner', 'trailblazers']
         for course_code in course_code_list:
             print("Verify course:" + course_code)
             response = pt_review_service.get_all_books_by_course(course_code)
@@ -32,7 +32,9 @@ class PTReviewTestCases:
                 assert_that(code_list == expected_code_list, "HF code returned is not as expected.")
             elif course_code == 'frontrunner':
                 assert_that(len(api_response_json) == 16, "frontrunner return list length should be 16")
-            elif course_code == 'TB':
+            elif course_code == 'trailblazers':
+                # the value will be used in DB query
+                course_code = 'TB'
                 expected_code_list = ['TBv3Bk1', 'TBv3Bk2', 'TBv3Bk3', 'TBv3Bk4', 'TBv3Bk5', 'TBv3Bk6', 'TBv3Bk7',
                                       'TBv3Bk8']
                 assert_that(code_list == expected_code_list, "TB code returned is not as expected.")

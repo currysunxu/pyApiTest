@@ -7,7 +7,7 @@ class PTReviewSQLString:
                               "and level =2 " \
                               "order by [sequence]"
 
-    hf_pt_assessment_sql = "select a.StudentId, a.Code, a.TestInstanceKey,a.OriginalScore,a.OverwrittenScore, " \
+    hf_pt_assessment_sql = "select a.StudentId, a.Code, a.TestInstanceKey,a.TestPrimaryKey, a.OriginalScore,a.OverwrittenScore, " \
                                 "a.TotalScore,b.BookKey, b.BookCode, b. BookName, b.UnitKey, b.UnitCode, b.UnitName " \
                                 "from OnlineSchoolPlatform.dbo.TestAssessmentMeta a " \
                                 "inner join OnlineSchoolPlatform.dbo.ProgressTestUnitIndexBookIndex b " \
@@ -45,6 +45,13 @@ class PTReviewData:
         },
         'Live': {
             '100201088': {
+                'TestPrimaryKey': '', # no need to set TestPrimaryKey for live data
+                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
+            }
+        },
+        'Live_SG': {
+            '100101406': {
                 'TestPrimaryKey': '', # no need to set TestPrimaryKey for live data
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'

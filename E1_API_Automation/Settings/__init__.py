@@ -100,6 +100,8 @@ elif os.environ['environment'] == 'LIVE':
 elif os.environ['environment'] == 'LIVE_SG':
     ENVIRONMENT = Environment.LIVE_SG
     OSP_ENVIRONMENT = OSPEnvironment.LIVE_SG
+    TPI_ENVIRONMENT = TPIEnvironment.LIVE_SG
+    OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
     env_key = 'Live_SG'
     DATABASE = {
         "Server": "",
