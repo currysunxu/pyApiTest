@@ -525,50 +525,31 @@ class PTReviewUtils:
         return error_message
 
     @staticmethod
-    def get_expected_default_available_books(inprogress_groups_json):
-        hf_course_groups = jmespath.search("[?CourseType.Code == 'HF']", inprogress_groups_json)
+    def get_expected_default_available_books(groups_json):
+        hf_course_groups = jmespath.search("groups[?program == 'High Flyers']", groups_json)
 
         hf_course_status_map = {}
         all_course_list = []
         for hf_course_group in hf_course_groups:
-            course_type_code = hf_course_group["CourseTypeLevel"]["Code"]
-            course_group_status = hf_course_group["GroupStatus"]["Name"]
-            is_current_group = hf_course_group["IsCurrentGroup"]
+            course_type_code = 'HF'+ hf_course_group["programLevel"]
+            course_group_status = hf_course_group["status"]
+            is_current_group = False
 
-            if course_group_status != CourseGroupStatus.Cancelled.value:
+            if course_group_status in (CourseGroupStatus.Past.value, CourseGroupStatus.Current.value):
                 course_group = CourseGroupInfo(course_type_code, course_group_status, is_current_group)
 
-                if course_group_status in (CourseGroupStatus.Created.value, CourseGroupStatus.Pending.value):
-                    key = str(is_current_group) + "_" + CourseGroupStatus.Created.value + "_" \
-                          + CourseGroupStatus.Pending.value
-                else:
-                    key = str(is_current_group) + "_" + course_group_status
-
-                hf_course_status_map.setdefault(key, []).append(course_group)
+                hf_course_status_map.setdefault(course_group_status, []).append(course_group)
                 all_course_list.append(course_group)
 
-        priority_first_key = str(True) + "_" + CourseGroupStatus.Activated.value
-        priority_second_key = str(True) + "_" + CourseGroupStatus.Completed.value
-        priority_third_key = str(False) + "_" + CourseGroupStatus.Activated.value
-        priority_forth_key = str(False) + "_" + CourseGroupStatus.Completed.value
-        priority_fifth_key = str(True) + "_" + CourseGroupStatus.Created.value + "_" \
-                             + CourseGroupStatus.Pending.value
-        priority_sixth_key = str(False) + "_" + CourseGroupStatus.Created.value + "_" \
-                             + CourseGroupStatus.Pending.value
+        priority_first_key = CourseGroupStatus.Current.value
+        priority_second_key = CourseGroupStatus.Past.value
 
         default_course = None
         if priority_first_key in hf_course_status_map.keys():
             default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_first_key], True)
         elif priority_second_key in hf_course_status_map.keys():
             default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_second_key], True)
-        elif priority_third_key in hf_course_status_map.keys():
-            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_third_key], True)
-        elif priority_forth_key in hf_course_status_map.keys():
-            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_forth_key], True)
-        elif priority_fifth_key in hf_course_status_map.keys():
-            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_fifth_key], False)
-        elif priority_sixth_key in hf_course_status_map.keys():
-            default_course = PTReviewUtils.get_default_course(hf_course_status_map[priority_sixth_key], False)
+
 
         if default_course is not None:
             default_course.set_is_default_course(True)
@@ -593,6 +574,7 @@ class PTReviewUtils:
 
         if len(default_available_course_api_json) != len(expected_course_list):
             error_message = "the actual result list length return from EnrolledGroupsWithState API are not expected!"
+            return error_message
 
         for actual_course in default_available_course_api_json:
             product_code = actual_course["ProductLevelCode"]

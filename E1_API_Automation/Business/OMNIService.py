@@ -23,6 +23,9 @@ class OMNIService:
     def get_customer_inprogressgroups(self, customer_id):
         return self.mou_tai.get("/api/v1/customer/{0}/inprogressgroups".format(customer_id))
 
+    def get_customer_groups(self, customer_id):
+        return self.mou_tai.get("/api/v1/customer/{0}/groups".format(customer_id))
+
 
 class CourseGroupInfo:
     def __init__(self, course_type_code, group_status, is_current_group, is_default=False):
@@ -41,3 +44,6 @@ class CourseGroupStatus(Enum):
     Created = 'Created'
     Pending = 'Pending'
     Cancelled = 'Cancelled'
+    Current = 'current'
+    Past = 'past'
+    Future = 'future'

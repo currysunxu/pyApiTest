@@ -61,21 +61,11 @@ class PTReviewData:
 
     ptr_hf_user = {
         'QA':
-            [{'username': 'hfDefBKTest.Mul.Activated', 'password': '12345'},
-             {'username': 'hfDefBKTest.Mul.Completed', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Mul.Activated', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Mul.Completed', 'password': '12345'},
-             {'username': 'hfDefBKTest.Mul.Created', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Mul.Created', 'password': '12345'},
-             {'username': 'hfDefBKTest.Sig.Created', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Sig.Activated', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Sig.Completed', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Sig.Created', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Sig.Pending', 'password': '12345'},
-             {'username': 'hfDefBKTest.Cancelled', 'password': '12345'},
-             {'username': 'hfDefBKTest.Mix.Pending', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Mix.Pending', 'password': '12345'},
-             {'username': 'ptReviewTest02', 'password': '12345'},
-             {'username': 'hf2.cn.02', 'password': '12345'}
+            [{'username': 'ptReviewTest_PastCurrent', 'password': '12345'},
+             {'username': 'ptReviewTest_Past', 'password': '12345'},
+             {'username': 'ptReviewTest_FutureInvalid', 'password': '12345'},
+             {'username': 'ptReviewTest_MixSSHF', 'password': '12345'},
+             {'username': 'ptReviewTest_OneCurrent', 'password': '12345'},
+             {'username': 'ptReviewTest01', 'password': '12345'},
             ]
     }

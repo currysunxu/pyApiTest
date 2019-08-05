@@ -275,15 +275,13 @@ class PTReviewTestCases:
             password = customer["password"]
             print("Verify user:" + user_name)
             customer_id = omni_service.get_customer_id(user_name, password)
-            inprogressgroups_response = omni_service.get_customer_inprogressgroups(customer_id)
-            expected_course_list = PTReviewUtils.get_expected_default_available_books(inprogressgroups_response.json())
-            actual_default_available_course_result = tpi_service.get_enrolled_groups_with_state(customer_id)
+            groups_response = omni_service.get_customer_groups(customer_id)
+            expected_course_list = PTReviewUtils.get_expected_default_available_books(groups_response.json())
+            actual_default_available_course_result = tpi_service.post_enrolled_groups_with_state(customer_id, 'highflyers')
             assert_that(actual_default_available_course_result.status_code == 200)
             error_message = \
                 PTReviewUtils.verify_enrolled_groups_with_state(actual_default_available_course_result.json(),
                                                                 expected_course_list)
             assert_that(error_message == '', user_name + "'s verification failed:" + error_message)
-
-
 
 
