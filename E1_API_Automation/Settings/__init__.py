@@ -2,7 +2,7 @@ import os
 
 
 class Environment(object):
-    QA = "http://e1svc-qa.ef.cn"
+    QA = "https://e1svc-qa.ef.cn"
     STAGING = "https://e1svc-staging.ef.cn"
     LIVE = "https://e1svc.ef.cn"
     STAGING_SG = "https://e1svc-staging.ef.com"

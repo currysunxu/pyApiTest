@@ -2,7 +2,9 @@ from E1_API_Automation.Business.PTSkillScore import PTSkillScore, SkillCode, Sub
 from hamcrest import assert_that
 from E1_API_Automation.Business.TPIService import TPIService
 from E1_API_Automation.Business.OMNIService import CourseGroupStatus, CourseGroupInfo
-from ...Settings import TPI_ENVIRONMENT
+from E1_API_Automation.Business.PTReviewService import PTReviewService
+from E1_API_Automation.Business.OSPService import OSPService
+from ...Settings import TPI_ENVIRONMENT, OSP_ENVIRONMENT
 import jmespath
 import datetime
 import random
@@ -420,7 +422,7 @@ class PTReviewUtils:
         return error_message
 
     @staticmethod
-    def update_score_as_null(pt_review_service, student_id, test_primary_key, skill_subskill_code, is_total_score):
+    def update_score_as_null(student_id, test_primary_key, skill_subskill_code, is_total_score):
         print("Checking code:" + skill_subskill_code + " for is_total_score:" + str(is_total_score))
         # make sure all the score have value at first
         PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
@@ -428,9 +430,9 @@ class PTReviewUtils:
         # if one skill or sub skill's TotalScore is null or if original score and overwritten score are both null,
         # then the api will return 409
         if is_total_score:
-            pt_review_service.update_pt_assessment_total_score(student_id, test_primary_key, skill_subskill_code)
+            PTReviewService.update_pt_assessment_total_score(student_id, test_primary_key, skill_subskill_code)
         else:
-            pt_review_service.update_pt_assessment_original_overwritten_score(student_id, test_primary_key,
+            PTReviewService.update_pt_assessment_original_overwritten_score(student_id, test_primary_key,
                                                                               skill_subskill_code)
 
     @staticmethod
@@ -594,3 +596,225 @@ class PTReviewUtils:
 
         return error_message
 
+    @staticmethod
+    def verify_resource_url(actual_resource_json, resource_list):
+        error_message = ''
+
+        if len(actual_resource_json) != len(resource_list):
+            error_message = "the actual result list length return from Resource/Batch API are not expected!"
+            return error_message
+
+        for actual_resource_url in actual_resource_json:
+            actual_identifier = actual_resource_url["Identifier"]
+            actual_credential_Uri = actual_resource_url["CredentialUri"]
+
+            expected_url = '.amazonaws.com.cn/'+actual_identifier
+            is_resource_exist = False
+
+            if actual_identifier in resource_list and expected_url in actual_credential_Uri:
+                is_resource_exist = True
+
+            if not is_resource_exist:
+                error_message = error_message + actual_identifier + " not exist in the expected list!"
+
+        return error_message
+
+    @staticmethod
+    def get_expected_ptr_bff_result_skill_level(api_pt_assess_by_skill_json):
+        expected_ptr_result_by_skill = {}
+        expected_ptr_result_by_skill['id'] = api_pt_assess_by_skill_json['UnitKey']
+        expected_ptr_result_by_skill['name'] = api_pt_assess_by_skill_json['UnitName']
+        expected_ptr_result_by_skill['bookName'] = api_pt_assess_by_skill_json['BookName']
+        expected_ptr_result_by_skill['ptKey'] = api_pt_assess_by_skill_json['PTKey']
+
+        if api_pt_assess_by_skill_json['PTTestBy'] == 0:
+            test_type = 'paper'
+        elif api_pt_assess_by_skill_json['PTTestBy'] == 0:
+            test_type = 'digital'
+
+        expected_ptr_result_by_skill['type'] = test_type
+
+        invalid = False
+        if api_pt_assess_by_skill_json['PTTotalScore'] is None:
+            invalid = True
+
+        expected_ptr_result_by_skill['invalid'] = invalid
+        expected_ptr_result_by_skill['score'] = api_pt_assess_by_skill_json['PTTotalScore']
+
+        skill_score_list = api_pt_assess_by_skill_json['SkillScores']
+        ptr_skills = []
+
+        for i in range(len(skill_score_list)):
+            ptr_skill = {}
+            ptr_skill_type = {}
+            ptr_skill_result = {}
+            skill_score = skill_score_list[i]
+            ptr_skill_type['id'] = skill_score['Code']
+            ptr_skill_type['name'] = skill_score['Code']
+            ptr_skill_result['score'] = skill_score['Score']
+            ptr_skill_result['totalScore'] = skill_score['TotalScore']
+            ptr_skill['type'] = ptr_skill_type
+            ptr_skill['result'] = ptr_skill_result
+
+            ptr_skills.append(ptr_skill)
+        expected_ptr_result_by_skill['skills'] = ptr_skills
+        return expected_ptr_result_by_skill
+
+    # verify pt review bff result for skill level body
+    @staticmethod
+    def verify_ptr_bff_graphql_skill_level(ptr_bff_graphql_response_json, expected_ptr_result_by_skill):
+        actual_ptr_bff_graphql_result_by_skill = ptr_bff_graphql_response_json['data']['test']
+
+        error_message = ''
+        for key in actual_ptr_bff_graphql_result_by_skill.keys():
+            actual_value = actual_ptr_bff_graphql_result_by_skill[key]
+            expected_value = expected_ptr_result_by_skill[key]
+
+            if key != 'skills':
+                if key == 'score':
+                    actual_value = int(actual_value)
+
+                if str(actual_value) != str(expected_value):
+                    error_message = error_message + " Key:" + key + \
+                                    "'s api result not equal to expected value, the result return in API is:" \
+                                    + str(actual_value) + ", but the value expected is:" \
+                                    + str(expected_value) + ";"
+            else:
+                if len(actual_value) != len(expected_value):
+                    error_message = error_message + " skills result length not as expected!"
+                else:
+                    for i in range(len(actual_value)):
+                        actual_skill = actual_value[i]
+                        expected_skill = expected_value[i]
+
+                        for skill_key in actual_skill.keys():
+                            for sub_key in actual_skill[skill_key].keys():
+                                actual_value_in_skill = actual_skill[skill_key][sub_key]
+                                expected_value_in_skill = expected_skill[skill_key][sub_key]
+                                if 'score' in sub_key.lower():
+                                    actual_value_in_skill = int(actual_value_in_skill)
+
+                                if str(actual_value_in_skill) != str(expected_value_in_skill):
+                                    error_message = error_message + " Key:" + skill_key + "[" + sub_key + "]" + \
+                                                    "'s api result not equal to expected value, the result return in API is:" \
+                                                    + str(actual_value_in_skill) + ", but the value expected is:" \
+                                                    + str(expected_value_in_skill) + ";"
+        return error_message
+
+    # get expected pt review bff result by unit level body
+    @staticmethod
+    def get_expected_ptr_bff_result_unit_level(student_id, course, book_key):
+        osp_service = OSPService(OSP_ENVIRONMENT)
+        tpi_service = TPIService(TPI_ENVIRONMENT)
+        if course == 'HF':
+            course = 'highflyers'
+
+        response = osp_service.get_all_books_by_course(course)
+        book_info_json = response.json()
+
+        default_available_course_result = tpi_service.post_enrolled_groups_with_state(student_id, course)
+
+        api_pt_assess_by_unit_response = osp_service.post_hf_student_pt_assess_by_unit(student_id, book_key)
+        api_pt_assess_by_unit_list = api_pt_assess_by_unit_response.json()
+
+        book_info_dict = jmespath.search("[?Key=='{0}']".format(book_key.lower()), book_info_json)[0]
+
+        book_name = book_info_dict['Name']
+        book_code = book_info_dict['Code']
+
+        default_available_course_info = \
+            jmespath.search("[?ProductLevelCode=='{0}']".format(book_code), default_available_course_result.json())
+
+        is_current = False
+        is_active = False
+        if default_available_course_info is not None:
+            is_current = default_available_course_info[0]['IsDefaultProductLevel']
+            is_active = True
+
+        ptr_bff_test_by_unit_list = []
+
+        for i in range(len(api_pt_assess_by_unit_list)):
+            ptr_bff_test_by_unit = {}
+            api_pt_assess_by_unit = api_pt_assess_by_unit_list[i]
+            ptr_bff_test_by_unit['id'] = api_pt_assess_by_unit['UnitKey']
+            ptr_bff_test_by_unit['name'] = api_pt_assess_by_unit['UnitName']
+
+            if api_pt_assess_by_unit['PTTestBy'] == 0:
+                test_type = 'paper'
+            elif api_pt_assess_by_unit['PTTestBy'] == 0:
+                test_type = 'digital'
+
+            invalid = True
+            score = None
+            if api_pt_assess_by_unit['PTTotalScore'] is not None:
+                invalid = False
+                score = api_pt_assess_by_unit['PTTotalScore']
+
+            ptr_bff_test_by_unit['invalid'] = invalid
+            ptr_bff_test_by_unit['type'] = test_type
+            ptr_bff_test_by_unit['score'] = score
+
+            ptr_bff_test_by_unit_list.append(ptr_bff_test_by_unit)
+
+        ptr_bff_book_dict = {}
+        ptr_bff_book_dict['id'] = book_key.lower()
+        ptr_bff_book_dict['code'] = book_code
+        ptr_bff_book_dict['title'] = book_name
+        ptr_bff_book_dict['tests'] = ptr_bff_test_by_unit_list
+        ptr_bff_book_dict['isCurrent'] = is_current
+        ptr_bff_book_dict['isActive'] = is_active
+        ptr_bff_book_cover = {}
+        ptr_bff_book_cover['url'] = book_code
+        ptr_bff_book_cover['alt'] = book_code
+        ptr_bff_book_dict['cover'] = ptr_bff_book_cover
+        return ptr_bff_book_dict
+
+    # verify pt review bff result for unit level body
+    @staticmethod
+    def verify_ptr_bff_graphql_unit_level(ptr_bff_graphql_response_json, expected_ptr_result_by_unit):
+        actual_ptr_bff_graphql_result_by_unit = ptr_bff_graphql_response_json['data']['book']
+
+        error_message = ''
+        for key in actual_ptr_bff_graphql_result_by_unit.keys():
+            actual_value = actual_ptr_bff_graphql_result_by_unit[key]
+            expected_value = expected_ptr_result_by_unit[key]
+
+            if key != 'tests' and key != 'cover':
+                if str(actual_value) != str(expected_value):
+                    error_message = error_message + " Key:" + key + \
+                                    "'s api result not equal to expected value, the result return in API is:" \
+                                    + str(actual_value) + ", but the value expected is:" \
+                                    + str(expected_value) + ";"
+            elif key == 'cover':
+                for sub_key in actual_value.keys():
+                    actual_cover_value = actual_value[sub_key]
+                    expected_cover_value = expected_value[sub_key]
+
+                    if str(actual_cover_value) != str(expected_cover_value):
+                        error_message = error_message + " Key in cover:" + key + \
+                                        "'s api result not equal to expected value, the result return in API is:" \
+                                        + str(actual_cover_value) + ", but the value expected is:" \
+                                        + str(expected_cover_value) + ";"
+
+            else:
+                # for tests field verification
+                if len(actual_value) != len(expected_value):
+                    error_message = error_message + " unit result length not as expected!"
+                else:
+                    for i in range(len(actual_value)):
+                        actual_unit = actual_value[i]
+                        expected_unit = expected_value[i]
+
+                        for unit_dict_key in actual_unit.keys():
+                            actual_tests_unit_value = actual_unit[unit_dict_key]
+                            expected_tests_unit_value = expected_unit[unit_dict_key]
+
+                            if unit_dict_key == 'score' and actual_tests_unit_value is not None:
+                                actual_tests_unit_value = int(actual_tests_unit_value)
+
+                            if str(actual_tests_unit_value) != str(expected_tests_unit_value):
+                                error_message = error_message + " Key in tests result:" + unit_dict_key + \
+                                                "'s api result not equal to expected value, the result return in API is:" \
+                                                + str(actual_tests_unit_value) + ", but the value expected is:" \
+                                                + str(expected_tests_unit_value) + ";"
+        return error_message

@@ -69,3 +69,24 @@ class PTReviewData:
              {'username': 'ptReviewTest01', 'password': '12345'},
             ]
     }
+
+    ptr_resource_list = {
+        'QA':
+            [
+                "2566bc78-da5e-4691-8015-986e1e3bda2d",
+                "c20e7a40-04d9-47ec-b847-236e8d7bad01",
+                "64ebd38b-1ed1-4871-b17c-2989267ef007",
+                "b12f5cd0-b03f-4ba5-bec5-117f239c213d",
+                "15880590-4a8d-4863-b648-5efff9cd6e56"
+            ]
+    }
+
+    ptr_bff_data = {
+        'QA': {
+            'HF': {
+                'StudentId': 12221442,
+                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'UnitKey': '50ED3E4D-BF78-4D9D-B6EE-05F6D4D9A260'
+            }
+        }
+    }
