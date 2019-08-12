@@ -1,9 +1,11 @@
 from ptest.decorator import TestClass, Test
 from E1_API_Automation.Business.PTReviewService import PTReviewService
+from E1_API_Automation.Business.OSPService import OSPService
+from E1_API_Automation.Business.PTReviewBFFService import PTReviewBFFService
 from E1_API_Automation.Business.Utils.PTReviewUtils import PTReviewUtils
 from E1_API_Automation.Business.TPIService import TPIService
 from E1_API_Automation.Business.OMNIService import OMNIService
-from ...Settings import OSP_ENVIRONMENT, TPI_ENVIRONMENT, OMNI_ENVIRONMENT, env_key
+from ...Settings import OSP_ENVIRONMENT, TPI_ENVIRONMENT, OMNI_ENVIRONMENT, ENVIRONMENT, env_key
 from ...Test_Data.PTReviewData import PTReviewData
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Business.PTSkillScore import SkillCode, SubSkillCode
@@ -17,12 +19,12 @@ class PTReviewTestCases:
 
     @Test(tags="qa, stg, live")
     def test_get_all_books_by_course(self):
-        pt_review_service = PTReviewService(OSP_ENVIRONMENT)
+        osp_service = OSPService(OSP_ENVIRONMENT)
         # verify all the three courses
         course_code_list = ['highflyers', 'frontrunner', 'trailblazers']
         for course_code in course_code_list:
             print("Verify course:" + course_code)
-            response = pt_review_service.get_all_books_by_course(course_code)
+            response = osp_service.get_all_books_by_course(course_code)
             assert_that(response.status_code == 200)
             api_response_json = response.json()
             code_list = jmespath.search('[].Code', api_response_json)
@@ -42,7 +44,7 @@ class PTReviewTestCases:
             # if it's not Live environment, then do the rest verification with DB
             if not EnvUtils.is_env_live():
                 # get the result from DB
-                db_query_result = pt_review_service.get_all_books_by_course_from_db(course_code)
+                db_query_result = PTReviewService.get_all_books_by_course_from_db(course_code)
 
                 # the list length should be equal for the response list and DB list
                 assert_that(len(api_response_json) == len(db_query_result))
@@ -76,9 +78,9 @@ class PTReviewTestCases:
         tpi_response = tpi_service.put_hf_student_omni_pt_assessment(omni_body)
         assert_that(tpi_response.status_code == 204)
 
-        pt_review_service = PTReviewService(OSP_ENVIRONMENT)
+        osp_service = OSPService(OSP_ENVIRONMENT)
         # call StudentPaperDigitalProgressTestAssessmentMetas API to get all the records from DB
-        assess_metas = pt_review_service.post_hf_student_pt_assess_metas(student_id, book_key)
+        assess_metas = osp_service.post_hf_student_pt_assess_metas(student_id, book_key)
         assert_that(assess_metas.status_code == 200)
         assess_metas_response = assess_metas.json()
 
@@ -98,18 +100,18 @@ class PTReviewTestCases:
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
 
-        pt_review_service = PTReviewService(OSP_ENVIRONMENT)
+        osp_service = OSPService(OSP_ENVIRONMENT)
         if not EnvUtils.is_env_live():
             # make sure all the score have value at first
             PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
-            hf_pt_assess = pt_review_service.get_hf_pt_assessment_from_db(student_id, book_key, unit_key)
+            hf_pt_assess = PTReviewService.get_hf_pt_assessment_from_db(student_id, book_key, unit_key)
             from_db = True
         else:
-            assess_metas = pt_review_service.post_hf_student_pt_assess_metas(student_id, book_key)
+            assess_metas = osp_service.post_hf_student_pt_assess_metas(student_id, book_key)
             hf_pt_assess = jmespath.search("@[?UnitKey == '{0}']".format(unit_key.lower()), assess_metas.json())
             from_db = False
         expected_pt_assess_by_skill = PTReviewUtils.get_expected_pt_assessment_by_skill(hf_pt_assess, from_db)
-        api_pt_assess_by_skill = pt_review_service.post_hf_student_pt_assess_by_skill(student_id, book_key, unit_key)
+        api_pt_assess_by_skill = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key, unit_key)
         if expected_pt_assess_by_skill is None:
             assert_that(api_pt_assess_by_skill.status_code == 409)
         else:
@@ -131,19 +133,19 @@ class PTReviewTestCases:
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
 
-        pt_review_service = PTReviewService(OSP_ENVIRONMENT)
+        osp_service = OSPService(OSP_ENVIRONMENT)
 
         # make sure all the score have value at first
         PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
         # update user's original score as overwritten score, and over written score as null to test if the API will get
         # original score when overwritten score as null
-        pt_review_service.update_pt_assessment_original_with_value(student_id, test_primary_key)
+        PTReviewService.update_pt_assessment_original_with_value(student_id, test_primary_key)
         # get value from DB
-        hf_pt_assess = pt_review_service.get_hf_pt_assessment_from_db(student_id, book_key, unit_key)
+        hf_pt_assess = PTReviewService.get_hf_pt_assessment_from_db(student_id, book_key, unit_key)
         # get the expected skill score list
         expected_pt_assess_by_skill = PTReviewUtils.get_expected_pt_assessment_by_skill(hf_pt_assess, True)
         # call the by skill API
-        api_pt_assess_by_skill = pt_review_service.post_hf_student_pt_assess_by_skill(student_id, book_key, unit_key)
+        api_pt_assess_by_skill = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key, unit_key)
         assert_that(api_pt_assess_by_skill.status_code == 200)
         api_pt_assess_by_skill_json = api_pt_assess_by_skill.json()
         # verify the API return result with expected value
@@ -151,7 +153,7 @@ class PTReviewTestCases:
                                                                        expected_pt_assess_by_skill)
         assert_that(error_message == '', error_message)
         # revert the orignal score column value
-        pt_review_service.update_pt_assessment_original_with_null(student_id, test_primary_key)
+        PTReviewService.update_pt_assessment_original_with_null(student_id, test_primary_key)
 
     '''
     test the unit API, to check if the return result is as expected
@@ -162,20 +164,21 @@ class PTReviewTestCases:
         test_primary_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['TestPrimaryKey']
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
 
-        pt_review_service = PTReviewService(OSP_ENVIRONMENT)
+        osp_service = OSPService(OSP_ENVIRONMENT)
+
         if not EnvUtils.is_env_live():
             # make sure all the score have value at first
             PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
-            hf_pt_assess = pt_review_service.get_hf_pt_assessment_by_book_from_db(student_id, book_key)
+            hf_pt_assess = PTReviewService.get_hf_pt_assessment_by_book_from_db(student_id, book_key)
             from_db = True
         else:
-            assess_metas = pt_review_service.post_hf_student_pt_assess_metas(student_id, book_key)
+            assess_metas = osp_service.post_hf_student_pt_assess_metas(student_id, book_key)
             hf_pt_assess = assess_metas.json()
             from_db = False
         # get the expected pt assessment list
         expected_pt_assess_by_unit = PTReviewUtils.get_expected_pt_assessment_by_unit(hf_pt_assess, from_db)
         # call the unit API
-        api_pt_assess_by_unit = pt_review_service.post_hf_student_pt_assess_by_unit(student_id, book_key)
+        api_pt_assess_by_unit = osp_service.post_hf_student_pt_assess_by_unit(student_id, book_key)
         assert_that(api_pt_assess_by_unit.status_code == 200)
         api_pt_assess_by_unit_json = api_pt_assess_by_unit.json()
         # do the verification
@@ -188,23 +191,23 @@ class PTReviewTestCases:
     and the PTTotalScore is null for Unit API 
     '''
     @staticmethod
-    def update_score_as_null_then_verify(pt_review_service, student_id, test_primary_key, book_key,
+    def update_score_as_null_then_verify(osp_service, student_id, test_primary_key, book_key,
                                          unit_key, skill_subskill_code, is_total_score):
         # update the pt score as null
-        PTReviewUtils.update_score_as_null(pt_review_service, student_id, test_primary_key, skill_subskill_code,
+        PTReviewUtils.update_score_as_null(student_id, test_primary_key, skill_subskill_code,
                                            is_total_score)
 
         # call the skill API, and do the verification, the API will return with 409 for not valid data
-        api_pt_assess_by_skill = pt_review_service.post_hf_student_pt_assess_by_skill(student_id, book_key,
+        api_pt_assess_by_skill = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key,
                                                                                       unit_key)
         assert_that(api_pt_assess_by_skill.status_code == 409)
 
         # call the unit API, and do the verification, the pttotalscore should be null for this unit
-        hf_pt_assess = pt_review_service.get_hf_pt_assessment_by_book_from_db(student_id, book_key)
+        hf_pt_assess = PTReviewService.get_hf_pt_assessment_by_book_from_db(student_id, book_key)
         # the expected unit pt assessment will have PTTotalScore as null as the data in DB is not valid for the logic
         expected_pt_assess_by_unit = PTReviewUtils.get_expected_pt_assessment_by_unit(hf_pt_assess, True)
         # call the unit API
-        api_pt_assess_by_unit = pt_review_service.post_hf_student_pt_assess_by_unit(student_id, book_key)
+        api_pt_assess_by_unit = osp_service.post_hf_student_pt_assess_by_unit(student_id, book_key)
         assert_that(api_pt_assess_by_unit.status_code == 200)
         api_pt_assess_by_unit_json = api_pt_assess_by_unit.json()
         error_message = PTReviewUtils.verify_hf_pt_assessment_by_unit(api_pt_assess_by_unit_json,
@@ -220,7 +223,8 @@ class PTReviewTestCases:
         test_primary_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['TestPrimaryKey']
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
-        pt_review_service = PTReviewService(OSP_ENVIRONMENT)
+
+        osp_service = OSPService(OSP_ENVIRONMENT)
 
         for skill in SkillCode.__members__:
             if skill in (SkillCode.Speaking.value, SkillCode.Writing.value):
@@ -228,11 +232,11 @@ class PTReviewTestCases:
                     sub_skill_code = skill + "-" + sub_skill
                     # update original score and overwritten score as null for each sub skill to check
                     # if the skill API return with 409, and also check the Unit API
-                    self.update_score_as_null_then_verify(pt_review_service, student_id, test_primary_key,
+                    self.update_score_as_null_then_verify(osp_service, student_id, test_primary_key,
                                                           book_key, unit_key, sub_skill_code, False)
             else:
                 # update original score and overwritten score as null for each skill to check if skill and unit API
-                self.update_score_as_null_then_verify(pt_review_service, student_id, test_primary_key, book_key,
+                self.update_score_as_null_then_verify(osp_service, student_id, test_primary_key, book_key,
                                                       unit_key, skill, False)
 
         # make all the data valid after test
@@ -247,7 +251,8 @@ class PTReviewTestCases:
         test_primary_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['TestPrimaryKey']
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
-        pt_review_service = PTReviewService(OSP_ENVIRONMENT)
+
+        osp_service = OSPService(OSP_ENVIRONMENT)
 
         for skill in SkillCode.__members__:
             if skill in (SkillCode.Speaking.value, SkillCode.Writing.value):
@@ -255,11 +260,11 @@ class PTReviewTestCases:
                     sub_skill_code = skill + "-" + sub_skill
                     # update total score as null for each sub skill to check if the skill API return with 409,
                     # and also check the Unit API
-                    self.update_score_as_null_then_verify(pt_review_service, student_id, test_primary_key,
+                    self.update_score_as_null_then_verify(osp_service, student_id, test_primary_key,
                                                           book_key, unit_key, sub_skill_code, True)
             else:
                 # update original score and overwritten score as null for each skill to check if skill and unit API
-                self.update_score_as_null_then_verify(pt_review_service, student_id, test_primary_key, book_key,
+                self.update_score_as_null_then_verify(osp_service, student_id, test_primary_key, book_key,
                                                       unit_key, skill, True)
 
         # make all the data valid after test
@@ -283,5 +288,69 @@ class PTReviewTestCases:
                 PTReviewUtils.verify_enrolled_groups_with_state(actual_default_available_course_result.json(),
                                                                 expected_course_list)
             assert_that(error_message == '', user_name + "'s verification failed:" + error_message)
+
+    @Test(tags="qa, stg")
+    def test_resource_url_lessthan_50(self):
+        pt_review_service = PTReviewService(ENVIRONMENT)
+        resource_list = PTReviewData.ptr_resource_list[env_key]
+        recource_url_response = pt_review_service.post_resource_batch(resource_list)
+        assert_that(recource_url_response.status_code == 200)
+        error_message = PTReviewUtils.verify_resource_url(recource_url_response.json(), resource_list)
+        assert_that(error_message == '', "Resource API verification failed:" + error_message)
+
+    @Test(tags="qa, stg")
+    def test_resource_url_exceed_50(self):
+        pt_review_service = PTReviewService(ENVIRONMENT)
+        resource_list = PTReviewData.ptr_resource_list[env_key]
+
+        original_length = len(resource_list)
+        loop_num, remainder = divmod(51, original_length)
+
+        # mock resouce list to make the size = 51,  API will not filter out the duplicate resouce key
+        exceed_fifty_resouce_list = []
+        for i in range(loop_num):
+            exceed_fifty_resouce_list.extend(resource_list)
+
+        if remainder > 0:
+            exceed_fifty_resouce_list.extend(resource_list[:remainder])
+
+        recource_url_response = pt_review_service.post_resource_batch(exceed_fifty_resouce_list)
+        assert_that(recource_url_response.status_code == 403)
+        response_message = recource_url_response.json()['Message']
+        assert_that('Reason: the max length of keys is 50' in response_message)
+
+    @Test(tags="qa, stg")
+    def test_ptr_bff_graphql_skill_level(self):
+        pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        osp_service = OSPService(OSP_ENVIRONMENT)
+        student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
+        book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
+        unit_key = PTReviewData.ptr_bff_data[env_key]['HF']['UnitKey']
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_skill_level(student_id, book_key, unit_key)
+        assert_that(ptr_bff_graphql_response.status_code == 200)
+
+        api_pt_assess_by_skill_response = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key, unit_key)
+        expected_ptr_result_by_skill = \
+            PTReviewUtils.get_expected_ptr_bff_result_skill_level(api_pt_assess_by_skill_response.json())
+        error_message = PTReviewUtils.verify_ptr_bff_graphql_skill_level(ptr_bff_graphql_response.json(),
+                                                                         expected_ptr_result_by_skill)
+        assert_that(error_message == '', error_message)
+
+    @Test(tags="qa, stg")
+    def test_ptr_bff_graphql_unit_level(self):
+        pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
+        book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
+        course_code = 'HF'
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_unit_level(student_id, course_code, book_key)
+        assert_that(ptr_bff_graphql_response.status_code == 200)
+
+        expected_ptr_result_by_unit = \
+            PTReviewUtils.get_expected_ptr_bff_result_unit_level(student_id, course_code, book_key)
+
+        error_message = PTReviewUtils.verify_ptr_bff_graphql_unit_level(ptr_bff_graphql_response.json(),
+                                                                         expected_ptr_result_by_unit)
+        assert_that(error_message == '', error_message)
+
 
 
