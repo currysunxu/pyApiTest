@@ -1,0 +1,9 @@
+boto3==1.9.199
+jmespath==0.9.3
+requests
+arrow==0.14.5
+PyHamcrest
+ptest==1.9.5
+pytest==3.9.3
+Cython
+pymssql
