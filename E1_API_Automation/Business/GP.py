@@ -4,6 +4,8 @@ from ptest.assertion import assert_that
 from E1_API_Automation.Test_Data.GPData import ShanghaiGradeKey, MoscowGradeKey, EducationRegion
 from ..Lib.Moutai import Moutai, Token
 from ..Lib.ResetGPGradeTool import ResetGPGradeTool
+from E1_API_Automation.Settings import env_key
+from E1_API_Automation.Test_Data.GPData import GP_user
 
 
 class GPService():
@@ -57,8 +59,9 @@ class GPService():
     def post_students_lesson_activity(self, module_info):
         return self.mou_tai.post("/api/v2/ActivityEntity/Web/", module_info)
 
-    def get_available_grade(self, region_key):
-        return self.mou_tai.get("/api/v2/AvailableGradeList/?regionKey=%s&cultureCode=zh-CN" % region_key)
+    def get_available_grade(self, region_key, culture_code):
+        return self.mou_tai.get("/api/v2/AvailableGradeList/?regionKey={0}&cultureCode={1}".format(region_key,
+                                                                                                   culture_code))
 
     def post_quiz_start(self, lesson_key):
         return self.mou_tai.post("/api/v2/RemediationLesson/Start/", lesson_key)
@@ -330,10 +333,10 @@ class GPService():
                 self.save_all_module_quiz_answer()
 
     def get_mapping(self):
-        all_module_info = self.get_available_grade(EducationRegion.cn_city_list['Shanghai']).json()
-        grade_id = jmespath.search("[*].GradeOrdinal", all_module_info)
+        all_module_info = self.get_all_module_info()
+        grade_ids = jmespath.search("[*].GradeOrdinal", all_module_info)
         mapping = []
-        for grade_id in grade_id:
+        for grade_id in grade_ids:
             module_key_list = jmespath.search("[?GradeOrdinal==`" + str(grade_id) + "`].Modules[].Key",
                                               all_module_info)
             for module_key in module_key_list:
@@ -345,6 +348,7 @@ class GPService():
         return mapping
 
     def search_mapping(self, search_value, expected_output, mapping):
+        result = []
         for single_mapping in mapping:
             if search_value in (single_mapping[0], single_mapping[1], single_mapping[2]):
                 if expected_output == 'key':
@@ -353,10 +357,15 @@ class GPService():
                     return single_mapping[0]
                 elif expected_output == 'level':
                     return single_mapping[1]
+                elif expected_output == 'levelWithGrade':
+                    result.append(single_mapping[1])
                 continue
 
             else:
                 continue
+
+        if expected_output == 'levelWithGrade':
+            return result
 
     def search_module_key_by_gradeid(self, lists, module_info):
         if type(lists) == int:
@@ -374,19 +383,35 @@ class GPService():
         results = []
         for search_value in lists:
             result = self.search_mapping(search_value, expected_output, mapping)
-            results.append(result)
+            if isinstance(result, list):
+                results = results + result
+            else:
+                results.append(result)
         if expected_output == 'key':
             return results
         else:
             results_list = list(set(results))
             return results_list
 
+    def get_all_module_info(self):
+        culture_code = GP_user.GPDTUsers[env_key]['culture_code']
+
+        if culture_code == 'zh-CN':
+            city_name = 'Shanghai'
+            region_key = EducationRegion.cn_city_list[city_name]
+        elif culture_code == 'ru-RU':
+            city_name = 'Moscow'
+            region_key = EducationRegion.ru_city_list[city_name]
+
+        all_module_info = self.get_available_grade(region_key, culture_code).json()
+        return all_module_info
+
     def get_new_recommended_module(self, failed_module_number):
         student_progress = self.get_student_progress().json()
         latest_dt_modules = jmespath.search("DiagnosticTestProgress.UserDiagnosticTestScoreSummary[*].ModuleKey",
                                             student_progress)
         mapping = self.get_mapping()
-        all_module_info = self.get_available_grade(EducationRegion.cn_city_list['Shanghai']).json()
+        all_module_info = self.get_all_module_info()
         dt_included_grade = self.get_mapping_result_set(latest_dt_modules, 'grade_id', mapping)
 
         dt_included_grade_key = self.search_module_key_by_gradeid(dt_included_grade, all_module_info)
@@ -405,13 +430,44 @@ class GPService():
 
     def get_same_grade_modules(self, failed_module_number, mapping, new_list, dt_included_grade):
         new_list_diff_level = self.get_mapping_result_set(new_list, 'level', mapping)
-        grade = self.get_mapping_result_set(new_list, 'grade_id', mapping)
-        start_grade = [x for x in dt_included_grade if x not in grade]
-        if grade < start_grade:
-            new_list_diff_level.sort()
-            new_list_diff_level.reverse()
+        grades = self.get_mapping_result_set(new_list, 'grade_id', mapping)
+        start_grade = [x for x in dt_included_grade if x not in grades]
+
+        culture_code = GP_user.GPDTUsers[env_key]['culture_code']
+
+        # if it's for ru-RU, when grade is middle grade testing, that is grade 6,
+        # the module will cross grade 5, 6 and 7, need to have specific logic for it
+        if len(grades) > 1 and len(start_grade) == 1 and culture_code == 'ru-RU':
+            lower_grade = []
+            higher_grade = []
+            for grade_value in grades:
+                if grade_value < start_grade[0]:
+                    lower_grade.append(grade_value)
+                else:
+                    higher_grade.append(grade_value)
+
+            '''
+            when failed_module_number = 3, means the DT score equal to 40, the expected module which need to do test 
+            again should be the module in grade 5;
+            if the failed_module_number = 4, means the DT Score lower than 40, the expected module which need to do test
+             again  should be the module in grade 5;
+            when failed_module_number = 2, means the DT Score higher than 40, the expected module which need to do test 
+            again should be all the left modules which haven't took test
+            '''
+            if failed_module_number > 2:
+                lower_grade_level = self.get_mapping_result_set(lower_grade, 'levelWithGrade', mapping)
+                new_list_lower_grade_diff_level = [x for x in new_list_diff_level if x in lower_grade_level]
+                new_list_diff_level = new_list_lower_grade_diff_level
+                new_list_diff_level.sort()
+                new_list_diff_level.reverse()
+            else:
+                new_list_diff_level.sort()
         else:
-            new_list_diff_level.sort()
+            if grades < start_grade:
+                new_list_diff_level.sort()
+                new_list_diff_level.reverse()
+            else:
+                new_list_diff_level.sort()
         recommend_modules_level = new_list_diff_level[:(5 - failed_module_number)]
         recommend_modules = self.get_mapping_result_set(recommend_modules_level, 'key', mapping)
         return recommend_modules

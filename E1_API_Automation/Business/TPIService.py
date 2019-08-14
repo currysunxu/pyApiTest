@@ -9,7 +9,11 @@ class TPIService:
     def put_hf_student_omni_pt_assessment(self, pt_score_body):
         return self.mou_tai.put("/api/v2/OmniProgressTestAssessment/", pt_score_body)
 
-    def get_enrolled_groups_with_state(self, customer_id):
+    def post_enrolled_groups_with_state(self, customer_id, course):
         self.mou_tai.headers['X-BA-TOKEN'] = "54297119-42D7-4948-A075-CA79CF1B8250"
-        return self.mou_tai.get("/api/v2/CourseGroup/EnrolledGroupsWithState/{0}".format(customer_id))
+        body = {
+            "StudentId": customer_id,
+            "Course": course,
+        }
+        return self.mou_tai.post("/api/v2/CourseGroup/EnrolledGroupsWithState", body)
 

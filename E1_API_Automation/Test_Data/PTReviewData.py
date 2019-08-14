@@ -7,7 +7,7 @@ class PTReviewSQLString:
                               "and level =2 " \
                               "order by [sequence]"
 
-    hf_pt_assessment_sql = "select a.StudentId, a.Code, a.TestInstanceKey,a.OriginalScore,a.OverwrittenScore, " \
+    hf_pt_assessment_sql = "select a.StudentId, a.Code, a.TestInstanceKey,a.TestPrimaryKey, a.OriginalScore,a.OverwrittenScore, " \
                                 "a.TotalScore,b.BookKey, b.BookCode, b. BookName, b.UnitKey, b.UnitCode, b.UnitName " \
                                 "from OnlineSchoolPlatform.dbo.TestAssessmentMeta a " \
                                 "inner join OnlineSchoolPlatform.dbo.ProgressTestUnitIndexBookIndex b " \
@@ -36,8 +36,22 @@ class PTReviewData:
                     'UnitKey': '1EC56EC1-A123-4B47-9057-96BE3EE7534D'
                     }
                 },
+        'Staging_SG': {
+            '10106831': {
+                'TestPrimaryKey': '1B026C66-6ED0-440D-99BF-998507061E28',
+                'BookKey': '0A5BF162-8FEA-4A22-80B5-9D18C704AD80',
+                'UnitKey': '994AFEC8-F395-4FDC-83E4-5CFF2F22F28C'
+            }
+        },
         'Live': {
             '100201088': {
+                'TestPrimaryKey': '', # no need to set TestPrimaryKey for live data
+                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
+            }
+        },
+        'Live_SG': {
+            '100101406': {
                 'TestPrimaryKey': '', # no need to set TestPrimaryKey for live data
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
@@ -47,21 +61,32 @@ class PTReviewData:
 
     ptr_hf_user = {
         'QA':
-            [{'username': 'hfDefBKTest.Mul.Activated', 'password': '12345'},
-             {'username': 'hfDefBKTest.Mul.Completed', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Mul.Activated', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Mul.Completed', 'password': '12345'},
-             {'username': 'hfDefBKTest.Mul.Created', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Mul.Created', 'password': '12345'},
-             {'username': 'hfDefBKTest.Sig.Created', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Sig.Activated', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Sig.Completed', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Sig.Created', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Sig.Pending', 'password': '12345'},
-             {'username': 'hfDefBKTest.Cancelled', 'password': '12345'},
-             {'username': 'hfDefBKTest.Mix.Pending', 'password': '12345'},
-             {'username': 'hfDefBKTest.false.Mix.Pending', 'password': '12345'},
-             {'username': 'ptReviewTest02', 'password': '12345'},
-             {'username': 'hf2.cn.02', 'password': '12345'}
+            [{'username': 'ptReviewTest_PastCurrent', 'password': '12345'},
+             {'username': 'ptReviewTest_Past', 'password': '12345'},
+             {'username': 'ptReviewTest_FutureInvalid', 'password': '12345'},
+             {'username': 'ptReviewTest_MixSSHF', 'password': '12345'},
+             {'username': 'ptReviewTest_OneCurrent', 'password': '12345'},
+             {'username': 'ptReviewTest01', 'password': '12345'},
             ]
+    }
+
+    ptr_resource_list = {
+        'QA':
+            [
+                "2566bc78-da5e-4691-8015-986e1e3bda2d",
+                "c20e7a40-04d9-47ec-b847-236e8d7bad01",
+                "64ebd38b-1ed1-4871-b17c-2989267ef007",
+                "b12f5cd0-b03f-4ba5-bec5-117f239c213d",
+                "15880590-4a8d-4863-b648-5efff9cd6e56"
+            ]
+    }
+
+    ptr_bff_data = {
+        'QA': {
+            'HF': {
+                'StudentId': 12221442,
+                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'UnitKey': '50ED3E4D-BF78-4D9D-B6EE-05F6D4D9A260'
+            }
+        }
     }
