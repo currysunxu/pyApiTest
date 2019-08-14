@@ -2,7 +2,7 @@ FROM python:3.7-slim
 
 WORKDIR /app
 
-COPY ./requirements.txt ./requirements.txt
+COPY ./E1_API_Automation/* ./E1_API_Automation
 RUN apt-get update -y
 RUN apt-get install -y freetds-dev gcc
 
