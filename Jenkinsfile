@@ -21,7 +21,7 @@ pipeline {
       agent {
         docker {
           label 'CN_Kids_QA_CI'
-          image 'http://10.128.42.216:5000/v2/apipython3:latest'
+          image '10.128.42.216:5000/apipython3:latest'
         }
       }
       steps {
