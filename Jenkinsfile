@@ -21,8 +21,8 @@ pipeline {
     stage('Verify') {
       agent {
         docker {
-          label 'CN-PD-BACKEND-CI02'
-          image '014301917773.dkr.ecr.cn-north-1.amazonaws.com.cn/e1-pd/kidapipython3:latest'
+          label 'CN_Kids_QA_CI'
+          image 'apipython3:latest'
         }
       }
       steps {
