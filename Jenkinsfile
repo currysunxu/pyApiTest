@@ -26,7 +26,7 @@ pipeline {
       }
       steps {
         script {
-          sh 'ptest3  -t E1_API_Automation.Test.GP'
+          sh 'ptest3  -t E1_API_Automation.Test.SmallStar'
         }
       }
     }
