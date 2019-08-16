@@ -36,25 +36,13 @@ pipeline {
         script {
            
           sh 'ptest3  -t E1_API_Automation.Test.TBV3'
+          junit 'test-output/xunit-results.xml'
         }
       }
     }
   }
-  post {
-      always {
-          publishTestResults(
-                        script: this,
-                        junit: [
-                            active:true,
-                            allowEmptyResults:true,
-                            archive: true,
-                            pattern: 'test-output/xunit-results.xml',
-                            updateResults: true
-                        ])
-  
-  }
-  
-  }
+
+
 
   
 }

@@ -36,6 +36,7 @@ pipeline {
         script {
            
           sh 'ptest3  -t E1_API_Automation.Test.PT'
+          junit 'test-output/xunit-results.xml'
         }
       }
     }
