@@ -38,7 +38,7 @@ pipeline {
            
           sh 'ptest3  -t E1_API_Automation.Test.GP'
           junit 'test-output/xunit-results.xml'
-          if (currentBuild.result = 'UNSTABLE')
+          if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
                 
           }
