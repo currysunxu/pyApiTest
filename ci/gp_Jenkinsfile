@@ -43,15 +43,8 @@ pipeline {
   
    post {
       always {
-          publishTestResults(
-                        script: this,
-                        junit: [
-                            active:true,
-                            allowEmptyResults:true,
-                            archive: true,
-                            pattern: 'test-output/xunit-results.xml',
-                            updateResults: true
-                        ])
+          junit 'test-output/xunit-results.xml'
+                         
   
   }
   
