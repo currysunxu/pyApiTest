@@ -15,7 +15,7 @@ pipeline {
   }
   agent none
   triggers {
-    cron('H/30 * * * *')
+    cron('H 03 * * *')
   }
   
   parameters {
