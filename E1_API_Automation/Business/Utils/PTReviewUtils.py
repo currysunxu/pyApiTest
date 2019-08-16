@@ -608,7 +608,7 @@ class PTReviewUtils:
             actual_identifier = actual_resource_url["Identifier"]
             actual_credential_Uri = actual_resource_url["CredentialUri"]
 
-            expected_url = '.amazonaws.com.cn/'+actual_identifier
+            expected_url = '/'+actual_identifier
             is_resource_exist = False
 
             if actual_identifier in resource_list and expected_url in actual_credential_Uri:
@@ -620,26 +620,26 @@ class PTReviewUtils:
         return error_message
 
     @staticmethod
-    def get_expected_ptr_bff_result_skill_level(api_pt_assess_by_skill_json):
-        expected_ptr_result_by_skill = {}
-        expected_ptr_result_by_skill['id'] = api_pt_assess_by_skill_json['UnitKey']
-        expected_ptr_result_by_skill['name'] = api_pt_assess_by_skill_json['UnitName']
-        expected_ptr_result_by_skill['bookName'] = api_pt_assess_by_skill_json['BookName']
-        expected_ptr_result_by_skill['ptKey'] = api_pt_assess_by_skill_json['PTKey']
+    def get_expected_ptr_bff_result_by_book_unit(api_pt_assess_by_skill_json):
+        expected_ptr_result_by_book_unit = {}
+        expected_ptr_result_by_book_unit['id'] = api_pt_assess_by_skill_json['UnitKey']
+        expected_ptr_result_by_book_unit['name'] = api_pt_assess_by_skill_json['UnitName']
+        expected_ptr_result_by_book_unit['bookName'] = api_pt_assess_by_skill_json['BookName']
+        expected_ptr_result_by_book_unit['ptKey'] = api_pt_assess_by_skill_json['PTKey']
 
         if api_pt_assess_by_skill_json['PTTestBy'] == 0:
             test_type = 'paper'
-        elif api_pt_assess_by_skill_json['PTTestBy'] == 0:
+        elif api_pt_assess_by_skill_json['PTTestBy'] == 1:
             test_type = 'digital'
 
-        expected_ptr_result_by_skill['type'] = test_type
+        expected_ptr_result_by_book_unit['type'] = test_type
 
         invalid = False
         if api_pt_assess_by_skill_json['PTTotalScore'] is None:
             invalid = True
 
-        expected_ptr_result_by_skill['invalid'] = invalid
-        expected_ptr_result_by_skill['score'] = api_pt_assess_by_skill_json['PTTotalScore']
+        expected_ptr_result_by_book_unit['invalid'] = invalid
+        expected_ptr_result_by_book_unit['score'] = api_pt_assess_by_skill_json['PTTotalScore']
 
         skill_score_list = api_pt_assess_by_skill_json['SkillScores']
         ptr_skills = []
@@ -657,18 +657,18 @@ class PTReviewUtils:
             ptr_skill['result'] = ptr_skill_result
 
             ptr_skills.append(ptr_skill)
-        expected_ptr_result_by_skill['skills'] = ptr_skills
-        return expected_ptr_result_by_skill
+        expected_ptr_result_by_book_unit['skills'] = ptr_skills
+        return expected_ptr_result_by_book_unit
 
-    # verify pt review bff result for skill level body
+    # verify pt review bff result by book and unit body
     @staticmethod
-    def verify_ptr_bff_graphql_skill_level(ptr_bff_graphql_response_json, expected_ptr_result_by_skill):
-        actual_ptr_bff_graphql_result_by_skill = ptr_bff_graphql_response_json['data']['test']
+    def verify_ptr_bff_graphql_by_book_unit(ptr_bff_graphql_response_json, expected_ptr_result_by_book_unit):
+        actual_ptr_bff_graphql_result_by_book_unit = ptr_bff_graphql_response_json['data']['test']
 
         error_message = ''
-        for key in actual_ptr_bff_graphql_result_by_skill.keys():
-            actual_value = actual_ptr_bff_graphql_result_by_skill[key]
-            expected_value = expected_ptr_result_by_skill[key]
+        for key in actual_ptr_bff_graphql_result_by_book_unit.keys():
+            actual_value = actual_ptr_bff_graphql_result_by_book_unit[key]
+            expected_value = expected_ptr_result_by_book_unit[key]
 
             if key != 'skills':
                 if key == 'score':
@@ -701,23 +701,28 @@ class PTReviewUtils:
                                                     + str(expected_value_in_skill) + ";"
         return error_message
 
-    # get expected pt review bff result by unit level body
+    # get expected pt review bff result by book body
     @staticmethod
-    def get_expected_ptr_bff_result_unit_level(student_id, course, book_key):
+    def get_expected_ptr_bff_result_by_book(student_id, course, book_key, book_info_dict):
         osp_service = OSPService(OSP_ENVIRONMENT)
         tpi_service = TPIService(TPI_ENVIRONMENT)
         if course == 'HF':
             course = 'highflyers'
 
-        response = osp_service.get_all_books_by_course(course)
-        book_info_json = response.json()
+        if book_info_dict is None and book_key is not None:
+            response = osp_service.get_all_books_by_course(course)
+            book_info_json = response.json()
+            book_info_dict = jmespath.search("[?Key=='{0}']".format(book_key.lower()), book_info_json)[0]
+        elif book_info_dict is not None and book_key is None:
+            book_key = book_info_dict['Key']
+        else:
+            # if book_key and book_info_dict are both None, then return None, not acceptable
+            return None
 
         default_available_course_result = tpi_service.post_enrolled_groups_with_state(student_id, course)
 
         api_pt_assess_by_unit_response = osp_service.post_hf_student_pt_assess_by_unit(student_id, book_key)
         api_pt_assess_by_unit_list = api_pt_assess_by_unit_response.json()
-
-        book_info_dict = jmespath.search("[?Key=='{0}']".format(book_key.lower()), book_info_json)[0]
 
         book_name = book_info_dict['Name']
         book_code = book_info_dict['Code']
@@ -727,7 +732,7 @@ class PTReviewUtils:
 
         is_current = False
         is_active = False
-        if default_available_course_info is not None:
+        if default_available_course_info is not None and len(default_available_course_info) > 0:
             is_current = default_available_course_info[0]['IsDefaultProductLevel']
             is_active = True
 
@@ -741,7 +746,7 @@ class PTReviewUtils:
 
             if api_pt_assess_by_unit['PTTestBy'] == 0:
                 test_type = 'paper'
-            elif api_pt_assess_by_unit['PTTestBy'] == 0:
+            elif api_pt_assess_by_unit['PTTestBy'] == 1:
                 test_type = 'digital'
 
             invalid = True
@@ -771,13 +776,13 @@ class PTReviewUtils:
 
     # verify pt review bff result for unit level body
     @staticmethod
-    def verify_ptr_bff_graphql_unit_level(ptr_bff_graphql_response_json, expected_ptr_result_by_unit):
-        actual_ptr_bff_graphql_result_by_unit = ptr_bff_graphql_response_json['data']['book']
+    def verify_ptr_bff_graphql_by_book(actual_ptr_bff_graphql_result_by_book, expected_ptr_result_by_book):
+        # actual_ptr_bff_graphql_result_by_book = ptr_bff_graphql_response_json['data']['book']
 
         error_message = ''
-        for key in actual_ptr_bff_graphql_result_by_unit.keys():
-            actual_value = actual_ptr_bff_graphql_result_by_unit[key]
-            expected_value = expected_ptr_result_by_unit[key]
+        for key in actual_ptr_bff_graphql_result_by_book.keys():
+            actual_value = actual_ptr_bff_graphql_result_by_book[key]
+            expected_value = expected_ptr_result_by_book[key]
 
             if key != 'tests' and key != 'cover':
                 if str(actual_value) != str(expected_value):
@@ -817,4 +822,48 @@ class PTReviewUtils:
                                                 "'s api result not equal to expected value, the result return in API is:" \
                                                 + str(actual_tests_unit_value) + ", but the value expected is:" \
                                                 + str(expected_tests_unit_value) + ";"
+        return error_message
+
+    # get expected pt review bff result by studentid body, for all courses
+    @staticmethod
+    def get_expected_ptr_bff_result_all_course(student_id, course):
+        osp_service = OSPService(OSP_ENVIRONMENT)
+        if course == 'HF':
+            course = 'highflyers'
+
+        response = osp_service.get_all_books_by_course(course)
+        book_info_json = response.json()
+
+        expected_ptr_bff_graphql_result = {}
+        expected_ptr_bff_all_books_list = []
+        for i in range(len(book_info_json)):
+            book_info_dict = book_info_json[i]
+            expected_ptr_bff_book_result = \
+                PTReviewUtils.get_expected_ptr_bff_result_by_book(student_id, course, None, book_info_dict)
+            expected_ptr_bff_all_books_list.append(expected_ptr_bff_book_result)
+
+        expected_ptr_bff_graphql_result['id'] = student_id
+        expected_ptr_bff_graphql_result['books'] = expected_ptr_bff_all_books_list
+        return expected_ptr_bff_graphql_result
+
+    @staticmethod
+    def verify_ptr_bff_graphql_all_course(ptr_bff_graphql_response_json, expected_ptr_bff_graphql_result):
+        actual_ptr_bff_result = ptr_bff_graphql_response_json['data']['viewer']
+
+        error_message = ''
+        if str(actual_ptr_bff_result['id']) != str(expected_ptr_bff_graphql_result['id']):
+            error_message = error_message + " id's value not as expected!"
+
+        actual_ptr_bff_result_books = actual_ptr_bff_result['books']
+        expected_ptr_bff_result_books = expected_ptr_bff_graphql_result['books']
+
+        if len(actual_ptr_bff_result_books) != len(expected_ptr_bff_result_books):
+            error_message = error_message + " books' value length not as expected!"
+        else:
+            for i in range(len(actual_ptr_bff_result_books)):
+                actual_ptr_bff_result_by_book = actual_ptr_bff_result_books[i]
+                expected_ptr_bff_result_by_book = expected_ptr_bff_result_books[i]
+                error_message = error_message + \
+                                PTReviewUtils.verify_ptr_bff_graphql_by_book(actual_ptr_bff_result_by_book,
+                                                                             expected_ptr_bff_result_by_book)
         return error_message

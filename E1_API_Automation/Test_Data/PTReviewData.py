@@ -27,6 +27,13 @@ class PTReviewData:
                     'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
                     'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
                     'UnitKey': '30E54D73-C793-4F00-AD61-59CBF0423A0F'
+                },
+                # this record is to test the omni API for multiple user,
+                # it need to have same pt key with the first student
+                '12214890': {
+                    'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
+                    'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
+                    'UnitKey': '30E54D73-C793-4F00-AD61-59CBF0423A0F'
                 }
               },
         'Staging': {
@@ -67,7 +74,11 @@ class PTReviewData:
              {'username': 'ptReviewTest_MixSSHF', 'password': '12345'},
              {'username': 'ptReviewTest_OneCurrent', 'password': '12345'},
              {'username': 'ptReviewTest01', 'password': '12345'},
-            ]
+            ],
+        'Staging':
+            [{'username': 'connie.test', 'password': '12345'},
+             {'username': 'siga.papertest', 'password': '12345'}
+             ]
     }
 
     ptr_resource_list = {
@@ -78,6 +89,20 @@ class PTReviewData:
                 "64ebd38b-1ed1-4871-b17c-2989267ef007",
                 "b12f5cd0-b03f-4ba5-bec5-117f239c213d",
                 "15880590-4a8d-4863-b648-5efff9cd6e56"
+            ],
+        'Staging':
+            [
+                "b3251797-f6d8-e811-814a-02bc62143fc0",
+                "b4251797-f6d8-e811-814a-02bc62143fc0",
+                "b5251797-f6d8-e811-814a-02bc62143fc0",
+                "b6251797-f6d8-e811-814a-02bc62143fc0"
+            ],
+        'Staging_SG':
+            [
+                "63d3075a-f4d8-e811-814a-02bc62143fc0",
+                "65d3075a-f4d8-e811-814a-02bc62143fc0",
+                "66d3075a-f4d8-e811-814a-02bc62143fc0",
+                "64d3075a-f4d8-e811-814a-02bc62143fc0"
             ]
     }
 
@@ -87,6 +112,13 @@ class PTReviewData:
                 'StudentId': 12221442,
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'UnitKey': '50ED3E4D-BF78-4D9D-B6EE-05F6D4D9A260'
+            }
+        },
+        'Staging': {
+            'HF': {
+                'StudentId': 100362513,
+                'BookKey': '8605C95C-9CF8-418C-8C67-B7A3122C5445',
+                'UnitKey': '22CFB67B-1CA2-4E71-A1EE-4FE8B0223FBA'
             }
         }
     }

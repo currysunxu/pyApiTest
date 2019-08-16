@@ -76,10 +76,10 @@ class Moutai():
 
     def options(self, url, **kwargs):
         url_combined = self.host + url
-        if self.token is None:
+        if self.token is None and self.request_session is not None:
             return self.request_session.options(url_combined, headers=self.headers, **kwargs)
         else:
-            return requests.options(url_combined, heaers=self.headers, **kwargs)
+            return requests.options(url_combined, headers=self.headers, **kwargs)
 
     def requests(self, method, url, **kwargs):
         url_combined = self.host + url

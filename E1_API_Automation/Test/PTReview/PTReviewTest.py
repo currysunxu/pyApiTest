@@ -87,6 +87,38 @@ class PTReviewTestCases:
         # verify if the data get from the StudentPaperDigitalProgressTestAssessmentMetas API are as what you constructed
         PTReviewUtils.verify_pt_score_with_api_response(skill_dic, assess_metas_response, unit_key)
 
+    # test the omni API for multiple user
+    @Test(tags="qa")
+    def test_save_total_score_with_omni_api_multiple_user(self):
+        student_skill = {}
+        for student_id in PTReviewData.pt_hf_user_key_book_unit[env_key].keys():
+            # the pt_key, book_key, unit_key will be same for omni api to support multiple user
+            pt_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['TestPrimaryKey']
+            # construct data to call the API
+            skill_dic = PTReviewUtils.generate_pt_whole_skill_subskill_randomscore_list()
+            student_skill[student_id] = skill_dic
+
+        omni_body = PTReviewUtils.generate_assessment_body_for_omni(pt_key, student_skill)
+
+        omni_body_json = json.dumps(omni_body)
+        print(omni_body_json)
+
+        # call OmniProgressTestAssessment API to update overwritten score and total score
+        tpi_service = TPIService(TPI_ENVIRONMENT)
+        tpi_response = tpi_service.put_hf_student_omni_pt_assessment(omni_body)
+        assert_that(tpi_response.status_code == 204)
+
+        osp_service = OSPService(OSP_ENVIRONMENT)
+        for student_id in PTReviewData.pt_hf_user_key_book_unit[env_key].keys():
+            book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
+            unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
+            # call StudentPaperDigitalProgressTestAssessmentMetas API to get all the records from DB
+            assess_metas = osp_service.post_hf_student_pt_assess_metas(student_id, book_key)
+            assert_that(assess_metas.status_code == 200)
+            assess_metas_response = assess_metas.json()
+            # verify if the data get from the StudentPaperDigitalProgressTestAssessmentMetas API are as what you constructed
+            PTReviewUtils.verify_pt_score_with_api_response(student_skill[student_id], assess_metas_response, unit_key)
+
     '''
     the case to test the StudentProgressTestAssessmentMetasGroupBySkill API, 
     for QA and staging: if the skill & sub skill's overwritten score is not null, it will get the value of 
@@ -293,6 +325,10 @@ class PTReviewTestCases:
     def test_resource_url_lessthan_50(self):
         pt_review_service = PTReviewService(ENVIRONMENT)
         resource_list = PTReviewData.ptr_resource_list[env_key]
+        # make sure options API return 200
+        recource_url_options_response = pt_review_service.options_resource_batch()
+        assert_that(recource_url_options_response.status_code == 200)
+
         recource_url_response = pt_review_service.post_resource_batch(resource_list)
         assert_that(recource_url_response.status_code == 200)
         error_message = PTReviewUtils.verify_resource_url(recource_url_response.json(), resource_list)
@@ -319,37 +355,57 @@ class PTReviewTestCases:
         response_message = recource_url_response.json()['Message']
         assert_that('Reason: the max length of keys is 50' in response_message)
 
+    # test pt review bff graphql API by book and unit
     @Test(tags="qa, stg")
-    def test_ptr_bff_graphql_skill_level(self):
+    def test_ptr_bff_graphql_by_book_unit(self):
         pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
         osp_service = OSPService(OSP_ENVIRONMENT)
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
         unit_key = PTReviewData.ptr_bff_data[env_key]['HF']['UnitKey']
-        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_skill_level(student_id, book_key, unit_key)
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book_unit(student_id, book_key, unit_key)
         assert_that(ptr_bff_graphql_response.status_code == 200)
 
         api_pt_assess_by_skill_response = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key, unit_key)
         expected_ptr_result_by_skill = \
-            PTReviewUtils.get_expected_ptr_bff_result_skill_level(api_pt_assess_by_skill_response.json())
-        error_message = PTReviewUtils.verify_ptr_bff_graphql_skill_level(ptr_bff_graphql_response.json(),
-                                                                         expected_ptr_result_by_skill)
+            PTReviewUtils.get_expected_ptr_bff_result_by_book_unit(api_pt_assess_by_skill_response.json())
+
+        error_message = PTReviewUtils.verify_ptr_bff_graphql_by_book_unit(ptr_bff_graphql_response.json(),
+                                                                          expected_ptr_result_by_skill)
         assert_that(error_message == '', error_message)
 
+    # test pt review bff graphql API by book
     @Test(tags="qa, stg")
-    def test_ptr_bff_graphql_unit_level(self):
+    def test_ptr_bff_graphql_by_book(self):
         pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
         course_code = 'HF'
-        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_unit_level(student_id, course_code, book_key)
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book(student_id, course_code, book_key)
         assert_that(ptr_bff_graphql_response.status_code == 200)
 
-        expected_ptr_result_by_unit = \
-            PTReviewUtils.get_expected_ptr_bff_result_unit_level(student_id, course_code, book_key)
+        expected_ptr_result_by_book = \
+            PTReviewUtils.get_expected_ptr_bff_result_by_book(student_id, course_code, book_key, None)
 
-        error_message = PTReviewUtils.verify_ptr_bff_graphql_unit_level(ptr_bff_graphql_response.json(),
-                                                                         expected_ptr_result_by_unit)
+        actual_ptr_bff_graphql_result_by_book = ptr_bff_graphql_response.json()['data']['book']
+        error_message = PTReviewUtils.verify_ptr_bff_graphql_by_book(actual_ptr_bff_graphql_result_by_book,
+                                                                     expected_ptr_result_by_book)
+        assert_that(error_message == '', error_message)
+
+    # test pt review bff graphql API for all course
+    @Test(tags="qa, stg")
+    def test_ptr_bff_graphql_all_course(self):
+        pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
+        course_code = 'HF'
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_student(student_id, course_code)
+        assert_that(ptr_bff_graphql_response.status_code == 200)
+
+        expected_ptr_result_all_course = \
+            PTReviewUtils.get_expected_ptr_bff_result_all_course(student_id, course_code)
+
+        error_message = PTReviewUtils.verify_ptr_bff_graphql_all_course(ptr_bff_graphql_response.json(),
+                                                                        expected_ptr_result_all_course)
         assert_that(error_message == '', error_message)
 
 

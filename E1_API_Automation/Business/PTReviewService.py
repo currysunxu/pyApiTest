@@ -12,6 +12,9 @@ class PTReviewService:
     def post_resource_batch(self, resource_list):
         return self.mou_tai.post("/Resource/Batch", resource_list)
 
+    def options_resource_batch(self):
+        return self.mou_tai.options("/Resource/Batch")
+
     @staticmethod
     def get_all_books_by_course_from_db(course_code):
         ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')
