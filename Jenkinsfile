@@ -16,6 +16,11 @@ pipeline {
   triggers {
     cron('H/30 * * * *')
   }
+  
+  parameters {
+        
+        choice(name:'test',choices:['QA','STG'],description:'')
+    }
    
   stages {
     
@@ -27,7 +32,7 @@ pipeline {
         }
       }
       steps {
-        env.environment = 'QA'
+
         script {
            
           sh 'ptest3  -t E1_API_Automation.Test.SmallStar'
