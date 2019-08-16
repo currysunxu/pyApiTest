@@ -7,3 +7,4 @@ ptest==1.9.5
 pytest==3.9.3
 Cython
 pymssql
+pytz
