@@ -16,6 +16,18 @@ pipeline {
   triggers {
     cron('H/30 * * * *')
   }
+  parameters { 
+
+   choice(name: ‘environment‘,
+   choices:‘QA\nSTG‘, 
+   description: ‘select the target environment to run the test‘)
+  }
+  enviornment 
+  {
+  
+  }
+  
+ 
   stages {
     stage('Verify') {
       agent {
@@ -26,9 +38,12 @@ pipeline {
       }
       steps {
         script {
+          sh "echo ${env.environment}" 
           sh 'ptest3  -t E1_API_Automation.Test.SmallStar'
         }
       }
     }
   }
+
+  
 }
