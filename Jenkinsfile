@@ -16,10 +16,9 @@ pipeline {
   triggers {
     cron('H/30 * * * *')
   }
-  env.environment = 'QA'
- 
-  
+   
   stages {
+    
     stage('Verify') {
       agent {
         docker {
@@ -28,6 +27,7 @@ pipeline {
         }
       }
       steps {
+        env.environment = 'QA'
         script {
            
           sh 'ptest3  -t E1_API_Automation.Test.SmallStar'
