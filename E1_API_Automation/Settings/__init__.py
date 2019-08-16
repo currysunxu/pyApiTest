@@ -40,7 +40,7 @@ class OMNIEnvironment(object):
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'QA'
+    os.environ['environment'] = 'STG'
 
 
 if os.environ['environment'] == 'QA':

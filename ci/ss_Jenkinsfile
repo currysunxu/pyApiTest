@@ -19,7 +19,7 @@ pipeline {
   
   parameters {
         
-        choice(name:'test',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
+        choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
     }
    
   stages {
@@ -37,6 +37,8 @@ pipeline {
            
           sh 'ptest3  -t E1_API_Automation.Test.SmallStar'
           junit 'test-output/xunit-results.xml'
+          if (currentBuild.result =='UNSTABLE')
+              currentBuild.result = 'FAILURE'
         }
       }
     }
