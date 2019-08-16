@@ -17,17 +17,9 @@ pipeline {
     cron('H/30 * * * *')
   }
   parameters { 
-
-   choice(name: ‘environment‘,
-   choices:‘QA',
-   description: ‘select the target environment to run the test‘)
-  }
-  enviornment 
-  {
-  
+   choice(name: ‘environment‘,choices:‘QA',description: ‘select the target environment to run the test‘)
   }
   
- 
   stages {
     stage('Verify') {
       agent {
