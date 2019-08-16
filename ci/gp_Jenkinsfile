@@ -19,7 +19,7 @@ pipeline {
   
   parameters {
         
-        choice(name:'test',choices:['QA','STG'],description:'')
+        choice(name:'test',choices:['QA','STG',''LIVE','LIVE_SG'],description:'')
     }
    
   stages {
@@ -35,7 +35,7 @@ pipeline {
 
         script {
            
-          sh 'ptest3  -t E1_API_Automation.Test.SmallStar'
+          sh 'ptest3  -t E1_API_Automation.Test.GP'
         }
       }
     }
