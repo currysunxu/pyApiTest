@@ -19,7 +19,7 @@ pipeline {
   parameters { 
 
    choice(name: ‘environment‘,
-   choices:[‘QA','STG'], 
+   choices:‘QA',
    description: ‘select the target environment to run the test‘)
   }
   enviornment 
