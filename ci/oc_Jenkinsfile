@@ -19,7 +19,9 @@ pipeline {
   
   parameters {
         
-        choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
+        choice(name:'test_env',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
+        string(name: 'Start_Time', defaultValue: 'Default', description: '')
+        string(name: 'End_Time', defaultValue: 'Default', description: '')
     }
   
   environment {
