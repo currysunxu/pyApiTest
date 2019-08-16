@@ -19,7 +19,7 @@ pipeline {
   
   parameters {
         
-        choice(name:'test',choices:['QA','STG',''LIVE','LIVE_SG'],description:'')
+        choice(name:'test',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
     }
    
   stages {
