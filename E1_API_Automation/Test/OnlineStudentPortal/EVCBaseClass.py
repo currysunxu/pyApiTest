@@ -195,6 +195,7 @@ class EVCBase():
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
         evc_profile_host='https://e1-evc-booking-integration.ef.com'
+        
 
     def get_different_teacher(teacher_id, teacher_list):
         for teacher in teacher_list:
@@ -204,9 +205,13 @@ class EVCBase():
 
     evc_service = None
     another_teacher = get_different_teacher(teacher_id, teacher_list)
+    
+    @BeforeSuite()
+    def set_up(self):
+        self.evc_service = KidsEVCService(host=self.host)
 
     def create_class(self):
-        self.evc_service = KidsEVCService(host=self.host)
+        
 
         #prepare the class which is assigned to teacher, which will follow the different environment.
         schedule_class, schedule_class_regular = (-1, -1)
