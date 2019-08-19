@@ -37,6 +37,10 @@ class OMNIEnvironment(object):
     STAGING = "http://omni-apigateway-staging-tccn.ef.com"
     LIVE = "http://omni-apigateway-tccn.ef.com"
 
+
+class LearningPlanEnvironment(object):
+    QA = "http://learning-plan.qa.edtech.kt"
+
 try:
     print(os.environ['environment'])
 except:
@@ -49,11 +53,17 @@ if os.environ['environment'] == 'QA':
     TPI_ENVIRONMENT = TPIEnvironment.QA
     AUTH_ENVIRONMENT = AuthEnvironment.QA
     OMNI_ENVIRONMENT = OMNIEnvironment.QA
+    LEARNING_PLAN_ENVIRONMENT = LearningPlanEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
         "User": "SchoolUser",
         "Password": "#Bugsfor$!"
+    }
+    CASSANDRA_DATABASE = {
+        "Server": "10.178.86.216",
+        "User": "cassandra",
+        "Password": "cassandra"
     }
 
 
