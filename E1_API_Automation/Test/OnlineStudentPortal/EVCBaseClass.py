@@ -205,7 +205,6 @@ class EVCBase():
     evc_service = None
     another_teacher = get_different_teacher(teacher_id, teacher_list)
 
-    @BeforeSuite()
     def create_class(self):
         self.evc_service = KidsEVCService(host=self.host)
 
