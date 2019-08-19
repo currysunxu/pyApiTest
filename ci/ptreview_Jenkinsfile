@@ -37,7 +37,6 @@ pipeline {
       }
       steps {
 
-        script {
           script {
           if (env.environment == 'STG')
               case_tag = 'stg'
@@ -52,6 +51,5 @@ pipeline {
       }
     }
   }
-
   
 }
