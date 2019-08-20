@@ -33,6 +33,7 @@ pipeline {
         docker {
           label 'CN_Kids_QA_CI'
           image '10.128.42.216:5000/apipython3:host_v1'
+          args '--add-host=learning-plan.qa.edtech.kt:10.178.86.8'
         }
       }
       steps {
