@@ -32,7 +32,7 @@ pipeline {
       agent {
         docker {
           label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/apipython3:v2'
+          image '10.128.42.216:5000/apipython3:host_v1'
         }
       }
       steps {
