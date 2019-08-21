@@ -5,7 +5,6 @@ from hamcrest import assert_that
 from ptest.decorator import TestClass, Test
 
 from ...Lib.HamcrestMatcher import match_to
-from ...Lib.HamcrestExister import exist
 from ...Lib.ScheduleClassTool import local2utc
 from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
 
@@ -26,18 +25,32 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("UserInfo.UserInfo.UserId"))
         return response
 
+    @Test()
+    def test_get_offline_active_groups(self):
+        self.test_login()
+
+        group_response = self.evc_service.get_offline_active_groups()
+        assert_that(group_response.json(), match_to("[*].courseType"))
+        assert_that(group_response.json(), match_to("[*].courseTypeLevelCode"))
+
+        course_type_list = jmespath.search("[?isCurrentGroup==`true`].courseType", group_response.json())
+        book_code_list = jmespath.search("[?isCurrentGroup==`true`].courseTypeLevelCode", group_response.json())
+        if course_type_list == []:
+            course_type = str(jmespath.search("[0].courseType", group_response.json()))
+            book_code = str(jmespath.search("[0].courseTypeLevelCode", group_response.json()))
+        else:
+            course_type = str(course_type_list[0])
+            book_code = str(book_code_list[0])
+        course = []
+        course.append(course_type)
+        course.append(book_code)
+        return course
+
     @Test(tags='qa,stg,live')
     def test_student_profile(self):
         self.test_login()
         response = self.evc_service.get_user_profile()
         assert_that(response.status_code == 200)
-        assert_that(response.json(), match_to("studentOrientationInfo[0].courseTypeLevelCode"))
-        assert_that(response.json(), match_to("studentOrientationInfo[0].courseType"))
-        assert_that(response.json(), exist("studentOrientationInfo[0].hasWatchedVideo"))
-        assert_that(response.json(), exist("studentOrientationInfo[0].isInvisible"))
-        assert_that(response.json(), match_to("studentOrientationInfo[0].lessonNumber"))
-        assert_that(response.json(), match_to("studentOrientationInfo[0].packageType"))
-        assert_that(response.json(), match_to("studentOrientationInfo[0].unitNumber"))
         assert_that(response.json(), match_to("userInfo"))
 
     @Test(tags='qa,stg,live')
@@ -48,63 +61,38 @@ class APITestCases(EVCBase):
         assert_that(response.status_code == 200)
         assert_that(jmespath.search("length([])", response.json()) >= 1)
         assert_that(response.json()[0]["classType"] == "Demo")
-        assert_that(response.json()[0]["courseType"] == "HF" or "HFV3Plus")
-
-    @Test(tags='qa, stg,live')
-    def test_get_recommended_lesson(self):
-        self.test_login()
-
-        student_profile_response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', student_profile_response.json())
-        package_type = jmespath.search('studentOrientationInfo[0].packageType', student_profile_response.json())
-
-        response = self.evc_service.get_recommended_class(hf_program_code, package_type)
-        assert_that(response.status_code == 200)
-        assert_that(response.json()["classType"] == "Regular")
-        assert_that(response.json()["courseType"] == hf_program_code)
-        assert_that(response.json()["packageType"] == package_type)
-        assert_that(response.json(), exist("courseTypeLevelCode"))
-        assert_that(response.json(), exist("unitNumber"))
-        assert_that(response.json(), exist("lessonNumber"))
-        assert_that(response.json(), exist("topicId"))
-        assert_that(response.json(), exist("topicStatement"))
+        assert_that(response.json()[0]["courseType"] == "HF" or "HFV3Plus" or "TB")
 
     @Test(tags='qa, stg,live')
     def test_get_all_available_teachers_demo_class(self):
-        self.test_login()
-
-        student_profile_response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', student_profile_response.json())
+        course = self.test_get_offline_active_groups()
+        course_type = course[0]
 
         available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
-                                                                                   local2utc(self.regular_end_time),
-                                                                                   course_type=hf_program_code,
-                                                                                   class_type=ClassType.DEMO.value,
-                                                                                   page_index=0, page_size=10)
+                                                                                  local2utc(self.regular_end_time),
+                                                                                  course_type=course_type,
+                                                                                  class_type=ClassType.DEMO.value,
+                                                                                  page_index=0, page_size=10)
         assert_that(available_teachers_response.json(), match_to("[0].teacherId"))
 
     @Test(tags='qa, stg,live')
     def test_get_all_available_teachers_regular_class(self):
-        self.test_login()
-
-        student_profile_response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', student_profile_response.json())
+        course = self.test_get_offline_active_groups()
+        course_type = course[0]
 
         available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
-                                                                                   local2utc(self.regular_end_time),
-                                                                                   course_type=hf_program_code,
-                                                                                   class_type=ClassType.REGULAR.value,
-                                                                                   page_index=0, page_size=10)
+                                                                                  local2utc(self.regular_end_time),
+                                                                                  course_type=course_type,
+                                                                                  class_type=ClassType.REGULAR.value,
+                                                                                  page_index=0, page_size=10)
         assert_that(available_teachers_response.json(), match_to("[0].teacherId"))
 
     @Test(tags='qa, stg, live')
     def test_get_online_class_booking_history(self):
-        self.test_login()
+        course = self.test_get_offline_active_groups()
+        course_type = course[0]
 
-        student_profile_response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', student_profile_response.json())
-
-        query_booking_history_response = self.evc_service.query_booking_history(hf_program_code,
+        query_booking_history_response = self.evc_service.query_booking_history(course_type,
                                                                                 ClassType.REGULAR.value)
         assert_that(query_booking_history_response.status_code == 200)
 
@@ -115,7 +103,6 @@ class APITestCases(EVCBase):
         * Get mandatory parameter from API:
             1, login
             2, get student profile
-        * Get lesson suggestion
         * Get OCH score
         * Get all available teachers
         * Book class and check class status code
@@ -127,25 +114,12 @@ class APITestCases(EVCBase):
         *
         :return:
         '''
-        # Login
-        self.test_login()
-
-        # Get student profile
-        student_profile_response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', student_profile_response.json())
-        package_type = jmespath.search('studentOrientationInfo[0].packageType', student_profile_response.json())
-
-        # Check the recommended lesson before booking
-        recommend_class_response = self.evc_service.get_recommended_class(hf_program_code, package_type)
-        assert_that(recommend_class_response.json(), match_to("courseTypeLevelCode"))
-        assert_that(recommend_class_response.json(), match_to("unitNumber"))
-        recommend_book = jmespath.search("courseTypeLevelCode", recommend_class_response.json())
-        recommend_unit = jmespath.search("unitNumber", recommend_class_response.json())
-        recommend_lesson = jmespath.search("lessonNumber", recommend_class_response.json())
-
+        # Login and get active offline groups
+        course = self.test_get_offline_active_groups()
+        course_type = course[0]
+        book_code = course[1]
         # Check OCH before book
         och_response = self.evc_service.get_credits()
-        assert_that(jmespath.search("length([])", och_response.json()) >= 2)
         assert_that(och_response.json(), match_to("[?classType=='Regular'].available"))
         OCH_number_before_booking = int(jmespath.search("[?classType=='Regular'].available", och_response.json())[0])
         sleep(2)
@@ -153,7 +127,7 @@ class APITestCases(EVCBase):
         # Get all available teachers
         available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
                                                                                   local2utc(self.regular_end_time),
-                                                                                  course_type=hf_program_code,
+                                                                                  course_type=course_type,
                                                                                   class_type=ClassType.REGULAR.value,
                                                                                   page_index=0, page_size=10)
         teacher_id = jmespath.search("[0].teacherId", available_teachers_response.json())
@@ -161,14 +135,14 @@ class APITestCases(EVCBase):
         # Book a class
         book_response = self.evc_service.book_class(local2utc(self.regular_start_time),
                                                     local2utc(self.regular_end_time),
-                                                    teacher_id, course_type=hf_program_code,
-                                                    class_type=ClassType.REGULAR.value, package=package_type,
-                                                    course_type_level_code=recommend_book, unit_number=recommend_unit,
-                                                    lesson_number=recommend_lesson)
+                                                    teacher_id, course_type=course_type,
+                                                    class_type=ClassType.REGULAR.value,
+                                                    course_type_level_code=book_code, unit_number="1",
+                                                    lesson_number="1", is_reschedule="true")
         assert_that(book_response.status_code == 201)
         class_id = jmespath.search("axisClassId", book_response.json())
 
-        # Verify 1 available HF credit should be deducted after booking
+        # Verify 1 available course_type credit should be deducted after booking
         och_response = self.evc_service.get_credits()
         assert_that(int(jmespath.search("[?classType=='Regular'].available", och_response.json())[0]) == (
                 OCH_number_before_booking - 1))
@@ -176,24 +150,24 @@ class APITestCases(EVCBase):
         # Check book failed with the class which is already booked
         book_response = self.evc_service.book_class(local2utc(self.regular_start_time),
                                                     local2utc(self.regular_end_time),
-                                                    teacher_id, course_type=hf_program_code,
-                                                    class_type=ClassType.REGULAR.value, package=package_type,
-                                                    course_type_level_code=recommend_book, unit_number=recommend_unit,
-                                                    lesson_number=recommend_lesson)
+                                                    teacher_id, course_type=course_type,
+                                                    class_type=ClassType.REGULAR.value,
+                                                    course_type_level_code=book_code, unit_number="1",
+                                                    lesson_number="1", is_reschedule="true")
         assert_that(book_response.status_code == 409)
         assert_that(jmespath.search("status", book_response.json()) == 409)
         assert_that(jmespath.search("subStatus", book_response.json()) == 1004)
 
         # Query booking history
-        query_booking_history_response = self.evc_service.query_booking_history(hf_program_code,
+        query_booking_history_response = self.evc_service.query_booking_history(course_type,
                                                                                 ClassType.REGULAR.value)
         assert_that(query_booking_history_response.json(), match_to("[*].classId"))
         assert_that(query_booking_history_response.json(), match_to("[*].classStatus"))
 
         # Change topic
-        change_topic_response = self.evc_service.change_topic(str(class_id), hf_program_code, package_type,
-                                                              ClassType.REGULAR.value, "H", recommend_unit,
-                                                              recommend_lesson)
+        change_topic_response = self.evc_service.change_topic(str(class_id), course_type,
+                                                              ClassType.REGULAR.value, "H", "1",
+                                                              "1")
         assert_that(change_topic_response.status_code == 204)
 
         # Cancel class
@@ -201,74 +175,68 @@ class APITestCases(EVCBase):
         assert_that(cancel_response.status_code == 204)
 
         # Query booking history again
-        query_booking_history_response = self.evc_service.query_booking_history(hf_program_code,
+        query_booking_history_response = self.evc_service.query_booking_history(course_type,
                                                                                 ClassType.REGULAR.value)
         assert_that(query_booking_history_response.json(), match_to("[*].classId"))
         assert_that(query_booking_history_response.json(), match_to("[*].classStatus"))
 
     @Test(tags='qa, stg,live')
-    def test_get_online_student_book_structure_hf_regular(self):
+    def test_get_online_book_structure_hf(self):
         self.test_login()
-        response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', response.json())
-        package_type = jmespath.search('studentOrientationInfo[0].packageType', response.json())
-
-        lesson_structure_response = self.evc_service.get_course_lesson_structure('Regular', hf_program_code,
-                                                                                 package_type)
-
+        lesson_structure_response = self.evc_service.get_course_lesson_structure('Regular', 'HF')
         assert_that(lesson_structure_response.json(), match_to("[0].classType"))
-        # Check that there are 192 lessons
+        # Check regular lessons
         assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 192)
-        # Check the book name
         assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
             ["C", "D", "E", "F", "G", "H", "I", "J"]))
 
-    @Test(tags='qa, stg,live')
-    def test_get_online_student_book_structure_hfv3plus_regular(self):
-        self.test_login()
-        lesson_structure_response = self.evc_service.get_course_lesson_structure('Regular', 'hfv3plus',
-                                                                                 '20')
-        assert_that(lesson_structure_response.json(), match_to("[0].classType"))
-        # Check that there are 160 lessons
+        # Check demo lesson
+        lesson_structure_response_hf = self.evc_service.get_course_lesson_structure('DEMO', 'HF')
+        assert_that(lesson_structure_response_hf.json(), match_to("[0].classType"))
+        assert_that(jmespath.search("length([])", lesson_structure_response_hf.json()) == 1)
+        assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response_hf.json())) == set(
+            ["X"]))
 
+    @Test(tags='qa, stg,live')
+    def test_get_online_book_structure_hfv3plus(self):
+        self.test_login()
+        lesson_structure_response = self.evc_service.get_course_lesson_structure('Regular', 'HFV3Plus')
+        assert_that(lesson_structure_response.json(), match_to("[0].classType"))
+        # Check regular lessons
         assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 160)
-        # Check the book name
         assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
             ["C", "D", "E", "F", "G", "H", "I", "J"]))
 
-    @Test(tags='qa, stg,live')
-    def test_get_online_student_book_structure_demo(self):
-        self.test_login()
-        lesson_structure_response = self.evc_service.get_course_lesson_structure('demo', 'hfv3plus',
-                                                                                 '20')
+        # Check demo lesson
+        lesson_structure_response = self.evc_service.get_course_lesson_structure('DEMO', 'HFV3Plus')
         assert_that(lesson_structure_response.json(), match_to("[0].classType"))
-        # Check that there are 160 lessons
-
         assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 1)
-        # Check the book name
         assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
             ["X"]))
-        lesson_structure_response_hf = self.evc_service.get_course_lesson_structure('demo', 'hf',
-                                                                                    '24')
-        assert_that(lesson_structure_response_hf.json(), match_to("[0].classType"))
-        # Check that there are 160 lessons
 
-        assert_that(jmespath.search("length([])", lesson_structure_response_hf.json()) == 1)
-        # Check the book name
-        assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response_hf.json())) == set(
+    @Test(tags='qa, stg,live')
+    def test_get_online_book_structure_tb(self):
+        self.test_login()
+        lesson_structure_response = self.evc_service.get_course_lesson_structure('Regular', 'TB')
+        assert_that(lesson_structure_response.json(), match_to("[0].classType"))
+        # Check regular lessons
+        assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 160)
+        assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
+            ["1", "2", "3", "4", "5", "6", "7", "8"]))
+
+        # Check demo lesson
+        lesson_structure_response = self.evc_service.get_course_lesson_structure('DEMO', 'TB')
+        assert_that(lesson_structure_response.json(), match_to("[0].classType"))
+        assert_that(jmespath.search("length([])", lesson_structure_response.json()) == 1)
+        assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
             ["X"]))
 
     @Test(tags='qa,stg,live')
     def test_verify_token_expired(self):
         self.test_login()
-
-        student_profile_response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', student_profile_response.json())
-        package_type = jmespath.search('studentOrientationInfo[0].packageType', student_profile_response.json())
-
         self.evc_service.sign_out()
-        response = self.evc_service.get_recommended_class(hf_program_code, package_type)
-        assert_that(response.status_code == 401)
+        student_profile_response = self.evc_service.get_user_profile()
+        assert_that(student_profile_response.status_code == 401)
 
     @Test(tags='qa,stg,live')
     def test_get_after_class_report(self):
@@ -285,24 +253,31 @@ class APITestCases(EVCBase):
     def test_book_class_error_code_with_not_enough_och(self):
         self.test_login()
         self.evc_service.login(user_name=self.user_with_zero_och["UserName"],
-                                password=self.user_with_zero_och["Password"])
+                               password=self.user_with_zero_och["Password"])
 
-        student_profile_response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', student_profile_response.json())
-        package_type = jmespath.search('studentOrientationInfo[0].packageType', student_profile_response.json())
+        group_response = self.evc_service.get_offline_active_groups()
+        course_type_list = jmespath.search("[?isCurrentGroup==`true`].courseType", group_response.json())
+        book_code_list = jmespath.search("[?isCurrentGroup==`true`].courseTypeLevelCode", group_response.json())
+        if course_type_list == []:
+            course_type = str(jmespath.search("[0].courseType", group_response.json()))
+            book_code = str(jmespath.search("[0].courseTypeLevelCode", group_response.json()))
+        else:
+            course_type = str(course_type_list[0])
+            book_code = str(book_code_list[0])
 
         available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
-                                                                                   local2utc(self.regular_end_time),
-                                                                                   course_type=hf_program_code,
-                                                                                   class_type=ClassType.REGULAR.value,
-                                                                                   page_index=0, page_size=10)
+                                                                                  local2utc(self.regular_end_time),
+                                                                                  course_type=course_type,
+                                                                                  class_type=ClassType.REGULAR.value,
+                                                                                  page_index=0, page_size=10)
         teacher_id = jmespath.search("[0].teacherId", available_teachers_response.json())
 
         book_response = self.evc_service.book_class(local2utc(self.regular_start_time),
-                                                     local2utc(self.regular_end_time),
-                                                     teacher_id, course_type=hf_program_code,
-                                                     class_type=ClassType.REGULAR.value, package=package_type,
-                                                     course_type_level_code="C", unit_number="2", lesson_number="2")
+                                                    local2utc(self.regular_end_time),
+                                                    teacher_id, course_type=course_type,
+                                                    class_type=ClassType.REGULAR.value,
+                                                    course_type_level_code=book_code, unit_number="2",
+                                                    lesson_number="2", is_reschedule="false")
         self.evc_service.sign_out()
         assert_that(book_response.status_code == 409)
         assert_that(jmespath.search("status", book_response.json()) == 409)
@@ -310,24 +285,21 @@ class APITestCases(EVCBase):
 
     @Test(tags='qa,stg,live')
     def test_book_class_error_code_with_topic_not_found(self):
-        self.test_login()
-
-        student_profile_response = self.evc_service.get_user_profile()
-        hf_program_code = jmespath.search('studentOrientationInfo[0].courseType', student_profile_response.json())
-        package_type = jmespath.search('studentOrientationInfo[0].packageType', student_profile_response.json())
+        course = self.test_get_offline_active_groups()
+        course_type = course[0]
 
         available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
-                                                                                   local2utc(self.regular_end_time),
-                                                                                   course_type=hf_program_code,
-                                                                                   class_type=ClassType.REGULAR.value,
-                                                                                   page_index=0, page_size=10)
+                                                                                  local2utc(self.regular_end_time),
+                                                                                  course_type=course_type,
+                                                                                  class_type=ClassType.REGULAR.value,
+                                                                                  page_index=0, page_size=10)
         teacher_id = jmespath.search("[0].teacherId", available_teachers_response.json())
 
         book_response = self.evc_service.book_class(local2utc(self.regular_start_time),
-                                                     local2utc(self.regular_end_time),
-                                                     teacher_id, course_type=hf_program_code,
-                                                     class_type=ClassType.REGULAR.value, package=package_type,
-                                                     course_type_level_code="Z", unit_number="2", lesson_number="2")
+                                                    local2utc(self.regular_end_time),
+                                                    teacher_id, course_type=course_type,
+                                                    class_type=ClassType.REGULAR.value,
+                                                    course_type_level_code="Z", unit_number="2", lesson_number="2", is_reschedule="false")
         assert_that(book_response.status_code == 404)
         assert_that(jmespath.search("status", book_response.json()) == 404)
         assert_that(jmespath.search("subStatus", book_response.json()) == 601)
@@ -347,17 +319,15 @@ class APITestCases(EVCBase):
         assert_that(response.status_code == 204)
 
     @Test(tags='qa,stg,live')
-    def test_save_orientation_info(self):
-        self.test_login()
-        orientation_info = [
-            {"courseType": "HF", "packageType": "24", "courseTypeLevelCode": "C", "isActive": True, "unitNumber": "1",
-             "lessonNumber": "1"}]
-        response = self.evc_service.update_orientation_info(orientation_info)
-        assert_that(response.status_code == 200)
-
-    @Test(tags='qa,stg,live')
     def test_evc_student_profile(self):
         self.test_login()
         response = self.evc_service.student_evc_profile(host=self.evc_profile_host)
         assert_that((response.status_code == 200))
         assert_that(response.json(), match_to('studentId'))
+
+    @Test(tags='qa,stg,live')
+    def test_app_download_url(self):
+        response = self.evc_service.get_app_download_url()
+        assert_that(response.status_code == 200)
+        assert_that(response.json(), match_to("appLinkForiOS"))
+        assert_that(response.json(), match_to("downloadLinkForAndroid"))
