@@ -103,6 +103,22 @@ class PTReviewData:
                 "65d3075a-f4d8-e811-814a-02bc62143fc0",
                 "66d3075a-f4d8-e811-814a-02bc62143fc0",
                 "64d3075a-f4d8-e811-814a-02bc62143fc0"
+            ],
+        'Live':
+            [
+                "a543df45-9408-401c-8232-649c894de105",
+                "46642319-f5d8-e811-814a-02bc62143fc0",
+                "47642319-f5d8-e811-814a-02bc62143fc0",
+                "5f91d558-9b9b-e811-814a-02bc62143fc0",
+                "48642319-f5d8-e811-814a-02bc62143fc0"
+            ],
+        'Live_SG':
+            [
+                "a543df45-9408-401c-8232-649c894de105",
+                "a7e0eb06-f5d8-e811-814a-02bc62143fc0",
+                "a8e0eb06-f5d8-e811-814a-02bc62143fc0",
+                "a9e0eb06-f5d8-e811-814a-02bc62143fc0",
+                "fd7ca371-983f-4af1-ab32-755b872909a8"
             ]
     }
 
@@ -119,6 +135,13 @@ class PTReviewData:
                 'StudentId': 100362513,
                 'BookKey': '8605C95C-9CF8-418C-8C67-B7A3122C5445',
                 'UnitKey': '22CFB67B-1CA2-4E71-A1EE-4FE8B0223FBA'
+            }
+        },
+        'Live': {
+            'HF': {
+                'StudentId': 100201088,
+                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
             }
         }
     }
