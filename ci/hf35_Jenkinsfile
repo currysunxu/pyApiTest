@@ -32,8 +32,8 @@ pipeline {
       agent {
         docker {
           label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/apipython3:host_v1'
-          args '--add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
+          image '10.128.42.216:5000/apipython3:v4'
+          args '-v --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
         }
       }
       steps {
