@@ -46,7 +46,7 @@ pipeline {
           if (env.environment == 'QA')
               case_tag = 'qa'
            
-          sh 'ptest3  -t E1_API_Automation.Test.HFV35 -i ${case_tag}'
+          sh 'ptest3  -t E1_API_Automation.Test.NGPlatform -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
