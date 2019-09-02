@@ -1,12 +1,12 @@
 
 class LearningPlan:
-    def __init__(self, product_id, plan_business_key, bucket_id, student_key, plan_type, state):
+    def __init__(self, product_id, plan_business_key, bucket_id, student_key):
         self.__product_id = product_id
         self.__plan_business_key = plan_business_key
         self.__bucket_id = bucket_id
         self.__student_key = student_key
-        self.__plan_type = plan_type
-        self.__state = state
+        self.__plan_type = None
+        self.__state = None
         self.__route = None
         self.__learning_unit = None
         self.__created_time = None
@@ -15,6 +15,7 @@ class LearningPlan:
         self.__last_updated_by = None
         self.__start_time = None
         self.__end_time = None
+        self.__system_key = None
 
     @property
     def product_id(self):
@@ -127,3 +128,11 @@ class LearningPlan:
     @end_time.setter
     def end_time(self, end_time):
         self.__end_time = end_time
+
+    @property
+    def system_key(self):
+        return self.__system_key
+
+    @system_key.setter
+    def system_key(self, system_key):
+        self.__system_key = system_key

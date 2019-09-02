@@ -8,3 +8,4 @@ pytest==3.9.3
 Cython
 pymssql
 pytz
+cassandra-driver
