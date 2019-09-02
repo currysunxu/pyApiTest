@@ -604,14 +604,15 @@ class PTReviewUtils:
             error_message = "the actual result list length return from Resource/Batch API are not expected!"
             return error_message
 
-        for actual_resource_url in actual_resource_json:
+        for i in range(len(resource_list)):
+            expected_identifier = resource_list[i]
+            expected_url = '/' + expected_identifier
+            actual_resource_url = actual_resource_json[i]
             actual_identifier = actual_resource_url["Identifier"]
             actual_credential_Uri = actual_resource_url["CredentialUri"]
 
-            expected_url = '/'+actual_identifier
             is_resource_exist = False
-
-            if actual_identifier in resource_list and expected_url in actual_credential_Uri:
+            if actual_identifier == expected_identifier and expected_url in actual_credential_Uri:
                 is_resource_exist = True
 
             if not is_resource_exist:
