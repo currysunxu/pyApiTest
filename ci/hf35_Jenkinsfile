@@ -51,7 +51,7 @@ pipeline {
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
-          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump /jacoco-data/learningplan/jacoco_learningplan_2.exec'
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump /jacoco-data/learningplan/jacoco_learningplan.exec'
           
         }
       }
@@ -61,17 +61,17 @@ pipeline {
         docker {
           label 'CN_Kids_QA_CI'
           image '10.128.42.216:5000/maven:3.6-jdk-8'
-          args '-v /jacoco:/app/jacoco'
+          args '-v /jacoco/data:/app/jacoco'
     
         }
       }
     steps{
     dir('PlanService'){
-     git credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
+     git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
      
      script{
      sh 'mvn clean package'
-     sh 'cp /app/jacoco/data/learningplan/jacoco_learningplan_2.exec jacoco.exec'
+     sh 'cp /app/jacoco/learningplan/jacoco_learningplan.exec jacoco.exec'
      jacoco()
      }
      }
