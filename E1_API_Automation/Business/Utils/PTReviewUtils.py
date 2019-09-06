@@ -198,6 +198,7 @@ class PTReviewUtils:
         writing_list = []
         speaking_code = SkillCode.Speaking.value
         writing_code = SkillCode.Writing.value
+        test_by = 1
         for skill_pt_score in student_pt_assessment_dict_list:
             skill_code = skill_pt_score["Code"]
             if skill_code.capitalize().startswith(speaking_code):
@@ -216,6 +217,10 @@ class PTReviewUtils:
                     score = skill_pt_score["OverwrittenScore"]
                     if score is None:
                         score = skill_pt_score["OriginalScore"]
+                    else:
+                        # if one of the grammer/vocabulary/reading/listening's OverwrittenScore have value, means it's paper test
+                        # modified by E1SP-405
+                        test_by = 0
                 else:
                     score = skill_pt_score["Score"]
 
@@ -259,7 +264,7 @@ class PTReviewUtils:
         else:
             return PTReviewUtils.construct_expected_skill_pt_score_result(student_pt_assessment_dict_list[0],
                                                                           expected_skill_score_list,
-                                                                          from_db)
+                                                                          from_db, test_by)
 
     '''
     get the expected pt assessment score by sub skill, for speaking and writing, the score and total score should be the 
@@ -314,15 +319,16 @@ class PTReviewUtils:
         return expected_skill_score
 
     @staticmethod
-    def construct_expected_skill_pt_score_result(skill_pt_score_dict, expected_skill_score_list, from_db):
+    def construct_expected_skill_pt_score_result(skill_pt_score_dict, expected_skill_score_list, from_db, test_by):
         expected_skill_pt_score_dict = {}
 
         if from_db:
             pt_key = skill_pt_score_dict["TestPrimaryKey"]
-            if skill_pt_score_dict["TestInstanceKey"] is None:
-                pt_test_by = 0
-            else:
-                pt_test_by = 1
+            # if skill_pt_score_dict["TestInstanceKey"] is None:
+            #     pt_test_by = 0
+            # else:
+            #     pt_test_by = 1
+            pt_test_by = test_by
         else:
             pt_test_by = skill_pt_score_dict["PTTestBy"]
             # if it's live env, there's no such field in the StudentPaperDigitalProgressTestAssessmentMetas API,
@@ -454,13 +460,25 @@ class PTReviewUtils:
             # then the expected unit total score is null
             if unit_expected_pt_assessment_by_skill is None:
                 unit_total_score = None
+
+                # according to E1SP-405, PTTestBy value is decided by four skill's overwrittenscore
+                test_by = 1
+                for unit_pt_assessment_dict in unit_pt_assessment_dict_list:
+                    skill_code = unit_pt_assessment_dict["Code"]
+                    if skill_code.capitalize() in (SkillCode.Grammar.value, SkillCode.Listening.value,
+                                                    SkillCode.Reading.value, SkillCode.Vocabulary.value):
+                        over_written_score = unit_pt_assessment_dict["OverwrittenScore"]
+
+                        if over_written_score is not None:
+                            test_by = 0
             else:
                 unit_total_score = unit_expected_pt_assessment_by_skill["PTTotalScore"]
+                test_by = unit_expected_pt_assessment_by_skill["PTTestBy"]
 
             expected_pt_score_by_unit_dict = \
                 PTReviewUtils.construct_expected_pt_score_by_unit_dict(unit_total_score,
                                                                        unit_pt_assessment_dict_list[0],
-                                                                       from_db)
+                                                                       from_db, test_by)
             expected_pt_assessment_by_unit.append(expected_pt_score_by_unit_dict)
 
         return expected_pt_assessment_by_unit
@@ -475,14 +493,15 @@ class PTReviewUtils:
         return int(result)
 
     @staticmethod
-    def construct_expected_pt_score_by_unit_dict(total_score, unit_pt_score_dict, from_db):
+    def construct_expected_pt_score_by_unit_dict(total_score, unit_pt_score_dict, from_db, test_by):
         expected_pt_score_by_unit_dict = {}
 
         if from_db:
-            if unit_pt_score_dict["TestInstanceKey"] is None:
-                pt_test_by = 0
-            else:
-                pt_test_by = 1
+            # if unit_pt_score_dict["TestInstanceKey"] is None:
+            #     pt_test_by = 0
+            # else:
+            #     pt_test_by = 1
+            pt_test_by = test_by
         else:
             pt_test_by = unit_pt_score_dict["PTTestBy"]
 
