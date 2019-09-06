@@ -45,13 +45,13 @@ pipeline {
               case_tag = 'live'
           if (env.environment == 'QA')
               case_tag = 'qa'
-          sh python E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService reset
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService reset'
            
           sh 'ptest3  -t E1_API_Automation.Test.NGPlatform -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
-          sh python E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump PlanService /jacoco/learningplan/jacoco.exec
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump PlanService /jacoco/learningplan/jacoco.exec'
           
         }
       }
@@ -86,7 +86,7 @@ pipeline {
       script{
       project_source = env.WORKSPACE + '/PlanService'
       
-      sh 'python 'E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService report /jacoco/learningplan/jacoco.exec /jacoco/learningplan/coveragereport ${project_source}'
+      sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService report /jacoco/learningplan/jacoco.exec /jacoco/learningplan/coveragereport ${project_source}'
       jacoco()
       }
       }
