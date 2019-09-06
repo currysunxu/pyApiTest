@@ -25,7 +25,7 @@ class APITestCases(EVCBase):
         assert_that(response.json(), match_to("UserInfo.UserInfo.UserId"))
         return response
 
-    @Test()
+    @Test(tags='qa,stg,live')
     def test_get_offline_active_groups(self):
         self.test_login()
 
@@ -60,7 +60,6 @@ class APITestCases(EVCBase):
         response = self.evc_service.get_credits()
         assert_that(response.status_code == 200)
         assert_that(jmespath.search("length([])", response.json()) >= 1)
-        assert_that(response.json()[0]["classType"] == "Demo")
         assert_that(response.json()[0]["courseType"] == "HF" or "HFV3Plus" or "TB")
 
     @Test(tags='qa, stg,live')

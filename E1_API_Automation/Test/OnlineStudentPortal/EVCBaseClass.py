@@ -22,9 +22,6 @@ class EVCBase():
     host = None
     start_time = None
     end_time = None
-    HF_course_type = "HF"
-    HF_region = "CN"
-    HF_package_type = 24
 
     teacher_list = {}
 
