@@ -51,7 +51,7 @@ pipeline {
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
-          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump PlanService /jacoco/learningplan/jacoco.exec'
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump PlanService /jacoco/learningplan/jacoco_learningplan.exec'
           
         }
       }
@@ -71,7 +71,7 @@ pipeline {
      
      script{
      sh 'mvn clean package'
-     sh 'cp /jacoco/learningplan/jacoco.exec jacoco.exec'
+     sh 'cp /app/jacoco/data/learningplan/jacoco_learningplan.exec jacoco.exec'
      jacoco()
      }
      }
