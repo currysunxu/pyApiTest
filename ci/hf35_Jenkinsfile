@@ -33,7 +33,7 @@ pipeline {
         docker {
           label 'CN_Kids_QA_CI'
           image '10.128.42.216:5000/apipython3:v4'
-          args '--add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
+          args '-v /jacoco:/app/jacoco --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
         }
       }
       steps {
@@ -45,13 +45,52 @@ pipeline {
               case_tag = 'live'
           if (env.environment == 'QA')
               case_tag = 'qa'
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService reset'
            
           sh 'ptest3  -t E1_API_Automation.Test.NGPlatform -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump PlanService /jacoco/learningplan/jacoco.exec'
+          
         }
       }
+    }
+    stage('Get Project Source'){
+    agent {
+        docker {
+          label 'CN_Kids_QA_CI'
+          image '10.128.42.216:5000/maven:3.6-jdk-8'
+    
+        }
+      }
+    steps{
+    dir('PlanService'){
+     git credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
+     
+     script{
+     sh 'mvn clean package'
+     }
+     }
+  }
+  }
+    stage(Generate Report){
+    agent {
+        docker {
+          label 'CN_Kids_QA_CI'
+          image '10.128.42.216:5000/apipython3:v4'
+          args '-v /jacoco:/app/jacoco --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
+        }
+      }
+      steps{
+      script{
+      project_source = env.WORKSPACE + '/PlanService'
+      
+      sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService report /jacoco/learningplan/jacoco.exec /jacoco/learningplan/coveragereport ${project_source}'
+      jacoco()
+      }
+      }
+      
     }
   }
   
