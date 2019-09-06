@@ -45,7 +45,7 @@ pipeline {
               case_tag = 'live'
           if (env.environment == 'QA')
               case_tag = 'qa'
-          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService reset'
+          
            
           sh 'ptest3  -t E1_API_Automation.Test.NGPlatform -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
