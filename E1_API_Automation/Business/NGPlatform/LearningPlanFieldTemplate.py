@@ -81,6 +81,8 @@ class FieldType(Enum):
     TypeInt = 'int'
     TypeString = 'string'
     TypeDate = 'date'
+    TypeUUID = 'uuid'
+    TypeObject = 'object'
 
 
 class FieldValueType(Enum):
@@ -88,3 +90,4 @@ class FieldValueType(Enum):
     BelowMin = 'belowMin'
     Max = 'max'
     Min = 'min'
+    Valid = 'valid'

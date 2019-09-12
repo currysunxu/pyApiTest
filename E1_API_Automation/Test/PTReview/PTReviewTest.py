@@ -356,7 +356,7 @@ class PTReviewTestCases:
         assert_that('Reason: the max length of keys is 50' in response_message)
 
     # test pt review bff graphql API by book and unit
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_ptr_bff_graphql_by_book_unit(self):
         pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
         osp_service = OSPService(OSP_ENVIRONMENT)
@@ -375,7 +375,7 @@ class PTReviewTestCases:
         assert_that(error_message == '', error_message)
 
     # test pt review bff graphql API by book
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg, live")
     def test_ptr_bff_graphql_by_book(self):
         pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']

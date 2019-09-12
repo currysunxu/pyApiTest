@@ -24,6 +24,10 @@ class AuthService:
         self.mou_tai.headers['X-EF-TOKEN'] = idToken
         return athentication_result
 
+    def get_auth_token(self):
+        token_value = self.mou_tai.headers.pop('X-EF-TOKEN')
+        return token_value
+
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v1/auth/logout")
 
