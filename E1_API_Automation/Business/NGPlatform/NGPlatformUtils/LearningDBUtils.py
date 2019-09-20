@@ -13,7 +13,6 @@ class LearningDBUtils:
                                                                  learning_plan.student_key,
                                                                  learning_plan.system_key)
         result_dict_list = cassandra_sql_server.exec_query_return_dict_list(sql)
-        print(result_dict_list)
         return result_dict_list
 
     @staticmethod
@@ -23,7 +22,6 @@ class LearningDBUtils:
                                                                  learning_plan.plan_business_key,
                                                                  learning_plan.bucket_id)
         result_dict_list = cassandra_sql_server.exec_query_return_dict_list(sql)
-        print(result_dict_list)
         return result_dict_list
 
     @staticmethod
@@ -34,7 +32,31 @@ class LearningDBUtils:
                                                                  learning_plan.bucket_id,
                                                                  learning_plan.student_key)
         result_dict_list = cassandra_sql_server.exec_query_return_dict_list(sql)
-        print(result_dict_list)
         return result_dict_list
 
+    @staticmethod
+    def get_specific_result(learning_result):
+        cassandra_sql_server = CassandraHelper(CASSANDRA_DATABASE, 'kids')
+        sql = LearningPlanSQLString.get_specific_result_sql.format(learning_result.product_id,
+                                                                   learning_result.student_key,
+                                                                   learning_result.plan_business_key,
+                                                                   learning_result.plan_system_key)
+        result_dict_list = cassandra_sql_server.exec_query_return_dict_list(sql)
+        return result_dict_list
 
+    @staticmethod
+    def get_partition_result(learning_result):
+        cassandra_sql_server = CassandraHelper(CASSANDRA_DATABASE, 'kids')
+        sql = LearningPlanSQLString.get_partition_result_sql.format(learning_result.product_id,
+                                                                    learning_result.student_key)
+        result_dict_list = cassandra_sql_server.exec_query_return_dict_list(sql)
+        return result_dict_list
+
+    @staticmethod
+    def get_user_result(learning_result):
+        cassandra_sql_server = CassandraHelper(CASSANDRA_DATABASE, 'kids')
+        sql = LearningPlanSQLString.get_user_result_sql.format(learning_result.product_id,
+                                                               learning_result.student_key,
+                                                               learning_result.plan_business_key)
+        result_dict_list = cassandra_sql_server.exec_query_return_dict_list(sql)
+        return result_dict_list

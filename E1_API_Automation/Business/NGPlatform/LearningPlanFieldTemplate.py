@@ -91,3 +91,5 @@ class FieldValueType(Enum):
     Max = 'max'
     Min = 'min'
     Valid = 'valid'
+    NoneValue = 'None'
+    EmptyValue = 'Empty'

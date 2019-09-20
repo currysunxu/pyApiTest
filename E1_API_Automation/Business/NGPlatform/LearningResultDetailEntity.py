@@ -6,6 +6,7 @@ class LearningResultDetailEntity:
         self.__question_key = None
         self.__question_version = None
         self.__answer = None
+        self.__extension = None
         self.__expected_score = None
         self.__actual_score = None
         self.__duration = None
@@ -51,6 +52,14 @@ class LearningResultDetailEntity:
     @answer.setter
     def answer(self, answer):
         self.__answer = answer
+
+    @property
+    def extension(self):
+        return self.__extension
+
+    @extension.setter
+    def extension(self, extension):
+        self.__extension = extension
 
     @property
     def expected_score(self):

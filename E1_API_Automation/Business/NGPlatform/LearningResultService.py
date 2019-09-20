@@ -11,7 +11,38 @@ class LearningResultService:
 
     def post_learning_result_insert(self, learning_result):
         learning_result_insert_dict = LearningResultUtils.construct_learning_result_dict(learning_result)
-        print(str(learning_result_insert_dict))
         return self.mou_tai.post("/api/v1/results/", learning_result_insert_dict)
 
+    def get_partition_result_without_limit(self, learning_result):
+        api_url = '/api/v1/results/{0}/{1}'.format(learning_result.product_id, learning_result.student_key)
+        return self.mou_tai.get(api_url)
 
+    def get_partition_result_with_limit(self, learning_result, limit):
+        if limit is None:
+            limit = ''
+        api_url = '/api/v1/results/{0}/{1}?limit={2}'.format(learning_result.product_id,
+                                                             learning_result.student_key, limit)
+        return self.mou_tai.get(api_url)
+
+    def get_user_result_without_limit(self, learning_result):
+        api_url = '/api/v1/results/{0}/{1}?planbusinesskey={2}'.format(learning_result.product_id,
+                                                                       learning_result.student_key,
+                                                                       learning_result.plan_business_key)
+        return self.mou_tai.get(api_url)
+
+    def get_user_result_with_limit(self, learning_result, limit):
+        if limit is None:
+            limit = ''
+
+        api_url = '/api/v1/results/{0}/{1}?planbusinesskey={2}&limit={3}'.format(learning_result.product_id,
+                                                                                 learning_result.student_key,
+                                                                                 learning_result.plan_business_key,
+                                                                                 limit)
+        return self.mou_tai.get(api_url)
+
+    def get_specific_result(self, learning_result):
+        api_url = '/api/v1/results/{0}/{1}?planbusinesskey={2}&plansystemkey={3}'.format(learning_result.product_id,
+                                                                                         learning_result.student_key,
+                                                                                         learning_result.plan_business_key,
+                                                                                         learning_result.plan_system_key)
+        return self.mou_tai.get(api_url)

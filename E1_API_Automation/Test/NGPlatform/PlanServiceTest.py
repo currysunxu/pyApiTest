@@ -1,6 +1,7 @@
 from ptest.decorator import TestClass, Test
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningPlanUtils import LearningPlanUtils
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningDBUtils import LearningDBUtils
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningPlan import LearningPlan
 from E1_API_Automation.Business.NGPlatform.LearningPlanFieldTemplate import FieldValueType
@@ -12,23 +13,23 @@ import random
 @TestClass()
 class PlanServiceTestCases:
 
-    # test learning plan insert API with valid required fields
+    # test learning plan insert API with valid fields
     @Test(tags="qa")
-    def test_learning_plan_insert_valid_required_fields(self):
+    def test_learning_plan_insert_valid_fields(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
 
-        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(True)
+        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(False)
         learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
         assert_that(learning_plan_insert_api_response.status_code == 200)
         # verify what it returned in response will be consistent what we want to insert
-        error_message = LearningPlanUtils.verify_learning_plan_data(learning_plan_insert_api_response.json(),
-                                                                    learning_plan)
+        error_message = LearningCommonUtils.verify_result_with_entity(learning_plan_insert_api_response.json(),
+                                                                      learning_plan)
         assert_that(error_message == '', error_message)
 
         # check when get specific plan, the return message will consistent what we want to insert through API
         learning_plan_get_api_response = learning_plan_service.get_specific_plan(learning_plan)
-        error_message = LearningPlanUtils.verify_learning_plan_data(learning_plan_get_api_response.json()[0],
-                                                                    learning_plan)
+        error_message = LearningCommonUtils.verify_result_with_entity(learning_plan_get_api_response.json()[0],
+                                                                      learning_plan)
         assert_that(error_message == '', error_message)
 
         # delete this specific learning plan at last
@@ -39,15 +40,15 @@ class PlanServiceTestCases:
     def test_get_specific_plan(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
 
-        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(True)
+        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(False)
         learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
         assert_that(learning_plan_insert_api_response.status_code == 200)
         learning_plan_get_api_response = learning_plan_service.get_specific_plan(learning_plan)
         assert_that(learning_plan_get_api_response.status_code == 200)
         learning_plan_list_from_db = LearningDBUtils.get_specific_plan(learning_plan)
 
-        error_message = LearningPlanUtils.\
-            verify_learning_plan_get_api_data_with_db(learning_plan_get_api_response.json(), learning_plan_list_from_db)
+        error_message = LearningCommonUtils.verify_learning_get_api_data_with_db(learning_plan_get_api_response.json(),
+                                                                                 learning_plan_list_from_db)
 
         assert_that(error_message == '', error_message)
 
@@ -59,7 +60,7 @@ class PlanServiceTestCases:
     def test_delete_specific_plan(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # insert data
-        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(True)
+        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(False)
         learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
         assert_that(learning_plan_insert_api_response.status_code == 200)
         # check data with the API
@@ -131,8 +132,8 @@ class PlanServiceTestCases:
         if batch_number > 50:
             learning_plan_list_from_db = learning_plan_list_from_db[:50]
 
-        error_message = LearningPlanUtils. \
-            verify_learning_plan_get_api_data_with_db(learning_plan_get_api_response.json(), learning_plan_list_from_db)
+        error_message = LearningCommonUtils.verify_learning_get_api_data_with_db(learning_plan_get_api_response.json(),
+                                                                                 learning_plan_list_from_db)
 
         assert_that(error_message == '', error_message)
 
@@ -179,9 +180,9 @@ class PlanServiceTestCases:
                 LearningPlanUtils.get_expected_learning_plan_from_db_by_limit_page(learning_plan_list_from_db,
                                                                                    limit, None)
 
-            error_message = LearningPlanUtils. \
-                verify_learning_plan_get_api_data_with_db(learning_plan_get_api_response.json(),
-                                                          expected_learning_plan_list_from_db)
+            error_message = LearningCommonUtils.\
+                verify_learning_get_api_data_with_db(learning_plan_get_api_response.json(),
+                                                     expected_learning_plan_list_from_db)
             assert_that(error_message == '', "When limit is:" + str(limit) + ", the error message is:" + error_message)
 
         # delete these learning plan at last
@@ -231,9 +232,9 @@ class PlanServiceTestCases:
                     LearningPlanUtils.get_expected_learning_plan_from_db_by_limit_page(learning_plan_list_from_db,
                                                                                        limit, page)
 
-                error_message = LearningPlanUtils. \
-                    verify_learning_plan_get_api_data_with_db(learning_plan_get_api_response.json(),
-                                                              expected_learning_plan_list_from_db)
+                error_message = LearningCommonUtils.\
+                    verify_learning_get_api_data_with_db(learning_plan_get_api_response.json(),
+                                                         expected_learning_plan_list_from_db)
                 assert_that(error_message == '', "When limit is:" + str(limit) + "page is:" + str(page)
                             + ",the error message is:" + error_message)
 
@@ -413,12 +414,12 @@ class PlanServiceTestCases:
     def test_learning_plan_update_valid(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # prepare learning plan first
-        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(True)
+        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(False)
         learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
         assert_that(learning_plan_insert_api_response.status_code == 200)
 
         # construct a update learning plan, it have same product_id, plan_business_key, bucket_id, student_key, system_key with original plan
-        learning_plan_update = LearningPlanUtils.construct_valid_learning_plan_based_on_entity(learning_plan, True)
+        learning_plan_update = LearningPlanUtils.construct_learning_plan_by_template(learning_plan, FieldValueType.Valid)
 
         learning_plan_update_api_response = learning_plan_service.put_learning_plan(learning_plan_update)
         assert_that(learning_plan_update_api_response.status_code == 200)
@@ -427,7 +428,7 @@ class PlanServiceTestCases:
 
         # check when get specific plan, the return message will consistent what we want to insert through API
         learning_plan_get_api_response = learning_plan_service.get_specific_plan(learning_plan_update)
-        error_message = LearningPlanUtils.verify_learning_plan_data(learning_plan_get_api_response.json()[0],
+        error_message = LearningCommonUtils.verify_result_with_entity(learning_plan_get_api_response.json()[0],
                                                                     learning_plan_update)
         assert_that(error_message == '', error_message)
 

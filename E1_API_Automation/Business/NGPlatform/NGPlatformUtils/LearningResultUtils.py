@@ -1,81 +1,38 @@
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningPlanFieldTemplate import LearningPlanFieldTemplate, FieldType, FieldValueType
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
 import random
 import string
-import datetime
-import uuid
-import jmespath
-import re
+
 
 
 class LearningResultUtils:
     @staticmethod
-    def construct_field_value(field_template, field_value_type):
-        field_value = None
-        if field_template.field_type == FieldType.TypeInt:
-            min_value = field_template.min_value
-            max_value = field_template.max_value
-
-            if field_value_type == FieldValueType.BelowMin:
-                if min_value is not None:
-                    field_value = min_value - 1
-                else:
-                    field_value = -1
-            elif field_value_type == FieldValueType.ExceedMax:
-                if max_value is None:
-                    max_value = 2147483647  # 2147483647 is int's maxvalue
-                field_value = max_value + 1
-            elif field_value_type == FieldValueType.Valid:
-                if min_value is None:
-                    min_value = 1
-                if max_value is None:
-                    max_value = 100
-                field_value = random.randint(min_value, max_value)
-        elif field_template.field_type == FieldType.TypeString:
-            if field_value_type == FieldValueType.BelowMin:
-                if field_template.content_format is not None:
-                    not_allowable_format = string.punctuation + string.whitespace
-                    not_allowable_format.replace('|', '')
-                    not_allowable_format.replace('-', '')
-                    field_value = ''.join(random.sample(not_allowable_format, 10))
-            elif field_value_type == FieldValueType.ExceedMax:
-                if field_template.content_format is not None:
-                    field_value = ''.join(random.choices(string.ascii_letters + string.digits + '|-', k=field_template.max_value + 1))
-                else:
-                    field_value = ''.join(random.choices(string.printable, k=field_template.max_value + 1))
-            elif field_value_type == FieldValueType.Valid:
-                content_len = random.randint(field_template.min_value, field_template.max_value)
-                if field_template.content_format is not None:
-                    field_value = ''.join(random.choices(string.ascii_letters + string.digits + '|-', k=content_len))
-                else:
-                    field_value = ''.join(random.choices(string.printable, k=content_len))
-        elif field_template.field_type == FieldType.TypeDate:
-            # for date field, if want to construct invalid data, random choose the year or characters
-            if field_value_type == FieldValueType.BelowMin or field_value_type == FieldValueType.ExceedMax:
-                value_str = ''.join(random.sample(string.ascii_letters, 5))
-                value_year = datetime.datetime.now().year
-                field_value = random.choice([value_str, value_year])
-            elif field_value_type == FieldValueType.Valid:
-                field_value = datetime.datetime.now().strftime(field_template.content_format)[:-4]+'Z'
-        elif field_template.field_type == FieldType.TypeUUID:
-            if field_value_type == FieldValueType.BelowMin or field_value_type == FieldValueType.ExceedMax:
-                field_value = ''.join(random.sample(string.ascii_letters, 5))
-            elif field_value_type == FieldValueType.Valid:
-                field_value = uuid.uuid1()
-        return field_value
+    def construct_learning_result_valid(details_number):
+        return LearningResultUtils.construct_learning_result_by_template(None, details_number)
 
     @staticmethod
-    def construct_learning_result_valid(details_number):
+    def construct_learning_result_by_template(learning_result_template, details_number):
         field_templates = LearningResultUtils.get_learning_result_field_templates()
         learning_result = LearningResultEntity(None, None, None)
-        student_plan_items = learning_result.__dict__
-        for item_key in student_plan_items.keys():
+        student_result_items = learning_result.__dict__
+        for item_key in student_result_items.keys():
             field_name = item_key[len('_' + learning_result.__class__.__name__ + '__'):]
 
             if field_name != 'details':
-                field_template = LearningResultUtils.get_field_template_by_name(field_name, field_templates)
-                field_value = LearningResultUtils.construct_field_value(field_template, FieldValueType.Valid)
+                is_copy_from_template = False
+                # for these three fields, if template already have value, then, copy them from template,
+                # otherwise, randomly generate value
+                if field_name in ('product_id', 'student_key', 'plan_business_key'):
+                    if learning_result_template is not None:
+                        field_value = getattr(learning_result_template, item_key)
+                        if field_value is not None:
+                            is_copy_from_template = True
+
+                if not is_copy_from_template:
+                    field_template = LearningCommonUtils.get_field_template_by_name(field_name, field_templates)
+                    field_value = LearningCommonUtils.construct_field_value(field_template, FieldValueType.Valid)
             else:
                 field_value = LearningResultUtils.construct_learning_result_details(FieldValueType.Valid,
                                                                                     details_number)
@@ -92,13 +49,27 @@ class LearningResultUtils:
             result_detail_items = learning_result_detail_entity.__dict__
             for item_key in result_detail_items.keys():
                 field_name = item_key[len('_' + learning_result_detail_entity.__class__.__name__ + '__'):]
-                field_template = LearningResultUtils.get_field_template_by_name(field_name, detail_field_templates)
-                field_value = LearningResultUtils.construct_field_value(field_template, field_value_type)
+                field_template = LearningCommonUtils.get_field_template_by_name(field_name, detail_field_templates)
+                field_value = LearningCommonUtils.construct_field_value(field_template, field_value_type)
                 setattr(learning_result_detail_entity, item_key, field_value)
 
             detail_entity_list.append(learning_result_detail_entity)
 
         return detail_entity_list
+
+    @staticmethod
+    def construct_learning_result_template(is_need_plan_business_key):
+        product_id = 2
+        student_key = 'resultInsert|StudentKeyTest|' + ''.join(
+            random.sample(string.ascii_letters + string.digits + '|-', 5))
+
+        plan_business_key = None
+        if is_need_plan_business_key:
+            plan_business_key = 'resultInsert|BusinessKeyTest|' \
+                                + ''.join(random.sample(string.ascii_letters + string.digits + '|-', 5))
+
+        learning_result_template = LearningResultEntity(product_id, plan_business_key, student_key)
+        return learning_result_template
 
     @staticmethod
     def construct_learning_result_details_dict(learning_result_details):
@@ -112,7 +83,7 @@ class LearningResultUtils:
                     learning_result_detail_field_name = item_key[len('_' + learning_result_detail.__class__.__name__ + '__'):]
                     item_value = learning_result_detail_items[item_key]
                     learning_result_detail_field_name = \
-                        LearningResultUtils.convert_name_from_lower_case_to_camel_case(learning_result_detail_field_name)
+                        LearningCommonUtils.convert_name_from_lower_case_to_camel_case(learning_result_detail_field_name)
                     learning_result_detail_dict[learning_result_detail_field_name] = item_value
                 learning_result_dict_list.append(learning_result_detail_dict)
             return learning_result_dict_list
@@ -132,7 +103,7 @@ class LearningResultUtils:
                     if item_value is not None:
                         item_value = str(item_value)
                 learning_result_field_name = \
-                    LearningResultUtils.convert_name_from_lower_case_to_camel_case(learning_result_field_name)
+                    LearningCommonUtils.convert_name_from_lower_case_to_camel_case(learning_result_field_name)
                 learning_result_dict[learning_result_field_name] = item_value
             else:
                 detail_dict_list = LearningResultUtils.construct_learning_result_details_dict(item_value)
@@ -140,35 +111,16 @@ class LearningResultUtils:
 
         return learning_result_dict
 
-    # as now service change all the input/output to use camelCase format, so, make the change
-    @staticmethod
-    def convert_name_from_lower_case_to_camel_case(field_name):
-        while field_name.find('_') > 0:
-            under_score_index = field_name.find('_')
-            under_score_next_char = field_name[under_score_index+1:under_score_index+2]
-            char_need_be_replaced = field_name[under_score_index:under_score_index+2]
-            field_name = field_name.replace(char_need_be_replaced, under_score_next_char.upper())
-        return field_name
-
-    @staticmethod
-    def convert_name_from_camel_case_to_lower_case(field_name):
-        to_be_replaced_name = field_name
-        for i in range(len(field_name)):
-            char = field_name[i:i+1]
-            if char.isupper():
-                to_be_replaced_name = to_be_replaced_name.replace(char, '_'+char.lower())
-
-        return to_be_replaced_name
-
     @staticmethod
     def get_learning_result_field_templates():
         learning_result_field_templates = []
 
         product_id_field_tempalte = LearningPlanFieldTemplate('productId', FieldType.TypeInt, True)
-        product_id_field_tempalte.min_value = 1
+        # product_id_field_tempalte.min_value = 1
         product_id_field_tempalte.min_error_code = '4402'
-        product_id_field_tempalte.max_value = 512
-        product_id_field_tempalte.max_error_code = '4403'
+        # product_id_field_tempalte.max_value = 512
+        # product_id_field_tempalte.max_error_code = '4403'
+        product_id_field_tempalte.content_format = [1, 2, 4, 8, 16, 32, 64]
 
         regular_expression = '^[A-Za-z0-9|-]+$'
         plan_business_key_field_tempalte = LearningPlanFieldTemplate('planBusinessKey', FieldType.TypeString, True)
@@ -187,10 +139,11 @@ class LearningResultUtils:
         student_key_field_tempalte.content_format = regular_expression
 
         plan_type_field_tempalte = LearningPlanFieldTemplate('planType', FieldType.TypeInt, True)
-        plan_type_field_tempalte.min_value = 1
+        # plan_type_field_tempalte.min_value = 1
         plan_type_field_tempalte.min_error_code = '4405'
-        plan_type_field_tempalte.max_value = 512
-        plan_type_field_tempalte.max_error_code = '4406'
+        # plan_type_field_tempalte.max_value = 512
+        # plan_type_field_tempalte.max_error_code = '4406'
+        plan_type_field_tempalte.content_format = [1, 2, 4, 8, 16, 32]
 
         trace_key_field_tempalte = LearningPlanFieldTemplate('traceKey', FieldType.TypeUUID, True)
         trace_key_field_tempalte.min_error_code = '4423'
@@ -215,6 +168,8 @@ class LearningResultUtils:
         created_by_field_tempalte.min_error_code = '4414'
         created_by_field_tempalte.max_value = 128
 
+        extension_field_tempalte = LearningPlanFieldTemplate('extension', FieldType.TypeObject, False)
+
         details_field_tempalte = LearningPlanFieldTemplate('details', FieldType.TypeObject, True)
         details_field_tempalte.min_value = 1
         details_field_tempalte.min_error_code = '4425'
@@ -230,6 +185,7 @@ class LearningResultUtils:
         learning_result_field_templates.append(expected_score_field_tempalte)
         learning_result_field_templates.append(actual_score_field_tempalte)
         learning_result_field_templates.append(created_by_field_tempalte)
+        learning_result_field_templates.append(extension_field_tempalte)
         learning_result_field_templates.append(details_field_tempalte)
 
         return learning_result_field_templates
@@ -245,20 +201,28 @@ class LearningResultUtils:
         activity_key_field_tempalte.max_value = 128
         activity_key_field_tempalte.content_format = regular_expression
 
-        activity_version_field_tempalte = LearningPlanFieldTemplate('activityVersion', FieldType.TypeInt, False)
+        activity_version_field_tempalte = LearningPlanFieldTemplate('activityVersion', FieldType.TypeString, False)
+        activity_version_field_tempalte.min_value = 0
+        activity_version_field_tempalte.min_error_code = '4426'
+        activity_version_field_tempalte.max_value = 256
 
         question_key_field_tempalte = LearningPlanFieldTemplate('questionKey', FieldType.TypeString, False)
         question_key_field_tempalte.min_value = 1
         question_key_field_tempalte.min_error_code = '4421'
-        question_key_field_tempalte.max_value = 128
-        question_key_field_tempalte.content_format = regular_expression
+        question_key_field_tempalte.max_value = 512
+        # question_key_field_tempalte.content_format = regular_expression
 
-        question_version_field_tempalte = LearningPlanFieldTemplate('questionVersion', FieldType.TypeInt, False)
+        question_version_field_tempalte = LearningPlanFieldTemplate('questionVersion', FieldType.TypeString, False)
+        question_version_field_tempalte.min_value = 0
+        question_version_field_tempalte.min_error_code = '4427'
+        question_version_field_tempalte.max_value = 256
 
-        answer_field_tempalte = LearningPlanFieldTemplate('answer', FieldType.TypeString, False)
-        answer_field_tempalte.min_value = 1
-        answer_field_tempalte.min_error_code = '4424'
-        answer_field_tempalte.max_value = 1024
+        answer_field_tempalte = LearningPlanFieldTemplate('answer', FieldType.TypeObject, False)
+        # answer_field_tempalte.min_value = 1
+        # answer_field_tempalte.min_error_code = '4424'
+        # answer_field_tempalte.max_value = 1024
+
+        extension_field_tempalte = LearningPlanFieldTemplate('extension', FieldType.TypeObject, False)
 
         expected_score_field_tempalte = LearningPlanFieldTemplate('expectedScore', FieldType.TypeInt, False)
 
@@ -278,6 +242,7 @@ class LearningResultUtils:
         learning_result_detail_field_templates.append(question_key_field_tempalte)
         learning_result_detail_field_templates.append(question_version_field_tempalte)
         learning_result_detail_field_templates.append(answer_field_tempalte)
+        learning_result_detail_field_templates.append(extension_field_tempalte)
         learning_result_detail_field_templates.append(expected_score_field_tempalte)
         learning_result_detail_field_templates.append(actual_score_field_tempalte)
         learning_result_detail_field_templates.append(duration_field_tempalte)
@@ -285,10 +250,3 @@ class LearningResultUtils:
         learning_result_detail_field_templates.append(end_time_field_tempalte)
 
         return learning_result_detail_field_templates
-
-    @staticmethod
-    def get_field_template_by_name(field_name, field_templates):
-        for field_template in field_templates:
-            if field_template.field_name.lower() == field_name.replace('_', ''):
-                return field_template
-

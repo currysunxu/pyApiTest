@@ -12,6 +12,7 @@ class LearningResultEntity:
         self.__expected_score = None
         self.__actual_score = None
         self.__created_by = None
+        self.__extension = None
         self.__details = None
 
     @property
@@ -101,6 +102,14 @@ class LearningResultEntity:
     @created_by.setter
     def created_by(self, created_by):
         self.__created_by = created_by
+
+    @property
+    def extension(self):
+        return self.__extension
+
+    @extension.setter
+    def extension(self, extension):
+        self.__extension = extension
 
     @property
     def details(self):
