@@ -1,6 +1,7 @@
 from E1_API_Automation.Test_Data.AuthData import AuthProduct
 import jmespath
 import json
+import jwt
 
 
 class AuthUtils:
@@ -23,3 +24,12 @@ class AuthUtils:
         elif student_status == 4:
             expected_gp_purchase_type = "TRIAL"
         return expected_gp_purchase_type
+
+    @staticmethod
+    def get_version_three_token(auth_token):
+        auth_token_decode_dict = jwt.decode(auth_token, verify=False)
+        decode_token_list = auth_token_decode_dict['tokens']
+
+        for decode_token in decode_token_list:
+            if decode_token['version'] == 3:
+                return decode_token['value']

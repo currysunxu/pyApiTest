@@ -11,7 +11,6 @@ class LearningPlanService:
 
     def post_learning_plan_insert(self, learning_plan):
         learning_plan_insert_dict = LearningPlanUtils.construct_learning_plan_dict(learning_plan)
-        print(str(learning_plan_insert_dict))
         api_response = self.mou_tai.post("/api/v1/plans/", learning_plan_insert_dict)
         # get the system_key for entity after insert API
         if api_response.status_code == 200:
@@ -22,7 +21,6 @@ class LearningPlanService:
 
     def post_learning_plan_batch_insert(self, learning_plan_list):
         learning_plan_batch_insert_dict = LearningPlanUtils.construct_batch_learning_plan_dict(learning_plan_list)
-        print(str(learning_plan_batch_insert_dict))
         api_response = self.mou_tai.post("/api/v1/plans/batch", learning_plan_batch_insert_dict)
         # get the system_key for entity list after insert API
         if api_response.status_code == 200:
@@ -34,7 +32,6 @@ class LearningPlanService:
 
     def put_learning_plan(self, learning_plan):
         learning_plan_update_dict = LearningPlanUtils.construct_learning_plan_dict(learning_plan)
-        print(str(learning_plan_update_dict))
         return self.mou_tai.put("/api/v1/plans/", learning_plan_update_dict)
 
     def get_partition_plan_without_limit_page(self, learning_plan):

@@ -1,6 +1,7 @@
 from E1_API_Automation.Business.NGPlatform.LearningPlan import LearningPlan
 from E1_API_Automation.Business.NGPlatform.LearningPlanErrorEntity import LearningPlanErrorEntity
 from E1_API_Automation.Business.NGPlatform.LearningPlanFieldTemplate import LearningPlanFieldTemplate, FieldType, FieldValueType
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
 import random
 import string
 import datetime
@@ -10,101 +11,52 @@ import re
 
 class LearningPlanUtils:
     @staticmethod
-    def construct_valid_learning_plan_based_on_entity(fixed_learning_plan, is_need_not_required):
-        if fixed_learning_plan is not None:
-            product_id = fixed_learning_plan.product_id
-            plan_business_key = fixed_learning_plan.plan_business_key
-            bucket_id = fixed_learning_plan.bucket_id
-            student_key = fixed_learning_plan.student_key
-        else:
-            product_id = random.randint(1, 512)
-            plan_business_key = 'PlanBusinessKeyTest|' \
-                                + ''.join(random.sample(string.ascii_letters + string.digits + '|-', 5))
-            bucket_id = random.randint(1, 2147483647 - 1)  # 2147483647 is int's maxvalue
-            student_key = 'StudentKeyTest|' + ''.join(random.sample(string.ascii_letters + string.digits + '|-', 5))
-
-        # when fixed_learning_plan is not null, student_key might be None
-        if student_key is None:
-            student_key = 'StudentKeyTest|' + ''.join(random.sample(string.ascii_letters + string.digits + '|-', 5))
-
-        plan_type = random.randint(1, 512)
-        state = random.randint(0, 10)
-        learning_plan = LearningPlan(product_id, plan_business_key, bucket_id, student_key)
-        learning_plan.plan_type = plan_type
-        learning_plan.state = state
-
-        if fixed_learning_plan is not None and fixed_learning_plan.system_key is not None:
-            learning_plan.system_key = fixed_learning_plan.system_key
-
-        if is_need_not_required:
-            learning_plan.route = 'route_test' + ''.join(random.sample(string.printable, 10))
-            learning_plan.learning_unit = 'learning_unit_test' + ''.join(random.sample(string.printable, 10))
-            learning_plan.created_by = 'created_by_test' + ''.join(random.sample(string.printable, 10))
-            learning_plan.last_updated_by = 'last_updated_by_test' + ''.join(random.sample(string.printable, 10))
-
-            time_format = '%Y-%m-%d %H:%M:%S.%f'
-            # time_format = '%Y-%m-%d %H:%M:%S'
-            learning_plan.created_time = datetime.datetime.now().strftime(time_format)[:-3]
-            learning_plan.last_updated_time = datetime.datetime.now().strftime(time_format)[:-3]
-            learning_plan.start_time = datetime.datetime.now().strftime(time_format)[:-3]
-            learning_plan.end_time = datetime.datetime.now().strftime(time_format)[:-3]
-        return learning_plan
-
-    @staticmethod
-    def construct_field_value(field_template, field_value_type):
-        field_value = None
-        if field_template.field_type == FieldType.TypeInt:
-            if field_value_type == FieldValueType.BelowMin:
-                if field_template.min_value is not None:
-                    field_value = field_template.min_value - 1
-                else:
-                    field_value = -1
-            elif field_value_type == FieldValueType.ExceedMax:
-                field_value = field_template.max_value + 1
-        if field_template.field_type == FieldType.TypeString:
-            if field_value_type == FieldValueType.BelowMin:
-                if field_template.content_format is not None:
-                    not_allowable_format = string.punctuation + string.whitespace
-                    not_allowable_format.replace('|', '')
-                    not_allowable_format.replace('-', '')
-                    field_value = ''.join(random.sample(not_allowable_format, 10))
-            elif field_value_type == FieldValueType.ExceedMax:
-                if field_template.content_format is not None:
-                    field_value = ''.join(random.choices(string.ascii_letters + string.digits + '|-', k=field_template.max_value + 1))
-                else:
-                    field_value = ''.join(random.choices(string.printable, k=field_template.max_value + 1))
-        if field_template.field_type == FieldType.TypeDate:
-            # for date field, if want to construct invalid data, random choose the year or characters
-            if field_value_type == FieldValueType.BelowMin or field_value_type == FieldValueType.ExceedMax:
-                value_str = ''.join(random.sample(string.ascii_letters, 5))
-                value_year = datetime.datetime.now().year
-                field_value = random.choice([value_str, value_year])
-        return field_value
+    def construct_learning_plan_by_template(learning_plan_template, field_value_type):
+        return LearningPlanUtils.\
+            construct_learning_plan_by_template_and_is_only_required(learning_plan_template, field_value_type, False)
 
     @staticmethod
     def construct_learning_plan_with_invalid_value(field_value_type):
+        return LearningPlanUtils.construct_learning_plan_by_template(None, field_value_type)
+
+    @staticmethod
+    def construct_learning_plan_by_template_and_is_only_required(learning_plan_template, field_value_type, is_need_not_required):
         field_templates = LearningPlanUtils.get_learning_plan_field_templates()
         learning_plan = LearningPlan(None, None, None, None)
         student_plan_items = learning_plan.__dict__
         for item_key in student_plan_items.keys():
             field_name = item_key[len('_' + learning_plan.__class__.__name__ + '__'):]
 
-            if field_name != 'system_key':
-                field_template = LearningPlanUtils.get_field_template_by_name(field_name, field_templates)
-                field_value = LearningPlanUtils.construct_field_value(field_template, field_value_type)
-                setattr(learning_plan, item_key, field_value)
+            is_copy_from_template = False
+            field_value = None
+            # for these three fields, if template already have value, then, copy them from template,
+            # otherwise, randomly generate value
+            if field_name in ('product_id', 'plan_business_key', 'bucket_id', 'student_key', 'system_key'):
+                if learning_plan_template is not None:
+                    field_value = getattr(learning_plan_template, item_key)
+                    if field_value is not None:
+                        is_copy_from_template = True
+
+            if not is_copy_from_template and field_name != 'system_key':
+                field_template = LearningCommonUtils.get_field_template_by_name(field_name, field_templates)
+                field_value = LearningCommonUtils.construct_field_value_by_is_only_required(field_template,
+                                                                                            field_value_type,
+                                                                                            is_need_not_required)
+            setattr(learning_plan, item_key, field_value)
 
         return learning_plan
 
     @staticmethod
-    def construct_random_valid_learning_plan(is_need_not_required):
-        return LearningPlanUtils.construct_valid_learning_plan_based_on_entity(None, is_need_not_required)
+    def construct_random_valid_learning_plan(is_only_required):
+        return LearningPlanUtils.construct_learning_plan_by_template_and_is_only_required(None, FieldValueType.Valid,
+                                                                                          is_only_required)
 
     @staticmethod
     def construct_multiple_valid_learning_plans(fixed_learning_plan, number):
         learning_plan_list = []
         for i in range(number):
-            learning_plan = LearningPlanUtils.construct_valid_learning_plan_based_on_entity(fixed_learning_plan, True)
+            learning_plan = LearningPlanUtils.construct_learning_plan_by_template(fixed_learning_plan,
+                                                                                  FieldValueType.Valid)
             learning_plan_list.append(learning_plan)
 
         return learning_plan_list
@@ -125,17 +77,7 @@ class LearningPlanUtils:
 
     @staticmethod
     def construct_learning_plan_with_empty_fields():
-        learning_plan = LearningPlan('', '', '', '')
-        learning_plan.plan_type = ''
-        learning_plan.state = ''
-        learning_plan.route = ''
-        learning_plan.learning_unit = ''
-        learning_plan.created_time = ''
-        learning_plan.created_by = ''
-        learning_plan.last_updated_time = ''
-        learning_plan.last_updated_by = ''
-        learning_plan.start_time = ''
-        learning_plan.end_time = ''
+        learning_plan = LearningPlanUtils.construct_learning_plan_by_template(None, FieldValueType.EmptyValue)
         return learning_plan
 
     @staticmethod
@@ -145,6 +87,7 @@ class LearningPlanUtils:
         for item_key in student_plan_items.keys():
             item_value = student_plan_items[item_key]
             learning_plan_key = item_key[len('_' + learning_plan.__class__.__name__ + '__'):]
+            learning_plan_key = LearningCommonUtils.convert_name_from_lower_case_to_camel_case(learning_plan_key)
             learning_plan_dict[learning_plan_key] = item_value
         return learning_plan_dict
 
@@ -161,43 +104,6 @@ class LearningPlanUtils:
         return batch_learning_plan_dict
 
     @staticmethod
-    def verify_learning_plan_data(actual_learning_plan_json, expected_learning_plan):
-        error_message = ''
-        for key in actual_learning_plan_json.keys():
-            actual_key_value = actual_learning_plan_json[key]
-            learning_plan_private_field_name = '_LearningPlan__' + key
-
-            is_field_exist = False
-            if hasattr(expected_learning_plan, learning_plan_private_field_name):
-                is_field_exist = True
-                expected_field_value = getattr(expected_learning_plan, learning_plan_private_field_name)
-                if '_time' in key and actual_key_value == '':
-                    actual_key_value = None
-
-            if key == 'system_key' and expected_field_value is None:
-                if actual_key_value is None or actual_key_value == '':
-                    error_message = error_message + " The system_key's value should not be null"
-            else:
-                is_value_same = True
-                # some times, the actual time don't have 0 in the end, while there's 0 in expected time, e.g.
-                # The actual value is:2019-08-26 16:05:31.82, but the expected value is:2019-08-26 16:05:31.820
-                if '_time' in key and expected_field_value is not None:
-                    time_format = '%Y-%m-%d %H:%M:%S.%f'
-                    actual_time = datetime.datetime.strptime(str(actual_key_value), time_format)
-                    expected_time = datetime.datetime.strptime(str(expected_field_value), time_format)
-                    if not is_field_exist or not actual_time == expected_time:
-                        is_value_same = False
-                else:
-                    if not is_field_exist or str(actual_key_value) != str(expected_field_value):
-                        is_value_same = False
-
-                if not is_value_same:
-                    error_message = error_message + " key:" + key + "'s value in API not as expected in learning plan." \
-                                                                    "The actual value is:" + str(actual_key_value) \
-                                    + ", but the expected value is:" + expected_field_value
-        return error_message
-
-    @staticmethod
     def verify_learning_plan_batch_insert_data(actual_learning_plan_batch_insert_json, expected_learning_plan_list):
         error_message = ''
 
@@ -207,8 +113,8 @@ class LearningPlanUtils:
         for i in range(len(expected_learning_plan_list)):
             actual_learning_plan = actual_learning_plan_batch_insert_json[i]
             expected_learning_plan = expected_learning_plan_list[i]
-            error_message = error_message + LearningPlanUtils.verify_learning_plan_data(actual_learning_plan,
-                                                                                        expected_learning_plan)
+            error_message = error_message + LearningCommonUtils.verify_result_with_entity(actual_learning_plan,
+                                                                                          expected_learning_plan)
         return error_message
 
     @staticmethod
@@ -221,10 +127,10 @@ class LearningPlanUtils:
         for i in range(len(expected_learning_plan_list)):
             expected_learning_plan = expected_learning_plan_list[i]
             actual_learning_plan = \
-                jmespath.search("[?system_key == '{0}'] | [0]".format(expected_learning_plan.system_key), actual_learning_plan_get_json)
+                jmespath.search("[?systemKey == '{0}'] | [0]".format(expected_learning_plan.system_key), actual_learning_plan_get_json)
 
-            error_message = error_message + LearningPlanUtils.verify_learning_plan_data(actual_learning_plan,
-                                                                                        expected_learning_plan)
+            error_message = error_message + LearningCommonUtils.verify_result_with_entity(actual_learning_plan,
+                                                                                          expected_learning_plan)
         return error_message
 
     # get learning plan system key, construct into the entity
@@ -233,10 +139,10 @@ class LearningPlanUtils:
         if isinstance(learning_plans, list):
             for i in range(len(learning_plans)):
                 learning_plan = learning_plans[i]
-                system_key = learning_plan_insert_json[i]['system_key']
+                system_key = learning_plan_insert_json[i]['systemKey']
                 learning_plan.system_key = system_key
         else:
-            system_key = learning_plan_insert_json['system_key']
+            system_key = learning_plan_insert_json['systemKey']
             learning_plans.system_key = system_key
         return learning_plans
 
@@ -261,40 +167,6 @@ class LearningPlanUtils:
             end_index = list_size
 
         return learning_plan_list_from_db[from_index:end_index]
-
-    # verify learning plan get API result with DB data
-    @staticmethod
-    def verify_learning_plan_get_api_data_with_db(actual_learning_plan_get_api_json, expected_db_learning_plan_list):
-        error_message = ''
-
-        if len(actual_learning_plan_get_api_json) != len(expected_db_learning_plan_list):
-            error_message = "the actual list length return from API not as expected!"
-
-        for i in range(len(actual_learning_plan_get_api_json)):
-            actual_learning_plan = actual_learning_plan_get_api_json[i]
-            expected_db_learning_plan = expected_db_learning_plan_list[i]
-
-            for key in actual_learning_plan.keys():
-                actual_value = actual_learning_plan[key]
-                expected_value = expected_db_learning_plan[key.replace('_', '')]
-
-                is_value_same = True
-                if '_time' in key and actual_value is not None:
-                    time_format = '%Y-%m-%d %H:%M:%S.%f'
-                    actual_time = datetime.datetime.strptime(str(actual_value), time_format)
-                    expected_time = datetime.datetime.strptime(str(expected_value), time_format)
-
-                    if not actual_time == expected_time:
-                        is_value_same = False
-                elif str(actual_value) != str(expected_value):
-                    is_value_same = False
-
-                if not is_value_same:
-                    error_message = error_message + " key:" + key + "'s value in get API not as expected in DB." \
-                                                                    "The actual value is:" + str(actual_value) \
-                                    + ", but the expected value is:" + expected_value
-
-        return error_message
 
     # verify error messages for insert/batch insert/put API
     @staticmethod
@@ -337,7 +209,7 @@ class LearningPlanUtils:
             field_name = item_key[len('_' + learning_plan.__class__.__name__ + '__'):]
 
             if field_name != 'system_key':
-                field_template = LearningPlanUtils.get_field_template_by_name(field_name, field_templates)
+                field_template = LearningCommonUtils.get_field_template_by_name(field_name, field_templates)
                 field_error_entity = LearningPlanUtils.get_expected_learning_plan_error_entity_by_template(field_value,
                                                                                                            field_template,
                                                                                                            request_index)
@@ -350,10 +222,11 @@ class LearningPlanUtils:
         learning_plan_field_templates = []
 
         product_id_field_tempalte = LearningPlanFieldTemplate('productId', FieldType.TypeInt, True)
-        product_id_field_tempalte.min_value = 1
+        # product_id_field_tempalte.min_value = 1
         product_id_field_tempalte.min_error_code = '4402'
-        product_id_field_tempalte.max_value = 512
-        product_id_field_tempalte.max_error_code = '4403'
+        # product_id_field_tempalte.max_value = 512
+        # product_id_field_tempalte.max_error_code = '4403'
+        product_id_field_tempalte.content_format = [1, 2, 4, 8, 16, 32, 64]
 
         regular_expression = '^[A-Za-z0-9|-]+$'
         plan_business_key_field_tempalte = LearningPlanFieldTemplate('planBusinessKey', FieldType.TypeString, True)
@@ -375,10 +248,11 @@ class LearningPlanUtils:
         student_key_field_tempalte.content_format = regular_expression
 
         plan_type_field_tempalte = LearningPlanFieldTemplate('planType', FieldType.TypeInt, True)
-        plan_type_field_tempalte.min_value = 1
+        # plan_type_field_tempalte.min_value = 1
         plan_type_field_tempalte.min_error_code = '4405'
-        plan_type_field_tempalte.max_value = 512
-        plan_type_field_tempalte.max_error_code = '4406'
+        # plan_type_field_tempalte.max_value = 512
+        # plan_type_field_tempalte.max_error_code = '4406'
+        plan_type_field_tempalte.content_format = [1, 2, 4, 8, 16, 32]
 
         route_field_tempalte = LearningPlanFieldTemplate('route', FieldType.TypeString, False)
         route_field_tempalte.min_value = 1
@@ -386,8 +260,9 @@ class LearningPlanUtils:
         route_field_tempalte.max_value = 512
 
         state_field_tempalte = LearningPlanFieldTemplate('state', FieldType.TypeInt, True)
-        state_field_tempalte.max_value = 10
-        state_field_tempalte.max_error_code = '4408'
+        # state_field_tempalte.max_value = 10
+        state_field_tempalte.min_error_code = '4408'
+        state_field_tempalte.content_format = [1, 2, 4, 8]
 
         learning_unit_field_tempalte = LearningPlanFieldTemplate('learningUnit', FieldType.TypeString, False)
         learning_unit_field_tempalte.min_value = 1
@@ -395,26 +270,31 @@ class LearningPlanUtils:
         learning_unit_field_tempalte.max_value = 1024
 
         created_by_field_tempalte = LearningPlanFieldTemplate('createdBy', FieldType.TypeString, False)
-        created_by_field_tempalte.min_value = 1
+        created_by_field_tempalte.min_value = 0
         created_by_field_tempalte.min_error_code = '4414'
         created_by_field_tempalte.max_value = 128
 
         last_updated_by_field_tempalte = LearningPlanFieldTemplate('lastUpdatedBy', FieldType.TypeString, False)
-        last_updated_by_field_tempalte.min_value = 1
+        last_updated_by_field_tempalte.min_value = 0
         last_updated_by_field_tempalte.min_error_code = '4415'
         last_updated_by_field_tempalte.max_value = 128
 
+        time_format_expression = '%Y-%m-%dT%H:%M:%S.%fZ'
         created_time_field_tempalte = LearningPlanFieldTemplate('createdTime', FieldType.TypeDate, False)
-        created_time_field_tempalte.min_error_code = '4410'
+        # created_time_field_tempalte.min_error_code = '4410'
+        created_time_field_tempalte.content_format = time_format_expression
 
-        last_updated_time_field_tempalte = LearningPlanFieldTemplate('lastupdatedTime', FieldType.TypeDate, False)
-        last_updated_time_field_tempalte.min_error_code = '4411'
+        last_updated_time_field_tempalte = LearningPlanFieldTemplate('lastUpdatedTime', FieldType.TypeDate, False)
+        # last_updated_time_field_tempalte.min_error_code = '4411'
+        last_updated_time_field_tempalte.content_format = time_format_expression
 
         start_time_field_tempalte = LearningPlanFieldTemplate('startTime', FieldType.TypeDate, False)
-        start_time_field_tempalte.min_error_code = '4412'
+        # start_time_field_tempalte.min_error_code = '4412'
+        start_time_field_tempalte.content_format = time_format_expression
 
         end_time_field_tempalte = LearningPlanFieldTemplate('endTime', FieldType.TypeDate, False)
-        end_time_field_tempalte.min_error_code = '4413'
+        # end_time_field_tempalte.min_error_code = '4413'
+        end_time_field_tempalte.content_format = time_format_expression
 
         learning_plan_field_templates.append(product_id_field_tempalte)
         learning_plan_field_templates.append(plan_business_key_field_tempalte)
@@ -434,12 +314,6 @@ class LearningPlanUtils:
         return learning_plan_field_templates
 
     @staticmethod
-    def get_field_template_by_name(field_name, field_templates):
-        for field_template in field_templates:
-            if field_template.field_name.lower() == field_name.replace('_', ''):
-                return field_template
-
-    @staticmethod
     def get_expected_learning_plan_error_entity_by_template(field_value, learning_plan_field_template, request_index):
         error_code = None
         if learning_plan_field_template.field_type == FieldType.TypeInt:
@@ -447,12 +321,18 @@ class LearningPlanUtils:
                 if learning_plan_field_template.is_required:
                     error_code = learning_plan_field_template.min_error_code
                     rejected_value = 0
-            elif learning_plan_field_template.min_value is not None and field_value < learning_plan_field_template.min_value:
-                error_code = learning_plan_field_template.min_error_code
-                rejected_value = field_value
-            elif field_value > learning_plan_field_template.max_value:
-                error_code = learning_plan_field_template.max_error_code
-                rejected_value = field_value
+            else:
+                if learning_plan_field_template.content_format is not None:
+                    if field_value not in learning_plan_field_template.content_format:
+                        error_code = learning_plan_field_template.min_error_code
+                        rejected_value = field_value
+                else:
+                    if learning_plan_field_template.min_value is not None and field_value < learning_plan_field_template.min_value:
+                        error_code = learning_plan_field_template.min_error_code
+                        rejected_value = field_value
+                    elif field_value > learning_plan_field_template.max_value:
+                        error_code = learning_plan_field_template.max_error_code
+                        rejected_value = field_value
         elif learning_plan_field_template.field_type == FieldType.TypeString:
             is_exist_error = False
             if field_value is None or field_value == '':
@@ -475,7 +355,7 @@ class LearningPlanUtils:
                 error_code = learning_plan_field_template.min_error_code
                 rejected_value = field_value
         elif learning_plan_field_template.field_type == FieldType.TypeDate:
-            time_format = '%Y-%m-%d %H:%M:%S.%f'
+            time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
             if field_value is not None and field_value != '':
                 try:
                     datetime.datetime.strptime(str(field_value), time_format)
