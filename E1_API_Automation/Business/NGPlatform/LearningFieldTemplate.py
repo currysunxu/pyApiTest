@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class LearningPlanFieldTemplate:
+class LearningFieldTemplate:
     def __init__(self, field_name, field_type, is_required):
         self.__field_name = field_name
         self.__field_type = field_type

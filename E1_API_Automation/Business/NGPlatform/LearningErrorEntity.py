@@ -1,10 +1,9 @@
 
-class LearningPlanErrorEntity:
+class LearningErrorEntity:
     def __init__(self, field_name, error_code, rejected_value):
         self.__field_name = field_name
         self.__error_code = error_code
         self.__rejected_value = rejected_value
-
 
     @property
     def field_name(self):
@@ -19,7 +18,7 @@ class LearningPlanErrorEntity:
         return self.__error_code
 
     @error_code.setter
-    def plan_business_key(self, error_code):
+    def error_code(self, error_code):
         self.__error_code = error_code
 
     @property
@@ -27,5 +26,5 @@ class LearningPlanErrorEntity:
         return self.__rejected_value
 
     @rejected_value.setter
-    def bucket_id(self, rejected_value):
+    def rejected_value(self, rejected_value):
         self.__rejected_value = rejected_value

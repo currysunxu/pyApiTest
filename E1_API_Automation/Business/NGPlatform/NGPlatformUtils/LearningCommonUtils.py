@@ -1,8 +1,12 @@
-from E1_API_Automation.Business.NGPlatform.LearningPlanFieldTemplate import FieldType, FieldValueType
+from E1_API_Automation.Business.NGPlatform.LearningFieldTemplate import FieldType, FieldValueType
+from E1_API_Automation.Business.NGPlatform.LearningErrorEntity import LearningErrorEntity
 import random
 import string
 import datetime
 import uuid
+import json
+import jmespath
+import re
 
 
 class LearningCommonUtils:
@@ -35,9 +39,13 @@ class LearningCommonUtils:
             if field_template.content_format is not None:
                 if field_value_type == FieldValueType.Valid:
                     field_value = random.choice(field_template.content_format)
+                elif field_value_type == FieldValueType.Max:
+                    field_value = field_template.content_format[-1]
+                elif field_value_type == FieldValueType.Min:
+                    field_value = field_template.content_format[0]
                 elif field_value_type == FieldValueType.ExceedMax:
                     field_value = field_template.content_format[-1] + 1
-                else:
+                elif field_value_type == FieldValueType.BelowMin:
                     random_value = random.randint(field_template.content_format[0], field_template.content_format[-2])
                     field_value = 2 * random_value + 1
             else:
@@ -50,15 +58,28 @@ class LearningCommonUtils:
                     else:
                         field_value = -1
                 elif field_value_type == FieldValueType.ExceedMax:
-                    if max_value is None:
-                        max_value = 2147483647  # 2147483647 is int's maxvalue
-                    field_value = max_value + 1
+                    # if the int value exceed int's max value, there's no normal code validation,
+                    # API will throw int exceed error directly
+                    if max_value is not None:
+                        field_value = max_value + 1
+                    else:
+                        field_value = 2147483647  # 2147483647 is int's maxvalue
                 elif field_value_type == FieldValueType.Valid:
                     if min_value is None:
                         min_value = 1
                     if max_value is None:
                         max_value = 100
                     field_value = random.randint(min_value, max_value)
+                elif field_value_type == FieldValueType.Max:
+                    if max_value is not None:
+                        field_value = max_value
+                    else:
+                        field_value = 2147483647  # 2147483647 is int's maxvalue
+                elif field_value_type == FieldValueType.Min:
+                    if min_value is not None:
+                        field_value = min_value
+                    else:
+                        field_value = 0
         elif field_template.field_type == FieldType.TypeString:
             if field_value_type == FieldValueType.BelowMin:
                 if field_template.content_format is not None:
@@ -71,28 +92,80 @@ class LearningCommonUtils:
                     field_value = ''.join(random.choices(string.ascii_letters + string.digits + '|-', k=field_template.max_value + 1))
                 else:
                     field_value = ''.join(random.choices(string.printable, k=field_template.max_value + 1))
-            elif field_value_type == FieldValueType.Valid:
-                content_len = random.randint(field_template.min_value, field_template.max_value)
-                if field_template.content_format is not None:
-                    field_value = ''.join(random.choices(string.ascii_letters + string.digits + '|-', k=content_len))
-                else:
-                    field_value = ''.join(random.choices(string.printable, k=content_len))
-        elif field_template.field_type == FieldType.TypeDate:
-            # for date field, if want to construct invalid data, random choose the year or characters
-            # if field_value_type == FieldValueType.BelowMin or field_value_type == FieldValueType.ExceedMax:
-            #     value_str = ''.join(random.sample(string.ascii_letters, 5))
-            #     value_year = datetime.datetime.now().year
-            #     field_value = random.choice([value_str, value_year])
+            else:
+                if field_value_type == FieldValueType.Valid:
+                    content_len = random.randint(field_template.min_value, field_template.max_value)
+                elif field_value_type == FieldValueType.Max:
+                    content_len = field_template.max_value
+                elif field_value_type == FieldValueType.Min:
+                    content_len = field_template.min_value
 
-            if field_value_type == FieldValueType.Valid:
+                if content_len is not None and content_len > 0:
+                    if field_template.content_format is not None:
+                        field_value = ''.join(
+                            random.choices(string.ascii_letters + string.digits + '|-', k=content_len))
+                    else:
+                        field_value = ''.join(random.choices(string.printable, k=content_len))
+        elif field_template.field_type == FieldType.TypeDate:
+            if field_value_type in (FieldValueType.Valid, FieldValueType.Max, FieldValueType.Min):
                 field_value = datetime.datetime.now().strftime(field_template.content_format)
                 index = field_value.rindex('.')
                 field_value = field_value[:index + 1] + field_value[index + 1:index + 4] + 'Z'
         elif field_template.field_type == FieldType.TypeUUID:
             if field_value_type == FieldValueType.BelowMin or field_value_type == FieldValueType.ExceedMax:
-                field_value = ''.join(random.sample(string.ascii_letters, 5))
-            elif field_value_type == FieldValueType.Valid:
+                # planSystemKey is different than other UUID fields, it's actually String type in DB, but other UUID fields is UUID in DB
+                if field_template.field_name == 'planSystemKey':
+                    field_value = ''.join(random.sample(string.ascii_letters, 5))
+            elif field_value_type in (FieldValueType.Valid, FieldValueType.Max, FieldValueType.Min):
                 field_value = uuid.uuid1()
+        elif field_template.field_type == FieldType.TypeObject:
+            if field_value_type == FieldValueType.BelowMin:
+                value_empty_dict = {}
+                value_empty_list = []
+                value_empty_list_with_empty_dict = [{}, {}]
+                field_value = random.choice([value_empty_dict, value_empty_list, value_empty_list_with_empty_dict])
+            elif field_value_type in (FieldValueType.Valid, FieldValueType.Max, FieldValueType.Min):
+                value_str = ''.join(random.sample(string.ascii_letters, 10))
+                value_int = random.randint(-1000, 1000)
+                value_float = random.uniform(2, 10)
+                value_boolean = random.choice([True, False])
+                value_list = [value_str, value_int, value_float, value_boolean]
+                value_json_dict1 = {}
+                value_json_dict1['testRevision'] = random.randint(1, 10)
+                value_json_dict1['testTitle'] = ''.join(random.sample(string.ascii_letters, 5))
+                value_json_dict1['testBoolean'] = value_boolean
+
+                value_sub_field_dict1 = {}
+                value_sub_field_dict1['testSubRevision'] = random.randint(1, 10)
+                value_sub_field_dict1['testSubType'] = ''.join(random.sample(string.ascii_letters, 5))
+                value_sub_field_dict1['testSubList'] = value_list
+
+                value_sub_field_dict2 = {}
+                value_sub_field_dict2['testSubRevision'] = random.randint(1, 10)
+                value_sub_field_dict2['testSubType'] = ''.join(random.sample(string.ascii_letters, 5))
+                value_sub_field_dict2['testSubTitle'] = ''.join(random.sample(string.ascii_letters, 10))
+
+                value_json_dict1['testList'] = [value_sub_field_dict1, value_sub_field_dict2]
+
+                value_json_dict2 = {}
+                value_json_dict2['testRevision'] = random.randint(1, 10)
+                value_json_dict2['testTitle'] = ''.join(random.sample(string.ascii_letters, 5))
+                value_json_dict2['testBoolean'] = value_boolean
+                value_json_dict2['testInt'] = value_int
+
+                value_json_dict3 = {}
+                value_json_dict3['testRevision'] = random.randint(1, 10)
+                value_json_dict3['testTitle'] = ''.join(random.sample(string.ascii_letters, 5))
+                value_json_dict3['testBoolean'] = value_boolean
+                value_json_dict3['testInt'] = value_int
+                value_json_dict3['testList'] = value_list
+
+                value_json_list = [value_json_dict1, value_json_dict2, value_json_dict3]
+
+                # json field value randomly choose from each type, includes primitive type and json with dict or list types
+                field_value = random.choice([value_str, value_int, value_float, value_boolean, value_list,
+                                             value_json_dict1, value_json_list])
+
         return field_value
 
     # as now service change all the input/output to use camelCase format, so, make the change
@@ -190,12 +263,22 @@ class LearningCommonUtils:
                 actual_value = actual_api_learning[key]
                 expected_value = expected_db_learning[key.lower()]
 
+                # some learning result's fields is object type, it can store any type of data
+                if isinstance(expected_value, str) and expected_value.startswith('java.'):
+                    index = expected_value.index('|')
+                    expected_value = expected_value[index+1:]
+                    expected_value = json.loads(expected_value)
+
                 is_value_same = True
                 if 'Time' in key and actual_value is not None:
                     api_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
                     actual_time = datetime.datetime.strptime(str(actual_value), api_time_format)
                     db_time_format = '%Y-%m-%d %H:%M:%S.%f'
-                    expected_time = datetime.datetime.strptime(str(expected_value), db_time_format)
+                    try:
+                        expected_time = datetime.datetime.strptime(str(expected_value), db_time_format)
+                    except:
+                        db_time_format = '%Y-%m-%d %H:%M:%S'
+                        expected_time = datetime.datetime.strptime(str(expected_value), db_time_format)
 
                     if not actual_time == expected_time:
                         is_value_same = False
@@ -212,3 +295,129 @@ class LearningCommonUtils:
                                     + ", but the expected value is:" + expected_value
 
         return error_message
+
+    @staticmethod
+    def get_expected_learning_error_entity_by_template(field_value, field_template, request_index, is_field_details):
+        error_code = None
+        if field_template.field_type == FieldType.TypeInt:
+            if field_value is None or field_value == '':
+                if field_template.is_required:
+                    error_code = field_template.min_error_code
+                    rejected_value = 0
+            else:
+                if field_template.content_format is not None:
+                    if field_value not in field_template.content_format:
+                        error_code = field_template.min_error_code
+                        rejected_value = field_value
+                else:
+                    if field_template.min_value is not None and field_value < field_template.min_value:
+                        error_code = field_template.min_error_code
+                        rejected_value = field_value
+                    elif field_template.max_value is not None and field_value > field_template.max_value:
+                        error_code = field_template.max_error_code
+                        rejected_value = field_value
+        elif field_template.field_type == FieldType.TypeString:
+            is_exist_error = False
+            if field_value is None or field_value == '':
+                if field_template.is_required:
+                    is_exist_error = True
+            else:
+                if field_template.content_format is not None:
+                    is_fit_format = re.search(field_template.content_format,
+                                              field_value)
+                    if is_fit_format:
+                        if len(field_value) > field_template.max_value:
+                            is_exist_error = True
+                    else:
+                        is_exist_error = True
+
+                if not is_exist_error and len(field_value) > field_template.max_value:
+                    is_exist_error = True
+
+            if is_exist_error:
+                error_code = field_template.min_error_code
+                rejected_value = field_value
+        elif field_template.field_type == FieldType.TypeDate:
+            time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+            if field_value is not None and field_value != '':
+                try:
+                    datetime.datetime.strptime(str(field_value), time_format)
+                except:
+                    error_code = field_template.min_error_code
+                    rejected_value = field_value
+        elif field_template.field_type == FieldType.TypeObject:
+            if field_template.is_required:
+                if field_value is None or len(field_value) == 0:
+                    error_code = field_template.min_error_code
+                    rejected_value = field_value
+        elif field_template.field_type == FieldType.TypeUUID:
+            if field_template.is_required:
+                if field_value is None or field_value == '':
+                    error_code = field_template.min_error_code
+                    rejected_value = field_value
+                    # planSystemKey is different than other UUID fields,
+                    # it's actually String type in DB, but other UUID fields is UUID in DB
+                    if field_template.field_name != 'planSystemKey':
+                        rejected_value = None
+                else:
+                    if field_template.field_name == 'planSystemKey':
+                        is_fit_format = \
+                            re.search('[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}',
+                                      field_value)
+
+                        if not is_fit_format:
+                            error_code = field_template.min_error_code
+                            rejected_value = field_value
+
+        if error_code is not None:
+            field_name = field_template.field_name
+            if request_index is not None:
+                if is_field_details:
+                    pre_text = 'details'
+                else:
+                    pre_text = 'requests'
+                field_name = pre_text + '[' + str(request_index) + '].' + field_name
+            learning_plan_error_entity = LearningErrorEntity(field_name, error_code, rejected_value)
+            return learning_plan_error_entity
+
+    # verify error messages for insert/batch insert/put API
+    @staticmethod
+    def verify_insert_put_error_messages(api_response_json, expected_error_entity_list):
+        error_message = ''
+
+        errors_in_api_response = api_response_json['errors']
+        if len(errors_in_api_response) != len(expected_error_entity_list):
+            error_message = "the actual list length return from API not as expected!"
+
+        for expected_error_entity in expected_error_entity_list:
+            actual_error_dict = jmespath.search("[?field == '{0}'] | [0]".format(expected_error_entity.field_name),
+                                                errors_in_api_response)
+            if actual_error_dict is None or actual_error_dict['defaultMessage'] != expected_error_entity.error_code \
+                    or str(actual_error_dict['rejectedValue']) != str(expected_error_entity.rejected_value):
+                error_message = error_message + " The field:" + expected_error_entity.field_name \
+                                + "'s error message not as expected!"
+        return error_message
+
+    @staticmethod
+    def get_expected_learning_data_from_db_by_limit_page(learning_list_from_db, limit, page):
+        # default limit value is 50
+        if limit is None or limit == '':
+            limit = 50
+
+        if page is None:
+            page = 1
+
+        list_size = len(learning_list_from_db)
+
+        from_index = (page - 1) * limit
+        # if the from index greater than list size, then, there should be empty return list
+        if from_index >= list_size:
+            return []
+        # if the end index greater than list size, then, the end index should be the list size
+        end_index = page * limit
+        if end_index > list_size:
+            end_index = list_size
+
+        return learning_list_from_db[from_index:end_index]
+
+

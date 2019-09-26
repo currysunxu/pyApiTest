@@ -3,8 +3,8 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningPlanUtils imp
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningDBUtils import LearningDBUtils
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
-from E1_API_Automation.Business.NGPlatform.LearningPlan import LearningPlan
-from E1_API_Automation.Business.NGPlatform.LearningPlanFieldTemplate import FieldValueType
+from E1_API_Automation.Business.NGPlatform.LearningPlanEntity import LearningPlanEntity
+from E1_API_Automation.Business.NGPlatform.LearningFieldTemplate import FieldValueType
 from ...Settings import LEARNING_PLAN_ENVIRONMENT
 from hamcrest import assert_that
 import random
@@ -15,10 +15,19 @@ class PlanServiceTestCases:
 
     # test learning plan insert API with valid fields
     @Test(tags="qa")
-    def test_learning_plan_insert_valid_fields(self):
+    def test_learning_plan_insert_valid_all_fields(self):
+        self.test_learning_plan_insert_valid_values(False)
+
+    # test learning plan insert API with valid fields
+    @Test(tags="qa")
+    def test_learning_plan_insert_valid_required_fields(self):
+        self.test_learning_plan_insert_valid_values(True)
+
+    # called by other test cases
+    def test_learning_plan_insert_valid_values(self, is_only_required):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
 
-        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(False)
+        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(is_only_required)
         learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
         assert_that(learning_plan_insert_api_response.status_code == 200)
         # verify what it returned in response will be consistent what we want to insert
@@ -74,16 +83,19 @@ class PlanServiceTestCases:
         learning_plan_get_api_response = learning_plan_service.get_specific_plan(learning_plan)
         assert_that(len(learning_plan_get_api_response.json()) == 0, 'The get specific plan API should return empty!')
 
-    @Test(tags="qa")
-    def test_learning_plan_batch_insert_valid(self):
+    # method can be called by other test cases
+    def test_learning_plan_batch_insert_valid_values(self, is_only_required):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
 
-        # batch insert need the whole batch have same partition,that means,need same product_id plan_business_key and bucket_id
+        # batch insert need the whole batch have same partition,that means,
+        # need same product_id plan_business_key and bucket_id
         learning_plan_template = LearningPlanUtils.construct_learning_plan_template(False)
         # construct valid learning plan list
         batch_number = 10
-        learning_plan_list = LearningPlanUtils.construct_multiple_valid_learning_plans(learning_plan_template,
-                                                                                       batch_number)
+        learning_plan_list = \
+            LearningPlanUtils.construct_multiple_plans_by_template_and_value_type(learning_plan_template,
+                                                                                  FieldValueType.Valid,
+                                                                                  batch_number, is_only_required)
         # call learning plan batch insert api
         learning_plan_batch_insert_api_response = \
             learning_plan_service.post_learning_plan_batch_insert(learning_plan_list)
@@ -95,15 +107,26 @@ class PlanServiceTestCases:
         assert_that(error_message == '', error_message)
 
         # check when get specific plan, the return message will consistent what we want to insert through API
-        learning_plan_get_api_response = learning_plan_service.get_partition_plan_without_limit_page(learning_plan_template)
-        error_message = LearningPlanUtils.verify_learning_plan_get_data_with_entity_list(learning_plan_get_api_response.json(),
-                                                                    learning_plan_list)
+        learning_plan_get_api_response = \
+            learning_plan_service.get_partition_plan_without_limit_page(learning_plan_template)
+        error_message = \
+            LearningPlanUtils.verify_learning_plan_get_data_with_entity_list(learning_plan_get_api_response.json(),
+                                                                             learning_plan_list)
         assert_that(error_message == '', error_message)
 
         # delete these whole learning plan at last
         delete_response = learning_plan_service.delete_plan_by_partition(learning_plan_template)
         assert_that(delete_response.status_code == 200)
 
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_valid_all_fields(self):
+        self.test_learning_plan_batch_insert_valid_values(False)
+
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_valid_required_fields(self):
+        self.test_learning_plan_batch_insert_valid_values(True)
+
+    # method will be called by test cases
     def test_get_plan_without_limit_page(self, batch_number, is_user_plan):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
 
@@ -177,8 +200,8 @@ class PlanServiceTestCases:
             assert_that(learning_plan_get_api_response.status_code == 200)
 
             expected_learning_plan_list_from_db = \
-                LearningPlanUtils.get_expected_learning_plan_from_db_by_limit_page(learning_plan_list_from_db,
-                                                                                   limit, None)
+                LearningCommonUtils.get_expected_learning_data_from_db_by_limit_page(learning_plan_list_from_db,
+                                                                                     limit, None)
 
             error_message = LearningCommonUtils.\
                 verify_learning_get_api_data_with_db(learning_plan_get_api_response.json(),
@@ -229,7 +252,7 @@ class PlanServiceTestCases:
                 assert_that(learning_plan_get_api_response.status_code == 200)
 
                 expected_learning_plan_list_from_db = \
-                    LearningPlanUtils.get_expected_learning_plan_from_db_by_limit_page(learning_plan_list_from_db,
+                    LearningCommonUtils.get_expected_learning_data_from_db_by_limit_page(learning_plan_list_from_db,
                                                                                        limit, page)
 
                 error_message = LearningCommonUtils.\
@@ -247,7 +270,7 @@ class PlanServiceTestCases:
 
     @Test(tags="qa")
     def test_get_partition_plan_without_limit_page_less_than_50(self):
-        batch_number = 15
+        batch_number = random.randint(1, 30)
         self.test_get_plan_without_limit_page(batch_number, False)
 
     # when there's more than 50 records in the DB, get API will by default get 50 records
@@ -258,7 +281,7 @@ class PlanServiceTestCases:
 
     @Test(tags="qa")
     def test_get_user_plan_without_limit_page_less_than_50(self):
-        batch_number = 15
+        batch_number = random.randint(1, 30)
         self.test_get_plan_without_limit_page(batch_number, True)
 
     # when there's more than 50 records in the DB, get API will by default get 50 records
@@ -277,7 +300,7 @@ class PlanServiceTestCases:
 
     @Test(tags="qa")
     def test_get_partition_plan_with_limit_larger_than_size(self):
-        batch_number = 15
+        batch_number = random.randint(10, 30)
         limit_list = [random.randint(1, batch_number-1), batch_number, batch_number + 1,
                       random.randint(batch_number + 2, 50)]
         self.test_get_plan_with_limit(batch_number-1, limit_list, False)
@@ -400,12 +423,12 @@ class PlanServiceTestCases:
 
     @Test(tags="qa")
     def test_delete_partition_plan(self):
-        batch_number = 15
+        batch_number = random.randint(10, 30)
         self.test_delete_user_partition_plan(batch_number, False)
 
     @Test(tags="qa")
     def test_delete_user_plan(self):
-        batch_number = 15
+        batch_number = random.randint(10, 30)
         self.test_delete_user_partition_plan(batch_number, True)
 
     # test learning plan update API with valid required fields
@@ -440,7 +463,7 @@ class PlanServiceTestCases:
     def test_learning_plan_insert_null_values(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # all the filed value as null
-        learning_plan = LearningPlan(None, None, None, None)
+        learning_plan = LearningPlanEntity(None, None, None, None)
         learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
         assert_that(learning_plan_insert_api_response.status_code == 400)
 
@@ -466,7 +489,7 @@ class PlanServiceTestCases:
     def test_learning_plan_batch_insert_single_plan_null_values(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # all the filed value as null
-        learning_plan = LearningPlan(None, None, None, None)
+        learning_plan = LearningPlanEntity(None, None, None, None)
         learning_plan_list = [learning_plan]
 
         learning_plan_batch_insert_api_response = learning_plan_service.post_learning_plan_batch_insert(learning_plan_list)
@@ -496,7 +519,7 @@ class PlanServiceTestCases:
     def test_learning_plan_batch_insert_multiple_plan_null_empty_values(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # all the filed value as null
-        learning_plan_null = LearningPlan(None, None, None, None)
+        learning_plan_null = LearningPlanEntity(None, None, None, None)
         # all the filed value as empty
         learning_plan_empty = LearningPlanUtils.construct_learning_plan_with_empty_fields()
         learning_plan_list = [learning_plan_null, learning_plan_empty]
@@ -513,7 +536,7 @@ class PlanServiceTestCases:
     def test_learning_plan_insert_invalid_value_below_min(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # all the filed value as null
-        learning_plan = LearningPlanUtils.construct_learning_plan_with_invalid_value(FieldValueType.BelowMin)
+        learning_plan = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.BelowMin)
         learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
         assert_that(learning_plan_insert_api_response.status_code == 400)
 
@@ -526,7 +549,7 @@ class PlanServiceTestCases:
     def test_learning_plan_insert_invalid_value_exceed_max(self):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # all the filed value as null
-        learning_plan = LearningPlanUtils.construct_learning_plan_with_invalid_value(FieldValueType.ExceedMax)
+        learning_plan = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.ExceedMax)
         learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
         assert_that(learning_plan_insert_api_response.status_code == 400)
 

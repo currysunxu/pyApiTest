@@ -24,30 +24,10 @@ class CassandraHelper(object):
         session = self.__get_connect()
         try:
             rs = session.execute(sql)
-
-            # result_dict_list = []
-            # for result_row in rs.current_rows:
-            #     col_value_dict = {}
-            #     for j in range(len(result_row._fields)):
-            #         column_value = result_row[j]
-            #         if isinstance(column_value, list):
-            #             column_value = self.convert_from_db_format_to_dict(column_value)
-            #         col_value_dict[result_row._fields[j]] = column_value
-            #     result_dict_list.append(col_value_dict)
             result_dict_list = self.convert_from_db_format_to_dict(rs.current_rows)
         finally:
             self.cluster.shutdown()
         return result_dict_list
-
-    # def convert_from_db_format_to_dict(self, db_format_field_value_list):
-    #     result_field_dict_list = []
-    #     for i in range(len(db_format_field_value_list)):
-    #         result_field_dict = {}
-    #         db_format_field_value = db_format_field_value_list[i]
-    #         for j in range(len(db_format_field_value._fields)):
-    #             result_field_dict[db_format_field_value._fields[j]] = db_format_field_value[j]
-    #         result_field_dict_list.append(result_field_dict)
-    #     return result_field_dict_list
 
     def convert_from_db_format_to_dict(self, db_format_value_list):
         result_dict_list = []
