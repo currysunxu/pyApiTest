@@ -1,5 +1,5 @@
 
-class LearningPlan:
+class LearningPlanEntity:
     def __init__(self, product_id, plan_business_key, bucket_id, student_key):
         self.__product_id = product_id
         self.__plan_business_key = plan_business_key
