@@ -45,13 +45,13 @@ pipeline {
               case_tag = 'live'
           if (env.environment == 'QA')
               case_tag = 'qa'
-          sh 'python E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService reset'
+          sh 'python E1_API_Automation/Tools/jacoco/jacoco_report.py ResultService reset'
            
-          sh 'ptest3  -t E1_API_Automation.Test.NGPlatform.PlanServiceTest -i ${case_tag}'
+          sh 'ptest3  -t E1_API_Automation.Test.NGPlatform.PlanResultTest -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
-          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump /jacoco-data/learningplan/jacoco_learningplan.exec'
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py ResultService dump /jacoco-data/learningpresult/jacoco_learningresult.exec'
           
         }
       }
@@ -66,12 +66,13 @@ pipeline {
         }
       }
     steps{
-    dir('PlanService'){
-     git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
+    dir('ResultService'){
+    
+     git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-result-svc.git'
      
      script{
      sh 'mvn clean package'
-     sh 'cp /app/jacoco/learningplan/jacoco_learningplan.exec jacoco.exec'
+     sh 'cp /app/jacoco/learningpresult/jacoco_learningpresult.exec jacoco.exec'
      jacoco()
      }
      }

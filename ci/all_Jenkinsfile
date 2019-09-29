@@ -22,20 +22,32 @@ pipeline {
         choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
     }
    
+  environment {
+     case_tag = 'qa'
+    }
+  
+   
   stages {
     
     stage('Verify') {
       agent {
         docker {
           label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/apipython3:latest'
+          image '10.128.42.216:5000/apipython3:v4'
         }
       }
       steps {
 
         script {
-           
-          sh 'ptest3  -t E1_API_Automation.Test.SmallStar -i ${case_tag}'
+          
+          if (env.environment == 'STG')
+              case_tag = 'stg'
+          sh 'ptest3  -t E1_API_Automation.Test.GP'
+          sh 'ptest3  -t E1_API_Automation.Test.OnlineStudentPortal -i ${case_tag}' 
+          sh 'ptest3  -t E1_API_Automation.Test.TBV3 -i ${case_tag}'
+          sh 'ptest3  -t E1_API_Automation.Test.PT'
+          sh 'ptest3  -t E1_API_Automation.Test.PTReview -i ${case_tag}'
+          sh 'ptest3  -t E1_API_Automation.Test.PTReview -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
@@ -43,6 +55,8 @@ pipeline {
       }
     }
   }
+
+
 
   
 }
