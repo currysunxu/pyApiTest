@@ -5,6 +5,7 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils i
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningPlanEntity import LearningPlanEntity
 from E1_API_Automation.Business.NGPlatform.LearningFieldTemplate import FieldValueType
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningPlanAPIType
 from ...Settings import LEARNING_PLAN_ENVIRONMENT
 from hamcrest import assert_that
 import random
@@ -459,103 +460,115 @@ class PlanServiceTestCases:
         delete_response = learning_plan_service.delete_specific_plan(learning_plan_update)
         assert_that(delete_response.status_code == 200)
 
+    # test when all the fields is null for insert and update APIs
     @Test(tags="qa")
-    def test_learning_plan_insert_null_values(self):
-        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
+    def test_learning_plan_insert_update_null_values(self):
         # all the filed value as null
         learning_plan = LearningPlanEntity(None, None, None, None)
-        learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
-        assert_that(learning_plan_insert_api_response.status_code == 400)
+        self.call_learning_plan_api_and_verify_errors(learning_plan, LearningPlanAPIType.TypeInsert)
+        self.call_learning_plan_api_and_verify_errors(learning_plan, LearningPlanAPIType.TypeUpdate)
 
-        error_message = LearningPlanUtils.verify_insert_put_error_messages(learning_plan_insert_api_response.json(),
-                                                                           learning_plan)
-
-        assert_that(error_message == '', error_message)
-
+    # test when all the fields is empty for insert and update APIs
     @Test(tags="qa")
-    def test_learning_plan_insert_empty_values(self):
-        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
+    def test_learning_plan_insert_update_empty_values(self):
         # all the filed value as empty
         learning_plan = LearningPlanUtils.construct_learning_plan_with_empty_fields()
-        learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
-        assert_that(learning_plan_insert_api_response.status_code == 400)
+        self.call_learning_plan_api_and_verify_errors(learning_plan, LearningPlanAPIType.TypeInsert)
+        self.call_learning_plan_api_and_verify_errors(learning_plan, LearningPlanAPIType.TypeUpdate)
 
-        error_message = LearningPlanUtils.verify_insert_put_error_messages(learning_plan_insert_api_response.json(),
-                                                                           learning_plan)
+    # insert API with value below min for insert and update APIs
+    @Test(tags="qa")
+    def test_learning_plan_insert_update_invalid_value_below_min(self):
+        # all the filed value below min
+        learning_plan = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.BelowMin)
+        self.call_learning_plan_api_and_verify_errors(learning_plan, LearningPlanAPIType.TypeInsert)
+        self.call_learning_plan_api_and_verify_errors(learning_plan, LearningPlanAPIType.TypeUpdate)
 
-        assert_that(error_message == '', error_message)
+    # insert API with value exceed max for insert and update APIs
+    @Test(tags="qa")
+    def test_learning_plan_insert_update_invalid_value_exceed_max(self):
+        # all the filed value exceed max
+        learning_plan = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.ExceedMax)
+        self.call_learning_plan_api_and_verify_errors(learning_plan, LearningPlanAPIType.TypeInsert)
+        self.call_learning_plan_api_and_verify_errors(learning_plan, LearningPlanAPIType.TypeUpdate)
 
     @Test(tags="qa")
     def test_learning_plan_batch_insert_single_plan_null_values(self):
-        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # all the filed value as null
         learning_plan = LearningPlanEntity(None, None, None, None)
         learning_plan_list = [learning_plan]
 
-        learning_plan_batch_insert_api_response = learning_plan_service.post_learning_plan_batch_insert(learning_plan_list)
-        assert_that(learning_plan_batch_insert_api_response.status_code == 400)
-
-        error_message = LearningPlanUtils.verify_insert_put_error_messages(learning_plan_batch_insert_api_response.json(),
-                                                                           learning_plan_list)
-
-        assert_that(error_message == '', error_message)
+        self.call_learning_plan_api_and_verify_errors(learning_plan_list, LearningPlanAPIType.TypeBatchInsert)
 
     @Test(tags="qa")
     def test_learning_plan_batch_insert_single_plan_empty_values(self):
-        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         # all the filed value as empty
         learning_plan = LearningPlanUtils.construct_learning_plan_with_empty_fields()
         learning_plan_list = [learning_plan]
 
-        learning_plan_batch_insert_api_response = learning_plan_service.post_learning_plan_batch_insert(learning_plan_list)
-        assert_that(learning_plan_batch_insert_api_response.status_code == 400)
+        self.call_learning_plan_api_and_verify_errors(learning_plan_list, LearningPlanAPIType.TypeBatchInsert)
 
-        error_message = LearningPlanUtils.verify_insert_put_error_messages(learning_plan_batch_insert_api_response.json(),
-                                                                           learning_plan_list)
+    # @Test(tags="qa")
+    # def test_learning_plan_batch_insert_multiple_plan_null_empty_values(self):
+    #     # all the filed value as null
+    #     learning_plan_null = LearningPlanEntity(None, None, None, None)
+    #     # all the filed value as empty
+    #     learning_plan_empty = LearningPlanUtils.construct_learning_plan_with_empty_fields()
+    #     learning_plan_list = [learning_plan_null, learning_plan_empty]
+    #
+    #     self.call_learning_plan_api_and_verify_errors(learning_plan_list, LearningPlanAPIType.TypeBatchInsert)
 
-        assert_that(error_message == '', error_message)
-
+    # batch insert API with value below min
     @Test(tags="qa")
-    def test_learning_plan_batch_insert_multiple_plan_null_empty_values(self):
-        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
+    def test_learning_plan_batch_insert_multiple_invalid_below_min(self):
+        batch_number = random.randint(5, 10)
+        learning_plan_list = \
+            LearningPlanUtils.construct_multiple_plans_by_template_and_value_type(None, FieldValueType.BelowMin,
+                                                                                  batch_number, False)
+
+        self.call_learning_plan_api_and_verify_errors(learning_plan_list, LearningPlanAPIType.TypeBatchInsert)
+
+    # batch insert API with value exceed max
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_multiple_invalid_exceed_max(self):
+        batch_number = random.randint(5, 10)
+        learning_plan_list = \
+            LearningPlanUtils.construct_multiple_plans_by_template_and_value_type(None, FieldValueType.ExceedMax,
+                                                                                  batch_number, False)
+
+        self.call_learning_plan_api_and_verify_errors(learning_plan_list, LearningPlanAPIType.TypeBatchInsert)
+
+    # batch insert data with different invalid values, null, empty, below min, exceed max
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_multiple_invalid_combination(self):
         # all the filed value as null
         learning_plan_null = LearningPlanEntity(None, None, None, None)
         # all the filed value as empty
         learning_plan_empty = LearningPlanUtils.construct_learning_plan_with_empty_fields()
-        learning_plan_list = [learning_plan_null, learning_plan_empty]
+        # all the filed value below min
+        learning_plan_below_min = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.BelowMin)
+        # all the filed value exceed max
+        learning_plan_exceed_max = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.ExceedMax)
+        learning_plan_list = [learning_plan_null, learning_plan_empty, learning_plan_below_min, learning_plan_exceed_max]
 
-        learning_plan_batch_insert_api_response = learning_plan_service.post_learning_plan_batch_insert(learning_plan_list)
-        assert_that(learning_plan_batch_insert_api_response.status_code == 400)
+        self.call_learning_plan_api_and_verify_errors(learning_plan_list, LearningPlanAPIType.TypeBatchInsert)
 
-        error_message = LearningPlanUtils.verify_insert_put_error_messages(learning_plan_batch_insert_api_response.json(),
-                                                                           learning_plan_list)
 
-        assert_that(error_message == '', error_message)
-
-    @Test(tags="qa")
-    def test_learning_plan_insert_invalid_value_below_min(self):
+    # common method which is called by test cases, for data with invalid values, call the API and verify errors
+    def call_learning_plan_api_and_verify_errors(self, learning_plans, learning_plan_api_type):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
-        # all the filed value as null
-        learning_plan = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.BelowMin)
-        learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
-        assert_that(learning_plan_insert_api_response.status_code == 400)
 
-        error_message = LearningPlanUtils.verify_insert_put_error_messages(learning_plan_insert_api_response.json(),
-                                                                           learning_plan)
+        if learning_plan_api_type == LearningPlanAPIType.TypeInsert:
+            learning_plan_api_response = learning_plan_service.post_learning_plan_insert(learning_plans)
+        elif learning_plan_api_type == LearningPlanAPIType.TypeBatchInsert:
+            learning_plan_api_response = learning_plan_service.post_learning_plan_batch_insert(learning_plans)
+        elif learning_plan_api_type == LearningPlanAPIType.TypeUpdate:
+            learning_plan_api_response = learning_plan_service.put_learning_plan(learning_plans)
 
-        assert_that(error_message == '', error_message)
+        assert_that(learning_plan_api_response.status_code == 400)
 
-    @Test(tags="qa")
-    def test_learning_plan_insert_invalid_value_exceed_max(self):
-        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
-        # all the filed value as null
-        learning_plan = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.ExceedMax)
-        learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
-        assert_that(learning_plan_insert_api_response.status_code == 400)
-
-        error_message = LearningPlanUtils.verify_insert_put_error_messages(learning_plan_insert_api_response.json(),
-                                                                           learning_plan)
+        error_message = \
+            LearningPlanUtils.verify_insert_put_error_messages_by_api_type(learning_plan_api_response.json(),
+                                                                           learning_plans, learning_plan_api_type)
 
         assert_that(error_message == '', error_message)
-
-
