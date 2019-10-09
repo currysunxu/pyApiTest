@@ -94,7 +94,7 @@ class LearningPlanService:
                                                                                   learning_plan.system_key)
         return self.mou_tai.get(api_url)
 
-    def delete_plan_by_partition(self, learning_plan):
+    def delete_partition_plan(self, learning_plan):
         api_url = '/api/v1/plans/{0}/{1}/{2}'.format(learning_plan.product_id, learning_plan.bucket_id,
                                                      learning_plan.plan_business_key)
         return self.mou_tai.delete(api_url)
