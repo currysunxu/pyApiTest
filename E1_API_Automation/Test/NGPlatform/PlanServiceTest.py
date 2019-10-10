@@ -11,11 +11,11 @@ from hamcrest import assert_that
 import random
 import string
 import uuid
+import datetime
 
 
 @TestClass()
 class PlanServiceTestCases:
-
     # test learning plan insert API with valid fields
     @Test(tags="qa")
     def test_learning_plan_insert_valid_all_fields(self):
@@ -80,33 +80,19 @@ class PlanServiceTestCases:
         delete_response = learning_plan_service.delete_specific_plan(learning_plan)
         assert_that(delete_response.status_code == 200)
 
-    @Test(tags="qa")
-    def test_delete_specific_plan(self):
-        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
-        # insert data
-        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(False)
-        learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
-        assert_that(learning_plan_insert_api_response.status_code == 200)
-        # check data with the API
-        learning_plan_get_api_response = learning_plan_service.get_specific_plan(learning_plan)
-        assert_that(len(learning_plan_get_api_response.json())>0, 'The get specific plan API return empty!')
-
-        # delete specific API
-        delete_response = learning_plan_service.delete_specific_plan(learning_plan)
-        assert_that(delete_response.status_code == 200)
-        # get specific API, check there's no return entity
-        learning_plan_get_api_response = learning_plan_service.get_specific_plan(learning_plan)
-        assert_that(len(learning_plan_get_api_response.json()) == 0, 'The get specific plan API should return empty!')
-
     # method can be called by other test cases
-    def test_learning_plan_batch_insert_valid_values(self, field_value_type, is_only_required=False):
+    def test_learning_plan_batch_insert_valid_values(self, field_value_type, is_only_required=False,
+                                                     is_single_plan=False):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
 
         # batch insert need the whole batch have same partition,that means,
         # need same product_id plan_business_key and bucket_id
         learning_plan_template = LearningPlanUtils.construct_learning_plan_template(False)
         # construct valid learning plan list
-        batch_number = random.randint(3, 10)
+        if is_single_plan:
+            batch_number = 1
+        else:
+            batch_number = random.randint(3, 10)
         learning_plan_list = \
             LearningPlanUtils.construct_multiple_plans_by_template_and_value_type(learning_plan_template,
                                                                                   field_value_type,
@@ -148,6 +134,10 @@ class PlanServiceTestCases:
     @Test(tags="qa")
     def test_learning_plan_batch_insert_valid_max(self):
         self.test_learning_plan_batch_insert_valid_values(FieldValueType.Max)
+
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_valid_single_plan(self):
+        self.test_learning_plan_batch_insert_valid_values(FieldValueType.Valid, False, True)
 
     # method will be called by test cases
     def test_get_plan_without_limit_page(self, batch_number, is_user_plan):
@@ -450,6 +440,24 @@ class PlanServiceTestCases:
     def test_delete_user_plan(self):
         batch_number = random.randint(10, 30)
         self.test_delete_user_partition_plan(batch_number, True)
+
+    @Test(tags="qa")
+    def test_delete_specific_plan(self):
+        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
+        # insert data
+        learning_plan = LearningPlanUtils.construct_random_valid_learning_plan(False)
+        learning_plan_insert_api_response = learning_plan_service.post_learning_plan_insert(learning_plan)
+        assert_that(learning_plan_insert_api_response.status_code == 200)
+        # check data with the API
+        learning_plan_get_api_response = learning_plan_service.get_specific_plan(learning_plan)
+        assert_that(len(learning_plan_get_api_response.json())>0, 'The get specific plan API return empty!')
+
+        # delete specific API
+        delete_response = learning_plan_service.delete_specific_plan(learning_plan)
+        assert_that(delete_response.status_code == 200)
+        # get specific API, check there's no return entity
+        learning_plan_get_api_response = learning_plan_service.get_specific_plan(learning_plan)
+        assert_that(len(learning_plan_get_api_response.json()) == 0, 'The get specific plan API should return empty!')
 
     # called by update related cases, with valid values
     def test_learning_plan_update_valid_values(self, field_value_type, is_only_required=False):
@@ -785,7 +793,7 @@ class PlanServiceTestCases:
 
     # test when product_id/bucket_id value exceed int max value
     @Test(tags="qa")
-    def test_get_delete_api_with_invalid_format_int_field(self):
+    def test_get_delete_api_with_exceed_max_int_field(self):
         exceed_max_int_value = 2147483648
         self.test_get_delete_api_with_invalid_int_field(exceed_max_int_value)
 
@@ -1055,7 +1063,7 @@ class PlanServiceTestCases:
                            {'limit': None, 'page': [None]}]
         self.test_get_user_plan_with_empty_student_key(batch_number, limit_page_list)
 
-    # called by other methods, to test the get specific plan API with empty/invalid student key/system key
+    # called by other methods, to test the get specific plan API with empty student key, empty/invalid system key
     def test_get_specific_plan_with_empty_invalid_key(self, student_key, system_key):
         learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
         batch_number = random.randint(2, 10)
@@ -1191,3 +1199,329 @@ class PlanServiceTestCases:
         # delete this specific learning plan at last
         delete_response = learning_plan_service.delete_specific_plan(learning_plan)
         assert_that(delete_response.status_code == 200)
+
+    # test when student_key , plan_business_key with value exceed the allowed
+    @Test(tags="qa")
+    def test_get_delete_api_with_business_student_key_value_exceed_max(self):
+        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
+
+        # with this construction, those two fields already have the value exceed the max they allowed
+        learning_plan = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.ExceedMax)
+        learning_plan.system_key = uuid.uuid1()
+
+        query_fields = ['plan_business_key', 'student_key']
+
+        for field_name in query_fields:
+            if field_name == 'plan_business_key':
+                learning_plan_api_response = learning_plan_service.get_partition_plan_without_limit_page(
+                    learning_plan)
+                assert_that(learning_plan_api_response.status_code == 200)
+                assert_that(len(learning_plan_api_response.json()) == 0)
+
+                learning_plan_api_response = learning_plan_service.get_partition_plan_with_limit(
+                    learning_plan, 10)
+                assert_that(learning_plan_api_response.status_code == 200)
+                assert_that(len(learning_plan_api_response.json()) == 0)
+
+                learning_plan_api_response = learning_plan_service.get_partition_plan_with_limit_page(
+                    learning_plan, 10, 1)
+                assert_that(learning_plan_api_response.status_code == 200)
+                assert_that(len(learning_plan_api_response.json()) == 0)
+
+            learning_plan_api_response = learning_plan_service.get_user_plan_without_limit_page(
+                learning_plan)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(len(learning_plan_api_response.json()) == 0)
+
+            learning_plan_api_response = learning_plan_service.get_user_plan_with_limit(
+                learning_plan, 10)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(len(learning_plan_api_response.json()) == 0)
+
+            learning_plan_api_response = learning_plan_service.get_user_plan_with_limit_page(
+                learning_plan, 10, 1)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(len(learning_plan_api_response.json()) == 0)
+
+            learning_plan_api_response = learning_plan_service.get_specific_plan(learning_plan)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(len(learning_plan_api_response.json()) == 0)
+
+            # test the delete APIs
+            if field_name == 'plan_business_key':
+                learning_plan_api_response = learning_plan_service.delete_partition_plan(learning_plan)
+                assert_that(learning_plan_api_response.status_code == 200)
+                assert_that(learning_plan_api_response.json() is False)
+
+            learning_plan_api_response = learning_plan_service.delete_user_plan(learning_plan)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(learning_plan_api_response.json() is False)
+
+            learning_plan_api_response = learning_plan_service.delete_specific_plan(learning_plan)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(learning_plan_api_response.json() is False)
+
+            # set the field back to valid value to not impact the next field validation
+            setattr(learning_plan, field_name,
+                    ''.join(random.choices(string.ascii_letters + string.digits + '|-', k=10)))
+
+    # called by other methods, to test the delete plan API with empty student key, empty/invalid system key
+    def test_delete_plan_with_empty_invalid_key(self, is_delete_user_plan, student_key, system_key):
+        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
+        batch_number = random.randint(2, 10)
+
+        # batch insert need the whole batch have same partition,that means,need same product_id plan_business_key and bucket_id
+        # user plan need student key
+        learning_plan_template = LearningPlanUtils.construct_learning_plan_template(True)
+        # construct valid learning plan list
+        learning_plan_list_1 = LearningPlanUtils.construct_multiple_valid_learning_plans(learning_plan_template,
+                                                                                         batch_number)
+        learning_plan_list = learning_plan_list_1
+        #create some different student_key learning plans
+        if student_key == '':
+            learning_plan_template.student_key = learning_plan_template.student_key + '|Update'
+            second_batch_number = random.randint(2, 10)
+            learning_plan_list_2 = LearningPlanUtils.construct_multiple_valid_learning_plans(learning_plan_template,
+                                                                                             second_batch_number)
+            learning_plan_list = learning_plan_list + learning_plan_list_2
+            partition_plan_number = batch_number + second_batch_number
+
+        # call learning plan batch insert api
+        learning_plan_batch_insert_api_response = \
+            learning_plan_service.post_learning_plan_batch_insert(learning_plan_list)
+        assert_that(learning_plan_batch_insert_api_response.status_code == 200)
+
+        # get the first learning plan to test the delete API
+        learning_plan_with_empty_invalid_key = learning_plan_list[0]
+
+        # check data before delete API
+        if student_key == '':
+            learning_plan_api_response = learning_plan_service.get_partition_plan_without_limit_page(learning_plan_template)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(len(learning_plan_api_response.json()) == partition_plan_number,
+                        'Length of Learning plan list you got from partition API not as expected!')
+            learning_plan_with_empty_invalid_key.student_key = student_key
+        elif system_key is not None:
+            # when system_key is empty or invalid, it will return all the result with productid, bucketid, planbusinesskey, studentkey params
+            learning_plan_api_response = learning_plan_service.get_user_plan_without_limit_page(learning_plan_template)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(len(learning_plan_api_response.json()) == batch_number,
+                        'Length of Learning plan list you got from user plan API not as expected!')
+            learning_plan_with_empty_invalid_key.system_key = system_key
+
+        # call delete APIs
+        if is_delete_user_plan:
+            learning_plan_delete_api_response = \
+                learning_plan_service.delete_user_plan(learning_plan_with_empty_invalid_key)
+        else:
+            learning_plan_delete_api_response = \
+                learning_plan_service.delete_specific_plan(learning_plan_with_empty_invalid_key)
+
+        assert_that(learning_plan_delete_api_response.status_code == 200)
+
+        # verify after the delete API
+        if student_key == '':
+            # when student_key is empty or invalid, delete API will delete all the result with productid, bucketid, planbusinesskey params
+            learning_plan_api_response = learning_plan_service.get_partition_plan_without_limit_page(learning_plan_template)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(len(learning_plan_api_response.json()) == 0,
+                        'The get partition plan API should return empty after delete API!')
+        elif system_key is not None:
+            # when system_key is empty or invalid, delete API will delete all the result with productid, bucketid, planbusinesskey, studentkey params
+            learning_plan_api_response = learning_plan_service.get_user_plan_without_limit_page(learning_plan_template)
+            assert_that(learning_plan_api_response.status_code == 200)
+            assert_that(len(learning_plan_api_response.json()) == 0,
+                        'The get user plan API should return empty after delete API!')
+
+    # test delete user plan with empty student key
+    @Test(tags="qa")
+    def test_delete_user_plan_with_empty_student_key(self):
+        self.test_delete_plan_with_empty_invalid_key(True, '', None)
+
+    # test delete specific plan with empty student key
+    @Test(tags="qa")
+    def test_delete_specific_plan_with_empty_student_key(self):
+        self.test_delete_plan_with_empty_invalid_key(False, '', None)
+
+    # test delete specific plan with empty system key
+    @Test(tags="qa")
+    def test_delete_specific_plan_with_empty_system_key(self):
+        self.test_delete_plan_with_empty_invalid_key(False, None, '')
+
+    # test delete specific plan with invalid system key
+    @Test(tags="qa")
+    def test_delete_specific_plan_with_invalid_system_key(self):
+        self.test_delete_plan_with_empty_invalid_key(False, None, ''.join(random.sample(string.ascii_letters, 5)))
+
+    # call learning plan api and verify the errors message for invalid date/int fields
+    def call_api_and_verify_errors_for_invalid_date_int_fields(self, learning_plans, field_value, learning_plan_api_type,
+                                                               is_check_date_type, is_exceed_int=False):
+        learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
+
+        if learning_plan_api_type == LearningPlanAPIType.TypeInsert:
+            learning_plan_api_response = learning_plan_service.post_learning_plan_insert(
+                learning_plans)
+        elif learning_plan_api_type == LearningPlanAPIType.TypeBatchInsert:
+            learning_plan_api_response = learning_plan_service.post_learning_plan_batch_insert(learning_plans)
+        elif learning_plan_api_type == LearningPlanAPIType.TypeUpdate:
+            learning_plan_api_response = learning_plan_service.put_learning_plan(learning_plans)
+
+        assert_that(learning_plan_api_response.status_code == 400)
+
+        api_response_json = learning_plan_api_response.json()
+        if is_check_date_type:
+            expected_message = "JSON decoding error: Cannot deserialize value of type `java.util.Date` from String \"{0}\"".format(
+                field_value)
+        else:
+            if not is_exceed_int:
+                expected_message = "JSON decoding error: Cannot deserialize value of type `int` from String \"{0}\"".format(
+                    field_value)
+            else:
+                expected_message = "JSON decoding error: Numeric value ({0}) out of range of int (-2147483648 - 2147483647)".format(
+                    field_value)
+        assert_that(api_response_json['message'].find('expected_message'),
+                    expected_message + " can't be found in message")
+
+    # test insert, update and batch insert with single plan API for date/int type field with invalid format value
+    # called by test cases
+    def test_learning_plan_insert_update_invalid_date_int_fields(self, learning_plan_api_type,
+                                                                 is_check_date_type, is_exceed_int=False):
+        if is_check_date_type:
+            # following is the date type fields in learning plan entity
+            test_type_fields = ['created_time', 'last_updated_time', 'start_time', 'end_time']
+        else:
+            # following is the int type fields in learning plan entity
+            test_type_fields = ['product_id', 'plan_type', 'state', 'bucket_id']
+
+        learning_plan = LearningPlanUtils.construct_learning_plan_by_value_type(FieldValueType.Valid)
+        if learning_plan_api_type == LearningPlanAPIType.TypeUpdate:
+            learning_plan.system_key = str(uuid.uuid1())
+
+        for test_type_field in test_type_fields:
+            original_value = getattr(learning_plan, test_type_field)
+            if is_check_date_type:
+                value_year = str(datetime.datetime.now().year)
+                value_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                field_value = random.choice([value_year, value_time])
+            else:
+                if not is_exceed_int:
+                    field_value = ''.join(random.sample(string.ascii_letters, 5))
+                else:
+                    field_value = 2147483648  # 2147483647 is int's maxvalue
+            
+            # set the invalid format value for date field
+            setattr(learning_plan, test_type_field, field_value)
+            learning_plans = learning_plan
+            # deal with batch insert API
+            if learning_plan_api_type == LearningPlanAPIType.TypeBatchInsert:
+                learning_plans = [learning_plan]
+
+            self.call_api_and_verify_errors_for_invalid_date_int_fields(learning_plans,
+                                                                        field_value,
+                                                                        learning_plan_api_type,
+                                                                        is_check_date_type,
+                                                                        is_exceed_int)
+            # as need to check other fields, so, set this field back to valid value at last
+            setattr(learning_plan, test_type_field, original_value)
+
+    # test insert API for date type field with invalid format value
+    @Test(tags="qa")
+    def test_learning_plan_insert_invalid_date_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeInsert, True)
+
+    # test update API for date type field with invalid format value
+    @Test(tags="qa")
+    def test_learning_plan_update_invalid_date_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeUpdate, True)
+
+    # test batch insert API with single plan for date type field with invalid format value
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_with_single_plan_invalid_date_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeBatchInsert, True)
+
+    # test insert API for int type field with invalid format value
+    @Test(tags="qa")
+    def test_learning_plan_insert_invalid_int_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeInsert, False)
+
+    # test update API for int type field with invalid format value
+    @Test(tags="qa")
+    def test_learning_plan_update_invalid_int_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeUpdate, False)
+
+    # test batch insert API with single plan for int type field with invalid format value
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_with_single_plan_invalid_int_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeBatchInsert, False)
+
+    # test insert API for int type field with exceed max value
+    @Test(tags="qa")
+    def test_learning_plan_insert_exceed_max_int_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeInsert, False, True)
+
+    # test update API for int type field with exceed max value
+    @Test(tags="qa")
+    def test_learning_plan_update_exceed_max_int_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeUpdate, False, True)
+
+    # test batch insert API with single plan for int type field with exceed max value
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_with_single_plan_exceed_max_int_fields(self):
+        self.test_learning_plan_insert_update_invalid_date_int_fields(LearningPlanAPIType.TypeBatchInsert, False, True)
+
+    # test batch insert API for date type field with invalid format value
+    # call by test cases
+    def test_learning_plan_batch_insert_with_multiple_plans_invalid_date_int_fields(self, is_check_date_type,
+                                                                                    is_exceed_int=False):
+        if is_check_date_type:
+            # following is the date type fields in learning plan entity
+            test_type_fields = ['created_time', 'last_updated_time', 'start_time', 'end_time']
+        else:
+            # following is the int type fields in learning plan entity
+            test_type_fields = ['product_id', 'plan_type', 'state', 'bucket_id']
+
+        # batch insert need the whole batch have same partition,that means,
+        # need same product_id plan_business_key and bucket_id
+        learning_plan_template = LearningPlanUtils.construct_learning_plan_template(False)
+        # construct valid learning plan list
+        batch_number = random.randint(2, 5)
+        learning_plan_list = \
+            LearningPlanUtils.construct_multiple_valid_learning_plans(learning_plan_template, batch_number)
+
+        for learning_plan in learning_plan_list:
+            for test_type_field in test_type_fields:
+                original_value = getattr(learning_plan, test_type_field)
+                if is_check_date_type:
+                    value_year = str(datetime.datetime.now().year)
+                    value_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    field_value = random.choice([value_year, value_time])
+                else:
+                    if not is_exceed_int:
+                        field_value = ''.join(random.sample(string.ascii_letters, 5))
+                    else:
+                        field_value = 2147483648  # 2147483647 is int's maxvalue
+
+                # set the invalid value for date/int field
+                setattr(learning_plan, test_type_field, field_value)
+                self.call_api_and_verify_errors_for_invalid_date_int_fields(learning_plan_list,
+                                                                            field_value,
+                                                                            LearningPlanAPIType.TypeBatchInsert,
+                                                                            is_check_date_type,
+                                                                            is_exceed_int)
+                # as need to check other fields, so, set this field as valid value at last
+                setattr(learning_plan, test_type_field, original_value)
+
+    # test batch insert API for date type field with invalid format value
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_with_multiple_plans_invalid_date_fields(self):
+        self.test_learning_plan_batch_insert_with_multiple_plans_invalid_date_int_fields(True)
+
+    # test batch insert API for int type field with invalid format value
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_with_multiple_plans_invalid_int_fields(self):
+        self.test_learning_plan_batch_insert_with_multiple_plans_invalid_date_int_fields(False)
+
+    # test batch insert API for int type field with exceed max value
+    @Test(tags="qa")
+    def test_learning_plan_batch_insert_with_multiple_plans_exceed_max_int_fields(self):
+        self.test_learning_plan_batch_insert_with_multiple_plans_invalid_date_int_fields(False, True)
