@@ -9,3 +9,4 @@ Cython
 pymssql
 pytz
 cassandra-driver
+pymongo
