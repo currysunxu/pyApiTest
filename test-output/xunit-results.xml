@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+	<testsuite errors="0" failures="0" name="DefaultSuite" skips="0" tests="3" time="78.263" timestamp="2019-10-12 15:40:39.682736">
+		<testcase classname="E1_API_Automation.Test.AuthService.AuthTest.AuthTestCases" name="test_legacy_logout" time="3.342"/>
+		<testcase classname="E1_API_Automation.Test.AuthService.AuthTest.AuthTestCases" name="test_login_logout" time="70.762"/>
+		<testcase classname="E1_API_Automation.Test.AuthService.AuthTest.AuthTestCases" name="test_products" time="4.151"/>
+	</testsuite>
