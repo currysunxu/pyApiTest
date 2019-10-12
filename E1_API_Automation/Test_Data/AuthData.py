@@ -2,13 +2,13 @@ from enum import Enum
 
 
 class AuthProduct(Enum):
-    HFV2 = 'HFV2'
-    SSV2 = 'SSV2'
-    TBV3 = 'TBV3'
-    SSV3 = 'SSV3'
-    FRV1 = 'FRV1'
-    HFV3 = 'HFV3'
-    GP = 'GP'
+    HFV2 = 'HF'
+    SSV2 = 'SSLEGACY'
+    TBV3 = 'TB'
+    SSV3 = 'SS'
+    FRV1 = 'FR'
+    HFV3 = 'HF'
+    GP = 'GL'
 
 
 class AuthUsers:
