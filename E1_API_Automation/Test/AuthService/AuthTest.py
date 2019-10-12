@@ -77,33 +77,28 @@ class AuthTestCases:
                     assert_that(product_content['purchaseType'] == 'SUBSCRIBE')
                     assert_that(product_content['isActived'])
                     assert_that(product_content['isCurrentGroup'])
-
-                    is_progress_test_exist = False
-                    # For Highflyer China own student, it will have progress test product, refer to E1SP-312
-                    if key == AuthProduct.HFV2.value or key == AuthProduct.HFV3.value:
+                    if key not in (AuthProduct.SSV2.value , AuthProduct.SSV3.value):
                         if not env_key.endswith('_SG'):
-                            business_line_code = None
-                            country_code = 'CN'
+                            if user.__contains__('countrycode'):
+                                country_code = user['countrycode']
+                            else:
+                                country_code = 'CN'
                             # for QA, it can set country code as it will not differ sg or not
-                            if env_key == 'QA':
-                                if user.__contains__('countrycode'):
-                                    country_code = user['countrycode']
+                            # if env_key == 'QA':
 
                             if user.__contains__('BusinessLineCode'):
                                 business_line_code = user['BusinessLineCode']
 
-                            if country_code == 'CN' and (business_line_code is None or business_line_code == 'OWN'):
-                                is_progress_test_exist = True
-
-                    product_content = jmespath.search("[?identity == 'PROGRESSTEST'] | [0]", product_response.json())
-                    if is_progress_test_exist:
-                        assert_that(product_content['value'] == expected_value)
-                        assert_that(product_content['level'] == 'PRODUCT')
-                        assert_that(product_content['description'] == expected_value)
-                        assert_that(product_content['parent']['identity'] == 'PROGRESSTEST')
-                        assert_that(product_content['parent']['value'] == 'PROGRESSTEST')
-                    else:
-                        assert_that(product_content is None, "PROGRESSTEST product should not present in Auth ACL!")
+                                if country_code == 'CN':
+                                    is_progress_test_exist = True
+                                    product_content = jmespath.search("[?identity == 'PROGRESSTEST'] | [0]", product_response.json())
+                                    assert_that(product_content['value'] == expected_value)
+                                    assert_that(product_content['level'] == 'PRODUCT')
+                                    assert_that(product_content['description'] == expected_value)
+                                    assert_that(product_content['parent']['identity'] == 'PROGRESSTEST')
+                                    assert_that(product_content['parent']['value'] == 'PROGRESSTEST')
+                                else:
+                                    assert_that(product_content is None, "PROGRESSTEST product should not present in Auth ACL!")
                 else:
                     product_content = jmespath.search("[?identity == 'GRAMMARPRO'] | [0]", product_response.json())
                     assert_that(product_content['value'] == expected_value)

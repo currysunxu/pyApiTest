@@ -7,10 +7,12 @@ import jwt
 class AuthUtils:
     @staticmethod
     def get_expected_product(product_key):
-        if product_key not in (AuthProduct.SSV2.value, AuthProduct.GP.value):
+        if product_key not in (AuthProduct.SSV2.value, AuthProduct.GP.value,AuthProduct.SSV3.value):
             expected_value = product_key[0:2]
         elif product_key == AuthProduct.SSV2.value:
             expected_value = "SSLEGACY"
+        elif product_key == AuthProduct.SSV3.value:
+            expected_value = "SS"
         elif product_key == AuthProduct.GP.value:
             expected_value = "GL"
         return expected_value
