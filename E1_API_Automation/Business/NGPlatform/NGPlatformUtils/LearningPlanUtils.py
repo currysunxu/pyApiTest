@@ -1,12 +1,11 @@
 from E1_API_Automation.Business.NGPlatform.LearningPlanEntity import LearningPlanEntity
-from E1_API_Automation.Business.NGPlatform.LearningErrorEntity import LearningErrorEntity
 from E1_API_Automation.Business.NGPlatform.LearningFieldTemplate import LearningFieldTemplate, FieldType, FieldValueType
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningPlanAPIType
 import random
 import string
 import datetime
 import jmespath
-import re
 
 
 class LearningPlanUtils:
@@ -55,11 +54,11 @@ class LearningPlanUtils:
     def construct_multiple_valid_learning_plans(fixed_learning_plan, number):
         return LearningPlanUtils.construct_multiple_plans_by_template_and_value_type(fixed_learning_plan,
                                                                                      FieldValueType.Valid,
-                                                                                     number, False)
+                                                                                     number)
 
     @staticmethod
     def construct_multiple_plans_by_template_and_value_type(fixed_learning_plan, field_value_type, number,
-                                                            is_only_required):
+                                                            is_only_required=False):
         learning_plan_list = []
         for i in range(number):
             learning_plan = \
@@ -158,23 +157,33 @@ class LearningPlanUtils:
     # verify error messages for insert/batch insert/put API
     @staticmethod
     def verify_insert_put_error_messages(api_response_json, learning_plans):
-        expected_error_entity_list = LearningPlanUtils.get_expected_learning_plan_error_list(learning_plans)
+        return LearningPlanUtils.verify_insert_put_error_messages_by_api_type(api_response_json, learning_plans, None)
+
+    # verify error messages for insert/batch insert/put API by API type
+    @staticmethod
+    def verify_insert_put_error_messages_by_api_type(api_response_json, learning_plans, learning_plan_api_type):
+        expected_error_entity_list = LearningPlanUtils.get_expected_learning_plan_error_list(learning_plans,
+                                                                                             learning_plan_api_type)
         return LearningCommonUtils.verify_insert_put_error_messages(api_response_json, expected_error_entity_list)
 
     @staticmethod
-    def get_expected_learning_plan_error_list(learning_plans):
+    def get_expected_learning_plan_error_list(learning_plans, learning_plan_api_type):
         error_entity_list = []
         if isinstance(learning_plans, list):
             for i in range(len(learning_plans)):
                 learning_plan = learning_plans[i]
-                field_error_entity_list = LearningPlanUtils.get_expected_learning_plan_error_list_by_entity(learning_plan, i)
+                field_error_entity_list = \
+                    LearningPlanUtils.get_expected_learning_plan_error_list_by_entity(learning_plan, i,
+                                                                                      learning_plan_api_type)
                 error_entity_list = error_entity_list + field_error_entity_list
         else:
-            error_entity_list = LearningPlanUtils.get_expected_learning_plan_error_list_by_entity(learning_plans, None)
+            error_entity_list = \
+                LearningPlanUtils.get_expected_learning_plan_error_list_by_entity(learning_plans, None,
+                                                                                  learning_plan_api_type)
         return error_entity_list
 
     @staticmethod
-    def get_expected_learning_plan_error_list_by_entity(learning_plan, request_index):
+    def get_expected_learning_plan_error_list_by_entity(learning_plan, request_index, learning_plan_api_type):
         learning_plan_field_error_entity_list = []
         field_templates = LearningPlanUtils.get_learning_plan_field_templates()
         student_plan_items = learning_plan.__dict__
@@ -182,7 +191,15 @@ class LearningPlanUtils:
             field_value = student_plan_items[item_key]
             field_name = item_key[len('_' + learning_plan.__class__.__name__ + '__'):]
 
+            is_need_to_verify_field = False
+
             if field_name != 'system_key':
+                is_need_to_verify_field = True
+            else:
+                if learning_plan_api_type == LearningPlanAPIType.TypeUpdate:
+                    is_need_to_verify_field = True
+
+            if is_need_to_verify_field:
                 field_template = LearningCommonUtils.get_field_template_by_name(field_name, field_templates)
                 field_error_entity = LearningCommonUtils.get_expected_learning_error_entity_by_template(field_value,
                                                                                                         field_template,
@@ -197,10 +214,7 @@ class LearningPlanUtils:
         learning_plan_field_templates = []
 
         product_id_field_tempalte = LearningFieldTemplate('productId', FieldType.TypeInt, True)
-        # product_id_field_tempalte.min_value = 1
         product_id_field_tempalte.min_error_code = '4402'
-        # product_id_field_tempalte.max_value = 512
-        # product_id_field_tempalte.max_error_code = '4403'
         product_id_field_tempalte.content_format = [1, 2, 4, 8, 16, 32, 64]
 
         regular_expression = '^[A-Za-z0-9|-]+$'
@@ -223,10 +237,7 @@ class LearningPlanUtils:
         student_key_field_tempalte.content_format = regular_expression
 
         plan_type_field_tempalte = LearningFieldTemplate('planType', FieldType.TypeInt, True)
-        # plan_type_field_tempalte.min_value = 1
         plan_type_field_tempalte.min_error_code = '4405'
-        # plan_type_field_tempalte.max_value = 512
-        # plan_type_field_tempalte.max_error_code = '4406'
         plan_type_field_tempalte.content_format = [1, 2, 4, 8, 16, 32]
 
         route_field_tempalte = LearningFieldTemplate('route', FieldType.TypeString, False)
@@ -235,7 +246,6 @@ class LearningPlanUtils:
         route_field_tempalte.max_value = 512
 
         state_field_tempalte = LearningFieldTemplate('state', FieldType.TypeInt, True)
-        # state_field_tempalte.max_value = 10
         state_field_tempalte.min_error_code = '4408'
         state_field_tempalte.content_format = [1, 2, 4, 8]
 
@@ -256,20 +266,20 @@ class LearningPlanUtils:
 
         time_format_expression = '%Y-%m-%dT%H:%M:%S.%fZ'
         created_time_field_tempalte = LearningFieldTemplate('createdTime', FieldType.TypeDate, False)
-        # created_time_field_tempalte.min_error_code = '4410'
         created_time_field_tempalte.content_format = time_format_expression
 
         last_updated_time_field_tempalte = LearningFieldTemplate('lastUpdatedTime', FieldType.TypeDate, False)
-        # last_updated_time_field_tempalte.min_error_code = '4411'
         last_updated_time_field_tempalte.content_format = time_format_expression
 
         start_time_field_tempalte = LearningFieldTemplate('startTime', FieldType.TypeDate, False)
-        # start_time_field_tempalte.min_error_code = '4412'
         start_time_field_tempalte.content_format = time_format_expression
 
         end_time_field_tempalte = LearningFieldTemplate('endTime', FieldType.TypeDate, False)
-        # end_time_field_tempalte.min_error_code = '4413'
         end_time_field_tempalte.content_format = time_format_expression
+
+        # this field is used in update API
+        system_key_field_tempalte = LearningFieldTemplate('systemKey', FieldType.TypeUUID, True)
+        system_key_field_tempalte.min_error_code = '4417'
 
         learning_plan_field_templates.append(product_id_field_tempalte)
         learning_plan_field_templates.append(plan_business_key_field_tempalte)
@@ -285,5 +295,6 @@ class LearningPlanUtils:
         learning_plan_field_templates.append(last_updated_time_field_tempalte)
         learning_plan_field_templates.append(start_time_field_tempalte)
         learning_plan_field_templates.append(end_time_field_tempalte)
+        learning_plan_field_templates.append(system_key_field_tempalte)
 
         return learning_plan_field_templates
