@@ -72,7 +72,9 @@ pipeline {
      script{
      sh 'mvn clean package'
      sh 'cp /app/jacoco/learningplan/jacoco_learningplan.exec jacoco.exec'
-     jacoco()
+     jacoco(
+      exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')
+     
      }
      }
   }
