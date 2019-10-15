@@ -1,5 +1,5 @@
 import jmespath
-from ptest.assertion import assert_that
+from hamcrest import assert_that
 
 from E1_API_Automation.Test_Data.GPData import ShanghaiGradeKey, MoscowGradeKey, EducationRegion
 from ..Lib.Moutai import Moutai, Token
@@ -500,3 +500,48 @@ class GPService():
             next_grade_module_id = self.get_mapping_result_set(next_grade_real_level, 'key', mapping)
             expected_new_module_key = new_list + next_grade_module_id
             return expected_new_module_key
+
+    def get_all_activity_keys(self):
+        student_progress = self.get_student_progress().json()
+        activity_keys = jmespath.search("RemediationProgress.LessThanSelectedGradeModules[].Lessons[].ActivityKeys[]", student_progress)
+        if activity_keys is None:
+            activity_keys = jmespath.search(
+                "RemediationProgress.RemediationModulesResult[].Lessons[].ActivityKeys[]", student_progress)
+        activity_keys = list(set(activity_keys))
+        return activity_keys
+
+    def get_and_verify_video_resource(self, activity_keys):
+        api_response = self.post_students_lesson_activity(activity_keys)
+        video_resource_ids = jmespath.search("Resources[?Mime=='video/mp4'].ResourceId", api_response.json())
+        video_resource_ids = list(set(video_resource_ids))
+        expected_datas = [
+            {
+                "Width": 640,
+                "Height": 360
+            },
+            {
+                "Width": 856,
+                "Height": 480
+            },
+            {
+                "Width": 1280,
+                "Height": 720
+            },
+            {
+                "Width": 1920,
+                "Height": 1080
+            }
+        ]
+        for video_resource_id in video_resource_ids:
+            video_resource_items = jmespath.search("Resources[?ResourceId=='"+video_resource_id+"']", api_response.json())
+            assert_that(len(video_resource_items) >= 4, "video resource must have more then 4 records in the api response")
+
+            # for each resource, check if each resource will have four type width*height,
+            # and length and duration should more than 0
+            for expected_data in expected_datas:
+                filter_str = "@[?(Width == `{0}` && Height == `{1}` && Quality == '{2}' && Length > `0` && Duration > `0`)]"\
+                    .format(expected_data['Width'], expected_data['Height'],
+                            str(expected_data['Width'])+'x' + str(expected_data['Height']))
+                resource_item = jmespath.search(filter_str, video_resource_items)
+                assert_that(resource_item is not None)
+
