@@ -44,10 +44,15 @@ class LearningPlanEnvironment(object):
 class LearningResultEnvironment(object):
     QA = "http://learning-result.qa.edtech.kt"
 
+class BffEnvironment(object):
+    QA = "http://highflyers.qa.edtech.kt/hf3"
+
 try:
     print(os.environ['environment'])
 except:
     os.environ['environment'] = 'QA'
+
+os.environ['environment'] = 'QA'
 
 
 if os.environ['environment'] == 'QA':
@@ -58,6 +63,7 @@ if os.environ['environment'] == 'QA':
     OMNI_ENVIRONMENT = OMNIEnvironment.QA
     LEARNING_PLAN_ENVIRONMENT = LearningPlanEnvironment.QA
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.QA
+    BFF_ENVIRONMENT = BffEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
