@@ -54,11 +54,11 @@ class LearningPlanUtils:
     def construct_multiple_valid_learning_plans(fixed_learning_plan, number):
         return LearningPlanUtils.construct_multiple_plans_by_template_and_value_type(fixed_learning_plan,
                                                                                      FieldValueType.Valid,
-                                                                                     number, False)
+                                                                                     number)
 
     @staticmethod
     def construct_multiple_plans_by_template_and_value_type(fixed_learning_plan, field_value_type, number,
-                                                            is_only_required):
+                                                            is_only_required=False):
         learning_plan_list = []
         for i in range(number):
             learning_plan = \

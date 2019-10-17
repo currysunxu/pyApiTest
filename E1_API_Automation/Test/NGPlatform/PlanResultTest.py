@@ -637,7 +637,8 @@ class PlanResultTestCases:
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetPartition)
         # construct valid learning result list, with same product_id, student_key, but different plan_business_key
         # learning_result_list = []
-        for i in range(5):
+        result_number = 10
+        for i in range(result_number):
             details_number = random.randint(1, 3)
             learning_result = LearningResultUtils.construct_learning_result_valid_by_template(learning_result_template,
                                                                                               details_number)
@@ -653,9 +654,10 @@ class PlanResultTestCases:
         # when plan_business_key is empty, the get user result API will return same result as get partition api
         assert_that(get_user_without_limit_api_response.json() == get_partition_api_response.json(),
                     'get user without limit API return result should be same as get partition api when plan_business_key is empty')
+        limit_number = random.randint(1, result_number)
         get_user_with_limit_api_response = \
-            learning_result_service.get_user_result_with_limit(learning_result_template, 10)
-        assert_that(get_user_with_limit_api_response.json() == get_partition_api_response.json(),
+            learning_result_service.get_user_result_with_limit(learning_result_template, limit_number)
+        assert_that(get_user_with_limit_api_response.json() == get_partition_api_response.json()[:limit_number],
                     'get user with limit API return result should be same as get partition api when plan_business_key is empty')
 
     # test when there's no record can be found with the param
