@@ -7,7 +7,7 @@ from ptest.decorator import TestClass, Test
 from ...Lib.HamcrestMatcher import match_to
 from ...Lib.ScheduleClassTool import local2utc
 from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
-
+import os
 
 class ClassType(Enum):
     DEMO = "Demo"
@@ -113,7 +113,7 @@ class APITestCases(EVCBase):
                                                                                 ClassType.REGULAR.value)
         assert_that(query_booking_history_response.status_code == 200)
 
-    @Test(tags='qa,stg')
+    @Test(enabled=os.environ['environment'].lower() in 'qa,stg', tags='qa, stg')
     def test_workflow(self):
         '''
         This workflow will run the following process:
