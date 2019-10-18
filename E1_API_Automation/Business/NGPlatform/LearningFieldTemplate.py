@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class LearningPlanFieldTemplate:
+class LearningFieldTemplate:
     def __init__(self, field_name, field_type, is_required):
         self.__field_name = field_name
         self.__field_type = field_type
@@ -81,6 +81,8 @@ class FieldType(Enum):
     TypeInt = 'int'
     TypeString = 'string'
     TypeDate = 'date'
+    TypeUUID = 'uuid'
+    TypeObject = 'object'
 
 
 class FieldValueType(Enum):
@@ -88,3 +90,6 @@ class FieldValueType(Enum):
     BelowMin = 'belowMin'
     Max = 'max'
     Min = 'min'
+    Valid = 'valid'
+    NoneValue = 'None'
+    EmptyValue = 'Empty'

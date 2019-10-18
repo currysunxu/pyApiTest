@@ -242,3 +242,10 @@ class GPAPITestCases(GrammarProBaseClass):
         new_module_list = self.gptest.get_new_recommend_module()
         expected_new_module_list = self.gptest.get_new_recommended_module(4)
         assert new_module_list == expected_new_module_list
+
+    # only for staging and live as qa don't have video
+    @Test()
+    def test_gp_video_valid(self):
+        self.gptest.login(GP_user.GPVideoUsers[env_key]['username'], GP_user.GPVideoUsers[env_key]['password'])
+        activity_keys = self.gptest.get_all_activity_keys()
+        self.gptest.get_and_verify_video_resource(activity_keys)

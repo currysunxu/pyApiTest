@@ -56,3 +56,8 @@ class GP_user:
                  'Live': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth11'},
                  'Staging_SG': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth10'},
                  'Live_SG': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth10'}}
+
+    GPVideoUsers = {'Staging': {'username': 'gp.cn.01', 'password': '12345'},
+                    'Live': {'username': 'gp.cn.auto1', 'password': '12345'},
+                    'Staging_SG': {'username': 'gp.ru.auto1', 'password': '12345'},
+                    'Live_SG': {'username': 'robin.wang', 'password': '12345'}}

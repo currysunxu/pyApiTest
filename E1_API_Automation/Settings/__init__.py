@@ -41,11 +41,15 @@ class OMNIEnvironment(object):
 class LearningPlanEnvironment(object):
     QA = "http://learning-plan.qa.edtech.kt"
 
+
+class LearningResultEnvironment(object):
+    QA = "http://learning-result.qa.edtech.kt"
+
+
 try:
     print(os.environ['environment'])
 except:
     os.environ['environment'] = 'QA'
-
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
@@ -54,6 +58,7 @@ if os.environ['environment'] == 'QA':
     AUTH_ENVIRONMENT = AuthEnvironment.QA
     OMNI_ENVIRONMENT = OMNIEnvironment.QA
     LEARNING_PLAN_ENVIRONMENT = LearningPlanEnvironment.QA
+    LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -64,6 +69,11 @@ if os.environ['environment'] == 'QA':
         "Server": "10.178.86.216",
         "User": "cassandra",
         "Password": "cassandra"
+    }
+    MONGO_DATABASE = {
+        "Server": "10.178.86.79,27017",
+        "User": "svcuser",
+        "Password": "Efef@123!"
     }
 
 

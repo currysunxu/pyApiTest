@@ -22,6 +22,10 @@ class SmallStarBase():
     if ENVIRONMENT == Environment.LIVE:
         user_name = "ss3.cnlive.1"
         password = '12345'
+    
+    if ENVIRONMENT == Environment.LIVE_SG:
+        user_name = "russia.trial"
+        password = '12345'
 
 
 
