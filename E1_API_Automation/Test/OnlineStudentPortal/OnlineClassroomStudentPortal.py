@@ -47,6 +47,24 @@ class APITestCases(EVCBase):
         return course
 
     @Test(tags='qa,stg,live')
+    def test_get_offline_group_sessions(self):
+        self.test_login()
+
+        group_response = self.evc_service.get_offline_active_groups()
+        group_id = str(jmespath.search("[0].groupSFId", group_response.json()))
+
+        session_response = self.evc_service.get_offline_group_sessions(group_id)
+        assert_that(session_response.json(), match_to("[*].reservationId"))
+        assert_that(session_response.json(), match_to("[*].sequenceNumber"))
+        assert_that(session_response.json(), match_to("[*].startTime"))
+        assert_that(session_response.json(), match_to("[*].endTime"))
+        assert_that(session_response.json(), match_to("[*].sessionType"))
+        assert_that(session_response.json(), match_to("[*].program"))
+        assert_that(session_response.json(), match_to("[*].programLevel"))
+        assert_that(session_response.json(), match_to("[*].lessons[0].unitNumber"))
+        assert_that(session_response.json(), match_to("[*].lessons[0].lessonNumber"))
+
+    @Test(tags='qa,stg,live')
     def test_student_profile(self):
         self.test_login()
         response = self.evc_service.get_user_profile()

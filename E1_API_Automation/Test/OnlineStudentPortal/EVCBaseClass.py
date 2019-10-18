@@ -112,7 +112,7 @@ class EVCBase():
         host = "https://e1svc-staging.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-stg-cn.ef.com'
         user_info = {
-            "UserName": "hf2.cn.auto1",
+            "UserName": "dada", #hf2.cn.auto1
             "Password": "12345",
             "DeviceType": 0,
             "Platform": 0

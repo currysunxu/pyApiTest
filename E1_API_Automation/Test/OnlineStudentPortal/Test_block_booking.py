@@ -1,5 +1,6 @@
 from datetime import *
 
+import arrow
 import jmespath
 from hamcrest import assert_that
 from ptest.decorator import BeforeClass, Test, TestClass
@@ -66,6 +67,79 @@ class TestBlockBooking():
     @BeforeClass()
     def create_service(self):
         self.service = KidsEVCService(self.host)
+
+    def select_booking_timeslots(self, booking_number):
+        timeslot_list = []
+
+        for i in range(0, booking_number):
+            start_time = arrow.now().shift(weeks=i, days=1, hours=1).format('YYYY-MM-DD HH:00:00')
+            end_time = arrow.now().shift(weeks=i, days=1, hours=1).format('YYYY-MM-DD HH:30:00')
+
+            dict = {
+                "startTime": start_time,
+                "endTime": end_time
+            }
+            i = i + 1
+            timeslot_list.append(dict)
+        return timeslot_list
+
+    def get_active_offline_group(self):
+        group_response = self.service.get_offline_active_groups()
+        course_type_list = jmespath.search("[?isCurrentGroup==`true`].courseType", group_response.json())
+        book_code_list = jmespath.search("[?isCurrentGroup==`true`].courseTypeLevelCode", group_response.json())
+        if course_type_list == []:
+            course_type = str(jmespath.search("[0].courseType", group_response.json()))
+            book_code = str(jmespath.search("[0].courseTypeLevelCode", group_response.json()))
+        else:
+            course_type = str(course_type_list[0])
+            book_code = str(book_code_list[0])
+        course = []
+        course.append(course_type)
+        course.append(book_code)
+        return course
+
+    def get_book_topics(self, course_type, book):
+        lesson_structure_response = self.service.get_course_lesson_structure('Regular', course_type)
+
+        unit = jmespath.search("[?courseTypeLevelCode=='" + book + "'].unitNumber",
+                               lesson_structure_response.json())
+        lesson = jmespath.search("[?courseTypeLevelCode=='" + book + "'].lessonNumber",
+                                 lesson_structure_response.json())
+        return unit, lesson
+
+    @Test()
+    def test_block_booking_search_by_weekday_and_timeslot(self):
+        self.service.login(user_name=self.user_info_HFV3["UserName"], password=self.user_info_HFV3["Password"])
+
+        # get current group
+        course = self.get_active_offline_group()
+
+        # get topics
+        topics = self.get_book_topics(course[0], course[1])
+
+        # search by weekday and time slot
+        time_slots = self.select_booking_timeslots(2)
+        search_result = self.service.block_booking_search_by_weekday_timeslot(self.user_info_HFV3["course_type"], time_slots)
+        teacher_id = jmespath.search("[0].teacherId", search_result.json())
+
+        for index, slot in enumerate(time_slots):
+            slot['unitNumber'] = topics[0][index]
+            slot['lessonNumber'] = topics[1][index]
+
+        # block booking
+        block_booking_response = self.service.block_booking_v3(course[0], course[1], teacher_id, time_slots)
+        assert_that(block_booking_response.status_code == 200)
+        class_list = jmespath.search("[*].classId", block_booking_response.json())
+
+        assert_that(block_booking_response.json(), match_to("[].classId"))
+        assert_that(block_booking_response.json(), match_to("[].startTime"))
+        assert_that(block_booking_response.json(), match_to("[].endTime"))
+        assert_that(block_booking_response.json(), match_to("[].classStatusCode"))
+
+        # cancel classes
+        for class_id in class_list:
+            cancel_response = self.service.cancel_class(str(class_id))
+            assert_that(cancel_response.status_code == 204)
 
     @Test()
     def block_booking_teacher_search_success_for_HF_student(self):
