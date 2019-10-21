@@ -20,14 +20,17 @@ class BffTest:
 	@Test(tag='qa')
 	def test_bff_auth_login_valid_username(self):
 		bff_service = BffService(BFF_ENVIRONMENT)
-		key = BffProduct.HFV35.value
-		user_name = BffUsers.BffUserPw[env_key][key][0]['username']
-		password = BffUsers.BffUserPw[env_key][key][0]['password']
-		response = bff_service.login(user_name,password,platform='UNDEFINED', device_type='NONE')
-		print("Bff login response is : %s"%(response.__str__()))
-		id_token = bff_service.get_auth_token()
-		print("Bff login Token is : %s"%(id_token))
-		assert_that((not id_token.__eq__("")) and id_token.__str__() is not None)
+		product_keys = BffUsers.BffUserPw[env_key].keys()
+		for key in product_keys:
+			user_name = BffUsers.BffUserPw[env_key][key][0]['username']
+			password = BffUsers.BffUserPw[env_key][key][0]['password']
+			if key.__contains__('HF'):
+				print("HF user is : %s"%(user_name))
+				response = bff_service.login(user_name, password)
+				print("Bff login response is : %s"%(response.__str__()))
+				id_token = bff_service.get_auth_token()
+				print("Bff login Token is : %s"%(id_token))
+				assert_that((not id_token.__eq__("")) and id_token.__str__() is not None)
 
 	@Test(tag='qa')
 	def test_bff_auth_login_invalid_username(self):
@@ -35,7 +38,7 @@ class BffTest:
 		key = BffProduct.HFV35.value
 		user_name = BffUsers.BffUserPw[env_key][key][0]['password']
 		password = BffUsers.BffUserPw[env_key][key][0]['password']
-		response = bff_service.login(user_name,password,platform='UNDEFINED', device_type='NONE')
+		response = bff_service.login(user_name,password)
 		print("Bff login response is : %s"%(response.__str__()))
 		assert_that(response.status_code, equal_to(404))
 
@@ -46,17 +49,14 @@ class BffTest:
 		for key in product_keys:
 			user_name = BffUsers.BffUserPw[env_key][key][0]['username']
 			password = BffUsers.BffUserPw[env_key][key][0]['password']
-			response = bff_service.login(user_name, password, platform='UNDEFINED', device_type='NONE')
+			response = bff_service.login(user_name, password)
 			print(
 				"Product:" + key + ";UserName:" + user_name )
-			if key !=BffProduct.HFV35.value:
+			if not key.__contains__('HF'):
 				print("status: %s, message: %s"%(str(response.json()['status']),response.json()['message']))
 				assert_that(response.status_code, equal_to(401))
 				assert_that((response.json()['error'].__eq__("Unauthorized")))
 
-	@Test(tag='qa')
-	def test_submit_new_attempt(self):
-		print()
 
 	@Test(tag='qa')
 	def test_submit_new_attempt_without_auth_token(self):

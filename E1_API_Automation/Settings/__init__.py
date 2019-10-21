@@ -53,10 +53,6 @@ try:
 except:
     os.environ['environment'] = 'QA'
 
-os.environ['environment'] = 'QA'
-
-
-
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
     OSP_ENVIRONMENT = OSPEnvironment.QA
