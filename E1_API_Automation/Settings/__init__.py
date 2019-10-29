@@ -48,6 +48,9 @@ class LearningResultEnvironment(object):
 class BffEnvironment(object):
     QA = "http://highflyers.qa.edtech.kt/hf3"
 
+class HomeworkEnvironment(object):
+    QA = "http://homework.qa.edtech.kt"
+
 try:
     print(os.environ['environment'])
 except:
@@ -62,6 +65,7 @@ if os.environ['environment'] == 'QA':
     LEARNING_PLAN_ENVIRONMENT = LearningPlanEnvironment.QA
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.QA
     BFF_ENVIRONMENT = BffEnvironment.QA
+    HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
