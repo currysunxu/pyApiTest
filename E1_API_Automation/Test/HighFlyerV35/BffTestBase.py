@@ -5,8 +5,8 @@
 #date:2019/10/29
 from hamcrest import assert_that, equal_to
 
-from E1_API_Automation.Business.NGPlatform.BffService import BffService
-from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.BffCommonData import BffCommonData
+from E1_API_Automation.Business.HighFlyer35.BffService import BffService
+from E1_API_Automation.Business.Utils.BffCommonData import BffCommonData
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Settings import LEARNING_PLAN_ENVIRONMENT, LEARNING_RESULT_ENVIRONMENT, BFF_ENVIRONMENT, env_key

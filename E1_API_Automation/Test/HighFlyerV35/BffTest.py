@@ -11,9 +11,9 @@ from E1_API_Automation.Business.NGPlatform.LearningPlanEntity import LearningPla
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Settings import env_key,HOMEWORK_ENVIRONMENT
-from E1_API_Automation.Test.NGPlatform.BffTestBase import BffTestBase
+from E1_API_Automation.Test.HighFlyerV35.BffTestBase import BffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers
-from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.BffCommonData import BffCommonData
+from E1_API_Automation.Business.Utils.BffCommonData import BffCommonData
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
