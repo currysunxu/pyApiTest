@@ -41,7 +41,7 @@ class ContentMapService:
 
     def post_insert_content_map_tree(self, course, tree_data, schema_version, region_ach):
         insert_body = {
-            "course": course.value,
+            "course": course,
             "data": tree_data,
             "schemaVersion": schema_version,
             "regionAch": region_ach
