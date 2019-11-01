@@ -11,16 +11,16 @@ from E1_API_Automation.Business.NGPlatform.LearningPlanEntity import LearningPla
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Settings import env_key,HOMEWORK_ENVIRONMENT
-from E1_API_Automation.Test.HighFlyerV35.BffTestBase import BffTestBase
+from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers
-from E1_API_Automation.Business.Utils.BffCommonData import BffCommonData
+from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
 
 
 @TestClass()
-class BffTest(BffTestBase):
+class Hf35BffTest(HfBffTestBase):
 
     @Test(tag='qa')
     def test_bff_auth_login_valid_username(self):
@@ -75,18 +75,14 @@ class BffTest(BffTestBase):
 
     @Test(tag='qa')
     def test_submit_new_attempt_with_valid_body(self):
-        bff_data_obj = BffCommonData()
+        bff_data_obj = Hf35BffCommonData(2,4)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
         print("Bff submit response is : %s" % (submit_response.__str__()))
         print("Bff submit response is : %s" % (submit_response.text))
         assert_that(submit_response.status_code,equal_to(200))
         assert_that((not submit_response.text.__eq__("")))
         # check learning plan
-        bucket_id = datetime.datetime.now().year
-        product_id = 2
-        plan_busniess = '|'.join(bff_data_obj.plan_business)
-        student_key = bff_data_obj.get_attempt_body()["studentId"]
-        learning_plan_entity = LearningPlanEntity(product_id, plan_busniess, bucket_id, student_key)
+        learning_plan_entity = LearningPlanEntity(None,None,None,None)
         self.setter_learning_plan(learning_plan_entity,bff_data_obj)
         plan_response = self.get_learning_plan_response(learning_plan_entity)
         plan_system = plan_response.json()[0]["systemKey"]
@@ -94,17 +90,17 @@ class BffTest(BffTestBase):
         assert_that(submit_response.text[1:-1], equal_to(plan_system))
         self.check_bff_compare_learning_plan(plan_response,learning_plan_entity)
         # check learning result
-        learning_result_entity = LearningResultEntity(product_id, plan_busniess, int(student_key))
-        result_response = self.get_learning_result_response(learning_result_entity)
+        learning_result_entity = LearningResultEntity(None,None,None)
         self.setter_learning_result(learning_result_entity,bff_data_obj,plan_system)
-        detail_act_key = BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..activityContentId')
-        learning_details_entity = LearningResultDetailEntity(detail_act_key)
+        result_response = self.get_learning_result_response(learning_result_entity)
+        assert_that(result_response.status_code,equal_to(200))
+        learning_details_entity = LearningResultDetailEntity(None)
         self.setter_learning_result_details(learning_details_entity,bff_data_obj)
         self.check_bff_compare_learning_result(result_response,learning_result_entity,learning_details_entity)
 
     @Test(tag='qa')
     def test_submit_best_attempt(self):
-        bff_data_obj = BffCommonData()
+        bff_data_obj = Hf35BffCommonData()
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
         print("Bff submit response is : %s" % (submit_response.__str__()))
         print("Bff submit response is : %s" % (submit_response.text))
@@ -116,17 +112,17 @@ class BffTest(BffTestBase):
         book_content_id = bff_data_obj.get_attempt_body()["bookContentId"]
         best_submit_response = self.bff_service.get_the_best_attempt(student_key,book_content_id)
         # check bff get best attempt
-        bff_best_total_score = sum(BffCommonData().get_value_by_json_path(best_submit_response.json()[0], "$..totalScore"))
-        expected_total_score = sum(BffCommonData().get_value_by_json_path(bff_data_obj.attempt_json,"$..totalScore"))
-        bff_best_score = sum(BffCommonData().get_value_by_json_path(best_submit_response.json()[0], "$..score"))
-        expected_score = sum(BffCommonData().get_value_by_json_path(bff_data_obj.attempt_json,"$..score"))
+        bff_best_total_score = sum(Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.activities..totalScore"))
+        expected_total_score = sum(Hf35BffCommonData.get_value_by_json_path(bff_data_obj.attempt_json,"$..totalScore"))
+        bff_best_score = sum(Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.activities..score"))
+        expected_score = sum(Hf35BffCommonData.get_value_by_json_path(bff_data_obj.attempt_json,"$..score"))
         assert_that(bff_best_total_score,equal_to(expected_total_score))
         assert_that(bff_best_score,equal_to(expected_score))
         # check homework service best attempt
         homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
         homework_best_attempt_response = homework_service.get_the_best_attempt(student_key,book_content_id)
-        homework_best_total_score = sum(BffCommonData().get_value_by_json_path(homework_best_attempt_response.json()[0],"$..totalScore"))
-        homework_best_score = sum(BffCommonData().get_value_by_json_path(homework_best_attempt_response.json()[0],"$..score"))
+        homework_best_total_score = sum(Hf35BffCommonData.get_value_by_json_path(homework_best_attempt_response.json()[0],"$.activities..totalScore"))
+        homework_best_score = sum(Hf35BffCommonData.get_value_by_json_path(homework_best_attempt_response.json()[0],"$.activities..score"))
         assert_that(homework_best_total_score,equal_to(bff_best_total_score))
         assert_that(homework_best_score,equal_to(bff_best_score))
 

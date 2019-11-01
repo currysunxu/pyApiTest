@@ -2,7 +2,7 @@ from E1_API_Automation.Lib.Moutai import Moutai
 import jmespath
 
 
-class BffService:
+class Hf35BffService:
     def __init__(self, host):
         self.host = host
         self.mou_tai = Moutai(host=self.host,headers={"Content-Type":"application/json;charset=UTF-8"})

@@ -3,10 +3,12 @@
 
 #author:Curry
 #date:2019/10/29
+import datetime
+
 from hamcrest import assert_that, equal_to
 
-from E1_API_Automation.Business.HighFlyer35.BffService import BffService
-from E1_API_Automation.Business.Utils.BffCommonData import BffCommonData
+from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
+from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Settings import LEARNING_PLAN_ENVIRONMENT, LEARNING_RESULT_ENVIRONMENT, BFF_ENVIRONMENT, env_key
@@ -15,11 +17,11 @@ from ptest.decorator import BeforeMethod
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
 
 
-class BffTestBase:
+class HfBffTestBase:
 
 	@BeforeMethod()
 	def setup(self):
-		self.bff_service = BffService(BFF_ENVIRONMENT)
+		self.bff_service = Hf35BffService(BFF_ENVIRONMENT)
 		self.key = BffProduct.HFV35.value
 		self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
 		self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
@@ -57,20 +59,29 @@ class BffTestBase:
 				assert_that(result_response.json()[0]["details"][index]["answer"], equal_to(detail["answer"]))
 				index += 1
 		# check activity object
-		self.extend_activity_obj(learning_details_entity)
-		assert_that(BffCommonData.get_value_by_json_path(result_response.json()[0], "$..activityKey"),
+		self.extend_activity_obj(learning_result_entity,learning_details_entity)
+		assert_that(Hf35BffCommonData.get_value_by_json_path(result_response.json()[0], "$..activityKey"),
 					equal_to(learning_details_entity.activity_key))
-		assert_that(BffCommonData.get_value_by_json_path(result_response.json()[0], "$..activityVersion"),
+		assert_that(Hf35BffCommonData.get_value_by_json_path(result_response.json()[0], "$..activityVersion"),
 					equal_to(learning_details_entity.activity_version))
 
-	def extend_activity_obj(self, learning_details_entity):
+	def extend_activity_obj(self, learning_result_entity,learning_details_entity):
+		"""extend activity_key and activity_version by details numbers
+		:param learning_details_entity:
+		learning_details_entity.activity_key and activity_version are both list type
+		For example: activity_key = {c,a,d} and details number = 4
+		1.The first element 'c' will be extend 3 times , {c,c,c,c,a,d}
+		2.insert_index will indicate to last index.
+		3.The following element will be extend by logic above.
+		"""
 		activity_field_tuple = [learning_details_entity.activity_key, learning_details_entity.activity_version]
 		for activity_field in activity_field_tuple:
 			activity_copy = activity_field.copy()
-			key_index = 0
-			for insert_index in range(len(activity_copy)):
-				activity_field.insert(key_index, activity_copy[insert_index])
-				key_index += 2
+			insert_index = 0
+			for element in activity_copy:
+				for index in range(len(learning_result_entity.details[0])-1):
+					activity_field.insert(insert_index, element)
+				insert_index += len(learning_result_entity.details[0])
 
 	def get_learning_plan_response(self, learning_plan_entity):
 		learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
@@ -85,6 +96,16 @@ class BffTestBase:
 		return result_response
 
 	def setter_learning_plan(self,learning_plan_entity,bff_data_obj):
+		"""
+		set all fields in learning_plan_entity
+		:param learning_plan_entity:
+		:param bff_data_obj: test data object
+		:return:
+		"""
+		learning_plan_entity.plan_business_key = '|'.join(bff_data_obj.plan_business)
+		learning_plan_entity.student_key = bff_data_obj.get_attempt_body()["studentId"]
+		learning_plan_entity.bucket_id = datetime.datetime.now().year
+		learning_plan_entity.product_id = 2
 		learning_plan_entity.state = 4
 		learning_plan_entity.learning_unit = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		learning_plan_entity.start_time = bff_data_obj.get_attempt_body()["startTimeUtc"]
@@ -93,26 +114,42 @@ class BffTestBase:
 
 
 	def setter_learning_result(self,learning_result_entity,bff_data_obj,plan_system):
-		all_question_expected_score = sum(
-			BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..totalScore'))
-		all_question_actual_score = sum(
-			BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..score'))
-		all_details = BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..details')
+		"""set all fields in learning_result_entity
+		:param learning_result_entity: all_question_expected_scores and all_question_actual_scores are both list type
+		:param bff_data_obj: json test data object
+		:param plan_system: from learning plan response
+		"""
+		all_question_expected_scores = sum(
+			Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..totalScore'))
+		all_question_actual_scores = sum(
+			Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..score'))
+		all_details = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..details')
 		learning_result_entity.plan_type = 1
+		learning_result_entity.product_id = 2
+		learning_result_entity.plan_business_key = '|'.join(bff_data_obj.get_plan_business())
+		learning_result_entity.student_key = int(bff_data_obj.get_attempt_body()["studentId"])
 		learning_result_entity.atomic_key = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		learning_result_entity.plan_system_key = plan_system
-		learning_result_entity.expected_score = all_question_expected_score
-		learning_result_entity.actual_score = all_question_actual_score
+		learning_result_entity.expected_score = all_question_expected_scores
+		learning_result_entity.actual_score = all_question_actual_scores
 		learning_result_entity.details = all_details
 
 	def setter_learning_result_details(self,learning_details_entity,bff_data_obj):
-		detail_act_version = BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(),'$..activityContentRevision')
-		detail_question_key = BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..questionId')
-		detail_answer = BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..answer')
-		detail_expected_score = BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..totalScore')
-		detail_actual_score = BffCommonData().get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..score')
-		learning_details_entity.activity_version = detail_act_version
-		learning_details_entity.question_key = detail_question_key
-		learning_details_entity.answer = detail_answer
-		learning_details_entity.expected_score = detail_expected_score
-		learning_details_entity.actual_score = detail_actual_score
+		"""
+		set all fields in learning_plan_details_entity
+		:param learning_details_entity: all variable are list type
+		:param bff_data_obj: json test data object
+		:return:
+		"""
+		detail_act_keys = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..activityContentId')
+		detail_act_versions = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(),'$..activityContentRevision')
+		detail_question_keys = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..questionId')
+		detail_answers = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..answer')
+		detail_expected_scores = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..totalScore')
+		detail_actual_scores = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..score')
+		learning_details_entity.activity_key = detail_act_keys
+		learning_details_entity.activity_version = detail_act_versions
+		learning_details_entity.question_key = detail_question_keys
+		learning_details_entity.answer = detail_answers
+		learning_details_entity.expected_score = detail_expected_scores
+		learning_details_entity.actual_score = detail_actual_scores
