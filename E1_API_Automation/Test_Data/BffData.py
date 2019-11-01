@@ -1,6 +1,7 @@
 from enum import Enum
 
 
+
 class BffProduct(Enum):
     HFV35 = 'HFV35'
     TBV3 = 'TBV3'
@@ -11,7 +12,7 @@ class BffProduct(Enum):
 
 
 class BffUsers:
-	BffUserPw = {
+    BffUserPw = {
         'QA': {
             BffProduct.HFV35.value: [{'username': 'ptReviewTest06', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
@@ -28,9 +29,7 @@ class BffUsers:
             BffProduct.HFV35.value: [{'username': 'hf3.cn.auto1', 'password': '12345'}],
         },
         'Live': {
-			# Todo need to do data refactor once Staging is ready
-			BffProduct.HFV35.value: [{'username': 'hf3.cn.auto1', 'password': '12345'}],
+            # Todo need to do data refactor once Staging is ready
+            BffProduct.HFV35.value: [{'username': 'hf3.cn.auto1', 'password': '12345'}],
         }
     }
-
-
