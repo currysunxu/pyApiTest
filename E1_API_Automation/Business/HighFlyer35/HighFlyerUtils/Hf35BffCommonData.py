@@ -45,6 +45,10 @@ class Hf35BffCommonData:
         return bff_entity_dict
 
     def get_plan_business(self):
+        """
+        join plan bussiness
+        :return: plan bussiness
+        """
         courseContentId = self.get_attempt_body()["courseContentId"]
         bookContentId = self.get_attempt_body()["bookContentId"]
         unitContentId = self.get_attempt_body()["unitContentId"]

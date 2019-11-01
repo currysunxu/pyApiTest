@@ -58,7 +58,7 @@ class Hf35BffUtils:
 		construct activity object
 		:param activity_num:
 		:param detail_list:
-		:return:
+		:return:a list include activity objects
 		"""
 		activity_list = []
 		for activity_index in range(activity_num):

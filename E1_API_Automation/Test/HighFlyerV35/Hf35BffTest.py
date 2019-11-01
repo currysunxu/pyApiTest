@@ -125,6 +125,7 @@ class Hf35BffTest(HfBffTestBase):
         homework_best_score = sum(Hf35BffCommonData.get_value_by_json_path(homework_best_attempt_response.json()[0],"$.activities..score"))
         assert_that(homework_best_total_score,equal_to(bff_best_total_score))
         assert_that(homework_best_score,equal_to(bff_best_score))
+        assert_that(best_submit_response.json(),equal_to(homework_best_attempt_response.json()))
 
 
 
