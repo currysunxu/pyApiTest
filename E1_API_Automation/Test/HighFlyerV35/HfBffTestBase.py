@@ -4,14 +4,19 @@
 #author:Curry
 #date:2019/10/29
 import datetime
+import json
 
 from hamcrest import assert_that, equal_to
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
+from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
+from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapService
+from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
-from E1_API_Automation.Settings import LEARNING_PLAN_ENVIRONMENT, LEARNING_RESULT_ENVIRONMENT, BFF_ENVIRONMENT, env_key
+from E1_API_Automation.Settings import LEARNING_PLAN_ENVIRONMENT, LEARNING_RESULT_ENVIRONMENT, BFF_ENVIRONMENT, env_key, \
+	CONTENT_MAP_ENVIRONMENT
 from ptest.decorator import BeforeMethod
 
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
@@ -153,3 +158,23 @@ class HfBffTestBase:
 		learning_details_entity.answer = detail_answers
 		learning_details_entity.expected_score = detail_expected_scores
 		learning_details_entity.actual_score = detail_actual_scores
+
+	def get_course_from_content_map(self,course,schema_version,json_body_dict):
+		"""
+		get course response from content map service
+		:param course:
+		:param schema_version:
+		:param json_body_dict: json body
+		:return: get course structure from content map
+		"""
+		content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+		content_map_entity = ContentMapQueryEntity(course,schema_version)
+		self.__setter_content_map_entity(content_map_entity,json_body_dict)
+		return content_map_service.post_content_map_query_tree(content_map_entity)
+
+	def __setter_content_map_entity(self,content_map_entity,json_body_dict):
+		content_map_entity.child_types = json_body_dict["childTypes"]
+		content_map_entity.content_id = json_body_dict["contentId"]
+		content_map_entity.region_ach = json_body_dict["regionAch"]
+		content_map_entity.tree_revision = json_body_dict["treeRevision"]
+

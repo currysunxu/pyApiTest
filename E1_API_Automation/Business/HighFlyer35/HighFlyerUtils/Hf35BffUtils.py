@@ -127,3 +127,14 @@ class Hf35BffUtils:
 		'''
 		sub = re.sub(r'(_\w)', lambda x: x.group(1)[1].upper(), underline_str)
 		return sub
+
+	@staticmethod
+	def hump2underline(hump_str):
+		'''
+		hump to underline
+		:param hunp_str: hump str
+		:return: lower str under line string
+		'''
+		p = re.compile(r'([a-z]|\d)([A-Z])')
+		sub = re.sub(p, r'\1_\2', hump_str).lower()
+		return sub

@@ -5,6 +5,7 @@
 #date:2019/10/14
 
 import datetime
+import json
 
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
 from E1_API_Automation.Business.NGPlatform.LearningPlanEntity import LearningPlanEntity
@@ -59,23 +60,25 @@ class Hf35BffTest(HfBffTestBase):
                 assert_that((response.json()['error'].__eq__("Unauthorized")))
 
 
-    @Test(tag='qa')
-    def test_submit_new_attempt_without_auth_token(self):
-        response = self.bff_service.submit_new_attempt_with_negative_auth_token()
+    @Test(tag='qa',data_provider=[("noToken")])
+    def test_submit_new_attempt_without_auth_token(self,negative_para):
+        bff_data_obj = Hf35BffCommonData()
+        response = self.bff_service.submit_new_attempt_with_negative_auth_token(bff_data_obj.get_attempt_body(),negative_para)
         print("Bff login response is : %s" % (response.__str__()))
         assert_that(response.status_code, equal_to(400))
         assert_that((response.json()['error'].__eq__("Bad Request")))
 
-    @Test(tag='qa')
-    def test_submit_new_attempt_with_invalid_auth_token(self):
-        response = self.bff_service.submit_new_attempt_with_negative_auth_token("invalid")
+    @Test(tag='qa',data_provider=[(""),("invalid")])
+    def test_submit_new_attempt_with_invalid_auth_token(self,negative_para):
+        bff_data_obj = Hf35BffCommonData()
+        response = self.bff_service.submit_new_attempt_with_negative_auth_token(bff_data_obj.get_attempt_body(),negative_para)
         print("Bff login response is : %s" % (response.__str__()))
         assert_that(response.status_code, equal_to(401))
         assert_that((response.json()['error'].__eq__("Unauthorized")))
 
-    @Test(tag='qa')
-    def test_submit_new_attempt_with_valid_body(self):
-        bff_data_obj = Hf35BffCommonData(2,4)
+    @Test(tag='qa',data_provider=[(1,1), (2,4), (4,2),(10,10)])
+    def test_submit_new_attempt_with_valid_body(self,activity_num,detail_num):
+        bff_data_obj = Hf35BffCommonData(activity_num,detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
         print("Bff submit response is : %s" % (submit_response.__str__()))
         print("Bff submit response is : %s" % (submit_response.text))
@@ -98,9 +101,9 @@ class Hf35BffTest(HfBffTestBase):
         self.setter_learning_result_details(learning_details_entity,bff_data_obj)
         self.check_bff_compare_learning_result(result_response,learning_result_entity,learning_details_entity)
 
-    @Test(tag='qa')
-    def test_submit_best_attempt(self):
-        bff_data_obj = Hf35BffCommonData()
+    @Test(tag='qa',data_provider=[(1,1), (2,4), (4,2),(10,10)])
+    def test_submit_best_attempt(self,activity_num,detail_num):
+        bff_data_obj = Hf35BffCommonData(activity_num,detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
         print("Bff submit response is : %s" % (submit_response.__str__()))
         print("Bff submit response is : %s" % (submit_response.text))
@@ -127,5 +130,110 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(homework_best_score,equal_to(bff_best_score))
         assert_that(best_submit_response.json(),equal_to(homework_best_attempt_response.json()))
 
+    @Test(tag='qa',data_provider=[("HIGH_FLYERS_35","1")])
+    def test_get_course_structure(self,course,scheme_version):
+        bff_course_response = self.bff_service.get_course_structure()
+        print("Bff get course response is : %s"%(json.dumps(bff_course_response.json(),indent=4)))
+        assert_that(bff_course_response.status_code,equal_to(200))
+        json_body = {
+          "childTypes":["COURSE","BOOK"] ,
+          "contentId": None,
+          "regionAch": "cn-3",
+          "treeRevision": None
+        }
+        content_map_response = self.get_course_from_content_map(course,scheme_version,json_body)
+        assert_that(bff_course_response.json(),equal_to(content_map_response.json()))
+
+    @Test(tag='qa',data_provider=[("HIGH_FLYERS_35","1")])
+    def test_get_book_structure(self,course,scheme_version):
+        json_body = {
+          "childTypes":["COURSE","BOOK","UNIT","LESSON"] ,
+          "contentId": None,
+          "regionAch": "cn-3",
+          "treeRevision": None
+        }
+        content_map_response = self.get_course_from_content_map(course,scheme_version,json_body)
+        content_id_from_content_map = content_map_response.json()["contentId"]
+        tree_revision_from_content_map = content_map_response.json()["treeRevision"]
+        bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,tree_revision_from_content_map)
+        print("Bff get course response is : %s"%(json.dumps(bff_book_response.json(),indent=4)))
+        assert_that(bff_book_response.status_code,equal_to(200))
+        assert_that(bff_book_response.json(),equal_to(content_map_response.json()))
+
+    @Test(tag='qa',data_provider=[(""),("invalid"),("noToken")])
+    def test_get_course_structure_with_invalid_token(self,invalid):
+        bff_course_response = self.bff_service.get_course_structure_with_negative_token(invalid)
+        print("Bff get course response is : %s"%(json.dumps(bff_course_response.json(),indent=4)))
+        print("Bff get course response : %s" % (bff_course_response.__str__()))
+        if invalid.__eq__("noToken"):
+            assert_that(bff_course_response.status_code, equal_to(400))
+            assert_that((bff_course_response.json()['error'].__eq__("Bad Request")))
+        else:
+            assert_that(bff_course_response.status_code, equal_to(401))
+            assert_that((bff_course_response.json()['error'].__eq__("Unauthorized")))
 
 
+    @Test(tag='qa',data_provider=[(""),("invalid"),("noToken")])
+    def test_get_book_structure_with_invalid_token(self,invalid):
+        json_body = {
+          "childTypes":["COURSE","BOOK","UNIT","LESSON"] ,
+          "contentId": None,
+          "regionAch": "cn-3",
+          "treeRevision": None
+        }
+        content_map_response = self.get_course_from_content_map("HIGH_FLYERS_35","1",json_body)
+        content_id_from_content_map = content_map_response.json()["contentId"]
+        tree_revision_from_content_map = content_map_response.json()["treeRevision"]
+        bff_book_response = self.bff_service.get_book_structure_with_negative_token(content_id_from_content_map,
+                                                                                      tree_revision_from_content_map,invalid)
+        print("Bff get book response is : %s"%(json.dumps(bff_book_response.json(),indent=4)))
+        print("Bff get book response : %s" % (bff_book_response.__str__()))
+        if invalid.__eq__("noToken"):
+            assert_that(bff_book_response.status_code, equal_to(400))
+            assert_that((bff_book_response.json()['error'].__eq__("Bad Request")))
+        else:
+            assert_that(bff_book_response.status_code, equal_to(401))
+            assert_that((bff_book_response.json()['error'].__eq__("Unauthorized")))
+
+    @Test(tag='qa', data_provider=[("no_content_id"), ("no_tree_revision")])
+    def test_get_book_structure_without_contentId_or_treeRevision(self, invalid):
+        json_body = {
+            "childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
+            "contentId": None,
+            "regionAch": "cn-3",
+            "treeRevision": None
+        }
+        content_map_response = self.get_course_from_content_map("HIGH_FLYERS_35", "1", json_body)
+        if invalid.__eq__("no_content_id"):
+            content_id_from_content_map = ""
+        else:
+            content_id_from_content_map = content_map_response.json()["contentId"]
+        if invalid.__eq__("no_tree_revision"):
+            tree_revision_from_content_map = ""
+        else:
+            tree_revision_from_content_map = content_map_response.json()["treeRevision"]
+
+        bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,tree_revision_from_content_map)
+        print("Bff get book response is : %s" % (json.dumps(bff_book_response.json(), indent=4)))
+        print("Bff get book response : %s" % (bff_book_response.__str__()))
+        assert_that(bff_book_response.status_code, equal_to(404))
+        assert_that((bff_book_response.json()['error'].__eq__("Not Found")))
+
+    @Test(tag='qa', data_provider=[("no_uuid")])
+    def test_get_book_structure_with_invalid_contentId(self, invalid):
+        json_body = {
+            "childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
+            "contentId": None,
+            "regionAch": "cn-3",
+            "treeRevision": None
+        }
+        content_map_response = self.get_course_from_content_map("HIGH_FLYERS_35", "1", json_body)
+        if invalid.__eq__("no_uuid"):
+            content_id_from_content_map = "5ba2a7066356aaa"
+        tree_revision_from_content_map = content_map_response.json()["treeRevision"]
+
+        bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,tree_revision_from_content_map)
+        print("Bff get book response is : %s" % (json.dumps(bff_book_response.json(), indent=4)))
+        print("Bff get book response : %s" % (bff_book_response.__str__()))
+        assert_that(bff_book_response.status_code, equal_to(400))
+        assert_that((bff_book_response.json()['error'].__eq__("Bad Request")))
