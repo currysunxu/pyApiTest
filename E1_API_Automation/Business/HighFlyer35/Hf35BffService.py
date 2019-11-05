@@ -22,14 +22,15 @@ class Hf35BffService:
         token_value = self.mou_tai.headers.pop('X-EF-TOKEN')
         return token_value
 
-    def submit_new_attempt_with_negative_auth_token(self, is_invalid="valid"):
-        if is_invalid.__eq__("invalid"):
+    def submit_new_attempt_with_negative_auth_token(self, attempt_json,negative_token):
+        if negative_token == "":
+            self.mou_tai.headers['X-EF-TOKEN'] = ""
+        elif negative_token == "noToken":
+            self.mou_tai.headers.pop('X-EF-TOKEN')
+        else:
             self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5MDAwMDIyIiwiZ2"
-        attempt_result = self.mou_tai.post("/api/v1/homework/attempts")
+        attempt_result = self.mou_tai.post("/api/v1/homework/attempts",attempt_json)
         return attempt_result
-
-    def get_course_structure(self):
-        self.mou_tai.get("/api/v1/course/structure")
 
     def submit_new_attempt(self, attempt_json):
         attempt_result = self.mou_tai.post("/api/v1/homework/attempts",attempt_json)
@@ -39,4 +40,27 @@ class Hf35BffService:
         api_url = '/api/v1/homework/attempts/best?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)
         return self.mou_tai.get(api_url)
 
+    def get_course_structure(self):
+        return self.mou_tai.get("/api/v1/course/structure")
+
+    def get_course_structure_with_negative_token(self, negative_token):
+        if negative_token == "":
+            self.mou_tai.headers['X-EF-TOKEN'] = ""
+        elif negative_token == "noToken":
+            self.mou_tai.headers.pop('X-EF-TOKEN')
+        else:
+            self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
+        return self.mou_tai.get("/api/v1/course/structure")
+
+    def get_book_structure(self, content_id, tree_revision):
+        return self.mou_tai.get("/api/v1/books/{0}/structure?treeRevision={1}".format(content_id, tree_revision))
+
+    def get_book_structure_with_negative_token(self,content_id,tree_revision,negative_token):
+        if negative_token == "":
+            self.mou_tai.headers['X-EF-TOKEN'] = ""
+        elif negative_token == "noToken":
+            self.mou_tai.headers.pop('X-EF-TOKEN')
+        else:
+            self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
+        return self.mou_tai.get("/api/v1/books/{0}/structure?treeRevision={1}".format(content_id, tree_revision))
 

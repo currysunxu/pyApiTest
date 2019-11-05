@@ -68,9 +68,11 @@ class Hf35BffCommonData:
     def set_best_attempt(self):
         """
         set best attempt score as actual score * 3, expected score * 2 to make sure best score
+        1. read activity node at first
+        2. add total score and score in each details node
         """
         for act_index in range(len(jsonpath.jsonpath(json.loads(json.dumps(self.previous_attempt)), '$..activities[*]'))):
-            for details_index in range(len(jsonpath.jsonpath(json.loads(json.dumps(self.previous_attempt)), '$..details'))):
+            for details_index in range(len(jsonpath.jsonpath(json.loads(json.dumps(self.previous_attempt)), '$.activities.[0].details'))):
                 self.previous_attempt["activities"][act_index]["details"][details_index]["totalScore"] *= 2
                 self.previous_attempt["activities"][act_index]["details"][details_index]["score"] *= 3
 

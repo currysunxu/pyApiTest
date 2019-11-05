@@ -11,7 +11,7 @@ class ContentMapService:
         query_body = {
             "childTypes": content_map_query_entity.child_types,
             "contentId": content_map_query_entity.content_id,
-            "regionAch": content_map_query_entity.regin_ach,
+            "regionAch": content_map_query_entity.region_ach,
             "treeRevision": content_map_query_entity.tree_revision
         }
 
