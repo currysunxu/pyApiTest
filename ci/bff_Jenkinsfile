@@ -1,0 +1,85 @@
+config = [
+  teamsConnectorName: 'EdTech-QA-Team',
+  teamsConnectorUrl:  'https://outlook.office.com/webhook/36e05938-50a0-40ed-9657-5483b2c4ec34@f0d1c6fd-dff0-486a-8e91-cfefefc7d98d/JenkinsCI/bc600ad16b3f4985be4749929e7d547c/85e457eb-b12b-44d6-bf27-0d23de69a378']
+
+pipeline {
+  options {
+    disableConcurrentBuilds()
+    timeout(time: 5, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+    office365ConnectorWebhooks([[
+      name: config.teamsConnectorName, url: config.teamsConnectorUrl,
+      notifySuccess: true, notifyFailure: true, notifyRepeatedFailure: true, notifyUnstable: true, notifyBackToNormal: true
+    ]])
+  }
+  agent none
+  triggers {
+    cron('H 03 * * *')
+  }
+  
+  parameters {
+        
+        choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
+    }
+    
+  environment {
+     case_tag = 'qa'
+    }
+   
+  stages {
+    
+    stage('Verify') {
+      agent {
+        docker {
+          label 'CN_Kids_QA_CI'
+          image '10.128.42.216:5000/apipython3:v4'
+          args '-v /jacoco:/app/jacoco --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
+        }
+      }
+      steps {
+
+          script {
+          if (env.environment == 'STG')
+              case_tag = 'stg'
+          if (env.environment == 'LIVE')
+              case_tag = 'live'
+          if (env.environment == 'QA')
+              case_tag = 'qa'
+          sh 'python E1_API_Automation/Tools/jacoco/jacoco_report.py BFF reset'
+           
+          sh 'ptest3  -t E1_API_Automation.Test.HighFlyerV35.Hf35BffTest -i ${case_tag}'
+          junit 'test-output/xunit-results.xml'
+          if (currentBuild.result =='UNSTABLE')
+              currentBuild.result = 'FAILURE'
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py BFF dump /jacoco-data/hf35bff/jacoco_bff.exec'
+          
+        }
+      }
+    }
+    stage('Jacoco Report'){
+    agent {
+        docker {
+          label 'CN_Kids_QA_CI'
+          image '10.128.42.216:5000/maven:3.6-jdk-8'
+          args '-v /jacoco/data:/app/jacoco'
+    
+        }
+      }
+    steps{
+    dir('BFFService'){
+     git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/hf-v35-bff.git'
+     
+     script{
+     sh 'mvn clean package'
+     sh 'cp /app/jacoco/hf35bff/jacoco_bff.exec jacoco.exec'
+     jacoco(
+      exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')
+     
+     }
+     }
+  }
+  }
+    
+  }
+  
+}

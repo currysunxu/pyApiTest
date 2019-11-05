@@ -23,9 +23,9 @@ class Hf35BffService:
         return token_value
 
     def submit_new_attempt_with_negative_auth_token(self, attempt_json,negative_token):
-        if negative_token.__eq__(""):
+        if negative_token == "":
             self.mou_tai.headers['X-EF-TOKEN'] = ""
-        elif negative_token.__eq__("noToken"):
+        elif negative_token == "noToken":
             self.mou_tai.headers.pop('X-EF-TOKEN')
         else:
             self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5MDAwMDIyIiwiZ2"
@@ -44,9 +44,9 @@ class Hf35BffService:
         return self.mou_tai.get("/api/v1/course/structure")
 
     def get_course_structure_with_negative_token(self, negative_token):
-        if negative_token.__eq__(""):
+        if negative_token == "":
             self.mou_tai.headers['X-EF-TOKEN'] = ""
-        elif negative_token.__eq__("noToken"):
+        elif negative_token == "noToken":
             self.mou_tai.headers.pop('X-EF-TOKEN')
         else:
             self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
@@ -56,9 +56,9 @@ class Hf35BffService:
         return self.mou_tai.get("/api/v1/books/{0}/structure?treeRevision={1}".format(content_id, tree_revision))
 
     def get_book_structure_with_negative_token(self,content_id,tree_revision,negative_token):
-        if negative_token.__eq__(""):
+        if negative_token == "":
             self.mou_tai.headers['X-EF-TOKEN'] = ""
-        elif negative_token.__eq__("noToken"):
+        elif negative_token == "noToken":
             self.mou_tai.headers.pop('X-EF-TOKEN')
         else:
             self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"

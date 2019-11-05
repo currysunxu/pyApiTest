@@ -114,12 +114,12 @@ class Hf35BffUtils:
 		new_dict = previous_dict.copy()
 		for item_key in previous_dict.keys():
 			field_name = item_key[Hf35BffUtils.last_index_of(item_key, "__") + 1:]
-			field_name = Hf35BffUtils.underline2hump(field_name)
+			field_name = Hf35BffUtils.underline_to_hump(field_name)
 			new_dict.update({field_name: new_dict.pop(item_key)})
 		return new_dict
 
 	@staticmethod
-	def underline2hump(underline_str):
+	def underline_to_hump(underline_str):
 		'''
 		underline string to hump
 		:param underline_str:
@@ -129,7 +129,7 @@ class Hf35BffUtils:
 		return sub
 
 	@staticmethod
-	def hump2underline(hump_str):
+	def hump_to_underline(hump_str):
 		'''
 		hump to underline
 		:param hunp_str: hump str
