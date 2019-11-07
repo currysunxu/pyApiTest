@@ -71,3 +71,22 @@ class Hf35BffService:
 	def get_homework_activity_asset_group(self, unitContentRevision, unitContentId):
 		api_url = "/api/v1/homework/content-groups?unitContentRevision=%s&unitContentId=%s"%(unitContentRevision,unitContentId)
 		return self.mou_tai.get(api_url)
+
+	def post_homework_activities_with_negative_token(self,inserted_content_body, negative_token):
+		if negative_token == "":
+			self.mou_tai.headers['X-EF-TOKEN'] = ""
+		elif negative_token == "noToken":
+			self.mou_tai.headers.pop('X-EF-TOKEN')
+		else:
+			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
+		return self.post_homework_activities(inserted_content_body)
+
+	def post_homework_activities_group_with_negative_token(self,unitContentRevision, unitContentId, negative_token):
+		if negative_token == "":
+			self.mou_tai.headers['X-EF-TOKEN'] = ""
+		elif negative_token == "noToken":
+			self.mou_tai.headers.pop('X-EF-TOKEN')
+		else:
+			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
+		return self.get_homework_activity_asset_group(unitContentRevision, unitContentId)
+

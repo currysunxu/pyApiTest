@@ -178,3 +178,13 @@ class HfBffTestBase:
 		content_map_entity.region_ach = json_body_dict["regionAch"]
 		content_map_entity.tree_revision = json_body_dict["treeRevision"]
 
+	def update_content_negative_body(self,negative_dict,content_body,is_mismatch = False):
+		keys = list(negative_dict.keys())
+		values = list(negative_dict.values())
+		for dict in content_body:
+			dict[keys[0]] = negative_dict[keys[0]]
+			if is_mismatch:
+				break
+		return content_body
+
+
