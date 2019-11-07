@@ -261,14 +261,14 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(content_repo_response.status_code == 200)
 		content_activities_response = content_repo_service.get_activities(content_repo_response.json()["savedItems"])
 		# bff post
-		bff_activity_response = self.bff_service.post_homework_activities(content_repo_response.json()["savedItems"])
+		bff_activity_response = self.bff_service.get_homework_activities(content_repo_response.json()["savedItems"])
 		assert_that(bff_activity_response.status_code == 200)
 		bff_activity_json = bff_activity_response.json()
 		assert_that(bff_activity_json, equal_to(content_activities_response.json()))
 
-	@Test(tag='qa')
-	def test_get_homework_activity_group(self):
-		content_repo_data = ContentRepoCommonData()
+	@Test(tag='qa',data_provider=[(3,"activity"),(2,"asset")])
+	def test_get_homework_activity_group(self,number,activity_or_asset):
+		content_repo_data = ContentRepoCommonData(number,activity_or_asset)
 		# insert content
 		content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 		content_json_body = content_repo_data.get_activity_content()
@@ -290,29 +290,10 @@ class Hf35BffTest(HfBffTestBase):
 			query_content_group_json_body["parentContentId"])
 		assert_that(bff_activity_response.status_code == 200)
 		bff_activity_json = bff_activity_response.json()
-		assert_that(bff_activity_json["activityGroups"], equal_to(content_group_activities_response.json()))
-
-	@Test(tag='qa')
-	def test_get_homework_asset_group(self):
-		content_repo_data = ContentRepoCommonData(2, "asset")
-		content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
-		# insert content group
-		content_group_json_body = content_repo_data.get_activity_or_asset_content_group()
-		content_group_repo_response = content_repo_service.post_content_group(content_group_json_body)
-		assert_that(content_group_repo_response.status_code == 200)
-		query_content_group_json_body = content_group_repo_response.json()["savedItems"][0].copy()
-		query_content_group_json_body.pop("savedContentType")
-		query_content_group_json_body["parentContentId"] = query_content_group_json_body.pop("contentId")
-		query_content_group_json_body["parentContentRevision"] = query_content_group_json_body.pop("contentRevision")
-		query_content_group_json_body["parentSchemaVersion"] = query_content_group_json_body.pop("schemaVersion")
-		content_group_activities_response = content_repo_service.get_activities_group(query_content_group_json_body)
-		# bff get activity group
-		bff_activity_response = self.bff_service.get_homework_activity_asset_group(
-			query_content_group_json_body["parentContentRevision"],
-			query_content_group_json_body["parentContentId"])
-		assert_that(bff_activity_response.status_code == 200)
-		bff_activity_json = bff_activity_response.json()
-		assert_that(bff_activity_json["assetGroups"], equal_to(content_group_activities_response.json()))
+		if (activity_or_asset == "activity"):
+			assert_that(bff_activity_json["activityGroups"], equal_to(content_group_activities_response.json()))
+		elif (activity_or_asset == "asset"):
+			assert_that(bff_activity_json["assetGroups"], equal_to(content_group_activities_response.json()))
 
 	@Test(tag='qa', data_provider=["", "invalid", "noToken"])
 	def test_post_homework_activity_with_negative_token(self, negative_token):
@@ -323,7 +304,7 @@ class Hf35BffTest(HfBffTestBase):
 		content_repo_response = content_repo_service.post_content(content_json_body)
 		assert_that(content_repo_response.status_code == 200)
 		content_activities_response = content_repo_service.get_activities(content_repo_response.json()["savedItems"])
-		bff_invalid_response = self.bff_service.post_homework_activities_with_negative_token(content_activities_response.json(),negative_token)
+		bff_invalid_response = self.bff_service.get_homework_activities_with_negative_token(content_activities_response.json(), negative_token)
 		print("Bff get book response is : %s" % (json.dumps(bff_invalid_response.json(), indent=4)))
 		if negative_token == ("noToken"):
 			assert_that(bff_invalid_response.status_code, equal_to(400))
@@ -344,7 +325,7 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(content_repo_response.status_code == 200)
 		content_activities_response = content_repo_service.get_activities(content_repo_response.json()["savedItems"])
 		bff_negative_json = self.update_content_negative_body(negative_parameter, content_activities_response.json())
-		bff_invalid_response = self.bff_service.post_homework_activities(bff_negative_json)
+		bff_invalid_response = self.bff_service.get_homework_activities(bff_negative_json)
 		assert_that(bff_invalid_response.status_code, equal_to(400))
 		assert_that((bff_invalid_response.json()['error'] == "Bad Request"))
 
@@ -359,7 +340,7 @@ class Hf35BffTest(HfBffTestBase):
 		content_activities_response = content_repo_service.get_activities(content_repo_response.json()["savedItems"])
 		bff_mismatch_json_body = self.update_content_negative_body(negative_parameter,
 																   content_activities_response.json(), True)
-		bff_mismatch_response = self.bff_service.post_homework_activities(bff_mismatch_json_body)
+		bff_mismatch_response = self.bff_service.get_homework_activities(bff_mismatch_json_body)
 		assert_that(bff_mismatch_response.status_code == 200)
 		print(json.dumps(bff_mismatch_response.json(), indent=4))
 		expected_result = content_activities_response.json()
@@ -385,7 +366,7 @@ class Hf35BffTest(HfBffTestBase):
 			"contentRevision")
 		query_content_group_json_body["parentSchemaVersion"] = query_content_group_json_body.pop("schemaVersion")
 		# bff get activity group
-		bff_invalid_response = self.bff_service.post_homework_activities_group_with_negative_token(
+		bff_invalid_response = self.bff_service.get_homework_activities_group_with_negative_token(
 			query_content_group_json_body["parentContentRevision"],
 			query_content_group_json_body["parentContentId"],
 			negative_token)

@@ -46,7 +46,7 @@ class LearningResultEnvironment(object):
     QA = "http://learning-result.qa.edtech.kt"
 
 class BffEnvironment(object):
-    QA = "http://highflyers.qa.edtech.kt/hf3"
+    QA = "http://highflyers.qa.edtech.kt"
 
 class HomeworkEnvironment(object):
     QA = "http://homework.qa.edtech.kt"

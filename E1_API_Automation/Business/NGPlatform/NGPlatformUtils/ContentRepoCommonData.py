@@ -31,7 +31,7 @@ class ContentRepoCommonData:
 			}
 			activity_body.append(activity_obj)
 
-		content_body = {"releaseRevision": "releaseRevisionTest",
+		content_body = {"releaseRevision": ''.join(random.sample(string.ascii_letters + string.digits, 10)),
 						"activities": activity_body}
 		return content_body
 
@@ -44,7 +44,7 @@ class ContentRepoCommonData:
 			"ancestorRefs": self.ancestor_refs,
 			"childRefs": self.create_child_obj(activity_or_asset)
 		}]
-		content_group_body = {"releaseRevision": "releaseRevision_contentGroup_Test02",
+		content_group_body = {"releaseRevision": ''.join(random.sample(string.ascii_letters + string.digits, 10)),
 							  "contentGroups": content_obj}
 		return content_group_body
 
@@ -58,18 +58,20 @@ class ContentRepoCommonData:
 		"""
 		ancestor_refs = []
 		type_value = ["LESSON","BOOK","UNIT"]
-		activities = self.content_body["activities"].copy()
+		ancestors = self.content_body["activities"].copy()
 
-		for act_num in activities:
+		for act_num in ancestors:
 			type_value.extend(type_value)
-			if type_value.__len__() > activities.__len__():
+			if type_value.__len__() > ancestors.__len__():
 				break
 
 		index = 0
-		for ancestor in activities:
+		for ancestor in ancestors:
+			contentId = uuid.uuid4().__str__()
 			ancestor.update({"type": type_value[index]})
 			ancestor.pop("entity")
 			ancestor.pop("url")
+			ancestor["contentId"] = contentId
 			ancestor_refs.append(ancestor)
 			index += 1
 		return ancestor_refs

@@ -13,7 +13,7 @@ class Hf35BffService:
 			"password": password,
 		}
 
-		athentication_result = self.mou_tai.post("/api/v1/auth/login", user_info)
+		athentication_result = self.mou_tai.post("/hf3/api/v1/auth/login", user_info)
 		idToken = jmespath.search('idToken', athentication_result.json())
 		self.mou_tai.headers['X-EF-TOKEN'] = idToken
 		return athentication_result
@@ -29,64 +29,51 @@ class Hf35BffService:
 			self.mou_tai.headers.pop('X-EF-TOKEN')
 		else:
 			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5MDAwMDIyIiwiZ2"
-		attempt_result = self.mou_tai.post("/api/v1/homework/attempts", attempt_json)
+		attempt_result = self.mou_tai.post("/hf3/api/v1/homework/attempts", attempt_json)
 		return attempt_result
 
 	def submit_new_attempt(self, attempt_json):
-		attempt_result = self.mou_tai.post("/api/v1/homework/attempts", attempt_json)
+		attempt_result = self.mou_tai.post("/hf3/api/v1/homework/attempts", attempt_json)
 		return attempt_result
 
 	def get_the_best_attempt(self, student_id, book_content_id):
-		api_url = '/api/v1/homework/attempts/best?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)
+		api_url = '/hf3/api/v1/homework/attempts/best?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)
 		return self.mou_tai.get(api_url)
 
 	def get_course_structure(self):
-		return self.mou_tai.get("/api/v1/course/structure")
+		return self.mou_tai.get("/hf3/api/v1/course/structure")
 
 	def get_course_structure_with_negative_token(self, negative_token):
-		if negative_token == "":
-			self.mou_tai.headers['X-EF-TOKEN'] = ""
-		elif negative_token == "noToken":
-			self.mou_tai.headers.pop('X-EF-TOKEN')
-		else:
-			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
-		return self.mou_tai.get("/api/v1/course/structure")
+		self.set_negative_token(negative_token)
+		return self.mou_tai.get("/hf3/api/v1/course/structure")
 
 	def get_book_structure(self, content_id, tree_revision):
-		return self.mou_tai.get("/api/v1/books/{0}/structure?treeRevision={1}".format(content_id, tree_revision))
+		return self.mou_tai.get("/hf3/api/v1/books/{0}/structure?treeRevision={1}".format(content_id, tree_revision))
 
 	def get_book_structure_with_negative_token(self, content_id, tree_revision, negative_token):
-		if negative_token == "":
-			self.mou_tai.headers['X-EF-TOKEN'] = ""
-		elif negative_token == "noToken":
-			self.mou_tai.headers.pop('X-EF-TOKEN')
-		else:
-			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
-		return self.mou_tai.get("/api/v1/books/{0}/structure?treeRevision={1}".format(content_id, tree_revision))
+		self.set_negative_token(negative_token)
+		return self.mou_tai.get("/hf3/api/v1/books/{0}/structure?treeRevision={1}".format(content_id, tree_revision))
 
-	def post_homework_activities(self, inserted_content_body):
-		api_url = "/api/v1/activities"
-		return self.mou_tai.post(api_url, inserted_content_body)
+	def get_homework_activities(self, content_body_from_content_repo):
+		api_url = "/hf3/api/v1/activities"
+		return self.mou_tai.post(api_url, content_body_from_content_repo)
 
 	def get_homework_activity_asset_group(self, unitContentRevision, unitContentId):
-		api_url = "/api/v1/homework/content-groups?unitContentRevision=%s&unitContentId=%s"%(unitContentRevision,unitContentId)
+		api_url = "/hf3/api/v1/homework/content-groups?unitContentRevision=%s&unitContentId=%s"%(unitContentRevision,unitContentId)
 		return self.mou_tai.get(api_url)
 
-	def post_homework_activities_with_negative_token(self,inserted_content_body, negative_token):
-		if negative_token == "":
-			self.mou_tai.headers['X-EF-TOKEN'] = ""
-		elif negative_token == "noToken":
-			self.mou_tai.headers.pop('X-EF-TOKEN')
-		else:
-			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
-		return self.post_homework_activities(inserted_content_body)
+	def get_homework_activities_with_negative_token(self, inserted_content_body, negative_token):
+		self.set_negative_token(negative_token)
+		return self.get_homework_activities(inserted_content_body)
 
-	def post_homework_activities_group_with_negative_token(self,unitContentRevision, unitContentId, negative_token):
-		if negative_token == "":
-			self.mou_tai.headers['X-EF-TOKEN'] = ""
-		elif negative_token == "noToken":
-			self.mou_tai.headers.pop('X-EF-TOKEN')
-		else:
-			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
+	def get_homework_activities_group_with_negative_token(self, unitContentRevision, unitContentId, negative_token):
+		self.set_negative_token(negative_token)
 		return self.get_homework_activity_asset_group(unitContentRevision, unitContentId)
 
+	def set_negative_token(self, negative_token):
+		if negative_token == "":
+			self.mou_tai.headers['X-EF-TOKEN'] = ""
+		elif negative_token == "noToken":
+			self.mou_tai.headers.pop('X-EF-TOKEN')
+		else:
+			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9"
