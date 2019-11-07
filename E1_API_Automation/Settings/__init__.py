@@ -54,6 +54,9 @@ class HomeworkEnvironment(object):
 class ContentMapEnvironment(object):
     QA = "http://content-map.qa.edtech.kt"
 
+class ContentRepoEnvironment(object):
+    QA = "http://content-repo.qa.edtech.kt"
+
 try:
     print(os.environ['environment'])
 except:
@@ -70,6 +73,7 @@ if os.environ['environment'] == 'QA':
     BFF_ENVIRONMENT = BffEnvironment.QA
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
+    CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",

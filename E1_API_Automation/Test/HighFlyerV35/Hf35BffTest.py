@@ -7,11 +7,13 @@
 import datetime
 import json
 
+from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
 from E1_API_Automation.Business.NGPlatform.LearningPlanEntity import LearningPlanEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
-from E1_API_Automation.Settings import env_key, HOMEWORK_ENVIRONMENT
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoCommonData import ContentRepoCommonData
+from E1_API_Automation.Settings import env_key, HOMEWORK_ENVIRONMENT,CONTENT_REPO_ENVIRONMENT
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
@@ -160,6 +162,7 @@ class Hf35BffTest(HfBffTestBase):
 			"treeRevision": None
 		}
 		content_map_response = self.get_course_from_content_map(course, scheme_version, json_body)
+		assert_that(content_map_response.status_code == 200)
 		content_id_from_content_map = content_map_response.json()["contentId"]
 		tree_revision_from_content_map = content_map_response.json()["treeRevision"]
 		bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,
@@ -247,3 +250,64 @@ class Hf35BffTest(HfBffTestBase):
 		print("Bff get book response : %s" % (bff_book_response.__str__()))
 		assert_that(bff_book_response.status_code, equal_to(400))
 		assert_that((bff_book_response.json()['error'] == "Bad Request"))
+
+	@Test(tag='qa',data_provider=[1,3,10])
+	def test_post_homework_activity(self,items):
+		content_repo_data = ContentRepoCommonData(items)
+		#insert content
+		contentRepoService = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+		content_json_body =content_repo_data.get_activity_content()
+		content_repo_response = contentRepoService.post_content(content_json_body)
+		assert_that(content_repo_response.status_code == 200)
+		content_activities_response = contentRepoService.get_activities(content_repo_response.json()["savedItems"])
+		#bff post
+		bff_activity_response = self.bff_service.post_homework_activities(content_repo_response.json()["savedItems"])
+		assert_that(bff_activity_response.status_code == 200)
+		bff_activity_json = bff_activity_response.json()
+		assert_that(bff_activity_json,equal_to(content_activities_response.json()))
+
+	@Test(tag='qa')
+	def test_get_homework_activity_group(self):
+		content_repo_data = ContentRepoCommonData()
+		#insert content
+		content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+		content_json_body =content_repo_data.get_activity_content()
+		content_repo_response = content_repo_service.post_content(content_json_body)
+		assert_that(content_repo_response.status_code == 200)
+		#insert content group
+		content_group_json_body = content_repo_data.get_activity_or_asset_content_group()
+		content_group_repo_response = content_repo_service.post_content_group(content_group_json_body)
+		assert_that(content_group_repo_response.status_code == 200)
+		query_content_group_json_body = content_group_repo_response.json()["savedItems"][0].copy()
+		query_content_group_json_body.pop("savedContentType")
+		query_content_group_json_body["parentContentId"] = query_content_group_json_body.pop("contentId")
+		query_content_group_json_body["parentContentRevision"] = query_content_group_json_body.pop("contentRevision")
+		query_content_group_json_body["parentSchemaVersion"] = query_content_group_json_body.pop("schemaVersion")
+		content_group_activities_response = content_repo_service.get_activities_group(query_content_group_json_body)
+		#bff get activity group
+		bff_activity_response = self.bff_service.get_homework_activity_asset_group(query_content_group_json_body["parentContentRevision"],
+																				   query_content_group_json_body["parentContentId"])
+		assert_that(bff_activity_response.status_code == 200)
+		bff_activity_json = bff_activity_response.json()
+		assert_that(bff_activity_json["activityGroups"],equal_to(content_group_activities_response.json()))
+
+	@Test(tag='qa')
+	def test_get_homework_asset_group(self):
+		content_repo_data = ContentRepoCommonData(2,"asset")
+		content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+		#insert content group
+		content_group_json_body = content_repo_data.get_activity_or_asset_content_group()
+		content_group_repo_response = content_repo_service.post_content_group(content_group_json_body)
+		assert_that(content_group_repo_response.status_code == 200)
+		query_content_group_json_body = content_group_repo_response.json()["savedItems"][0].copy()
+		query_content_group_json_body.pop("savedContentType")
+		query_content_group_json_body["parentContentId"] = query_content_group_json_body.pop("contentId")
+		query_content_group_json_body["parentContentRevision"] = query_content_group_json_body.pop("contentRevision")
+		query_content_group_json_body["parentSchemaVersion"] = query_content_group_json_body.pop("schemaVersion")
+		content_group_activities_response = content_repo_service.get_activities_group(query_content_group_json_body)
+		#bff get activity group
+		bff_activity_response = self.bff_service.get_homework_activity_asset_group(query_content_group_json_body["parentContentRevision"],
+																				   query_content_group_json_body["parentContentId"])
+		assert_that(bff_activity_response.status_code == 200)
+		bff_activity_json = bff_activity_response.json()
+		assert_that(bff_activity_json["assetGroups"],equal_to(content_group_activities_response.json()))
