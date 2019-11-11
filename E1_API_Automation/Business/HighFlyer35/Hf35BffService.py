@@ -23,12 +23,7 @@ class Hf35BffService:
 		return token_value
 
 	def submit_new_attempt_with_negative_auth_token(self, attempt_json, negative_token):
-		if negative_token == "":
-			self.mou_tai.headers['X-EF-TOKEN'] = ""
-		elif negative_token == "noToken":
-			self.mou_tai.headers.pop('X-EF-TOKEN')
-		else:
-			self.mou_tai.headers['X-EF-TOKEN'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiI5MDAwMDIyIiwiZ2"
+		self.set_negative_token(negative_token)
 		attempt_result = self.mou_tai.post("/hf3/api/v1/homework/attempts", attempt_json)
 		return attempt_result
 

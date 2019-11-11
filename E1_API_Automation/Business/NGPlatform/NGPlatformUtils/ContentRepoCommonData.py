@@ -3,9 +3,9 @@
 
 # author:Curry
 # date:2019/11/6
+import copy
 import random
 import string
-import time
 import uuid
 
 
@@ -36,29 +36,67 @@ class ContentRepoCommonData:
 		return content_body
 
 	def create_content_group_body(self, activity_or_asset):
-		content_obj = [{
-			"groupType": activity_or_asset.upper()+"_GROUP",
+		"""
+		create content group body by content group object
+		:param activity_or_asset:
+		:return: content group body
+		"""
+		content_obj_list = self.create_content_group_obj(activity_or_asset)
+		content_group_body = {"releaseRevision": ''.join(random.sample(string.ascii_letters + string.digits, 10)),
+							  "contentGroups": content_obj_list}
+		return content_group_body
+
+	def create_content_group_obj(self, activity_or_asset):
+		"""
+		create content group object by activity or asset or activity&asset
+		:param activity_or_asset: use when test case include both activity and asset node
+		:return: a common content object list
+		"""
+		content_obj_list = []
+		if activity_or_asset == "activity_and_asset":
+			for content_group_type in activity_or_asset.split("_and_"):
+				content_obj = self.construct_content_obj(content_group_type)
+				content_obj_list.append(content_obj)
+				if content_obj_list.__len__() == 2:
+					break
+				self.ancestor_refs = self.create_ancestor_obj(activity_or_asset)
+		else:
+			content_obj = self.construct_content_obj(activity_or_asset)
+			content_obj_list.append(content_obj)
+		return content_obj_list
+
+
+	def construct_content_obj(self, activity_or_asset):
+		"""
+		construct content object which include either activity or asset
+		:param activity_or_asset:
+		:return:
+		"""
+		content_obj = {
+			"groupType": activity_or_asset.upper() + "_GROUP",
 			"contentType": "HOMEWORK",
 			"schemaVersion": 1,
 			"parentRef": self.create_parent_obj(),
 			"ancestorRefs": self.ancestor_refs,
 			"childRefs": self.create_child_obj(activity_or_asset)
-		}]
-		content_group_body = {"releaseRevision": ''.join(random.sample(string.ascii_letters + string.digits, 10)),
-							  "contentGroups": content_obj}
-		return content_group_body
+		}
+		return content_obj
 
 	def create_parent_obj(self):
 		return self.ancestor_refs[0]
 
-	def create_ancestor_obj(self):
+	def create_ancestor_obj(self,activity_and_asset = "activity"):
 		"""
 		create ancestor_refs by content_body
+		:param: if data is activity_and_asset , then use deepcopy to create new list for ancestors
 		:return: list of ancestor_refs
 		"""
 		ancestor_refs = []
 		type_value = ["LESSON","BOOK","UNIT"]
-		ancestors = self.content_body["activities"].copy()
+		if activity_and_asset == "activity_and_asset":
+			ancestors = copy.deepcopy(self.content_body["activities"])
+		else:
+			ancestors = self.content_body["activities"].copy()
 
 		for act_num in ancestors:
 			type_value.extend(type_value)
@@ -69,8 +107,10 @@ class ContentRepoCommonData:
 		for ancestor in ancestors:
 			contentId = uuid.uuid4().__str__()
 			ancestor.update({"type": type_value[index]})
-			ancestor.pop("entity")
-			ancestor.pop("url")
+			if "entity" in ancestor.keys():
+				ancestor.pop("entity")
+			if "url" in ancestor.keys():
+				ancestor.pop("url")
 			ancestor["contentId"] = contentId
 			ancestor_refs.append(ancestor)
 			index += 1

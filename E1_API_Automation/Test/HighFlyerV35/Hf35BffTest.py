@@ -266,7 +266,7 @@ class Hf35BffTest(HfBffTestBase):
 		bff_activity_json = bff_activity_response.json()
 		assert_that(bff_activity_json, equal_to(content_activities_response.json()))
 
-	@Test(tag='qa',data_provider=[(3,"activity"),(2,"asset")])
+	@Test(tag='qa',data_provider=[(3,"activity"),(3,"asset"),(2,"activity_and_asset")])
 	def test_get_homework_activity_group(self,number,activity_or_asset):
 		content_repo_data = ContentRepoCommonData(number,activity_or_asset)
 		# insert content
