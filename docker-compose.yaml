@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  mt-paper-builder-svc:
+    image: test4kids/kt-qa-api-test:${IMAGE_TAG}
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+      network: host
