@@ -36,7 +36,6 @@ pipeline {
       steps {
         container('maven') {
           script {
-            def branch = ktGetTriggerBranch()
             def commitHash = ktGetCommitHash()
             IMAGE_TAG = ktGetBranchWithHashTag(branch, commitHash)
           }
