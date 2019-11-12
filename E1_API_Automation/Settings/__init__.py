@@ -45,6 +45,17 @@ class LearningPlanEnvironment(object):
 class LearningResultEnvironment(object):
     QA = "http://learning-result.qa.edtech.kt"
 
+class BffEnvironment(object):
+    QA = "http://highflyers.qa.edtech.kt"
+
+class HomeworkEnvironment(object):
+    QA = "http://homework.qa.edtech.kt"
+
+class ContentMapEnvironment(object):
+    QA = "http://content-map.qa.edtech.kt"
+
+class ContentRepoEnvironment(object):
+    QA = "http://content-repo.qa.edtech.kt"
 
 try:
     print(os.environ['environment'])
@@ -59,6 +70,10 @@ if os.environ['environment'] == 'QA':
     OMNI_ENVIRONMENT = OMNIEnvironment.QA
     LEARNING_PLAN_ENVIRONMENT = LearningPlanEnvironment.QA
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.QA
+    BFF_ENVIRONMENT = BffEnvironment.QA
+    HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
+    CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
+    CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
