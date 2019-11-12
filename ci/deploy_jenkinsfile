@@ -21,22 +21,34 @@ pipeline {
       notifySuccess: true, notifyFailure: true, notifyRepeatedFailure: true, notifyUnstable: true, notifyBackToNormal: true
     ]])
   }
-  agent none
+  agent {
+    kubernetes {
+      label 'java-slave'
+      defaultContainer 'jnlp'
+      yaml ktJavaPodTemplate()
+    }
+  }
   triggers {
     pollSCM('')
   }
   stages {
-    stage('Build & Push Image') {
-      agent {
-        label 'k8s-slave'
+    stage('Prepare') {
+      steps {
+        container('maven') {
+          script {
+            def branch = ktGetTriggerBranch()
+            def commitHash = ktGetCommitHash()
+            IMAGE_TAG = ktGetBranchWithHashTag(branch, commitHash)
+          }
+        }
       }
+    }
+    stage('Build & Push Image') {
       steps {
         script {
-          def branch = ktGetTriggerBranch()
-          def commitHash = ktGetCommitHash()
-          def imageTag = ktGetBranchWithHashTag(branch, commitHash)
-
-          ktBuildAndPushImage(config.service, config.imageRepo, imageTag)
+          container('docker') {
+            ktBuildAndPushImage(config.service, config.imageRepo, IMAGE_TAG)
+          }
         }
       }
     }
