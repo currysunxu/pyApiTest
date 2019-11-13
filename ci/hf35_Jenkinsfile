@@ -32,10 +32,8 @@ pipeline {
      case_tag = 'qa'
     }
    
-  stages {
-    
-    stage('Verify') {
-      
+  stages { 
+    stage('Verify') {   
       steps {
       container('python') {
 
@@ -59,22 +57,22 @@ pipeline {
       }
     }
     stage('Jacoco Report'){
-    container('maven') {
-    steps{
-    dir('PlanService'){
-     git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
+      steps{
+        container('maven') {
+    
+          dir('PlanService'){
+          git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
      
-     script{
-     sh 'mvn clean package'
-     sh 'cp /jacoco-data/learningplan/jacoco_learningplan.exec jacoco.exec'
-     jacoco(
-      exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')
-     
-     }
-     }
+          script{
+            sh 'mvn clean package'
+            sh 'cp /jacoco-data/learningplan/jacoco_learningplan.exec jacoco.exec'
+            jacoco(
+              exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')    
+                }
+          }
+        }
+      }
     }
-   }
-  }
     
   }
   
