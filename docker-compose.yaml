@@ -7,3 +7,9 @@ services:
       context: ./
       dockerfile: ./Dockerfile
       network: host
+  maven:
+    image: test4kids/Maven:${IMAGE_TAG}
+    build:
+      context: ./
+      dockerfile: ./DockerfileM
+      network: host
