@@ -33,7 +33,7 @@ pipeline {
         docker {
           label 'CN_Kids_QA_CI'
           image 'hub.tencentyun.com/test4kids/kt-qa-api-test:master-ef4c044'
-          args '-v /jacoco:/app/jacoco --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
+          args '-v /jacoco-data:/app/jacoco --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
         }
       }
       steps {
