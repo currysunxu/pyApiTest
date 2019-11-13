@@ -10,3 +10,4 @@ pymssql
 pytz
 cassandra-driver
 pymongo
+jsonpath=0.82
