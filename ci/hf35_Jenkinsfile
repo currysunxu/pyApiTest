@@ -12,7 +12,13 @@ pipeline {
       notifySuccess: true, notifyFailure: true, notifyRepeatedFailure: true, notifyUnstable: true, notifyBackToNormal: true
     ]])
   }
-  agent none
+  agent {
+    kubernetes {
+      label 'java-slave'
+      defaultContainer 'jnlp'
+      yaml ktAutomationPodTemplate()
+    }
+  }
   triggers {
     cron('H 03 * * *')
   }
@@ -29,14 +35,9 @@ pipeline {
   stages {
     
     stage('Verify') {
-      agent {
-        docker {
-          label 'java-slave'
-          image 'hub.tencentyun.com/test4kids/kt-qa-api-test:master-ef4c044'
-          args '-v /jacoco-data:/app/jacoco --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
-        }
-      }
+      
       steps {
+      container('python') {
 
           script {
           if (env.environment == 'STG')
@@ -55,29 +56,24 @@ pipeline {
           
         }
       }
+      }
     }
     stage('Jacoco Report'){
-    agent {
-        docker {
-          label 'java-slave'
-          image 'hub.tencentyun.com/test4kids/maven:3.6-jdk-8'
-          args '-v /jacoco-data:/app/jacoco'
-    
-        }
-      }
+    container('maven') {
     steps{
     dir('PlanService'){
      git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
      
      script{
      sh 'mvn clean package'
-     sh 'cp /app/jacoco/learningplan/jacoco_learningplan.exec jacoco.exec'
+     sh 'cp /jacoco-data/learningplan/jacoco_learningplan.exec jacoco.exec'
      jacoco(
       exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')
      
      }
      }
-  }
+    }
+   }
   }
     
   }
