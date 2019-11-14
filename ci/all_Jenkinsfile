@@ -12,7 +12,13 @@ pipeline {
       notifySuccess: true, notifyFailure: true, notifyRepeatedFailure: true, notifyUnstable: true, notifyBackToNormal: true
     ]])
   }
-  agent none
+  agent {
+    kubernetes {
+      label 'java-slave'
+      defaultContainer 'jnlp'
+      yaml ktAutomationPodTemplate()
+    }
+  }
   triggers {
     cron('H 03 * * *')
   }

@@ -1,3 +1,8 @@
+#!groovy
+library identifier: 'jenkinssharedlib@tencentcloud', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: 'ssh://git@bitbucket.englishtown.cn:7999/elab/jenkinssharedlib.git',
+   credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e'])
 config = [
   teamsConnectorName: 'EdTech-QA-Team',
   teamsConnectorUrl:  'https://outlook.office.com/webhook/36e05938-50a0-40ed-9657-5483b2c4ec34@f0d1c6fd-dff0-486a-8e91-cfefefc7d98d/JenkinsCI/bc600ad16b3f4985be4749929e7d547c/85e457eb-b12b-44d6-bf27-0d23de69a378']
@@ -12,7 +17,13 @@ pipeline {
       notifySuccess: true, notifyFailure: true, notifyRepeatedFailure: true, notifyUnstable: true, notifyBackToNormal: true
     ]])
   }
-  agent none
+  agent {
+    kubernetes {
+      label 'java-slave'
+      defaultContainer 'jnlp'
+      yaml ktAutomationPodTemplate()
+    }
+  }
   triggers {
     cron('H 03 * * *')
   }
@@ -29,14 +40,9 @@ pipeline {
   stages {
     
     stage('Verify') {
-      agent {
-        docker {
-          label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/apipython3:v4'
-          args '-v /jacoco:/app/jacoco --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
-        }
-      }
+      
       steps {
+      container('python') {
 
           script {
           if (env.environment == 'STG')
@@ -54,27 +60,23 @@ pipeline {
           sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py ResultService dump /jacoco-data/learningresult/jacoco_learningresult.exec'
           
         }
+       }
       }
     }
     stage('Jacoco Report'){
-    agent {
-        docker {
-          label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/maven:3.6-jdk-8'
-          args '-v /jacoco/data:/app/jacoco'
     
-        }
-      }
     steps{
+    container('maven') {
     dir('ResultService'){
     
      git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-result-svc.git'
      
      script{
      sh 'mvn clean package'
-     sh 'cp /app/jacoco/learningresult/jacoco_learningresult.exec jacoco.exec'
+     sh 'cp /jacoco-data/learningresult/jacoco_learningresult.exec jacoco.exec'
      jacoco(
       exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')
+     }
      }
      }
   }
