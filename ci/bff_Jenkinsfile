@@ -20,7 +20,7 @@ pipeline {
   }
   agent {
     kubernetes {
-      label 'java-slave'
+      label 'qa-slave'
       defaultContainer 'jnlp'
       yaml ktAutomationPodTemplate()
     }

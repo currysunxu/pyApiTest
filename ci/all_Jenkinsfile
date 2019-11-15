@@ -14,7 +14,7 @@ pipeline {
   }
   agent {
     kubernetes {
-      label 'java-slave'
+      label 'qa-slave'
       defaultContainer 'jnlp'
       yaml ktAutomationPodTemplate()
     }
@@ -36,14 +36,9 @@ pipeline {
   stages {
     
     stage('Verify') {
-      agent {
-        docker {
-          label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/apipython3:v4'
-        }
-      }
+    
       steps {
-
+        container('python') {
         script {
           
           if (env.environment == 'STG')
@@ -57,6 +52,7 @@ pipeline {
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
+        }
         }
       }
     }
