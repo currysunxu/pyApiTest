@@ -24,7 +24,7 @@ from ptest.decorator import TestClass, Test
 @TestClass()
 class Hf35BffTest(HfBffTestBase):
 
-	@Test(tag='qa')
+	@Test(tags='qa')
 	def test_bff_auth_login_valid_username(self):
 		product_keys = BffUsers.BffUserPw[env_key].keys()
 		for key in product_keys:
@@ -38,7 +38,7 @@ class Hf35BffTest(HfBffTestBase):
 				print("Bff login Token is : %s" % (id_token))
 				assert_that((not id_token == "" and id_token.__str__() is not None))
 
-	@Test(tag='qa')
+	@Test(tags='qa')
 	def test_bff_auth_login_invalid_username(self):
 		user_name = BffUsers.BffUserPw[env_key][self.key][0]['password']
 		password = BffUsers.BffUserPw[env_key][self.key][0]['password']
@@ -46,7 +46,7 @@ class Hf35BffTest(HfBffTestBase):
 		print("Bff login response is : %s" % (response.__str__()))
 		assert_that(response.status_code, equal_to(404))
 
-	@Test(tag='qa')
+	@Test(tags='qa')
 	def test_bff_auth_login_not_HF_username(self):
 		product_keys = BffUsers.BffUserPw[env_key].keys()
 		for key in product_keys:
@@ -60,7 +60,7 @@ class Hf35BffTest(HfBffTestBase):
 				assert_that(response.status_code, equal_to(401))
 				assert_that((response.json()['error'] == "Unauthorized"))
 
-	@Test(tag='qa', data_provider=["noToken"])
+	@Test(tags='qa', data_provider=["noToken"])
 	def test_submit_new_attempt_without_auth_token(self, negative_para):
 		bff_data_obj = Hf35BffCommonData()
 		response = self.bff_service.submit_new_attempt_with_negative_auth_token(bff_data_obj.get_attempt_body(),
@@ -69,7 +69,7 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(response.status_code, equal_to(400))
 		assert_that((response.json()['error'] == "Bad Request"))
 
-	@Test(tag='qa', data_provider=["", "invalid"])
+	@Test(tags='qa', data_provider=["", "invalid"])
 	def test_submit_new_attempt_with_invalid_auth_token(self, negative_para):
 		bff_data_obj = Hf35BffCommonData()
 		response = self.bff_service.submit_new_attempt_with_negative_auth_token(bff_data_obj.get_attempt_body(),
@@ -78,7 +78,7 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(response.status_code, equal_to(401))
 		assert_that((response.json()['error'] == "Unauthorized"))
 
-	@Test(tag='qa', data_provider=[(1, 1), (2, 4), (4, 2)])
+	@Test(tags='qa', data_provider=[(1, 1), (2, 4), (4, 2)])
 	def test_submit_new_attempt_with_valid_body(self, activity_num, detail_num):
 		bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
 		submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -103,7 +103,7 @@ class Hf35BffTest(HfBffTestBase):
 		self.setter_learning_result_details(learning_details_entity, bff_data_obj)
 		self.check_bff_compare_learning_result(result_response, learning_result_entity, learning_details_entity)
 
-	@Test(tag='qa', data_provider=[(1, 1), (4, 2)])
+	@Test(tags='qa', data_provider=[(1, 1), (4, 2)])
 	def test_submit_best_attempt(self, activity_num, detail_num):
 		bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
 		submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -139,7 +139,7 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(homework_best_score, equal_to(bff_best_score))
 		assert_that(best_submit_response.json(), equal_to(homework_best_attempt_response.json()))
 
-	@Test(tag='qa', data_provider=[("HIGH_FLYERS_35", "1")])
+	@Test(tags='qa', data_provider=[("HIGH_FLYERS_35", "1")])
 	def test_get_course_structure(self, course, scheme_version):
 		bff_course_response = self.bff_service.get_course_structure()
 		print("Bff get course response is : %s" % (json.dumps(bff_course_response.json(), indent=4)))
@@ -153,7 +153,7 @@ class Hf35BffTest(HfBffTestBase):
 		content_map_response = self.get_course_from_content_map(course, scheme_version, json_body)
 		assert_that(bff_course_response.json(), equal_to(content_map_response.json()))
 
-	@Test(tag='qa', data_provider=[("HIGH_FLYERS_35", "1")])
+	@Test(tags='qa', data_provider=[("HIGH_FLYERS_35", "1")])
 	def test_get_book_structure(self, course, scheme_version):
 		json_body = {
 			"childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
@@ -171,7 +171,7 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(bff_book_response.status_code, equal_to(200))
 		assert_that(bff_book_response.json(), equal_to(content_map_response.json()))
 
-	@Test(tag='qa', data_provider=["", "invalid", "noToken"])
+	@Test(tags='qa', data_provider=["", "invalid", "noToken"])
 	def test_get_course_structure_with_invalid_token(self, invalid):
 		bff_course_response = self.bff_service.get_course_structure_with_negative_token(invalid)
 		print("Bff get course response is : %s" % (json.dumps(bff_course_response.json(), indent=4)))
@@ -183,7 +183,7 @@ class Hf35BffTest(HfBffTestBase):
 			assert_that(bff_course_response.status_code, equal_to(401))
 			assert_that((bff_course_response.json()['error'] == "Unauthorized"))
 
-	@Test(tag='qa', data_provider=["", "invalid", "noToken"])
+	@Test(tags='qa', data_provider=["", "invalid", "noToken"])
 	def test_get_book_structure_with_invalid_token(self, invalid):
 		json_body = {
 			"childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
@@ -206,7 +206,7 @@ class Hf35BffTest(HfBffTestBase):
 			assert_that(bff_book_response.status_code, equal_to(401))
 			assert_that((bff_book_response.json()['error'] == "Unauthorized"))
 
-	@Test(tag='qa', data_provider=["no_content_id", "no_tree_revision"])
+	@Test(tags='qa', data_provider=["no_content_id", "no_tree_revision"])
 	def test_get_book_structure_without_contentId_or_treeRevision(self, invalid):
 		json_body = {
 			"childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
@@ -231,7 +231,7 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(bff_book_response.status_code, equal_to(404))
 		assert_that((bff_book_response.json()['error'] == ("Not Found")))
 
-	@Test(tag='qa', data_provider=["no_uuid"])
+	@Test(tags='qa', data_provider=["no_uuid"])
 	def test_get_book_structure_with_invalid_contentId(self, invalid):
 		json_body = {
 			"childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
@@ -251,7 +251,7 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(bff_book_response.status_code, equal_to(400))
 		assert_that((bff_book_response.json()['error'] == "Bad Request"))
 
-	@Test(tag='qa', data_provider=[1, 3, 10])
+	@Test(tags='qa', data_provider=[1, 3, 10])
 	def test_post_homework_activity(self, items):
 		content_repo_data = ContentRepoCommonData(items)
 		# insert content
@@ -266,7 +266,7 @@ class Hf35BffTest(HfBffTestBase):
 		bff_activity_json = bff_activity_response.json()
 		assert_that(bff_activity_json, equal_to(content_activities_response.json()))
 
-	@Test(tag='qa',data_provider=[(3,"activity"),(3,"asset"),(2,"activity_and_asset")])
+	@Test(tags='qa',data_provider=[(3,"activity"),(3,"asset"),(2,"activity_and_asset")])
 	def test_get_homework_activity_group(self,number,activity_or_asset):
 		content_repo_data = ContentRepoCommonData(number,activity_or_asset)
 		# insert content
@@ -295,7 +295,7 @@ class Hf35BffTest(HfBffTestBase):
 		elif (activity_or_asset == "asset"):
 			assert_that(bff_activity_json["assetGroups"], equal_to(content_group_activities_response.json()))
 
-	@Test(tag='qa', data_provider=["", "invalid", "noToken"])
+	@Test(tags='qa', data_provider=["", "invalid", "noToken"])
 	def test_post_homework_activity_with_negative_token(self, negative_token):
 		content_repo_data = ContentRepoCommonData()
 		# insert content
@@ -313,7 +313,7 @@ class Hf35BffTest(HfBffTestBase):
 			assert_that(bff_invalid_response.status_code, equal_to(401))
 			assert_that((bff_invalid_response.json()['error'] == "Unauthorized"))
 
-	@Test(tag='qa', data_provider=[{"contentId": ""}, {"contentId": None}, {"contentRevision": ""},
+	@Test(tags='qa', data_provider=[{"contentId": ""}, {"contentId": None}, {"contentRevision": ""},
 								   {"contentId": "test_neg"}, {"contentRevision": None},
 								   {"schemaVersion": ""}, {"schemaVersion": None}, {"schemaVersion": "c"}])
 	def test_post_homework_activity_with_negative_parameter(self, negative_parameter):
@@ -329,7 +329,7 @@ class Hf35BffTest(HfBffTestBase):
 		assert_that(bff_invalid_response.status_code, equal_to(400))
 		assert_that((bff_invalid_response.json()['error'] == "Bad Request"))
 
-	@Test(tag='qa', data_provider=[{"contentId": "f3417c1a-cf92-4257-9cec-3efa911b46da"}])
+	@Test(tags='qa', data_provider=[{"contentId": "f3417c1a-cf92-4257-9cec-3efa911b46da"}])
 	def test_post_homework_activity_with_mismatch_para(self, negative_parameter):
 		content_repo_data = ContentRepoCommonData()
 		# insert content
@@ -347,7 +347,7 @@ class Hf35BffTest(HfBffTestBase):
 		del expected_result[0]
 		assert_that(bff_mismatch_response.json(), equal_to(expected_result))
 
-	@Test(tag='qa', data_provider=["", "invalid", "noToken"])
+	@Test(tags='qa', data_provider=["", "invalid", "noToken"])
 	def test_post_homework_activity_group_with_negative_token(self, negative_token):
 		content_repo_data = ContentRepoCommonData()
 		# insert content
@@ -377,14 +377,14 @@ class Hf35BffTest(HfBffTestBase):
 			assert_that(bff_invalid_response.status_code, equal_to(401))
 			assert_that((bff_invalid_response.json()['error'] == "Unauthorized"))
 
-	@Test(tag='qa', data_provider=[("", ""), (None, None), ("testRevision", "non-uuid")])
+	@Test(tags='qa', data_provider=[("", ""), (None, None), ("testRevision", "non-uuid")])
 	def test_post_homework_activity_group_with_negative_parameter(self, negative_content_revision, negative_content_id):
 		bff_activity_response = self.bff_service.get_homework_activity_asset_group(negative_content_revision,
 																				   negative_content_id)
 		assert_that(bff_activity_response.status_code == 400)
 		assert_that((bff_activity_response.json()['error'] == "Bad Request"))
 
-	@Test(tag='qa', data_provider=[("test_content_revision","5f99af36-cad7-4a45-b811-02c9076f47f1")])
+	@Test(tags='qa', data_provider=[("test_content_revision","5f99af36-cad7-4a45-b811-02c9076f47f1")])
 	def test_post_homework_activity_asset_group_with_mismatch_para(self, negative_content_revision, negative_content_id):
 		bff_mismatch_response = self.bff_service.get_homework_activity_asset_group(negative_content_revision, negative_content_id)
 		assert_that(bff_mismatch_response.status_code == 200)
