@@ -75,7 +75,7 @@ pipeline {
      sh 'mvn clean package'
      sh 'cp /jacoco-data/hf35bff/jacoco_bff.exec jacoco.exec'
      jacoco(
-      exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')
+      exclusionPattern: '**/entities/**,**/dto/**,**/po/**,**/vo/**,**/jwt/**,**/utils/**')
      }
      }
      }
