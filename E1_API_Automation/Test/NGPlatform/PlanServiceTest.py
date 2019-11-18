@@ -1039,7 +1039,7 @@ class PlanServiceTestCases:
     # test get user plan with empty student_key with limit and page
     @Test(tags="qa")
     def test_get_user_plan_with_empty_student_key_with_limit_page(self):
-        batch_number = random.randint(10, 30)
+        batch_number = random.randint(11, 30)
         # there will be 10 learning plans with other student_key value
         partition_batch_number = batch_number + 10
         limit_1 = random.randint(1, 9)
