@@ -119,13 +119,14 @@ class ContentRepoCommonData:
 	def create_child_obj(self, activity_or_asset):
 		"""
 		create child_refs by content_body
-		:param activity_or_asset: add "sha1" field if it is asset
+		:param activity_or_asset: add "sha1" and "url" field if it is asset
 		:return: list of child_refs
 		"""
 		child_refs = self.ancestor_refs[-1].copy()
 		child_refs.update({"nodeType": activity_or_asset.upper(), "title": "Lesson 1: Activity&Asset - Listening"})
 		if activity_or_asset == "asset":
 			child_refs.update({"sha1":''.join(random.sample(string.ascii_letters + string.digits, 40))})
+			child_refs.update({"url":''.join(random.sample(string.ascii_letters + string.digits, 30))})
 		return [child_refs]
 
 	def get_activity_content(self):
