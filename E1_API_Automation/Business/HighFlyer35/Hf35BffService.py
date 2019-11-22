@@ -30,6 +30,15 @@ class Hf35BffService:
 	def submit_new_attempt(self, attempt_json):
 		attempt_result = self.mou_tai.post("/hf3/api/v1/homework/attempts", attempt_json)
 		return attempt_result
+	
+	def get_bootstrap_controller(self, platform):
+		if platform:
+		    return self.mou_tai.get("/hf3/api/v1/bootstrap?platform={0}".format(platform))
+		else:
+			return self.mou_tai.get("/hf3/api/v1/bootstrap")
+	
+	def get_unlock_progress_controller(self):
+		return self.mou_tai.get("hf3/api/v1/unlocked-progress")
 
 	def get_the_best_attempt(self, student_id, book_content_id):
 		api_url = '/hf3/api/v1/homework/attempts/best?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)

@@ -17,6 +17,8 @@ from E1_API_Automation.Settings import env_key, HOMEWORK_ENVIRONMENT, CONTENT_RE
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
+from E1_API_Automation.Lib.HamcrestExister import exist
+from ...Lib.HamcrestMatcher import match_to
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
@@ -393,3 +395,23 @@ class Hf35BffTest(HfBffTestBase):
     		"assetGroups": []
 		}
 		assert_that(bff_mismatch_response.json(), equal_to(expected_result))
+
+	@Test(tags='qa')
+	def test_bootstrap_controller_status(self):
+		response = self.bff_service.get_bootstrap_controller(platform = 2)
+		assert_that(response.status_code == 200)
+		assert_that(response.json(), exist("provision"))
+	
+	@Test(tags='qa')
+	def test_bootstrap_controller_with_wrong_platform_number(self):
+		response = self.bff_service.get_bootstrap_controller(platform=None)
+		assert_that(response.status_code == 400)
+	
+	@Test(tags='qa')
+	def test_unlock_progress_controller(self):
+		response = self.bff_service.get_unlock_progress_controller()
+		
+	
+
+
+		
