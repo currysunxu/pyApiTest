@@ -30,11 +30,13 @@ class AuthEnvironment(object):
     STAGING = "https://auth-svc-stg.ef.cn"
     STAGING_SG = "https://auth-svc-stg.ef.com"
     LIVE = "https://auth-svc.ef.cn"
+    LIVE_SG = "https://auth-svc.ef.com"
 
 
 class OMNIEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/omni/apigateway"
     STAGING = "http://omni-apigateway-staging-tccn.ef.com"
+    STAGING_SG = "http://omni-apigateway-tcjp.ef.com"
     LIVE = "http://omni-apigateway-tccn.ef.com"
 
 
@@ -110,7 +112,7 @@ elif os.environ['environment'] == 'STG_SG':
     OSP_ENVIRONMENT = OSPEnvironment.STAGING_SG
     TPI_ENVIRONMENT = TPIEnvironment.STAGING_SG
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING_SG
-    OMNI_ENVIRONMENT = OMNIEnvironment.STAGING
+    OMNI_ENVIRONMENT = OMNIEnvironment.STAGING_SG
     env_key = 'Staging_SG'
     DATABASE = {
         "Server": "SGE1STGDB01.e1ef.com,1434",
@@ -136,6 +138,7 @@ elif os.environ['environment'] == 'LIVE_SG':
     ENVIRONMENT = Environment.LIVE_SG
     OSP_ENVIRONMENT = OSPEnvironment.LIVE_SG
     TPI_ENVIRONMENT = TPIEnvironment.LIVE_SG
+    AUTH_ENVIRONMENT = AuthEnvironment.LIVE_SG
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
     env_key = 'Live_SG'
     DATABASE = {
