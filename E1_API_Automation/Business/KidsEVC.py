@@ -2,11 +2,10 @@ import random
 
 from ..Lib.Moutai import Moutai, Token
 from .AuthService import AuthService
-from ..Lib.jwt_helper import JWTHelper
 from E1_API_Automation.Settings import AuthEnvironment,env_key
 import jmespath
 import requests
-import os
+
 
 
 
@@ -20,12 +19,10 @@ class KidsEVCService():
     def login(self, user_name, password):
         auth = AuthService(getattr(AuthEnvironment,env_key))
         id_token = auth.login(user_name, password).json()['idToken']
-        project_dir = os.path.dirname(os.path.abspath(__file__))
-        user_info = JWTHelper.decode_token(id_token, project_dir + "/rsa/public_key.pem")
-        ba_token = jmespath.search('tokens[?version==`3`].value', user_info)[0]
+        ba_token = auth.get_v3_token(id_token)
         headers = {"X-BA-TOKEN": ba_token, "Content-Type": "application/json"}
         self.mou_tai.set_header(headers)
-        return user_info
+        return ba_token
 
     def get_offline_active_groups(self):
         return self.mou_tai.get("/ksdsvc/api/v2/groups")
