@@ -1,8 +1,10 @@
 from ..Lib.Moutai import Moutai
+import os
 from enum import Enum
 from E1_API_Automation.Settings import DATABASE
 from ..Lib.db_mssql import MSSQLHelper
 from E1_API_Automation.Test_Data.AuthData import AuthSQLString
+from ..Lib.jwt_helper import JWTHelper
 import jmespath
 
 
@@ -23,6 +25,13 @@ class AuthService:
         idToken = jmespath.search('idToken', athentication_result.json())
         self.mou_tai.headers['X-EF-TOKEN'] = idToken
         return athentication_result
+    
+    def get_v3_token(self, id_token):
+        project_dir = os.path.dirname(os.path.abspath(__file__))
+        user_info = JWTHelper.decode_token(id_token, project_dir + "/rsa/public_key.pem")
+        ba_token = jmespath.search('tokens[?version==`3`].value', user_info)[0]
+        return ba_token
+        
 
     def get_auth_token(self):
         token_value = self.mou_tai.headers.pop('X-EF-TOKEN')

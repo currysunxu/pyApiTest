@@ -1,9 +1,12 @@
 import random
 
-
 from ..Lib.Moutai import Moutai, Token
+from .AuthService import AuthService
+from E1_API_Automation.Settings import AuthEnvironment,env_key
 import jmespath
 import requests
+
+
 
 
 class KidsEVCService():
@@ -14,13 +17,12 @@ class KidsEVCService():
         self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
 
     def login(self, user_name, password):
-        user_info = {
-            "UserName": user_name,
-            "Password": password,
-            "DeviceType": 0,
-            "Platform": 0
-        }
-        return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/OnlineStudentPortal/")
+        auth = AuthService(getattr(AuthEnvironment,env_key))
+        id_token = auth.login(user_name, password).json()['idToken']
+        ba_token = auth.get_v3_token(id_token)
+        headers = {"X-BA-TOKEN": ba_token, "Content-Type": "application/json"}
+        self.mou_tai.set_header(headers)
+        return ba_token
 
     def get_offline_active_groups(self):
         return self.mou_tai.get("/ksdsvc/api/v2/groups")

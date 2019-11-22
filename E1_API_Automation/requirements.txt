@@ -11,3 +11,4 @@ pymssql
 pytz
 cassandra-driver
 pymongo
+jwt
