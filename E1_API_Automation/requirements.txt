@@ -1,3 +1,4 @@
+pymssql==2.1.4
 boto3==1.9.199
 jmespath==0.9.3
 requests
@@ -7,8 +8,7 @@ ptest==1.9.5
 pytest==3.9.3
 jsonpath==0.82
 Cython
-pymssql
-pytz
-cassandra-driver
-pymongo
 PyJWT==1.7.0
+pytz
+cassandra-driver==3.19.0
+pymongo
