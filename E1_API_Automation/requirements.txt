@@ -11,4 +11,4 @@ pymssql
 pytz
 cassandra-driver
 pymongo
-jwt
+PyJWT==1.7.0
