@@ -410,6 +410,3 @@ class Hf35BffTest(HfBffTestBase):
         response = self.bff_service.get_bootstrap_controller(platform=None)
         assert_that(response.status_code == 400)
 
-    @Test(tags='qa')
-    def test_unlock_progress_controller(self):
-        response = self.bff_service.get_unlock_progress_controller()
