@@ -411,8 +411,7 @@ class Hf35BffTest(HfBffTestBase):
     def test_bootstrap_controller_with_wrong_platform_number(self):
         response = self.bff_service.get_bootstrap_controller(platform=None)
         assert_that(response.status_code == 400)
-        
-    
+
     @Test(tags='qa')
     def test_bootstrap_controller_ios_platform(self):
         response = self.bff_service.get_bootstrap_controller(platform='ios')
@@ -422,6 +421,5 @@ class Hf35BffTest(HfBffTestBase):
     def test_bootstrap_controller_android_platform(self):
         response = self.bff_service.get_bootstrap_controller(platform='android')
         assert_that(jmespath.search('provision.Name', response.json()), contains_string('andriod'))
-   
-        
+
 
