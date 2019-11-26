@@ -19,8 +19,9 @@ from E1_API_Automation.Test_Data.BffData import BffUsers
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Lib.HamcrestExister import exist
 from ...Lib.HamcrestMatcher import match_to
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to,contains_string
 from ptest.decorator import TestClass, Test
+import jmespath
 
 
 @TestClass()
@@ -404,9 +405,21 @@ class Hf35BffTest(HfBffTestBase):
         response = self.bff_service.get_bootstrap_controller(platform=2)
         assert_that(response.status_code == 200)
         assert_that(response.json(), exist("provision"))
+        
 
     @Test(tags='qa')
     def test_bootstrap_controller_with_wrong_platform_number(self):
         response = self.bff_service.get_bootstrap_controller(platform=None)
         assert_that(response.status_code == 400)
+
+    @Test(tags='qa')
+    def test_bootstrap_controller_ios_platform(self):
+        response = self.bff_service.get_bootstrap_controller(platform='ios')
+        assert_that(jmespath.search('provision.Name', response.json()), contains_string('iOS'))
+
+    @Test(tags='qa')
+    def test_bootstrap_controller_android_platform(self):
+        response = self.bff_service.get_bootstrap_controller(platform='android')
+        assert_that(jmespath.search('provision.Name', response.json()), contains_string('andriod'))
+
 
