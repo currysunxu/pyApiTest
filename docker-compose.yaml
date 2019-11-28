@@ -2,14 +2,13 @@ version: '3.7'
 
 services:
   kidsqa_python3:
-    image: test4kids/kt-qa-api-test:${IMAGE_TAG}
+    image: edtech-kt/kt-qa-api-test:${IMAGE_TAG}
     build:
       context: ./
       dockerfile: ./Dockerfile
       network: host
   maven:
-    image: test4kids/Maven:${IMAGE_TAG}
+    image: edtech-kt/Maven:${IMAGE_TAG}
     build:
       context: ./
       dockerfile: ./DockerfileM
-      network: host
