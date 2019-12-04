@@ -115,8 +115,8 @@ class HfBffTestBase:
 		learning_plan_entity.learning_unit = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		learning_plan_entity.start_time = bff_data_obj.get_attempt_body()["startTimeUtc"]
 		learning_plan_entity.end_time = bff_data_obj.get_attempt_body()["endTimeUtc"]
-		learning_plan_entity.route = bff_data_obj.get_attempt_body()["treeRevision"]
-
+		#Todo need to refactor dynamicly for groupId after add corresponding api in Homework Service
+		learning_plan_entity.route = "treeRevision=%s|%s" % (bff_data_obj.get_attempt_body()["treeRevision"],"groupId=null")
 
 	def setter_learning_result(self,learning_result_entity,bff_data_obj,plan_system):
 		"""set all fields in learning_result_entity
