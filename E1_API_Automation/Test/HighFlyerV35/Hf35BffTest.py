@@ -117,7 +117,7 @@ class Hf35BffTest(HfBffTestBase):
         submit_best_response = self.bff_service.submit_new_attempt(bff_data_obj.previous_attempt)
         assert_that(submit_best_response.status_code, equal_to(200))
         book_content_id = bff_data_obj.get_attempt_body()["bookContentId"]
-        best_submit_response = self.bff_service.get_the_best_attempt(self.student_id, book_content_id)
+        best_submit_response = self.bff_service.get_the_best_attempt(book_content_id)
         # check bff get best attempt
         bff_best_total_score = sum(
             Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.activities..totalScore"))
@@ -131,7 +131,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_best_score, equal_to(expected_score))
         # check homework service best attempt
         homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
-        homework_best_attempt_response = homework_service.get_the_best_attempt(self.student_id, book_content_id)
+        homework_best_attempt_response = homework_service.get_the_best_attempt(self.customer_id, book_content_id)
         homework_best_total_score = sum(
             Hf35BffCommonData.get_value_by_json_path(homework_best_attempt_response.json()[0],
                                                      "$.activities..totalScore"))

@@ -33,7 +33,7 @@ class HfBffTestBase:
 		self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
 		self.bff_service.login(self.user_name,self.password)
 		self.omni_service = OMNIService(OMNI_ENVIRONMENT)
-		self.student_id = self.omni_service.get_customer_id(self.user_name, self.password)
+		self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
 
 
 	def check_bff_compare_learning_plan(self, plan_response, leanring_plan_entity):
@@ -111,7 +111,7 @@ class HfBffTestBase:
 		:return:
 		"""
 		learning_plan_entity.plan_business_key = '|'.join(bff_data_obj.plan_business)
-		learning_plan_entity.student_key = self.student_id
+		learning_plan_entity.student_key = self.customer_id
 		learning_plan_entity.bucket_id = datetime.datetime.now().year
 		learning_plan_entity.product_id = 2
 		learning_plan_entity.state = 4
@@ -135,7 +135,7 @@ class HfBffTestBase:
 		learning_result_entity.plan_type = 1
 		learning_result_entity.product_id = 2
 		learning_result_entity.plan_business_key = '|'.join(bff_data_obj.get_plan_business())
-		learning_result_entity.student_key = int(self.student_id)
+		learning_result_entity.student_key = int(self.customer_id)
 		learning_result_entity.atomic_key = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		learning_result_entity.plan_system_key = plan_system
 		learning_result_entity.expected_score = all_question_expected_scores
