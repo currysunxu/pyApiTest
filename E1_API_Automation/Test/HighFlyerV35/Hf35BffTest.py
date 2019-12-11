@@ -81,7 +81,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(response.status_code, equal_to(401))
         assert_that((response.json()['error'] == "Unauthorized"))
 
-    @Test(tag='qa', data_provider=[(1, 1), (2, 4), (4, 2)])
+    @Test(tags='qa', data_provider=[(1, 1), (2, 4), (4, 2)])
     def test_submit_new_attempt_with_valid_body(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -106,7 +106,7 @@ class Hf35BffTest(HfBffTestBase):
         self.setter_learning_result_details(learning_details_entity, bff_data_obj)
         self.check_bff_compare_learning_result(result_response, learning_result_entity, learning_details_entity)
 
-    @Test(tag='qa', data_provider=[(1, 1), (4, 2)])
+    @Test(tags='qa', data_provider=[(1, 1), (4, 2)])
     def test_submit_best_attempt(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
