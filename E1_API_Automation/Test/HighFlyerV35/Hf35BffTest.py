@@ -81,7 +81,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(response.status_code, equal_to(401))
         assert_that((response.json()['error'] == "Unauthorized"))
 
-    @Test(tags='qa', data_provider=[(1, 1), (2, 4), (4, 2)])
+    @Test(tag='qa', data_provider=[(1, 1), (2, 4), (4, 2)])
     def test_submit_new_attempt_with_valid_body(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -106,7 +106,7 @@ class Hf35BffTest(HfBffTestBase):
         self.setter_learning_result_details(learning_details_entity, bff_data_obj)
         self.check_bff_compare_learning_result(result_response, learning_result_entity, learning_details_entity)
 
-    @Test(tags='qa', data_provider=[(1, 1), (4, 2)])
+    @Test(tag='qa', data_provider=[(1, 1), (4, 2)])
     def test_submit_best_attempt(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -116,9 +116,8 @@ class Hf35BffTest(HfBffTestBase):
         bff_data_obj.set_best_attempt()
         submit_best_response = self.bff_service.submit_new_attempt(bff_data_obj.previous_attempt)
         assert_that(submit_best_response.status_code, equal_to(200))
-        student_key = bff_data_obj.get_attempt_body()["studentId"]
         book_content_id = bff_data_obj.get_attempt_body()["bookContentId"]
-        best_submit_response = self.bff_service.get_the_best_attempt(student_key, book_content_id)
+        best_submit_response = self.bff_service.get_the_best_attempt(self.student_id, book_content_id)
         # check bff get best attempt
         bff_best_total_score = sum(
             Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.activities..totalScore"))
@@ -132,7 +131,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_best_score, equal_to(expected_score))
         # check homework service best attempt
         homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
-        homework_best_attempt_response = homework_service.get_the_best_attempt(student_key, book_content_id)
+        homework_best_attempt_response = homework_service.get_the_best_attempt(self.student_id, book_content_id)
         homework_best_total_score = sum(
             Hf35BffCommonData.get_value_by_json_path(homework_best_attempt_response.json()[0],
                                                      "$.activities..totalScore"))
