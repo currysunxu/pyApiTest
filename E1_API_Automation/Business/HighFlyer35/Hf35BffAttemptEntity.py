@@ -5,8 +5,7 @@
 # date:2019/10/30
 
 class Hf35BffAttemptEntity:
-	def __init__(self, student_id, learning_unit_content_id, activities):
-		self.__student_id = student_id
+	def __init__(self, learning_unit_content_id, activities):
 		self.__start_time_utc= None
 		self.__end_time_utc = None
 		self.__course_content_id = None

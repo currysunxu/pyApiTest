@@ -40,9 +40,8 @@ class Hf35BffService:
     def get_unlock_progress_controller(self):
         return self.mou_tai.get("hf3/api/v1/unlocked-progress")
 
-    def get_the_best_attempt(self, student_id, book_content_id):
-        api_url = '/hf3/api/v1/homework/attempts/best?studentId={0}&bookContentId={1}'.format(student_id,
-                                                                                              book_content_id)
+    def get_the_best_attempt(self, book_content_id):
+        api_url = '/hf3/api/v1/homework/attempts/best?bookContentId={0}'.format(book_content_id)
         return self.mou_tai.get(api_url)
 
     def get_course_structure(self):

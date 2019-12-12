@@ -15,8 +15,9 @@ from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapSe
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
+from E1_API_Automation.Business.OMNIService import OMNIService
 from E1_API_Automation.Settings import LEARNING_PLAN_ENVIRONMENT, LEARNING_RESULT_ENVIRONMENT, BFF_ENVIRONMENT, env_key, \
-	CONTENT_MAP_ENVIRONMENT
+	CONTENT_MAP_ENVIRONMENT, OMNI_ENVIRONMENT
 from ptest.decorator import BeforeMethod
 
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
@@ -31,6 +32,8 @@ class HfBffTestBase:
 		self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
 		self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
 		self.bff_service.login(self.user_name,self.password)
+		self.omni_service = OMNIService(OMNI_ENVIRONMENT)
+		self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
 
 
 	def check_bff_compare_learning_plan(self, plan_response, leanring_plan_entity):
@@ -108,7 +111,7 @@ class HfBffTestBase:
 		:return:
 		"""
 		learning_plan_entity.plan_business_key = '|'.join(bff_data_obj.plan_business)
-		learning_plan_entity.student_key = bff_data_obj.get_attempt_body()["studentId"]
+		learning_plan_entity.student_key = self.customer_id
 		learning_plan_entity.bucket_id = datetime.datetime.now().year
 		learning_plan_entity.product_id = 2
 		learning_plan_entity.state = 4
@@ -132,7 +135,7 @@ class HfBffTestBase:
 		learning_result_entity.plan_type = 1
 		learning_result_entity.product_id = 2
 		learning_result_entity.plan_business_key = '|'.join(bff_data_obj.get_plan_business())
-		learning_result_entity.student_key = int(bff_data_obj.get_attempt_body()["studentId"])
+		learning_result_entity.student_key = int(self.customer_id)
 		learning_result_entity.atomic_key = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		learning_result_entity.plan_system_key = plan_system
 		learning_result_entity.expected_score = all_question_expected_scores
@@ -186,5 +189,3 @@ class HfBffTestBase:
 			if is_mismatch:
 				break
 		return content_body
-
-

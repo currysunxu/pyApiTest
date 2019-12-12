@@ -78,10 +78,9 @@ class Hf35BffUtils:
 		:param activity_list:
 		:return:  return bff attempt json data
 		"""
-		random_student_id = ''.join(random.sample(string.digits, 8))
 		random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
 		learning_content_id = uuid.uuid4().__str__()
-		bff_entity = Hf35BffAttemptEntity(random_student_id,learning_content_id,activity_list)
+		bff_entity = Hf35BffAttemptEntity(learning_content_id,activity_list)
 		bff_entity.start_time_utc =random_date_time
 		bff_entity.end_time_utc =random_date_time
 		bff_entity.book_content_id = uuid.uuid4().__str__()
