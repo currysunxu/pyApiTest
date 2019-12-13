@@ -51,7 +51,7 @@ pipeline {
               case_tag = 'qa'
           sh 'python E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService reset'
            
-          sh 'ptest3  -t E1_API_Automation.Test.HighFlyerV13.bfftest -i ${case_tag}'
+          sh 'ptest3  -t E1_API_Automation.Test.HighFlyerV35.bfftest -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
