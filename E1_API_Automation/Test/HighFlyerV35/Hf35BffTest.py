@@ -403,7 +403,9 @@ class Hf35BffTest(HfBffTestBase):
     def test_bootstrap_controller_status(self):
         response = self.bff_service.get_bootstrap_controller(platform=2)
         assert_that(response.status_code == 200)
-        assert_that(response.json(), exist("provision"))
+        assert_that(response.json(), match_to("provision"))
+        assert_that(response.json(), match_to("userContext.availableBooks"))
+        assert_that(response.json(), match_to("userContext.currentBook"))
         
 
     @Test(tags='qa')
@@ -414,11 +416,18 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags='qa')
     def test_bootstrap_controller_ios_platform(self):
         response = self.bff_service.get_bootstrap_controller(platform='ios')
-        assert_that(jmespath.search('provision.Name', response.json()), contains_string('iOS'))
+        assert_that(jmespath.search('provision.name', response.json()), contains_string('iOS'))
 
     @Test(tags='qa')
     def test_bootstrap_controller_android_platform(self):
         response = self.bff_service.get_bootstrap_controller(platform='android')
-        assert_that(jmespath.search('provision.Name', response.json()), contains_string('andriod'))
+        assert_that(jmespath.search('provision.name', response.json()), contains_string('andriod'))
+
+    @Test(tags='qa')
+    def test_get_unlock_progress(self):
+        current_book = jmespath.search('userContext.currentBook', self.bff_service.get_bootstrap_controller('ios').json())
+        print(current_book)
+        response = self.bff_service.get_unlock_progress_controller(current_book)
+        assert_that(response.status_code == 200)
 
 
