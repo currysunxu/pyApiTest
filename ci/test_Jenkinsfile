@@ -3,7 +3,6 @@ library identifier: 'jenkinssharedlib@tc/v2', retriever: modernSCM(
   [$class: 'GitSCMSource',
    remote: 'ssh://git@bitbucket.englishtown.cn:7999/elab/jenkinssharedlib.git',
    credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e'])
-   
 config = [
   teamsConnectorName: 'EdTech-QA-Team',
   teamsConnectorUrl:  'https://outlook.office.com/webhook/36e05938-50a0-40ed-9657-5483b2c4ec34@f0d1c6fd-dff0-486a-8e91-cfefefc7d98d/JenkinsCI/bc600ad16b3f4985be4749929e7d547c/85e457eb-b12b-44d6-bf27-0d23de69a378']
@@ -38,10 +37,8 @@ pipeline {
      case_tag = 'qa'
     }
    
-  stages {
-    
-    stage('Verify') {
-      
+  stages { 
+    stage('Verify') {   
       steps {
       container('python') {
 
@@ -52,35 +49,35 @@ pipeline {
               case_tag = 'live'
           if (env.environment == 'QA')
               case_tag = 'qa'
-          sh 'python E1_API_Automation/Tools/jacoco/jacoco_report.py BFF reset'
+          sh 'python E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService reset'
            
-          sh 'ptest3  -t E1_API_Automation.Test.HighFlyerV35.bfftest'
+          sh 'ptest3  -t E1_API_Automation.Test.HighFlyerV13.bfftest -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
-          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py BFF dump /jacoco-data/hf35bff/jacoco_bff.exec'
+          sh 'python3 E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService dump /jacoco-data/learningplan/jacoco_learningplan.exec'
           
         }
       }
       }
     }
     stage('Jacoco Report'){
-   
-    steps{
-    container('maven') {
-    dir('BFFService'){
-     git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/hf-v35-bff.git'
+      steps{
+        container('maven') {
+    
+          dir('PlanService'){
+          git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
      
-     script{
-     sh 'mvn clean package'
-     sh 'cp /jacoco-data/hf35bff/jacoco_bff.exec jacoco.exec'
-     jacoco(
-      exclusionPattern: '**/entities/**,**/dto/**,**/po/**,**/vo/**,**/jwt/**,**/utils/**')
-     }
-     }
-     }
-  }
-  }
+          script{
+            sh 'mvn clean package'
+            sh 'cp /jacoco-data/learningplan/jacoco_learningplan.exec jacoco.exec'
+            jacoco(
+              exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')    
+                }
+          }
+        }
+      }
+    }
     
   }
   
