@@ -18,7 +18,7 @@ import jmespath
 
 
 @TestClass()
-class HighFlyer(HfBffTestBase):
+class HighFlyer():
 
     @Test(tags='qa')
     def test_bootstrap_controller_status(self):
