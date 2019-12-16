@@ -1,23 +1,14 @@
-#!/usr/bin/env python
-#-*-coding:utf-8-*-
-
-#author:Curry
-#date:2019/10/29
 import datetime
-import json
-
 from hamcrest import assert_that, equal_to
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
-from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapService
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Business.OMNIService import OMNIService
-from E1_API_Automation.Settings import LEARNING_PLAN_ENVIRONMENT, LEARNING_RESULT_ENVIRONMENT, BFF_ENVIRONMENT, env_key, \
-	CONTENT_MAP_ENVIRONMENT, OMNI_ENVIRONMENT
+from E1_API_Automation.Settings import *
 from ptest.decorator import BeforeMethod
 
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers

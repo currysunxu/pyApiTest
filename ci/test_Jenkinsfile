@@ -49,7 +49,6 @@ pipeline {
               case_tag = 'live'
           if (env.environment == 'QA')
               case_tag = 'qa'
-          sh 'python E1_API_Automation/Tools/jacoco/jacoco_report.py PlanService reset'
            
           sh 'ptest3  -t E1_API_Automation.Test.HighFlyerV35.bfftest -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
@@ -59,23 +58,6 @@ pipeline {
           
         }
       }
-      }
-    }
-    stage('Jacoco Report'){
-      steps{
-        container('maven') {
-    
-          dir('PlanService'){
-          git branch: 'develop', credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e', url: 'ssh://git@bitbucket.englishtown.cn:7999/etkt/platform-plan-svc.git'
-     
-          script{
-            sh 'mvn clean package'
-            sh 'cp /jacoco-data/learningplan/jacoco_learningplan.exec jacoco.exec'
-            jacoco(
-              exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')    
-                }
-          }
-        }
       }
     }
     
