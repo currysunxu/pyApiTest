@@ -18,10 +18,24 @@ import jmespath
 
 
 @TestClass()
-class HighFlyer():
+class HighFlyer(HfBffTestBase):
 
     @Test(tags='qa')
     def test_bootstrap_controller_status(self):
         pass
+
+    @Test(tags='qa')
+    def test_bff_auth_login_valid_username(self):
+        product_keys = BffUsers.BffUserPw[env_key].keys()
+        for key in product_keys:
+            user_name = BffUsers.BffUserPw[env_key][key][0]['username']
+            password = BffUsers.BffUserPw[env_key][key][0]['password']
+            if key.__contains__('HF'):
+                print("HF user is : %s" % (user_name))
+                response = self.bff_service.login(user_name, password)
+                print("Bff login response is : %s" % (response.__str__()))
+                id_token = self.bff_service.get_auth_token()
+                print("Bff login Token is : %s" % (id_token))
+                assert_that((not id_token == "" and id_token.__str__() is not None))
 
 

@@ -31,7 +31,7 @@ class HfBffTestBase:
 		self.key = BffProduct.HFV35.value
 		self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
 		self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
-		self.bff_service.login(self.user_name,self.password)
+		self.bff_service.login(self.user_name, self.password)
 		self.omni_service = OMNIService(OMNI_ENVIRONMENT)
 		self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
 
