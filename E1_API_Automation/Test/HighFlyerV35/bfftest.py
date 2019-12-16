@@ -1,6 +1,6 @@
 import json
 from hamcrest import assert_that, equal_to, contains_string
-from ptest.decorator import TestClass, Test
+from ptest.decorator import TestClass, Test,BeforeMethod
 
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
@@ -13,12 +13,14 @@ from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
-
+from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
+from E1_API_Automation.Settings import *
 import jmespath
 
 
 @TestClass()
 class HighFlyer(HfBffTestBase):
+
 
     @Test(tags='qa')
     def test_bootstrap_controller_status(self):
