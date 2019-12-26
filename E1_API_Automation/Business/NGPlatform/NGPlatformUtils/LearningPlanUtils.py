@@ -252,7 +252,7 @@ class LearningPlanUtils:
         learning_unit_field_tempalte = LearningFieldTemplate('learningUnit', FieldType.TypeString, False)
         learning_unit_field_tempalte.min_value = 1
         learning_unit_field_tempalte.min_error_code = '4416'
-        learning_unit_field_tempalte.max_value = 1024
+        learning_unit_field_tempalte.max_value = 4096
 
         created_by_field_tempalte = LearningFieldTemplate('createdBy', FieldType.TypeString, False)
         created_by_field_tempalte.min_value = 0

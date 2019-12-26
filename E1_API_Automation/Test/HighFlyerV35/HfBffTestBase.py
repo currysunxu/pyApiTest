@@ -37,10 +37,10 @@ class HfBffTestBase:
 
 
 	def check_bff_compare_learning_plan(self, plan_response, leanring_plan_entity):
-		assert_that(plan_response.json()[0]["planBusinessKey"], equal_to(leanring_plan_entity.plan_business_key))
+		assert_that(plan_response.json()[0]["planBusinessKey"], equal_to(leanring_plan_entity.business_key))
 		assert_that(int(plan_response.json()[0]["studentKey"]), equal_to(int(leanring_plan_entity.student_key)))
 		assert_that(plan_response.json()[0]["bucketId"], equal_to(leanring_plan_entity.bucket_id))
-		assert_that(plan_response.json()[0]["productId"], equal_to(leanring_plan_entity.product_id))
+		assert_that(plan_response.json()[0]["productId"], equal_to(leanring_plan_entity.product))
 		assert_that(plan_response.json()[0]["state"], equal_to(leanring_plan_entity.state))
 		assert_that(plan_response.json()[0]["learningUnit"], equal_to(leanring_plan_entity.learning_unit))
 		assert_that(plan_response.json()[0]["route"], equal_to(leanring_plan_entity.route))
@@ -48,11 +48,11 @@ class HfBffTestBase:
 		assert_that(plan_response.json()[0]["endTime"], equal_to(leanring_plan_entity.end_time))
 
 	def check_bff_compare_learning_result(self, result_response, learning_result_entity, learning_details_entity):
-		assert_that(result_response.json()[0]["productId"], equal_to(learning_result_entity.product_id))
-		assert_that(result_response.json()[0]["planType"], equal_to(learning_result_entity.plan_type))
+		assert_that(result_response.json()[0]["productId"], equal_to(learning_result_entity.product))
+		assert_that(result_response.json()[0]["planType"], equal_to(learning_result_entity.product_module))
 		assert_that(int(result_response.json()[0]["studentKey"]), equal_to(int(learning_result_entity.student_key)))
 		assert_that(result_response.json()[0]["atomicKey"], equal_to(learning_result_entity.atomic_key))
-		assert_that(result_response.json()[0]["planBusinessKey"], equal_to(learning_result_entity.plan_business_key))
+		assert_that(result_response.json()[0]["planBusinessKey"], equal_to(learning_result_entity.business_key))
 		assert_that(result_response.json()[0]["planSystemKey"], equal_to(learning_result_entity.plan_system_key))
 		assert_that(result_response.json()[0]["expectedScore"], equal_to(learning_result_entity.expected_score))
 		assert_that(result_response.json()[0]["actualScore"], equal_to(learning_result_entity.actual_score))
@@ -110,10 +110,10 @@ class HfBffTestBase:
 		:param bff_data_obj: test data object
 		:return:
 		"""
-		learning_plan_entity.plan_business_key = '|'.join(bff_data_obj.plan_business)
+		learning_plan_entity.business_key = '|'.join(bff_data_obj.plan_business)
 		learning_plan_entity.student_key = self.customer_id
 		learning_plan_entity.bucket_id = datetime.datetime.now().year
-		learning_plan_entity.product_id = 2
+		learning_plan_entity.product = 2
 		learning_plan_entity.state = 4
 		learning_plan_entity.learning_unit = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		learning_plan_entity.start_time = bff_data_obj.get_attempt_body()["startTimeUtc"]
@@ -132,9 +132,9 @@ class HfBffTestBase:
 		all_question_actual_scores = sum(
 			Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..score'))
 		all_details = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..details')
-		learning_result_entity.plan_type = 1
-		learning_result_entity.product_id = 2
-		learning_result_entity.plan_business_key = '|'.join(bff_data_obj.get_plan_business())
+		learning_result_entity.product_module = 1
+		learning_result_entity.product = 2
+		learning_result_entity.business_key = '|'.join(bff_data_obj.get_plan_business())
 		learning_result_entity.student_key = int(self.customer_id)
 		learning_result_entity.atomic_key = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		learning_result_entity.plan_system_key = plan_system

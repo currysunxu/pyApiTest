@@ -172,21 +172,6 @@ class PlanResultTestCases:
 
         assert_that(error_message == '', error_message)
 
-    # test when uuid field with invalid format value
-    @Test(tags="qa")
-    def test_learning_result_insert_trace_key_invalid_format(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
-        # all the filed value as valid, but trace key is not UUID value
-        learning_result = LearningResultUtils.construct_learning_result_by_value_type(random.randint(1, 5),
-                                                                                      FieldValueType.Valid)
-        learning_result.trace_key = ''.join(random.sample(string.ascii_letters, 5))
-        learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
-        assert_that(learning_result_insert_api_response.status_code == 400)
-
-        api_response_json = learning_result_insert_api_response.json()
-        expected_message = "JSON decoding error: Cannot deserialize value of type `java.util.UUID` from String \"{0}\": UUID".format(learning_result.trace_key)
-        assert_that(api_response_json['message'].find('expected_message'),
-                    expected_message + " can't be found in message")
 
     # this method will be called by other method to check int type field with invalid value,
     # including invalid format value and value exceed int's max value
@@ -218,7 +203,7 @@ class PlanResultTestCases:
     def test_learning_result_insert_invalid_int_fields(self, is_exceed_int):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # following is the int type fields in result entity and details entity
-        int_type_fields = ['product_id', 'plan_type', 'expected_score', 'actual_score']
+        int_type_fields = ['product', 'product_module', 'expected_score', 'actual_score', 'duration']
         int_type_details_fields = ['expected_score', 'actual_score', 'duration']
 
         detail_number = random.randint(1, 3)
@@ -246,39 +231,47 @@ class PlanResultTestCases:
     def test_learning_result_insert_exceed_int_value_for_int_fields(self):
         self.test_learning_result_insert_invalid_int_fields(True)
 
+    def validate_date_type_field_with_invalid_value(self, learning_result_service, learning_result, learning_entity,
+                                                   field_name):
+        value_year = str(datetime.datetime.now().year)
+        value_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        field_value = random.choice([value_year, value_time])
+
+        setattr(learning_entity, field_name, field_value)
+
+        learning_result_insert_api_response = learning_result_service.post_learning_result_insert(
+            learning_result)
+        assert_that(learning_result_insert_api_response.status_code == 400)
+
+        api_response_json = learning_result_insert_api_response.json()
+        expected_message = "JSON decoding error: Cannot deserialize value of type `java.util.Date` from String \"{0}\"".format(
+            field_value)
+        assert_that(api_response_json['message'].find('expected_message'),
+                    expected_message + " can't be found in message")
+        # as need to check other fields, so, set this field as valid value at last
+        setattr(learning_entity, field_name, None)
+
     # test when date type field with invalid format value
     @Test(tags="qa")
     def test_learning_result_insert_invalid_date_fields(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # following is the date type fields in details entity
-        date_type_details_fields = ['start_time', 'end_time']
+        date_type_fields = ['start_time', 'end_time']
 
         detail_number = random.randint(1, 3)
         learning_result = LearningResultUtils.construct_learning_result_by_value_type(detail_number,
                                                                                       FieldValueType.Valid)
 
+        for date_type_field in date_type_fields:
+            self.validate_date_type_field_with_invalid_value(learning_result_service, learning_result,
+                                                             learning_result, date_type_field)
+
         learning_details = learning_result.details
-        for date_type_details_field in date_type_details_fields:
+        for date_type_details_field in date_type_fields:
             for i in range(detail_number):
                 learning_detail_entity = learning_details[i]
-
-                value_year = str(datetime.datetime.now().year)
-                value_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                field_value = random.choice([value_year, value_time])
-
-                setattr(learning_detail_entity, date_type_details_field, field_value)
-
-                learning_result_insert_api_response = learning_result_service.post_learning_result_insert(
-                    learning_result)
-                assert_that(learning_result_insert_api_response.status_code == 400)
-
-                api_response_json = learning_result_insert_api_response.json()
-                expected_message = "JSON decoding error: Cannot deserialize value of type `java.util.Date` from String \"{0}\"".format(
-                    field_value)
-                assert_that(api_response_json['message'].find('expected_message'),
-                            expected_message + " can't be found in message")
-                # as need to check other fields, so, set this field as valid value at last
-                setattr(learning_detail_entity, date_type_details_field, None)
+                self.validate_date_type_field_with_invalid_value(learning_result_service, learning_result,
+                                                            learning_detail_entity, date_type_details_field)
 
     # test insert with max values
     @Test(tags="qa")
@@ -440,7 +433,7 @@ class PlanResultTestCases:
         record_number = 51
         self.test_get_result_api(record_number, None, LearningResultQueryType.TypeGetSpecific)
 
-    # test when product_id/student_key is empty for all the query APIs
+    # test when product/student_key is empty for all the query APIs
     @Test(tags="qa")
     def test_get_api_with_empty_value(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
@@ -448,7 +441,7 @@ class PlanResultTestCases:
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)
 
-        query_fields = ['product_id', 'student_key']
+        query_fields = ['product', 'student_key']
 
         for field_name in query_fields:
             original_value = getattr(learning_result_template, field_name)
@@ -483,7 +476,7 @@ class PlanResultTestCases:
         assert_that(learning_result_get_api_response.json()['message'].find('expected_message'),
                     expected_message + " can't be found in message")
 
-    # test when product_id value is not int
+    # test when product, product_module value is not int
     @Test(tags="qa")
     def test_get_api_with_invalid_format_product_id(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
@@ -491,31 +484,41 @@ class PlanResultTestCases:
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)
 
-        learning_result_template.product_id = ''.join(random.sample(string.ascii_letters, 5))
+        query_fields = ['product', 'product_module']
 
-        learning_result_get_api_response = learning_result_service.get_partition_result_without_limit(
-            learning_result_template)
-        self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
-                                                                    learning_result_template.product_id)
+        for field_name in query_fields:
+            original_value = getattr(learning_result_template, field_name)
+            invalid_value = ''.join(random.sample(string.ascii_letters, 5))
+            setattr(learning_result_template, field_name, invalid_value)
 
-        learning_result_get_api_response = \
-            learning_result_service.get_partition_result_with_limit(learning_result_template, 2)
-        self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
-                                                                    learning_result_template.product_id)
+            if field_name == 'product':
+                learning_result_get_api_response = learning_result_service.get_partition_result_without_limit(
+                    learning_result_template)
+                self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
+                                                                         invalid_value)
 
-        learning_result_get_api_response = learning_result_service.get_user_result_without_limit(
-            learning_result_template)
-        self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
-                                                                    learning_result_template.product_id)
+                learning_result_get_api_response = \
+                    learning_result_service.get_partition_result_with_limit(learning_result_template, 2)
+                self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
+                                                                         invalid_value)
 
-        learning_result_get_api_response = learning_result_service.get_user_result_with_limit(
-            learning_result_template, 2)
-        self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
-                                                                    learning_result_template.product_id)
+            learning_result_get_api_response = learning_result_service.get_user_result_without_limit(
+                learning_result_template)
+            self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
+                                                                     invalid_value)
 
-        learning_result_get_api_response = learning_result_service.get_specific_result(learning_result_template)
-        self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
-                                                                    learning_result_template.product_id)
+            learning_result_get_api_response = learning_result_service.get_user_result_with_limit(
+                learning_result_template, 2)
+            self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
+                                                                     invalid_value)
+
+            learning_result_get_api_response = learning_result_service.get_specific_result(learning_result_template)
+            self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response,
+                                                                     invalid_value)
+
+            setattr(learning_result_template, field_name, original_value)
+
+
 
     # test when limit value is not int
     @Test(tags="qa")
@@ -554,7 +557,7 @@ class PlanResultTestCases:
                 learning_result_service.get_user_result_with_limit(learning_result_template, limit)
             assert_that(learning_result_get_api_response.status_code == 400)
 
-    # test when student_key , plan_business_key, plan_system_key with invalid format
+    # test when student_key , business_key with invalid format
     @Test(tags="qa")
     def test_get_api_with_invalid_value_key(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
@@ -563,7 +566,7 @@ class PlanResultTestCases:
         learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
         assert_that(learning_result_insert_api_response.status_code == 200)
 
-        query_fields = ['student_key', 'plan_business_key']
+        query_fields = ['student_key', 'business_key']
 
         for field_name in query_fields:
             original_value = getattr(learning_result, field_name)
@@ -586,15 +589,15 @@ class PlanResultTestCases:
                 assert_that(learning_result_get_api_response.status_code == 200)
                 assert_that(len(learning_result_get_api_response.json()) == 0)
 
-            learning_result_get_api_response = learning_result_service.get_user_result_without_limit(
-                learning_result)
-            assert_that(learning_result_get_api_response.status_code == 200)
-            assert_that(len(learning_result_get_api_response.json()) == 0)
+                learning_result_get_api_response = learning_result_service.get_user_result_without_limit(
+                    learning_result)
+                assert_that(learning_result_get_api_response.status_code == 200)
+                assert_that(len(learning_result_get_api_response.json()) == 0)
 
-            learning_result_get_api_response = learning_result_service.get_user_result_with_limit(
-                learning_result, 2)
-            assert_that(learning_result_get_api_response.status_code == 200)
-            assert_that(len(learning_result_get_api_response.json()) == 0)
+                learning_result_get_api_response = learning_result_service.get_user_result_with_limit(
+                    learning_result, 2)
+                assert_that(learning_result_get_api_response.status_code == 200)
+                assert_that(len(learning_result_get_api_response.json()) == 0)
 
             learning_result_get_api_response = learning_result_service.get_specific_result(learning_result)
             assert_that(learning_result_get_api_response.status_code == 200)
@@ -602,41 +605,29 @@ class PlanResultTestCases:
 
             setattr(learning_result, field_name, original_value)
 
-        # when plan_system_key with invalid format value, it also return 200 with empty
-        learning_result.plan_system_key = ''.join(random.sample(string.ascii_letters, 10))
-        learning_result_get_api_response = learning_result_service.get_specific_result(learning_result)
-        assert_that(learning_result_get_api_response.status_code == 200)
-        assert_that(len(learning_result_get_api_response.json()) == 0)
-        # when plan_system_key has emtpy value
-        learning_result.plan_system_key = ''
-        learning_result_get_api_response = learning_result_service.get_specific_result(learning_result)
-        assert_that(learning_result_get_api_response.status_code == 200)
-        assert_that(len(learning_result_get_api_response.json()) == 0)
-
-    # test when plan_business_key is empty for get specific result
+    # test when business_key is empty for get specific result
     @Test(tags="qa")
-    def test_get_specific_result_with_empty_plan_business_key(self):
+    def test_get_specific_result_with_empty_business_key(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)
-        learning_result_template.plan_business_key = ''
+        learning_result_template.business_key = ''
         learning_result_get_api_response = learning_result_service.get_specific_result(learning_result_template)
         assert_that(learning_result_get_api_response.status_code == 500)
         expected_message = 'PRIMARY KEY column \"plansystemkey\" cannot be restricted as preceding column \"planbusinesskey\" is not restricted'
         assert_that(learning_result_get_api_response.json()['message'].find('expected_message'),
         expected_message + " can't be found in message")
 
-    # test when plan_business_key is empty for get user results
+    # test when product_module is empty for get user results
     @Test(tags="qa")
-    def test_get_user_result_with_empty_plan_business_key(self):
+    def test_get_user_result_with_empty_product_module(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
         # get result api need some same fields, so, use it as template
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetPartition)
-        # construct valid learning result list, with same product_id, student_key, but different plan_business_key
-        # learning_result_list = []
+        # construct valid learning result list, with same product, student_key, but different product_module
         result_number = 10
         for i in range(result_number):
             details_number = random.randint(1, 3)
@@ -644,21 +635,47 @@ class PlanResultTestCases:
                                                                                               details_number)
             learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
             assert_that(learning_result_insert_api_response.status_code == 200)
-            # learning_result_list.append(learning_result)
 
         get_partition_api_response = \
             learning_result_service.get_partition_result_without_limit(learning_result_template)
-        learning_result_template.plan_business_key = ''
+        learning_result_template.product_module = ''
         get_user_without_limit_api_response = \
             learning_result_service.get_user_result_without_limit(learning_result_template)
-        # when plan_business_key is empty, the get user result API will return same result as get partition api
+        # when product_module is empty, the get user result API will return same result as get partition api
         assert_that(get_user_without_limit_api_response.json() == get_partition_api_response.json(),
-                    'get user without limit API return result should be same as get partition api when plan_business_key is empty')
+                    'get user without limit API return result should be same as get partition api when product_module is empty')
         limit_number = random.randint(1, result_number)
         get_user_with_limit_api_response = \
             learning_result_service.get_user_result_with_limit(learning_result_template, limit_number)
         assert_that(get_user_with_limit_api_response.json() == get_partition_api_response.json()[:limit_number],
-                    'get user with limit API return result should be same as get partition api when plan_business_key is empty')
+                    'get user with limit API return result should be same as get partition api when product_module is empty')
+
+
+    # test when business_key is empty for get specific_result
+    @Test(tags="qa")
+    def test_get_specific_result_with_empty_business_key(self):
+        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+
+        # get result api need some same fields, so, use it as template
+        learning_result_template = \
+            LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetUser)
+        # construct valid learning result list, with same product_id, student_key, product_module, but different plan_business_key
+        result_number = 10
+        for i in range(result_number):
+            details_number = random.randint(1, 3)
+            learning_result = LearningResultUtils.construct_learning_result_valid_by_template(learning_result_template,
+                                                                                              details_number)
+            learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
+            assert_that(learning_result_insert_api_response.status_code == 200)
+
+        get_user_without_limit_api_response = \
+            learning_result_service.get_user_result_without_limit(learning_result_template)
+        learning_result_template.business_key = ''
+        get_specific_result_api_response = \
+            learning_result_service.get_specific_result(learning_result_template)
+        # when business_key is empty, the get specific result API will return same result as get user api
+        assert_that(get_specific_result_api_response.json() == get_user_without_limit_api_response.json(),
+                    'get specific result API return result should be same as user without limit api when business_key is empty')
 
     # test when there's no record can be found with the param
     @Test(tags="qa")
