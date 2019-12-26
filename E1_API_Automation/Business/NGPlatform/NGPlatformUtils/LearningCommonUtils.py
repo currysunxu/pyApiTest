@@ -224,22 +224,25 @@ class LearningCommonUtils:
                         error_message = error_message + \
                                         LearningCommonUtils.verify_result_with_entity(actual_detail_dict,
                                                                                       expected_detail_dict)
-            elif entity_class_name == 'LearningPlan' and key == 'systemkey' and expected_field_value is None:
+            elif entity_class_name == 'LearningPlanEntity' and key == 'systemkey' and expected_field_value is None:
                 if actual_key_value is None or actual_key_value == '':
-                    error_message = error_message + " The system_key's value should not be null"
+                    error_message = error_message + " The learning plan's system_key value should not be null"
+            elif entity_class_name == 'LearningResultEntity' and key == 'resultKey' and expected_field_value is None:
+                if actual_key_value is None or actual_key_value == '':
+                    error_message = error_message + " The learning result's resultKey value should not be null"
             else:
-                is_value_same = True
+                is_value_same = False
                 # some times, the actual time don't have 0 in the end, while there's 0 in expected time, e.g.
                 # The actual value is:2019-08-26 16:05:31.82, but the expected value is:2019-08-26 16:05:31.820
                 if 'Time' in key and expected_field_value is not None:
                     time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
                     actual_time = datetime.datetime.strptime(str(actual_key_value), time_format)
                     expected_time = datetime.datetime.strptime(str(expected_field_value), time_format)
-                    if not is_field_exist or not actual_time == expected_time:
-                        is_value_same = False
+                    if is_field_exist and actual_time == expected_time:
+                        is_value_same = True
                 else:
-                    if not is_field_exist or str(actual_key_value) != str(expected_field_value):
-                        is_value_same = False
+                    if is_field_exist and str(actual_key_value) == str(expected_field_value):
+                        is_value_same = True
 
                 if not is_value_same:
                     error_message = error_message + " key:" + key + "'s value in API not as expected in learning svc." \
@@ -269,7 +272,7 @@ class LearningCommonUtils:
                     expected_value = expected_value[index+1:]
                     expected_value = json.loads(expected_value)
 
-                is_value_same = True
+                is_value_same = False
                 if 'Time' in key and actual_value is not None:
                     api_time_format = '%Y-%m-%dT%H:%M:%S.%fZ'
                     actual_time = datetime.datetime.strptime(str(actual_value), api_time_format)
@@ -280,14 +283,14 @@ class LearningCommonUtils:
                         db_time_format = '%Y-%m-%d %H:%M:%S'
                         expected_time = datetime.datetime.strptime(str(expected_value), db_time_format)
 
-                    if not actual_time == expected_time:
-                        is_value_same = False
+                    if actual_time == expected_time:
+                        is_value_same = True
                 elif key == 'details':
                     error_message = error_message + \
                                     LearningCommonUtils.verify_learning_get_api_data_with_db(actual_value,
                                                                                              expected_value)
-                elif str(actual_value) != str(expected_value):
-                    is_value_same = False
+                elif str(actual_value) == str(expected_value):
+                    is_value_same = True
 
                 if key != 'details' and not is_value_same:
                     error_message = error_message + " key:" + key + "'s value in get API not as expected in DB." \

@@ -44,7 +44,7 @@ class LearningResultUtils:
                 is_copy_from_template = False
                 # for these three fields, if template already have value, then, copy them from template,
                 # otherwise, randomly generate value
-                if field_name in ('product_id', 'student_key', 'plan_business_key', 'plan_system_key'):
+                if field_name in ('product', 'student_key', 'product_module', 'business_key'):
                     if learning_result_template is not None:
                         field_value = getattr(learning_result_template, item_key)
                         if field_value is not None:
@@ -90,21 +90,23 @@ class LearningResultUtils:
 
     @staticmethod
     def construct_learning_result_template(learning_result_query_type):
-        product_id = random.choice([1, 2, 4, 8, 16, 32, 64])
+        product = random.choice([1, 2, 4, 8, 16, 32, 64])
         student_key = 'resultInsert|StudentKeyTest|' + ''.join(
             random.sample(string.ascii_letters + string.digits + '|-', 5))
 
-        plan_business_key = None
-        plan_system_key = None
+        product_module = None
+        business_key = None
         if learning_result_query_type != LearningResultQueryType.TypeGetPartition:
-            plan_business_key = 'resultInsert|BusinessKeyTest|' \
-                                + ''.join(random.sample(string.ascii_letters + string.digits + '|-', 5))
+            # plan_business_key = 'resultInsert|BusinessKeyTest|' \
+            #                     + ''.join(random.sample(string.ascii_letters + string.digits + '|-', 5))
+            product_module = random.choice([1, 2, 4, 8, 16, 32])
 
             if learning_result_query_type == LearningResultQueryType.TypeGetSpecific:
-                plan_system_key = uuid.uuid1()
+                business_key = 'resultInsert|BusinessKeyTest|' \
+                                        + ''.join(random.sample(string.ascii_letters + string.digits + '|-', 5))
 
-        learning_result_template = LearningResultEntity(product_id, plan_business_key, student_key)
-        learning_result_template.plan_system_key = plan_system_key
+        learning_result_template = LearningResultEntity(product, student_key, product_module)
+        learning_result_template.business_key = business_key
         return learning_result_template
 
     @staticmethod
@@ -151,7 +153,7 @@ class LearningResultUtils:
     def get_learning_result_field_templates():
         learning_result_field_templates = []
 
-        product_id_field_tempalte = LearningFieldTemplate('productId', FieldType.TypeInt, True)
+        product_id_field_tempalte = LearningFieldTemplate('product', FieldType.TypeInt, True)
         # product_id_field_tempalte.min_value = 1
         product_id_field_tempalte.min_error_code = '4402'
         # product_id_field_tempalte.max_value = 512
@@ -159,14 +161,14 @@ class LearningResultUtils:
         product_id_field_tempalte.content_format = [1, 2, 4, 8, 16, 32, 64]
 
         regular_expression = '^[A-Za-z0-9|-]+$'
-        plan_business_key_field_tempalte = LearningFieldTemplate('planBusinessKey', FieldType.TypeString, True)
+        plan_business_key_field_tempalte = LearningFieldTemplate('businessKey', FieldType.TypeString, True)
         plan_business_key_field_tempalte.min_value = 1
         plan_business_key_field_tempalte.min_error_code = '4404'
         plan_business_key_field_tempalte.max_value = 512
         plan_business_key_field_tempalte.content_format = regular_expression
 
-        plan_system_key_field_tempalte = LearningFieldTemplate('planSystemKey', FieldType.TypeUUID, True)
-        plan_system_key_field_tempalte.min_error_code = '4419'
+        # plan_system_key_field_tempalte = LearningFieldTemplate('planSystemKey', FieldType.TypeUUID, True)
+        # plan_system_key_field_tempalte.min_error_code = '4419'
 
         student_key_field_tempalte = LearningFieldTemplate('studentKey', FieldType.TypeString, True)
         student_key_field_tempalte.min_value = 1
@@ -174,26 +176,26 @@ class LearningResultUtils:
         student_key_field_tempalte.max_value = 128
         student_key_field_tempalte.content_format = regular_expression
 
-        plan_type_field_tempalte = LearningFieldTemplate('planType', FieldType.TypeInt, True)
+        plan_type_field_tempalte = LearningFieldTemplate('productModule', FieldType.TypeInt, True)
         # plan_type_field_tempalte.min_value = 1
         plan_type_field_tempalte.min_error_code = '4405'
         # plan_type_field_tempalte.max_value = 512
         # plan_type_field_tempalte.max_error_code = '4406'
         plan_type_field_tempalte.content_format = [1, 2, 4, 8, 16, 32]
 
-        trace_key_field_tempalte = LearningFieldTemplate('traceKey', FieldType.TypeUUID, True)
-        trace_key_field_tempalte.min_error_code = '4423'
+        # trace_key_field_tempalte = LearningFieldTemplate('traceKey', FieldType.TypeUUID, True)
+        # trace_key_field_tempalte.min_error_code = '4423'
 
-        route_field_tempalte = LearningFieldTemplate('route', FieldType.TypeString, False)
-        route_field_tempalte.min_value = 1
-        route_field_tempalte.min_error_code = '4407'
-        route_field_tempalte.max_value = 512
+        route_field_tempalte = LearningFieldTemplate('route', FieldType.TypeObject, False)
+        # route_field_tempalte.min_value = 1
+        # route_field_tempalte.min_error_code = '4407'
+        # route_field_tempalte.max_value = 512
 
-        atomic_key_field_tempalte = LearningFieldTemplate('atomicKey', FieldType.TypeString, False)
-        atomic_key_field_tempalte.min_value = 1
-        atomic_key_field_tempalte.min_error_code = '4422'
-        atomic_key_field_tempalte.max_value = 512
-        atomic_key_field_tempalte.content_format = regular_expression
+        # atomic_key_field_tempalte = LearningFieldTemplate('atomicKey', FieldType.TypeString, False)
+        # atomic_key_field_tempalte.min_value = 1
+        # atomic_key_field_tempalte.min_error_code = '4422'
+        # atomic_key_field_tempalte.max_value = 512
+        # atomic_key_field_tempalte.content_format = regular_expression
 
         expected_score_field_tempalte = LearningFieldTemplate('expectedScore', FieldType.TypeInt, False)
 
@@ -210,19 +212,31 @@ class LearningResultUtils:
         details_field_tempalte.min_value = 1
         details_field_tempalte.min_error_code = '4425'
 
+        duration_field_tempalte = LearningFieldTemplate('duration', FieldType.TypeInt, False)
+
+        time_format_expression = '%Y-%m-%dT%H:%M:%S.%fZ'
+        start_time_field_tempalte = LearningFieldTemplate('startTime', FieldType.TypeDate, False)
+        start_time_field_tempalte.content_format = time_format_expression
+
+        end_time_field_tempalte = LearningFieldTemplate('endTime', FieldType.TypeDate, False)
+        end_time_field_tempalte.content_format = time_format_expression
+
         learning_result_field_templates.append(product_id_field_tempalte)
         learning_result_field_templates.append(plan_business_key_field_tempalte)
-        learning_result_field_templates.append(plan_system_key_field_tempalte)
+        # learning_result_field_templates.append(plan_system_key_field_tempalte)
         learning_result_field_templates.append(student_key_field_tempalte)
         learning_result_field_templates.append(plan_type_field_tempalte)
-        learning_result_field_templates.append(trace_key_field_tempalte)
+        # learning_result_field_templates.append(trace_key_field_tempalte)
         learning_result_field_templates.append(route_field_tempalte)
-        learning_result_field_templates.append(atomic_key_field_tempalte)
+        # learning_result_field_templates.append(atomic_key_field_tempalte)
         learning_result_field_templates.append(expected_score_field_tempalte)
         learning_result_field_templates.append(actual_score_field_tempalte)
         learning_result_field_templates.append(created_by_field_tempalte)
         learning_result_field_templates.append(extension_field_tempalte)
         learning_result_field_templates.append(details_field_tempalte)
+        learning_result_field_templates.append(duration_field_tempalte)
+        learning_result_field_templates.append(start_time_field_tempalte)
+        learning_result_field_templates.append(end_time_field_tempalte)
 
         return learning_result_field_templates
 
