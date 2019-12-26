@@ -1,35 +1,38 @@
 
 class LearningResultEntity:
-    def __init__(self, product_id, plan_business_key, student_key):
-        self.__product_id = product_id
-        self.__plan_business_key = plan_business_key
+    def __init__(self, product, student_key, product_module):
+        self.__product = product
         self.__student_key = student_key
-        self.__plan_system_key = None
-        self.__plan_type = None
-        self.__trace_key = None
+        self.__product_module = product_module
+        self.__business_key = None
+        # self.__plan_system_key = None
+        # self.__trace_key = None
         self.__route = None
-        self.__atomic_key = None
+        # self.__atomic_key = None
         self.__expected_score = None
         self.__actual_score = None
         self.__created_by = None
         self.__extension = None
         self.__details = None
+        self.__duration = None
+        self.__start_time = None
+        self.__end_time = None
 
     @property
-    def product_id(self):
-        return self.__product_id
+    def product(self):
+        return self.__product
 
-    @product_id.setter
-    def product_id(self, product_id):
-        self.__product_id = product_id
+    @product.setter
+    def product(self, product):
+        self.__product = product
 
     @property
-    def plan_business_key(self):
-        return self.__plan_business_key
+    def business_key(self):
+        return self.__business_key
 
-    @plan_business_key.setter
-    def plan_business_key(self, plan_business_key):
-        self.__plan_business_key = plan_business_key
+    @business_key.setter
+    def business_key(self, business_key):
+        self.__business_key = business_key
 
     @property
     def student_key(self):
@@ -39,29 +42,29 @@ class LearningResultEntity:
     def student_key(self, student_key):
         self.__student_key = student_key
 
-    @property
-    def plan_system_key(self):
-        return self.__plan_system_key
-
-    @plan_system_key.setter
-    def plan_system_key(self, plan_system_key):
-        self.__plan_system_key = plan_system_key
-
-    @property
-    def plan_type(self):
-        return self.__plan_type
-
-    @plan_type.setter
-    def plan_type(self, plan_type):
-        self.__plan_type = plan_type
+    # @property
+    # def plan_system_key(self):
+    #     return self.__plan_system_key
+    #
+    # @plan_system_key.setter
+    # def plan_system_key(self, plan_system_key):
+    #     self.__plan_system_key = plan_system_key
 
     @property
-    def trace_key(self):
-        return self.__trace_key
+    def product_module(self):
+        return self.__product_module
 
-    @trace_key.setter
-    def trace_key(self, trace_key):
-        self.__trace_key = trace_key
+    @product_module.setter
+    def product_module(self, product_module):
+        self.__product_module = product_module
+
+    # @property
+    # def trace_key(self):
+    #     return self.__trace_key
+    #
+    # @trace_key.setter
+    # def trace_key(self, trace_key):
+    #     self.__trace_key = trace_key
 
     @property
     def route(self):
@@ -71,13 +74,13 @@ class LearningResultEntity:
     def route(self, route):
         self.__route = route
 
-    @property
-    def atomic_key(self):
-        return self.__atomic_key
-
-    @atomic_key.setter
-    def atomic_key(self, atomic_key):
-        self.__atomic_key = atomic_key
+    # @property
+    # def atomic_key(self):
+    #     return self.__atomic_key
+    #
+    # @atomic_key.setter
+    # def atomic_key(self, atomic_key):
+    #     self.__atomic_key = atomic_key
 
     @property
     def expected_score(self):
@@ -118,4 +121,28 @@ class LearningResultEntity:
     @details.setter
     def details(self, details):
         self.__details = details
+
+    @property
+    def duration(self):
+        return self.__duration
+
+    @duration.setter
+    def duration(self, duration):
+        self.__duration = duration
+
+    @property
+    def start_time(self):
+        return self.__start_time
+
+    @start_time.setter
+    def start_time(self, start_time):
+        self.__start_time = start_time
+
+    @property
+    def end_time(self):
+        return self.__end_time
+
+    @end_time.setter
+    def end_time(self, end_time):
+        self.__end_time = end_time
 
