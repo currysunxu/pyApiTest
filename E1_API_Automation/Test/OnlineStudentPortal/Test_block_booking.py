@@ -24,7 +24,7 @@ class TestBlockBooking():
     # os.environ["test_env"] = "QA"
 
     if ENVIRONMENT == Environment.QA:
-        host = "https://e1svc-qa.ef.cn"
+        host = "https://study-qa.ef.cn"
         user_info_HF = {
             "UserName": "hf2.cn.03",
             "Password": "12345",
@@ -45,7 +45,7 @@ class TestBlockBooking():
 
 
     if ENVIRONMENT == Environment.STAGING:
-        host = "https://e1svc-staging.ef.cn"
+        host = "https://study-staging.ef.cn"
         user_info_HF = {
             "UserName": "hf2.cn.01",
             "Password": "12345",
