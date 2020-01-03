@@ -100,7 +100,7 @@ elif os.environ['environment'] == 'STG':
     TPI_ENVIRONMENT = TPIEnvironment.STAGING
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING
     OMNI_ENVIRONMENT = OMNIEnvironment.STAGING
-    env_key = 'STAGING'
+    env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
         "User": "TBV3",
