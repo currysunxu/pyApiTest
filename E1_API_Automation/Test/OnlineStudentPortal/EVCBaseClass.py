@@ -63,7 +63,8 @@ class EVCBase():
             teacher_id = os.environ['Teacher_Id']
         except:
             teacher_id = "10703777"
-        host = "https://e1svc-qa.ef.cn"
+        host = "https://study-qa.ef.cn"
+        svcHost = "https://e1svc-qa.ef.cn"
         SIS_SERVICE = 'https://internal-e1-evc-booking-qa-cn.ef.com'
         user_info = {
             "UserName": "hf2.cn.auto1",
@@ -109,7 +110,8 @@ class EVCBase():
         except:
 
             teacher_id = "10369666"
-        host = "https://e1svc-staging.ef.cn"
+        host = "https://study-staging.ef.cn"
+        svcHost = "https://e1svc-staging.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-stg-cn.ef.com'
         user_info = {
             "UserName": "hf2.cn.02",
@@ -138,9 +140,9 @@ class EVCBase():
             "AvatarUrl": "https://staging.englishtown.cn/opt-media/?id=79f51ea2-cf76-42ca-9565-a8d41206c027"
         }
         after_report_info = {
-            "Student_User_Name": "hf2.cn.auto2",
+            "Student_User_Name": "hf2.cn.01",
             "Student_Password": "12345",
-            "ClassId": "343793"
+            "ClassId": "352350"
         }
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
@@ -156,7 +158,8 @@ class EVCBase():
         except:
 
             teacher_id = "10369666"
-        host = "https://e1svc.ef.cn"
+        host = "https://study.ef.cn"
+        svcHost = "https://e1svc.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-cn.ef.com'
         user_info = {
             "UserName": "hf2.cn.01",

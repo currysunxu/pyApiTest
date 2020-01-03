@@ -101,3 +101,11 @@ class Moutai():
             return self.request_session.request("put", url_combined, verify=False,json=json, headers=self.headers, **kwargs)
         else:
             return requests.put(url_combined, json=json, verify=False, headers=self.headers, **kwargs)
+
+    def patch(self, url, json=None, **kwargs):
+        url_combined = self.host + url
+        if self.token is None and self.request_session is not None:
+            return self.request_session.request("patch", url_combined, verify=False, json=json, headers=self.headers,
+                                                **kwargs)
+        else:
+            return requests.patch(url_combined, json=json, verify=False, headers=self.headers, **kwargs)
