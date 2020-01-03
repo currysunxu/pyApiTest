@@ -130,7 +130,8 @@ class SmallStarTestCases(SmallStarBase):
     @Test()
     def synchronize_all_historical_activity_answer_newapi(self):
         response = self.small_star_service.synchronize_small_star_student_activity_answer_newapi(self.current_book_key,
-                                                                                                 self.course_plan_key)
+                                                                                                 self.course_plan_key,
+                                                                                                 amount=AMOUNT)
         assert_that(len(jmespath.search('Upserts', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].ActivityCourseKey', response.json())) != 0)
         assert_that(len(jmespath.search('Upserts[*].ActivityKey', response.json())) != 0)
@@ -176,7 +177,7 @@ class SmallStarTestCases(SmallStarBase):
     def check_content_with_last_stamp_and_key(self, response, synchronize_function, item_to_be_checked):
         last_key, last_stamp = self.get_last_stamp_and_key(response)
         second_response = synchronize_function(self.current_book_key, self.course_plan_key,
-                                               #amount=AMOUNT,
+                                               amount=AMOUNT,
                                                last_synchronized_key=last_key,
                                                last_Synchronized_Stamp=last_stamp)
         assert_that(len(jmespath.search('Upserts[*].%s' % item_to_be_checked, second_response.json())) != 0)

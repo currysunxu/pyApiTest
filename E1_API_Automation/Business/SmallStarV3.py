@@ -116,11 +116,12 @@ class SmallStarService():
         return self.mou_tai.post("/api/v2/HistoricalActivityAnswer/SynchronizeAll/", json=body)
 
     def synchronize_small_star_student_activity_answer_newapi(self, book_key, course_plan_key, upserts_only=True,
-                                                              last_Synchronized_Stamp=None, last_synchronized_key=None):
+                                                              amount=123, last_Synchronized_Stamp=None, last_synchronized_key=None):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
-            "UpsertsOnly": upserts_only
+            "UpsertsOnly": upserts_only,
+            "Amount": amount
         }
 
         if last_synchronized_key and last_synchronized_key is not None:
