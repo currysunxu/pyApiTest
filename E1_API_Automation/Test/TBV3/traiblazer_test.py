@@ -1,11 +1,10 @@
 import jmespath
 from hamcrest import assert_that, equal_to, contains_string
-
 from ptest.decorator import TestClass, Test
-from ...Lib.HamcrestMatcher import match_to
-from ...Lib.HamcrestExister import exist
 
 from .traiblazer_base import TraiblazerBaseClass
+from ...Lib.HamcrestExister import exist
+from ...Lib.HamcrestMatcher import match_to
 
 
 @TestClass()
@@ -37,13 +36,13 @@ class TBTestCases(TraiblazerBaseClass):
         activity_contents = self.tb_test.course_node_synchronize(self.tb_test.active_book, self.tb_test.course_plan_key)
         assert_that(activity_contents.status_code == 200)
 
-    @Test(tags="qa, stg, live" )
+    @Test(tags="qa, stg, live")
     def test_get_privacy_policy(self):
         privacy_content = self.tb_test.get_privacy_content()
         assert_that(privacy_content.status_code == 200)
         assert_that(privacy_content.json(), exist("LatestPrivacyPolicyDocumentResult"))
 
-    @Test(tags="qa, stg, live" )
+    @Test(tags="qa, stg, live")
     def test_save_privacy(self):
         save_result = self.tb_test.save_privacy(2, 3)
         assert_that(save_result.status_code == 204)
@@ -178,6 +177,13 @@ class TBTestCases(TraiblazerBaseClass):
     def test_get_all_book(self):
         response = self.tb_test.get_all_books()
         assert_that(response.status_code == 200)
+
+    @Test(tags="qa, stg, live")
+    def test_get_resource(self):
+        response = self.tb_test.get_all_books()
+        resource_id = str(response.json()[0]['Body']['thumbnail']['image']).split('//')[1]
+        result = self.tb_test.get_resource(resource_id)
+        assert_that(result.status_code == 200)
 
     @Test(tags="qa,  stg, live")
     def test_get_all_book_schema(self):
