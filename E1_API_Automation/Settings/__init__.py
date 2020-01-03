@@ -100,7 +100,7 @@ elif os.environ['environment'] == 'STG':
     TPI_ENVIRONMENT = TPIEnvironment.STAGING
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING
     OMNI_ENVIRONMENT = OMNIEnvironment.STAGING
-    env_key = 'Staging'
+    env_key = 'STAGING'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
         "User": "TBV3",
@@ -127,7 +127,7 @@ elif os.environ['environment'] == 'LIVE':
     TPI_ENVIRONMENT = TPIEnvironment.LIVE
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
-    env_key = 'Live'
+    env_key = 'LIVE'
     DATABASE = {
         "Server": "",
         "User": "",
