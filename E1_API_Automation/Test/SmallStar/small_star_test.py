@@ -143,6 +143,21 @@ class SmallStarTestCases(SmallStarBase):
                                                    'Key')
 
     @Test()
+    def synchronize_all_historical_unit_quiz_answer(self):
+        response = self.small_star_service.synchronize_small_star_student_unit_quiz_answer(self.current_book_key,
+                                                                                           self.course_plan_key,
+                                                                                           amount=AMOUNT)
+        assert_that(len(jmespath.search('Upserts', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].ActivityCourseKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].ActivityKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].QuestionKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].SubmitIdentifier', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].Key', response.json())) != 0)
+        self.check_content_with_last_stamp_and_key(response,
+                                                   self.small_star_service.synchronize_small_star_student_unit_quiz_answer,
+                                                   'Key')
+
+    @Test()
     def course_unlock(self):
         response = self.small_star_service.get_small_star_unlock_course_keys(self.current_book_key)
         assert_that(len(jmespath.search('[*]', response.json())) != 0)
@@ -165,12 +180,13 @@ class SmallStarTestCases(SmallStarBase):
     def activity_answer_new_api(self):
         self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
             self.current_book_key).json()
-        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers_newapi(self.product_code,
-                                                                                                  self.group_id,
-                                                                                                  self.current_book_key,
-                                                                                                  self.un_lock_lesson_keys[0],
-                                                                                                  self.course_plan_key,
-                                                                                                  self.user_id, True)
+        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers_newapi(
+            self.product_code,
+            self.group_id,
+            self.current_book_key,
+            self.un_lock_lesson_keys[0],
+            self.course_plan_key,
+            self.user_id, True)
         assert_that(response.json(), exist("SubmitIdentifier"))
         assert_that(response.json(), exist("AnswerKeys"))
 
@@ -192,11 +208,12 @@ class SmallStarTestCases(SmallStarBase):
         self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
             self.current_book_key).json()
         response, submit_unit_quiz_key = self.small_star_service.submit_small_star_unit_quiz_answers(self.product_code,
-                                                                                                  self.group_id,
-                                                                                                  self.current_book_key,
-                                                                                                  self.un_lock_lesson_keys[0],
-                                                                                                  self.course_plan_key,
-                                                                                                  self.user_id, True)
+                                                                                                     self.group_id,
+                                                                                                     self.current_book_key,
+                                                                                                     self.un_lock_lesson_keys[
+                                                                                                         0],
+                                                                                                     self.course_plan_key,
+                                                                                                     self.user_id, True)
         assert_that(response.json(), exist("SubmitIdentifier"))
         assert_that(response.json(), exist("AnswerKeys"))
 
@@ -207,7 +224,8 @@ class SmallStarTestCases(SmallStarBase):
         response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code,
                                                                                                   self.group_id,
                                                                                                   self.current_book_key,
-                                                                                                  self.un_lock_lesson_keys[0],
+                                                                                                  self.un_lock_lesson_keys[
+                                                                                                      0],
                                                                                                   self.course_plan_key,
                                                                                                   self.user_id, True)
 
