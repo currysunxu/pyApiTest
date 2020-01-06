@@ -87,6 +87,7 @@ class Hf35BffTest(HfBffTestBase):
         self.setter_learning_result(learning_result_entity, bff_data_obj)
         result_response = self.get_learning_result_response(learning_result_entity)
         assert_that(result_response.status_code, equal_to(200))
+        assert_that(submit_response.text[1:-1],equal_to(result_response.json()[0]["resultKey"]))
         learning_details_entity = LearningResultDetailEntity(None)
         self.setter_learning_result_details(learning_details_entity, bff_data_obj)
         self.check_bff_compare_learning_result(result_response, learning_result_entity, learning_details_entity)
