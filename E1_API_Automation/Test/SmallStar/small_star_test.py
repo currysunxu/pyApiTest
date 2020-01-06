@@ -2,9 +2,7 @@ import jmespath
 from hamcrest import assert_that
 from ptest.decorator import TestClass, Test
 
-from E1_API_Automation.Business.SchoolCourse import CourseBook
 from E1_API_Automation.Lib.HamcrestExister import exist
-from E1_API_Automation.Settings import ENVIRONMENT, Environment
 from E1_API_Automation.Test.SmallStar.SmallStarBase import SmallStarBase
 
 AMOUNT = 500  # 210000#2147483617
@@ -12,6 +10,12 @@ AMOUNT = 500  # 210000#2147483617
 
 @TestClass()
 class SmallStarTestCases(SmallStarBase):
+
+    @Test()
+    def test_get_privacy_policy(self):
+        privacy_content = self.small_star_service.get_student_privacy_policy_content_for_mobile(self.culture_code)
+        assert_that(privacy_content.status_code == 200)
+        assert_that(privacy_content.json(), exist("LatestPrivacyPolicyDocumentResult"))
 
     @Test()
     def get_content(self):
@@ -124,6 +128,36 @@ class SmallStarTestCases(SmallStarBase):
                                                    'Key')
 
     @Test()
+    def synchronize_all_historical_activity_answer_newapi(self):
+        response = self.small_star_service.synchronize_small_star_student_activity_answer_newapi(self.current_book_key,
+                                                                                                 self.course_plan_key,
+                                                                                                 amount=AMOUNT)
+        assert_that(len(jmespath.search('Upserts', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].ActivityCourseKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].ActivityKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].QuestionKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].SubmitIdentifier', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].Key', response.json())) != 0)
+        self.check_content_with_last_stamp_and_key(response,
+                                                   self.small_star_service.synchronize_small_star_student_activity_answer_newapi,
+                                                   'Key')
+
+    @Test()
+    def synchronize_all_historical_unit_quiz_answer(self):
+        response = self.small_star_service.synchronize_small_star_student_unit_quiz_answer(self.current_book_key,
+                                                                                           self.course_plan_key,
+                                                                                           amount=AMOUNT)
+        assert_that(len(jmespath.search('Upserts', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].ActivityCourseKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].ActivityKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].QuestionKey', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].SubmitIdentifier', response.json())) != 0)
+        assert_that(len(jmespath.search('Upserts[*].Key', response.json())) != 0)
+        self.check_content_with_last_stamp_and_key(response,
+                                                   self.small_star_service.synchronize_small_star_student_unit_quiz_answer,
+                                                   'Key')
+
+    @Test()
     def course_unlock(self):
         response = self.small_star_service.get_small_star_unlock_course_keys(self.current_book_key)
         assert_that(len(jmespath.search('[*]', response.json())) != 0)
@@ -131,7 +165,7 @@ class SmallStarTestCases(SmallStarBase):
     @Test()
     def activity_answer(self):
         self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
-        self.current_book_key).json()
+            self.current_book_key).json()
         response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code,
                                                                                                   self.group_id,
                                                                                                   self.current_book_key,
@@ -145,14 +179,14 @@ class SmallStarTestCases(SmallStarBase):
     @Test()
     def activity_answer_new_api(self):
         self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
-        self.current_book_key).json()
-        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers_newapi(self.product_code,
-                                                                                                  self.group_id,
-                                                                                                  self.current_book_key,
-                                                                                                  self.un_lock_lesson_keys[
-                                                                                                      0],
-                                                                                                  self.course_plan_key,
-                                                                                                  self.user_id, True)
+            self.current_book_key).json()
+        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers_newapi(
+            self.product_code,
+            self.group_id,
+            self.current_book_key,
+            self.un_lock_lesson_keys[0],
+            self.course_plan_key,
+            self.user_id, True)
         assert_that(response.json(), exist("SubmitIdentifier"))
         assert_that(response.json(), exist("AnswerKeys"))
 
@@ -170,8 +204,23 @@ class SmallStarTestCases(SmallStarBase):
         return last_key, last_stamp
 
     @Test()
+    def unit_quiz_answer(self):
+        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
+            self.current_book_key).json()
+        response, submit_unit_quiz_key = self.small_star_service.submit_small_star_unit_quiz_answers(self.product_code,
+                                                                                                     self.group_id,
+                                                                                                     self.current_book_key,
+                                                                                                     self.un_lock_lesson_keys[
+                                                                                                         0],
+                                                                                                     self.course_plan_key,
+                                                                                                     self.user_id, True)
+        assert_that(response.json(), exist("SubmitIdentifier"))
+        assert_that(response.json(), exist("AnswerKeys"))
+
+    @Test()
     def synchronize_activity_answer(self):
-        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(self.current_book_key).json()
+        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
+            self.current_book_key).json()
         response, submit_activity_key = self.small_star_service.submit_small_star_student_answers(self.product_code,
                                                                                                   self.group_id,
                                                                                                   self.current_book_key,
@@ -191,5 +240,56 @@ class SmallStarTestCases(SmallStarBase):
 
         result = jmespath.search("Upserts[?ActivityKey=='{}']".format(submit_activity_key[0]),
                                  historical_activity_answer.json())[-1]
+
+        assert_that(result['TotalScore'] == result['Score'])
+
+    @Test()
+    def synchronize_activity_answer_newapi(self):
+        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
+            self.current_book_key).json()
+        response, submit_activity_key = self.small_star_service.submit_small_star_student_answers_newapi(
+            self.product_code,
+            self.group_id,
+            self.current_book_key,
+            self.un_lock_lesson_keys[0],
+            self.course_plan_key,
+            self.user_id, True)
+
+        historical_activity_answer = self.small_star_service.synchronize_small_star_student_activity_answer_newapi(
+            self.current_book_key,
+            self.course_plan_key)
+
+        activity_keys = jmespath.search('Upserts[*].ActivityKey', historical_activity_answer.json())
+
+        assert_that(submit_activity_key[0] in activity_keys)
+
+        result = jmespath.search("Upserts[?ActivityKey=='{}']".format(submit_activity_key[0]),
+                                 historical_activity_answer.json())[-1]
+
+        assert_that(result['TotalScore'] == result['Score'])
+
+    @Test()
+    def synchronize_unit_quiz_answer(self):
+        self.un_lock_lesson_keys = self.small_star_service.get_small_star_unlock_course_keys(
+            self.current_book_key).json()
+        response, submit_unit_quiz_key = self.small_star_service.submit_small_star_unit_quiz_answers(
+            self.product_code,
+            self.group_id,
+            self.current_book_key,
+            self.un_lock_lesson_keys[0],
+            self.course_plan_key,
+            self.user_id, True)
+
+        historical_quiz_answer = self.small_star_service.synchronize_small_star_student_unit_quiz_answer(
+            self.current_book_key,
+            self.course_plan_key,
+            amount=2147483617)
+
+        activity_keys = jmespath.search('Upserts[*].ActivityKey', historical_quiz_answer.json())
+
+        assert_that(submit_unit_quiz_key[0] in activity_keys)
+
+        result = jmespath.search("Upserts[?ActivityKey=='{}']".format(submit_unit_quiz_key[0]),
+                                 historical_quiz_answer.json())[-1]
 
         assert_that(result['TotalScore'] == result['Score'])
