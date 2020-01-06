@@ -127,7 +127,7 @@ elif os.environ['environment'] == 'LIVE':
     TPI_ENVIRONMENT = TPIEnvironment.LIVE
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
-    env_key = 'LIVE'
+    env_key = 'Live'
     DATABASE = {
         "Server": "",
         "User": "",
