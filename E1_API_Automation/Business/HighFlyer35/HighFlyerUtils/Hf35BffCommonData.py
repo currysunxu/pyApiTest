@@ -28,7 +28,7 @@ class Hf35BffCommonData:
         :param detail_num: default details is 3
         """
         self.attempt_json = self.create_attempt_json_body(activity_num,detail_num)
-        self.plan_business = self.get_plan_business()
+        self.business_key = self.get_business_key()
         self.previous_attempt = self.attempt_json
 
     def create_attempt_json_body(self,activity_num,detail_num):
@@ -44,23 +44,23 @@ class Hf35BffCommonData:
         bff_entity_dict = Hf35BffUtils.construct_bff_entity(activity_list)
         return bff_entity_dict
 
-    def get_plan_business(self):
+    def get_business_key(self):
         """
-        join plan bussiness
-        :return: plan bussiness
+        join bussiness key
+        :return: bussiness key
         """
         courseContentId = self.get_attempt_body()["courseContentId"]
         bookContentId = self.get_attempt_body()["bookContentId"]
         unitContentId = self.get_attempt_body()["unitContentId"]
         lessonContentId = self.get_attempt_body()["lessonContentId"]
         learningUnitContentId = self.get_attempt_body()["learningUnitContentId"]
-        plan_business_list = []
-        plan_business_list.append(courseContentId)
-        plan_business_list.append(bookContentId)
-        plan_business_list.append(unitContentId)
-        plan_business_list.append(lessonContentId)
-        plan_business_list.append(learningUnitContentId)
-        return plan_business_list
+        business_keys = []
+        business_keys.append(courseContentId)
+        business_keys.append(bookContentId)
+        business_keys.append(unitContentId)
+        business_keys.append(lessonContentId)
+        business_keys.append(learningUnitContentId)
+        return business_keys
 
     def get_attempt_body(self):
         return self.attempt_json

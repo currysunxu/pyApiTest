@@ -82,19 +82,12 @@ class Hf35BffTest(HfBffTestBase):
         print("Bff submit response is : %s" % (submit_response.text))
         assert_that(submit_response.status_code, equal_to(200))
         assert_that(not submit_response.text == "")
-        # check learning plan
-        learning_plan_entity = LearningPlanEntity(None, None, None, None)
-        self.setter_learning_plan(learning_plan_entity, bff_data_obj)
-        plan_response = self.get_learning_plan_response(learning_plan_entity)
-        plan_system = plan_response.json()[0]["systemKey"]
-        print("Bff submit response %s should be same with plan system key : %s" % (submit_response.text, plan_system))
-        assert_that(submit_response.text[1:-1], equal_to(plan_system))
-        self.check_bff_compare_learning_plan(plan_response, learning_plan_entity)
         # check learning result
         learning_result_entity = LearningResultEntity(None, None, None)
-        self.setter_learning_result(learning_result_entity, bff_data_obj, plan_system)
+        self.setter_learning_result(learning_result_entity, bff_data_obj)
         result_response = self.get_learning_result_response(learning_result_entity)
         assert_that(result_response.status_code, equal_to(200))
+        assert_that(submit_response.text[1:-1],equal_to(result_response.json()[0]["resultKey"]))
         learning_details_entity = LearningResultDetailEntity(None)
         self.setter_learning_result_details(learning_details_entity, bff_data_obj)
         self.check_bff_compare_learning_result(result_response, learning_result_entity, learning_details_entity)

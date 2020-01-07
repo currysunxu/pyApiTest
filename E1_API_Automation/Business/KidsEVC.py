@@ -19,6 +19,13 @@ class KidsEVCService():
     def login(self, user_name, password):
         auth = AuthService(getattr(AuthEnvironment,env_key))
         id_token = auth.login(user_name, password).json()['idToken']
+        headers = {"X-EF-TOKEN": id_token, "Content-Type": "application/json"}
+        self.mou_tai.set_header(headers)
+        return id_token
+
+    def login_get_v3_token(self, user_name, password):
+        auth = AuthService(getattr(AuthEnvironment, env_key))
+        id_token = auth.login(user_name, password).json()['idToken']
         ba_token = auth.get_v3_token(id_token)
         headers = {"X-BA-TOKEN": ba_token, "Content-Type": "application/json"}
         self.mou_tai.set_header(headers)
@@ -64,7 +71,9 @@ class KidsEVCService():
         return self.mou_tai.put("/ksdsvc/api/v2/classes/lesson", json=body)
 
     def sign_out(self):
-        return self.mou_tai.delete(url="/api/v1/Token/")
+        auth = AuthService(getattr(AuthEnvironment, env_key))
+        auth.sign_out()
+        # return self.mou_tai.delete(url="/api/v1/Token/")
 
     def block_booking_teacher_search(self, start_date_time, end_date_time, course_type, unit_number, lesson_number):
         random_num = random.randint(0, 23)
@@ -122,13 +131,13 @@ class KidsEVCService():
     def duplicate_block_booking(self, json):
         return self.mou_tai.post(url="/ksdsvc/api/v2/block-booking", json=json)
 
-    def save_policy_agreement(self):
+    def save_policy_agreement(self, ba_token, host):
         json = {"product":"8","privacyDocumentId":3}
-        return self.mou_tai.post(url = "/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement", json = json)
-    
+        return requests.post(url= host+"/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement", json=json, headers={"Content-Type": "application/json", "X-BA-TOKEN": ba_token})
+
+
     def student_evc_profile(self, host):
         student_id = jmespath.search('userInfo.userId',self.get_user_profile().json())
-        print(student_id)
         response = requests.get(url=host +'/api/v1/students/Kids_{0}/evc-profile'.format(student_id), verify=False, headers={"Content-Type": "application/json"})
 
         return response
@@ -156,3 +165,12 @@ class KidsEVCService():
 
     def get_app_download_url(self):
         return self.mou_tai.get("/ksdsvc/api/v2/classroom/app-info")
+
+    def reschedule(self, class_id, teacher_id, start_stamp, end_stamp):
+        body = [
+
+            {"op": "replace", "path": "/teacherId", "value": teacher_id},
+            {"op": "replace", "path": "/classTime/startDateTimeUtc", "value": start_stamp},
+            {"op": "replace", "path": "/classTime/endDateTimeUtc", "value": end_stamp}
+        ]
+        return self.mou_tai.patch("/ksdsvc/api/v2/classes/"+str(class_id), json=body)

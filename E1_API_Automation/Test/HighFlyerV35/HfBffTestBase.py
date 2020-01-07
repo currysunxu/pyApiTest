@@ -39,14 +39,14 @@ class HfBffTestBase:
 		assert_that(plan_response.json()[0]["endTime"], equal_to(leanring_plan_entity.end_time))
 
 	def check_bff_compare_learning_result(self, result_response, learning_result_entity, learning_details_entity):
-		assert_that(result_response.json()[0]["productId"], equal_to(learning_result_entity.product))
-		assert_that(result_response.json()[0]["planType"], equal_to(learning_result_entity.product_module))
+		assert_that(result_response.json()[0]["product"], equal_to(learning_result_entity.product))
+		assert_that(result_response.json()[0]["productModule"], equal_to(learning_result_entity.product_module))
 		assert_that(int(result_response.json()[0]["studentKey"]), equal_to(int(learning_result_entity.student_key)))
-		assert_that(result_response.json()[0]["atomicKey"], equal_to(learning_result_entity.atomic_key))
-		assert_that(result_response.json()[0]["planBusinessKey"], equal_to(learning_result_entity.business_key))
-		assert_that(result_response.json()[0]["planSystemKey"], equal_to(learning_result_entity.plan_system_key))
+		assert_that(result_response.json()[0]["businessKey"], equal_to(learning_result_entity.business_key))
 		assert_that(result_response.json()[0]["expectedScore"], equal_to(learning_result_entity.expected_score))
 		assert_that(result_response.json()[0]["actualScore"], equal_to(learning_result_entity.actual_score))
+		assert_that(result_response.json()[0]["startTime"], equal_to(learning_result_entity.start_time))
+		assert_that(result_response.json()[0]["endTime"], equal_to(learning_result_entity.end_time))
 		# check details object
 		index = 0
 		for details in learning_result_entity.details:
@@ -90,7 +90,7 @@ class HfBffTestBase:
 
 	def get_learning_result_response(self, learning_result_entity):
 		learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
-		result_response = learning_result_service.get_user_result_without_limit(learning_result_entity)
+		result_response = learning_result_service.get_specific_result(learning_result_entity)
 		print(result_response.json())
 		return result_response
 
@@ -112,11 +112,13 @@ class HfBffTestBase:
 		#Todo need to refactor dynamicly for groupId after add corresponding api in Homework Service
 		learning_plan_entity.route = "treeRevision=%s|%s" % (bff_data_obj.get_attempt_body()["treeRevision"],"groupId=null")
 
-	def setter_learning_result(self,learning_result_entity,bff_data_obj,plan_system):
+	def setter_learning_result(self,learning_result_entity,bff_data_obj):
 		"""set all fields in learning_result_entity
 		:param learning_result_entity: all_question_expected_scores and all_question_actual_scores are both list type
 		:param bff_data_obj: json test data object
 		:param plan_system: from learning plan response
+		learning_result_entity.product_module = 1 means 'homework'
+		learning_result_entity.product = 2 means 'high flyers'
 		"""
 		all_question_expected_scores = sum(
 			Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..totalScore'))
@@ -125,13 +127,13 @@ class HfBffTestBase:
 		all_details = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..details')
 		learning_result_entity.product_module = 1
 		learning_result_entity.product = 2
-		learning_result_entity.business_key = '|'.join(bff_data_obj.get_plan_business())
+		learning_result_entity.business_key = '|'.join(bff_data_obj.get_business_key())
 		learning_result_entity.student_key = int(self.customer_id)
-		learning_result_entity.atomic_key = bff_data_obj.get_attempt_body()["learningUnitContentId"]
-		learning_result_entity.plan_system_key = plan_system
 		learning_result_entity.expected_score = all_question_expected_scores
 		learning_result_entity.actual_score = all_question_actual_scores
 		learning_result_entity.details = all_details
+		learning_result_entity.start_time = bff_data_obj.get_attempt_body()["startTimeUtc"]
+		learning_result_entity.end_time = bff_data_obj.get_attempt_body()["endTimeUtc"]
 
 	def setter_learning_result_details(self,learning_details_entity,bff_data_obj):
 		"""

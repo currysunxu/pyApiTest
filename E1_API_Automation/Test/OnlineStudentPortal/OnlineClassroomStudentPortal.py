@@ -8,6 +8,7 @@ from ...Lib.HamcrestMatcher import match_to
 from ...Lib.ScheduleClassTool import local2utc
 from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
 import os
+import arrow
 
 class ClassType(Enum):
     DEMO = "Demo"
@@ -21,7 +22,6 @@ class APITestCases(EVCBase):
     def test_login(self):
         # Login failed was also verified at the lower layer.
         response = self.evc_service.login(user_name=self.user_info["UserName"], password=self.user_info["Password"])
-    
         return response
 
     @Test(tags='qa,stg,live')
@@ -51,7 +51,6 @@ class APITestCases(EVCBase):
 
         group_response = self.evc_service.get_offline_active_groups()
         group_id = str(jmespath.search("[0].groupSFId", group_response.json()))
-
         session_response = self.evc_service.get_offline_group_sessions(group_id)
         assert_that(session_response.json(), match_to("[*].reservationId"))
         assert_that(session_response.json(), match_to("[*].sequenceNumber"))
@@ -247,10 +246,11 @@ class APITestCases(EVCBase):
         assert_that(set(jmespath.search("[].courseTypeLevelCode", lesson_structure_response.json())) == set(
             ["X"]))
 
-    @Test(tags='qa,stg,live')
+    # @Test(tags='qa,stg,live')
     def test_verify_token_expired(self):
         self.test_login()
         self.evc_service.sign_out()
+
         student_profile_response = self.evc_service.get_user_profile()
         assert_that(student_profile_response.status_code == 401)
 
@@ -329,9 +329,8 @@ class APITestCases(EVCBase):
 
     @Test(tags='qa,stg,live')
     def test_save_policy_agreement(self):
-        self.test_login()
-
-        response = self.evc_service.save_policy_agreement()
+        ba_token = self.evc_service.login_get_v3_token(user_name=self.user_info["UserName"], password=self.user_info["Password"])
+        response = self.evc_service.save_policy_agreement(ba_token, host=self.svcHost)
         assert_that(response.status_code == 204)
 
     @Test(tags='qa,stg,live')
@@ -347,3 +346,48 @@ class APITestCases(EVCBase):
         assert_that(response.status_code == 200)
         assert_that(response.json(), match_to("appLinkForiOS"))
         assert_that(response.json(), match_to("downloadLinkForAndroid"))
+
+    @Test(enabled=os.environ['environment'].lower() in 'qa,stg', tags='qa, stg')
+    def test_reschedule(self):
+        # Login and get active offline groups
+        course = self.test_get_offline_active_groups()
+        course_type = course[0]
+        book_code = course[1]
+
+        # Get all available teachers
+        available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
+                                                                                  local2utc(self.regular_end_time),
+                                                                                  course_type=course_type,
+                                                                                  class_type=ClassType.REGULAR.value,
+                                                                                  page_index=0, page_size=10)
+        teacher_id = jmespath.search("[0].teacherId", available_teachers_response.json())
+
+        # Book a class
+        book_response = self.evc_service.book_class(local2utc(self.regular_start_time),
+                                                    local2utc(self.regular_end_time),
+                                                    teacher_id, course_type=course_type,
+                                                    class_type=ClassType.REGULAR.value,
+                                                    course_type_level_code=book_code, unit_number="1",
+                                                    lesson_number="1", is_reschedule="true")
+        assert_that(book_response.status_code == 201)
+        class_id = jmespath.search("axisClassId", book_response.json())
+
+        # Get all available teachers again
+        reschedule_start_time = arrow.now().shift(weeks=1, days=1, hours=1).format('YYYY-MM-DD HH:00:00')
+        reschedule_end_time = arrow.now().shift(weeks=1, days=1, hours=1).format('YYYY-MM-DD HH:30:00')
+
+        current_available_teachers_response = self.evc_service.get_all_available_teachers(reschedule_start_time,
+                                                                                  reschedule_end_time,
+                                                                                  course_type=course_type,
+                                                                                  class_type=ClassType.REGULAR.value,
+                                                                                  page_index=0, page_size=10)
+        teacher_id = jmespath.search("[0].teacherId", current_available_teachers_response.json())
+
+        # Reschedule
+        reschedule_response = self.evc_service.reschedule(class_id, teacher_id, reschedule_start_time, reschedule_end_time)
+        assert_that(reschedule_response.status_code == 200)
+        assert_that(int(jmespath.search("classId", reschedule_response.json())) == int(class_id))
+
+        # Cancel class
+        cancel_response = self.evc_service.cancel_class(str(class_id))
+        assert_that(cancel_response.status_code == 204)

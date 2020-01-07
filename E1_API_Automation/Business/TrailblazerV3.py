@@ -1,9 +1,11 @@
+from functools import reduce
+
+import arrow
+import jmespath
+
 from E1_API_Automation.Business.SchoolCourse import CourseBook
 from E1_API_Automation.Business.template.create_acitivty import Activity
 from ..Lib.Moutai import Moutai, Token
-import jmespath
-import arrow
-from functools import reduce
 
 
 class TrailbazerService:
@@ -31,15 +33,14 @@ class TrailbazerService:
 
     def get_privacy_content(self):
         return self.mou_tai.get('/api/v2/PrivacyPolicy/studentPrivacyPolicyAgreement/?cultureCode=zh-CN&product=2')
-    
-    def save_privacy(self,privacy_document_id, product_id):
-        privacy_content ={
-            "privacyDocumentId":privacy_document_id,
-            "product":product_id
+
+    def save_privacy(self, privacy_document_id, product_id):
+        privacy_content = {
+            "privacyDocumentId": privacy_document_id,
+            "product": product_id
         }
-        return self.mou_tai.post('/api/v2/PrivacyPolicy/studentPrivacyPolicyAgreement/',json=privacy_content)
-        
-    
+        return self.mou_tai.post('/api/v2/PrivacyPolicy/studentPrivacyPolicyAgreement/', json=privacy_content)
+
     def get_student_profile(self):
         return self.mou_tai.get("/api/v2/StudentProfile/TBV3")
 
@@ -49,7 +50,6 @@ class TrailbazerService:
         self.course_plan_key = jmespath.search('CourseGroups[0].Group.CoursePlanKey', profile)
         self.user_id = jmespath.search('UserId', profile)
         self.group_id = jmespath.search('CourseGroups[0].Group.OdinId', profile)
-
 
     def query_school_info(self):
         body = {
@@ -71,6 +71,9 @@ class TrailbazerService:
 
     def get_all_books(self):
         return self.mou_tai.get("/api/v2/AllBook")
+
+    def get_resource(self, resource_id):
+        return self.mou_tai.get("/resource/%s" % resource_id)
 
     def course_node_synchronize(self, book_key, course_play_key):
         body = {"BookKey": book_key,
@@ -118,7 +121,7 @@ class TrailbazerService:
         return self.mou_tai.get("/api/v2/DigitalInteractionInfo/ByBook/{0}".format(book_key))
 
     def get_child_node(self, parent_key):
-        book = CourseBook(self.mou_tai, "TBV3",self.active_book,self.course_plan_key)
+        book = CourseBook(self.mou_tai, "TBV3", self.active_book, self.course_plan_key)
         book.content_nodes
         self.course_node_synchronize(self.active_book, self.course_plan_key)
         child_node = jmespath.search("@[?ParentNodeKey=='{0}']".format(parent_key), self.book_contents)
@@ -139,11 +142,12 @@ class TrailbazerService:
         return self.mou_tai.put(url='/api/v2/HomeworkLessonAnswer', json=body)
 
     def homework_lesson_correction(self, lesson_key):
-        activity_nodes= self.book_contents.get_child_nodes_by_parent_key(lesson_key.lower())
+        activity_nodes = self.book_contents.get_child_nodes_by_parent_key(lesson_key.lower())
         activity_keys = self.book_contents.get_activity_keys(activity_nodes)
         detail_activities = self.book_contents.get_activity_json_by_activity_key(activity_keys)
         total_question_count = reduce(lambda x, y: x + y,
-                                      map(lambda x: Activity().create_activity(x).total_question_count, detail_activities))
+                                      map(lambda x: Activity().create_activity(x).total_question_count,
+                                          detail_activities))
         body = {
             'CorrectedAmount': total_question_count,
             'CourseKey': lesson_key,
