@@ -36,7 +36,7 @@ class Hf35BffUtils:
 	def construct_detail_obj(answer_list):
 		"""
 		construct details object by question_id,total_score,score,answer
-		total_score and score are double.
+		total_score and score will be integer or float by answer_size.
 		:param answer_list:
 		:return: a list include details objects
 		"""
