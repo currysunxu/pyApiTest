@@ -402,12 +402,12 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags='qa')
     def test_bootstrap_controller_ios_platform(self):
         response = self.bff_service.get_bootstrap_controller(platform='ios')
-        assert_that(jmespath.search('provision.name', response.json()), contains_string('iOS'))
+        assert_that(jmespath.search('provision.name', response.json()), contains_string('EF Highflyers'))
 
     @Test(tags='qa')
     def test_bootstrap_controller_android_platform(self):
         response = self.bff_service.get_bootstrap_controller(platform='android')
-        assert_that(jmespath.search('provision.name', response.json()), contains_string('andriod'))
+        assert_that(jmespath.search('provision.name', response.json()), contains_string('EF Highflyers'))
 
     @Test(tags='qa')
     def test_get_unlock_progress(self):

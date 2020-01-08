@@ -36,15 +36,17 @@ class Hf35BffUtils:
 	def construct_detail_obj(answer_list):
 		"""
 		construct details object by question_id,total_score,score,answer
+		total_score and score are double.
 		:param answer_list:
 		:return: a list include details objects
 		"""
 		details_list = []
+		answer_size = len(answer_list)
 		for answer in answer_list:
 			question_id = uuid.uuid4().__str__()
 			details_entity = Hf35BffDetailsEntity(question_id)
-			details_entity.total_score = random.randint(9,10)
-			details_entity.score = random.randint(1,8)
+			details_entity.total_score = random.randint(9,10) if (answer_size==1) else random.uniform(9,10)
+			details_entity.score = random.randint(1,8) if (answer_size==1) else random.uniform(9,10)
 			details_entity.answer = answer
 			detail_items = details_entity.__dict__
 			detail_items_new = Hf35BffUtils.modify_dict_keys(detail_items)
