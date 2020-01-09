@@ -60,7 +60,7 @@ pipeline {
     agent {
         docker {
           label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/maven:3.6-jdk-8'
+          image 'maven:3.6-jdk-11'
           args '-v /jacoco/data:/app/jacoco'
     
         }
