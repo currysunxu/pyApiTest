@@ -1,8 +1,3 @@
-#!groovy
-library identifier: 'jenkinssharedlib@tc/v2', retriever: modernSCM(
-  [$class: 'GitSCMSource',
-   remote: 'ssh://git@bitbucket.englishtown.cn:7999/elab/jenkinssharedlib.git',
-   credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e'])
 config = [
   teamsConnectorName: 'EdTech-QA-Team',
   teamsConnectorUrl:  'https://outlook.office.com/webhook/36e05938-50a0-40ed-9657-5483b2c4ec34@f0d1c6fd-dff0-486a-8e91-cfefefc7d98d/JenkinsCI/bc600ad16b3f4985be4749929e7d547c/85e457eb-b12b-44d6-bf27-0d23de69a378']
@@ -17,13 +12,7 @@ pipeline {
       notifySuccess: true, notifyFailure: true, notifyRepeatedFailure: true, notifyUnstable: true, notifyBackToNormal: true
     ]])
   }
-  agent {
-    kubernetes {
-      label 'qa-slave'
-      defaultContainer 'jnlp'
-      yaml ktAutomationPodTemplate()
-    }
-  }
+  agent none
   triggers {
     cron('H 03 * * *')
   }
@@ -32,39 +21,31 @@ pipeline {
         
         choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
     }
-   
+    
   environment {
      case_tag = 'qa'
     }
-  
    
   stages {
     
     stage('Verify') {
-      
-      steps {
-      container('python') {
+      agent {
+        docker {
+          label 'CN_Kids_QA_CI'
+          image '10.128.42.216:5000/apipython3:v5'
 
-        script {
-          
-          if (env.environment == 'STG')
-              case_tag = 'stg'
-          if (env.environment == 'LIVE')
-              case_tag = 'live' 
-          if (env.environment == 'LIVE_SG')
-              case_tag = 'live' 
-             
-          sh 'ptest3  -t E1_API_Automation.Test.TBV3 -i ${case_tag}'
+        }
+      }
+      steps {       
+          sh 'ptest3  -t E1_API_Automation.Test.PT'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
-        }
-      }
-      }
+                
+          }
     }
+   
+    
   }
-
-
-
   
 }
