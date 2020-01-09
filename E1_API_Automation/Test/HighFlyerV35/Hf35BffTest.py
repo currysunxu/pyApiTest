@@ -13,7 +13,7 @@ from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
-
+from E1_API_Automation.Settings import *
 import jmespath
 
 

@@ -1,23 +1,14 @@
-#!/usr/bin/env python
-#-*-coding:utf-8-*-
-
-#author:Curry
-#date:2019/10/29
 import datetime
-import json
-
 from hamcrest import assert_that, equal_to
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
-from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapService
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Business.OMNIService import OMNIService
-from E1_API_Automation.Settings import LEARNING_PLAN_ENVIRONMENT, LEARNING_RESULT_ENVIRONMENT, BFF_ENVIRONMENT, env_key, \
-	CONTENT_MAP_ENVIRONMENT, OMNI_ENVIRONMENT
+from E1_API_Automation.Settings import *
 from ptest.decorator import BeforeMethod
 
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
@@ -31,7 +22,7 @@ class HfBffTestBase:
 		self.key = BffProduct.HFV35.value
 		self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
 		self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
-		self.bff_service.login(self.user_name,self.password)
+		self.bff_service.login(self.user_name, self.password)
 		self.omni_service = OMNIService(OMNI_ENVIRONMENT)
 		self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
 
