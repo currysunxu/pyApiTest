@@ -45,19 +45,19 @@ class LearningPlanEnvironment(object):
 
 
 class LearningResultEnvironment(object):
-    QA = "http://learning-result.qa.edtech.kt"
+    QA = "http://learning-result-qa.kt.eflabs.cn"
 
 class BffEnvironment(object):
-    QA = "http://highflyers.qa.edtech.kt"
+    QA = "https://ktsvc-qa.ef.cn"
 
 class HomeworkEnvironment(object):
-    QA = "http://homework.qa.edtech.kt"
+    QA = "http://homework-qa.kt.eflabs.cn"
 
 class ContentMapEnvironment(object):
-    QA = "http://content-map.qa.edtech.kt"
+    QA = "http://content-map-qa.kt.eflabs.cn"
 
 class ContentRepoEnvironment(object):
-    QA = "http://content-repo.qa.edtech.kt"
+    QA = "http://content-repo-qa.kt.eflabs.cn"
 
 try:
     print(os.environ['environment'])
