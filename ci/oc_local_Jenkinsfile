@@ -1,0 +1,141 @@
+#!groovy
+library identifier: 'jenkinssharedlib@tc/v2', retriever: modernSCM(
+  [$class: 'GitSCMSource',
+   remote: 'ssh://git@bitbucket.englishtown.cn:7999/elab/jenkinssharedlib.git',
+   credentialsId: '6eb8497e-6687-41e7-8a3c-1856eb98116e'])
+
+config = [
+  teamsConnectorName: 'EdTech-QA-Team',
+  teamsConnectorUrl:  'https://outlook.office.com/webhook/36e05938-50a0-40ed-9657-5483b2c4ec34@f0d1c6fd-dff0-486a-8e91-cfefefc7d98d/JenkinsCI/bc600ad16b3f4985be4749929e7d547c/85e457eb-b12b-44d6-bf27-0d23de69a378']
+
+pipeline {
+  options {
+    disableConcurrentBuilds()
+    timeout(time: 5, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+    office365ConnectorWebhooks([[
+      name: config.teamsConnectorName, url: config.teamsConnectorUrl,
+      notifySuccess: true, notifyFailure: true, notifyRepeatedFailure: true, notifyUnstable: true, notifyBackToNormal: true
+    ]])
+  }
+  agent {
+    kubernetes {
+      label 'qa-slave'
+      defaultContainer 'jnlp'
+      yaml ktAutomationPodTemplate()
+    }
+  }
+  triggers {
+    cron('H 03 * * *')
+  }
+  
+  parameters {
+        
+        choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
+    }
+   
+  stages {
+    
+    stage('Verify') {
+     
+      steps {
+      container('python') {
+
+        script {       
+          if (env.environment == 'STG')
+              case_tag = 'stg'
+          if (env.environment == 'LIVE')
+              case_tag = 'live'
+           
+          sh 'ptest3  -t E1_API_Automation.Test.OnlineStudentPortal -i ${case_tag}'
+          junit 'test-output/xunit-results.xml'
+          if (currentBuild.result =='UNSTABLE')
+              currentBuild.result = 'FAILURE'
+                
+          }
+      }
+      }
+    }
+  }
+  post {
+        failure {
+                emailext attachLog: true, attachmentsPattern: 'test-output/*.*,*.log', body: '''<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${ENV, var="JOB_NAME"}-The ${BUILD_NUMBER}th Build Log</title>
+</head>
+<body leftmargin="8" marginwidth="0" topmargin="8" marginheight="4"
+    offset="0">
+    <table width="95%" cellpadding="0" cellspacing="0"
+        style="font-size: 11pt; font-family: Tahoma, Arial, Helvetica, sans-serif">
+
+        <tr>
+            <td><h2>
+                    <font color="#0000FF">Build Result - ${BUILD_STATUS}</font>
+                </h2></td>
+        </tr>
+        <tr>
+            <td><br />
+            <b><font color="#0B610B">Build Information</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>Project Name&nbsp;：&nbsp;${PROJECT_NAME}</li>
+                    <li>Build Number&nbsp;：&nbsp; The ${BUILD_NUMBER}th build</li>
+                    <li>Build Cause：&nbsp;${CAUSE}</li>
+                    <li>Build Log：&nbsp;<a href="${BUILD_URL}console">${BUILD_URL}console</a></li>
+                    <li>Build&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${BUILD_URL}">${BUILD_URL}</a></li>
+                    <li>Working Path&nbsp;：&nbsp;<a href="${PROJECT_URL}ws">${PROJECT_URL}ws</a></li>
+                    <li>Project&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${PROJECT_URL}">${PROJECT_URL}</a></li>
+                    <li>Branch Name&nbsp;：&nbsp;${Branch}</li>
+                    <li>Book Name&nbsp;：&nbsp;${BookName}</li>
+                    <li>Book URL&nbsp;：&nbsp;${BookUrl}</li>
+                </ul>
+            </td>
+        </tr>
+
+        <tr>
+            <td><b><font color="#0B610B">Failed Test Results</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td><pre
+                    style="font-size: 11pt; font-family: Tahoma, Arial, Helvetica, sans-serif">$FAILED_TESTS</pre>
+                <br /></td>
+        </tr>
+        <tr>
+            <td><b><font color="#0B610B">Changes Since Last
+                        Successful Build:</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td>
+                <ul>
+                    <li>Changes of History: <a href="${PROJECT_URL}changes">${PROJECT_URL}changes</a></li>
+                </ul> ${CHANGES_SINCE_LAST_SUCCESS,reverse=true, format="Changes for Build #%n:<br />%c<br />",showPaths=true,changesFormat="<pre>[%a]<br />%m</pre>",pathFormat="&nbsp;&nbsp;&nbsp;&nbsp;%p"}
+            </td>
+        </tr>
+        <tr>
+            <td><b><font color="#0B610B">Build Log (last 50 lines):</font></b>
+            <hr size="2" width="100%" align="center" /></td>
+        </tr>
+        <tr>
+            <td><textarea cols="80" rows="30" readonly="readonly"
+                    style="font-family: Courier New">${BUILD_LOG, maxLines=50}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td><font color="#0000FF">The mail is automatically distributed, please do not reply.</font></td>
+        </tr>
+    </table>
+</body>
+</html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', to: 'cindy.song@ef.com'
+            }
+    }
+
+
+  
+}
