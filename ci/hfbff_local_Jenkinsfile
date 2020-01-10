@@ -33,7 +33,7 @@ pipeline {
         docker {
           label 'CN_Kids_QA_CI'
           image '10.128.42.216:5000/apipython3:v5'
-          args '-v /jacoco:/app/jacoco --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
+          args '-v /jacoco-data:/jacoco-data --add-host=jacoco-cmd.qa.edtech.kt:10.178.86.8 --add-host=learning-result.qa.edtech.kt:10.178.86.8 --add-host=homework.qa.edtech.kt:10.178.86.8 --add-host=media-repo.qa.edtech.kt:10.178.86.8 --add-host=highflyers.qa.edtech.kt:10.178.86.8 --add-host=learning-plan.qa.edtech.kt:10.178.86.8 --add-host=content-builder.qa.edtech.kt:10.178.86.8 --add-host=content-map.qa.edtech.kt:10.178.86.8 --add-host=content-repo.qa.edtech.kt:10.178.86.8 --add-host=extracurricular.qa.edtech.kt:10.178.86.8'
         }
       }
       steps {
@@ -61,7 +61,7 @@ pipeline {
         docker {
           label 'CN_Kids_QA_CI'
           image 'maven:3.6-jdk-11'
-          args '-v /jacoco/data:/app/jacoco'
+          args '-v /jacoco-data:/jacoco-data'
     
         }
       }
@@ -71,7 +71,7 @@ pipeline {
      
      script{
      sh 'mvn clean package'
-     sh 'cp /app/jacoco/hf35bff/jacoco_bff.exec jacoco.exec'
+     sh 'cp /jacoco-data/hf35bff/jacoco_bff.exec jacoco.exec'
      jacoco(
       exclusionPattern: '**/core/**,**/domain/**,**/config/**,**/api/admin/**,**/Application.class')
      
