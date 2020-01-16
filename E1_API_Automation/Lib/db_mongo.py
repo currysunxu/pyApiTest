@@ -9,7 +9,6 @@ class MongoHelper(object):
         self.db_name = db_name
 
     def __get_connect(self):
-        # self.conn = MongoClient(self.server, int(self.port))
         self.conn = MongoClient('mongodb://' + self.server + '/')
         self.conn.admin.authenticate(self.user, self.password, mechanism='SCRAM-SHA-1')
         db = self.conn.get_database(self.db_name)
