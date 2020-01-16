@@ -88,7 +88,7 @@ if os.environ['environment'] == 'QA':
         "Password": "cassandra"
     }
     MONGO_DATABASE = {
-        "Server": "10.178.86.79,27017",
+        "Server": "10.179.243.73:27017,10.179.243.72:27017,10.179.243.66:27017",
         "User": "svcuser",
         "Password": "Efef@123!"
     }
