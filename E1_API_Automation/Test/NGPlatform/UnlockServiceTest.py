@@ -233,6 +233,27 @@ class UnlockServiceTestCases:
         session_db_dict_list = mongo_sql_server.exec_query_return_dict_list('offline_sessions', find_condition)
         assert_that(len(session_db_dict_list) == 0)
 
+    # if the course is not HFV3Plus, the kafka message will not be processed
+    @Test(tags="qa")
+    def test_invalid_program_session_kafka_msg_will_not_be_processed(self):
+        session_topic_name = UnlockServiceData.session_topic_name
+        kafka_broker = UnlockKafkaServer.kafka_broker[env_key]
+
+        unlock_session = UnlockServiceUtils.construct_session_entity(random.randint(2, 6))
+        unlock_session.course = 'HFV3Plus_Test'
+        session_kafka_msg = UnlockServiceUtils.get_session_session_member_format_kafka_msg(True, unlock_session)
+
+        producer = KafkaProducer(bootstrap_servers=kafka_broker)
+        # send session message
+        producer.send(topic=session_topic_name, value=json.dumps(session_kafka_msg).encode())
+
+        # verify db data with expected entity
+        mongo_sql_server = MongoHelper(MONGO_DATABASE, 'homework_qa')
+        find_condition = {"_id": unlock_session.reservation_id}
+        # check session db record
+        session_db_dict_list = mongo_sql_server.exec_query_return_dict_list('offline_sessions', find_condition)
+        assert_that(len(session_db_dict_list) == 0)
+
     @Test(tags="qa")
     def test_invalid_session_kafka_msg_will_not_be_processed(self):
         session_topic_name = UnlockServiceData.session_topic_name
