@@ -40,29 +40,31 @@ class OMNIEnvironment(object):
     LIVE = "http://omni-apigateway-tccn.ef.com"
 
 
-class LearningPlanEnvironment(object):
-    QA = "http://learning-plan.qa.edtech.kt"
-
-
 class LearningResultEnvironment(object):
-    QA = "http://learning-result-qa.kt.eflabs.cn"
+    QA = "http://internal-ktsvc-qa-cn.ef.com/learning-result"
+
 
 class BffEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn"
 
+
 class HomeworkEnvironment(object):
-    QA = "http://homework-qa.kt.eflabs.cn"
+    QA = "http://internal-ktsvc-qa-cn.ef.com/homework"
+
 
 class ContentMapEnvironment(object):
-    QA = "http://content-map-qa.kt.eflabs.cn"
+    QA = "http://internal-ktsvc-qa-cn.ef.com/content-map"
+
 
 class ContentRepoEnvironment(object):
-    QA = "http://content-repo-qa.kt.eflabs.cn"
+    QA = "http://internal-ktsvc-qa-cn.ef.com/content-repo"
+
 
 try:
     print(os.environ['environment'])
 except:
     os.environ['environment'] = 'QA'
+
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
@@ -70,7 +72,6 @@ if os.environ['environment'] == 'QA':
     TPI_ENVIRONMENT = TPIEnvironment.QA
     AUTH_ENVIRONMENT = AuthEnvironment.QA
     OMNI_ENVIRONMENT = OMNIEnvironment.QA
-    LEARNING_PLAN_ENVIRONMENT = LearningPlanEnvironment.QA
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.QA
     BFF_ENVIRONMENT = BffEnvironment.QA
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA

@@ -82,14 +82,20 @@ class Hf35BffUtils:
 		"""
 		random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
 		learning_content_id = uuid.uuid4().__str__()
-		bff_entity = Hf35BffAttemptEntity(learning_content_id,activity_list)
-		bff_entity.start_time_utc =random_date_time
-		bff_entity.end_time_utc =random_date_time
+		bff_entity = Hf35BffAttemptEntity(learning_content_id, activity_list)
+		bff_entity.start_time = random_date_time
+		bff_entity.end_time = random_date_time
 		bff_entity.book_content_id = uuid.uuid4().__str__()
+		bff_entity.book_content_revision = "BookContentRevision%s" % (random.randint(1, 100))
 		bff_entity.course_content_id = uuid.uuid4().__str__()
+		bff_entity.course_content_revision = "CourseContentRevision%s" % (random.randint(1, 100))
 		bff_entity.unit_content_id = uuid.uuid4().__str__()
+		bff_entity.unit_content_revision = "UnitContentRevision%s" % (random.randint(1, 100))
 		bff_entity.lesson_content_id = uuid.uuid4().__str__()
-		bff_entity.tree_revision = "TestRevision%s"%(random.randint(1,10))
+		bff_entity.lesson_content_revision = "LessonContentRevision%s" % (random.randint(1, 100))
+		bff_entity.learning_unit_content_revision = "LearningUnitContentRevision%s" % (random.randint(1, 100))
+		bff_entity.tree_revision = "TestRevision%s" % (random.randint(1, 10))
+		bff_entity.schema_version = random.randint(1, 10)
 		bff_dict = bff_entity.__dict__
 		bff_dict_new = Hf35BffUtils.modify_dict_keys(bff_dict)
 		return bff_dict_new
