@@ -68,4 +68,3 @@ class MockTestBFFService:
         assert_that(mt_response.json(), exist("data.test"))
         assert_that(mt_response.json(), exist("extensions.tracing"))
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
-        print(jmespath.search("data.test.id", mt_response.json()))
