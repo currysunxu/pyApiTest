@@ -47,6 +47,7 @@ class HfBffTestBase:
 		assert_that(result_response.json()[0]["actualScore"], equal_to(learning_result_entity.actual_score))
 		assert_that(result_response.json()[0]["startTime"], equal_to(learning_result_entity.start_time))
 		assert_that(result_response.json()[0]["endTime"], equal_to(learning_result_entity.end_time))
+		assert_that(result_response.json()[0]["route"], equal_to(learning_result_entity.route))
 		# check details object
 		index = 0
 		for details in learning_result_entity.details:
@@ -132,8 +133,25 @@ class HfBffTestBase:
 		learning_result_entity.expected_score = all_question_expected_scores
 		learning_result_entity.actual_score = all_question_actual_scores
 		learning_result_entity.details = all_details
-		learning_result_entity.start_time = bff_data_obj.get_attempt_body()["startTimeUtc"]
-		learning_result_entity.end_time = bff_data_obj.get_attempt_body()["endTimeUtc"]
+		learning_result_entity.start_time = bff_data_obj.get_attempt_body()["startTime"]
+		learning_result_entity.end_time = bff_data_obj.get_attempt_body()["endTime"]
+		route = {}
+		route['course'] = 'HIGH_FLYERS_35'
+		route['regionAch'] = 'cn-3'
+		route['treeRevision'] = bff_data_obj.get_attempt_body()["treeRevision"]
+		route['schemaVersion'] = bff_data_obj.get_attempt_body()["schemaVersion"]
+		route['courseContentId'] = bff_data_obj.get_attempt_body()["courseContentId"]
+		route['courseContentRevision'] = bff_data_obj.get_attempt_body()["courseContentRevision"]
+		route['bookContentId'] = bff_data_obj.get_attempt_body()["bookContentId"]
+		route['bookContentRevision'] = bff_data_obj.get_attempt_body()["bookContentRevision"]
+		route['unitContentId'] = bff_data_obj.get_attempt_body()["unitContentId"]
+		route['unitContentRevision'] = bff_data_obj.get_attempt_body()["unitContentRevision"]
+		route['lessonContentId'] = bff_data_obj.get_attempt_body()["lessonContentId"]
+		route['lessonContentRevision'] = bff_data_obj.get_attempt_body()["lessonContentRevision"]
+		route['learningUnitContentId'] = bff_data_obj.get_attempt_body()["learningUnitContentId"]
+		route['learningUnitContentRevision'] = bff_data_obj.get_attempt_body()["learningUnitContentRevision"]
+		learning_result_entity.route = route
+
 
 	def setter_learning_result_details(self,learning_details_entity,bff_data_obj):
 		"""
