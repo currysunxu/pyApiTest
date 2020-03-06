@@ -1,10 +1,14 @@
+import datetime
 import json
+import random
 
 import jmespath
 from hamcrest import assert_that, equal_to, contains_string
 from ptest.decorator import TestClass, Test
 
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
+from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
+from E1_API_Automation.Business.KidsEVC import KidsEVCService
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
@@ -14,6 +18,9 @@ from E1_API_Automation.Lib.HamcrestMatcher import match_to
 from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
+    ContentRepoGroupType
+from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import OnlineScope
 
 
 @TestClass()
@@ -315,13 +322,6 @@ class Hf35BffTest(HfBffTestBase):
         bff_invalid_response = self.bff_service.get_homework_activities_with_negative_token(
             content_activities_response.json(), negative_token)
         self.verify_bff_api_response_with_invalid_token(negative_token, bff_invalid_response)
-        # print("Bff get book response is : %s" % (json.dumps(bff_invalid_response.json(), indent=4)))
-        # if negative_token == ("noToken"):
-        #     assert_that(bff_invalid_response.status_code, equal_to(400))
-        #     assert_that((bff_invalid_response.json()['error'] == "Bad Request"))
-        # else:
-        #     assert_that(bff_invalid_response.status_code, equal_to(401))
-        #     assert_that((bff_invalid_response.json()['error'] == "Unauthorized"))
 
     @Test(tags='qa', data_provider=[{"contentId": ""}, {"contentId": None}, {"contentRevision": ""},
                                     {"contentId": "test_neg"}, {"contentRevision": None},
@@ -444,8 +444,199 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags='qa')
     def test_get_unlock_progress(self):
-        current_book = jmespath.search('userContext.currentBook',
-                                       self.bff_service.get_bootstrap_controller('ios').json())
+        current_book = self.get_current_book_from_bootstrap()
         print(current_book)
-        response = self.bff_service.get_unlock_progress_controller(current_book)
-        assert_that(response.status_code == 200)
+        bff_unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
+        assert_that(bff_unlock_response.status_code == 200)
+
+        homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
+        homework_unlock_response = homework_service.get_unlock_progress(self.customer_id, current_book)
+        assert_that(homework_unlock_response.status_code == 200)
+
+        assert_that(bff_unlock_response.json(), equal_to(homework_unlock_response.json()))
+
+    @Test(tags='qa')
+    def test_get_homework_content_groups(self):
+        current_book = self.get_current_book_from_bootstrap()
+        tree_revision = self.get_tree_revision_from_course_structure()
+        book_structure_response = self.bff_service.get_book_structure(current_book, tree_revision)
+        unit_content_id = jmespath.search('children[0].contentId', book_structure_response.json())
+        unit_content_revision = jmespath.search('children[0].contentRevision', book_structure_response.json())
+        unit_schema_version = jmespath.search('children[0].schemaVersion', book_structure_response.json())
+        bff_homework_content_group_response = self.bff_service.get_homework_activity_asset_group(unit_content_revision,
+                                                                                                 unit_content_id,
+                                                                                                 unit_schema_version)
+        assert_that(bff_homework_content_group_response.status_code == 200)
+
+        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        homework_activity_group_response = \
+            content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHomework.value,
+                                                             ContentRepoGroupType.TypeActivityGroup.value,
+                                                             unit_content_id, unit_content_revision,
+                                                             unit_schema_version)
+        assert_that(homework_activity_group_response.status_code == 200)
+
+        homework_asset_group_response = \
+            content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHomework.value,
+                                                             ContentRepoGroupType.TypeAssetGroup.value,
+                                                             unit_content_id, unit_content_revision,
+                                                             unit_schema_version)
+        assert_that(homework_asset_group_response.status_code == 200)
+
+        assert_that(bff_homework_content_group_response.json()["activityGroups"],
+                    equal_to(homework_activity_group_response.json()))
+        assert_that(bff_homework_content_group_response.json()["assetGroups"],
+                    equal_to(homework_asset_group_response.json()))
+
+    @Test(tags='qa')
+    def test_get_handout_content_groups(self):
+        book_content_id = self.get_current_book_from_bootstrap()
+        course_structure_response = self.bff_service.get_course_structure()
+
+        book_content_revision = jmespath.search('children[?contentId==\'%s\'].contentRevision| [0]' % (book_content_id),
+                                                course_structure_response.json())
+        book_schema_version = jmespath.search('children[?contentId==\'%s\'].schemaVersion| [0]' % (book_content_id),
+                                              course_structure_response.json())
+
+        bff_handout_content_group_response = \
+            self.bff_service.get_handout_content_groups(book_content_id, book_content_revision, book_schema_version)
+        assert_that(bff_handout_content_group_response.status_code == 200)
+
+        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        handout_eca_group_response = \
+            content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHandout.value,
+                                                             ContentRepoGroupType.TypeECAGroup.value,
+                                                             book_content_id, book_content_revision,
+                                                             book_schema_version)
+        assert_that(handout_eca_group_response.status_code == 200)
+
+        handout_asset_group_response = \
+            content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHandout.value,
+                                                             ContentRepoGroupType.TypeAssetGroup.value,
+                                                             book_content_id, book_content_revision,
+                                                             book_schema_version)
+        assert_that(handout_asset_group_response.status_code == 200)
+
+        assert_that(bff_handout_content_group_response.json()["ecaGroups"],
+                    equal_to(handout_eca_group_response.json()))
+        assert_that(bff_handout_content_group_response.json()["assetGroups"],
+                    equal_to(handout_asset_group_response.json()))
+
+    @Test(tags='qa')
+    def test_get_homework_activities(self):
+        current_book = self.get_current_book_from_bootstrap()
+        tree_revision = self.get_tree_revision_from_course_structure()
+        book_structure_response = self.bff_service.get_book_structure(current_book, tree_revision)
+        unit_content_id = jmespath.search('children[0].contentId', book_structure_response.json())
+        unit_content_revision = jmespath.search('children[0].contentRevision', book_structure_response.json())
+        unit_schema_version = jmespath.search('children[0].schemaVersion', book_structure_response.json())
+        bff_homework_content_group_response = self.bff_service.get_homework_activity_asset_group(unit_content_revision,
+                                                                                                 unit_content_id,
+                                                                                                 unit_schema_version)
+        assert_that(bff_homework_content_group_response.status_code == 200)
+        # get two activity items from activity group
+        activity_filter_body = jmespath.search(
+            'activityGroups[0].childRefs[:2].{schemaVersion:schemaVersion,contentId:contentId, contentRevision:contentRevision}',
+            bff_homework_content_group_response.json())
+        bff_activity_response = self.bff_service.get_homework_activities(activity_filter_body)
+        assert_that(bff_activity_response.status_code == 200)
+
+        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_activity_response = content_repo_service.get_activities(activity_filter_body)
+        assert_that(content_repo_activity_response.status_code == 200)
+        # check the bff activity api response will be same to what you get from content repo
+        assert_that(bff_activity_response.json(), equal_to(content_repo_activity_response.json()))
+
+    @Test(tags='qa')
+    def test_get_handout_eca(self):
+        book_content_id = self.get_current_book_from_bootstrap()
+        course_structure_response = self.bff_service.get_course_structure()
+
+        book_content_revision = jmespath.search('children[?contentId==\'%s\'].contentRevision| [0]' % (book_content_id),
+                                                course_structure_response.json())
+        book_schema_version = jmespath.search('children[?contentId==\'%s\'].schemaVersion| [0]' % (book_content_id),
+                                              course_structure_response.json())
+
+        bff_handout_content_group_response = \
+            self.bff_service.get_handout_content_groups(book_content_id, book_content_revision, book_schema_version)
+        assert_that(bff_handout_content_group_response.status_code == 200)
+
+        # get two eca items from eca group
+        eca_filter_body = jmespath.search(
+            'ecaGroups[0].childRefs[:2].{schemaVersion:schemaVersion,contentId:contentId, contentRevision:contentRevision}',
+            bff_handout_content_group_response.json())
+        bff_eca_response = self.bff_service.get_handout_ecas(eca_filter_body)
+        assert_that(bff_eca_response.status_code == 200)
+
+        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_eca_response = content_repo_service.get_ecas(eca_filter_body)
+        assert_that(content_repo_eca_response.status_code == 200)
+        # check the bff eca api response will be same to what you get from content repo
+        assert_that(bff_eca_response.json(), equal_to(content_repo_eca_response.json()))
+
+    # test get online class for ksd
+    @Test(tags='qa')
+    def test_get_online_class_ksd(self):
+        bff_online_ksd_response = self.bff_service.get_online_class(OnlineScope.KSD.value)
+        assert_that(bff_online_ksd_response.status_code == 200)
+
+        evc_service = KidsEVCService(KIDS_EVC_ENVIRONMENT)
+        evc_service.mou_tai.headers['X-EF-TOKEN'] = self.bff_service.id_token
+
+        date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
+        local_time_utc = datetime.datetime.utcnow()
+
+        # if there's no data found, need to create ksd online class first
+        if len(bff_online_ksd_response.json()) == 0:
+            evc_start_time_utc = local_time_utc + datetime.timedelta(hours=1)
+            # make the evc start time with zero minutes, seconds
+            evc_start_time_utc = datetime.datetime(evc_start_time_utc.year, evc_start_time_utc.month,
+                                                   evc_start_time_utc.day, evc_start_time_utc.hour, 0, 0, 0)
+            evc_start_time_utc_str = evc_start_time_utc.strftime(date_time_format)
+            evc_end_time_utc_str = (evc_start_time_utc + datetime.timedelta(minutes=30)).strftime(date_time_format)
+            available_teachers_response = evc_service.get_all_available_teachers(
+                evc_start_time_utc_str,
+                evc_end_time_utc_str,
+                course_type='HFV3Plus',
+                class_type='Regular',
+                page_index=0, page_size=10)
+            # randomly choose a teacher so will not conflict when create another class
+            available_teachers_list = available_teachers_response.json()
+            random_teacher_index = random.randint(0, len(available_teachers_list) - 1)
+            teacher_id = jmespath.search("[{0}].teacherId".format(random_teacher_index),
+                                         available_teachers_response.json())
+
+            book_response = evc_service.book_class(evc_start_time_utc_str,
+                                                   evc_end_time_utc_str,
+                                                   teacher_id, course_type='HFV3Plus',
+                                                   class_type='Regular',
+                                                   course_type_level_code='C', unit_number="1",
+                                                   lesson_number="1", is_reschedule="true")
+            assert_that(book_response.status_code == 201)
+            # after insert online data, get hf35 bff data again
+            bff_online_ksd_response = self.bff_service.get_online_class(OnlineScope.KSD.value)
+            assert_that(bff_online_ksd_response.status_code == 200)
+
+        # start time is 3 hours before current utc time, end time is 4 weeks after current utc time
+        start_time_utc = (local_time_utc - datetime.timedelta(hours=3)).strftime(date_time_format)
+        end_time_utc = (local_time_utc + datetime.timedelta(days=28)).strftime(date_time_format)
+
+        evc_student_online_class_response = evc_service.get_hfv3plus_student_online_class(start_time_utc, end_time_utc)
+        # code will filter out endDateTimeUtc greater than current utc time data
+        evc_student_online_class_expected = jmespath.search(
+            '[?endDateTimeUtc>\'' + local_time_utc.strftime(date_time_format) + '\']',
+            evc_student_online_class_response.json())
+        teacher_id_set = set(jmespath.search('[].teacherId', evc_student_online_class_expected))
+
+        evc_teacher_info_response = evc_service.get_teacher_info(teacher_id_set)
+
+        error_message = Hf35BffUtils.verify_ksd_online_class(bff_online_ksd_response.json(),
+                                                             evc_student_online_class_expected,
+                                                             evc_teacher_info_response.json())
+        assert_that(error_message == '', error_message)
+
+    # test get online class for osd, as we can't manipulate the osd online classes, so, only check status for now
+    @Test(tags='qa')
+    def test_get_online_class_osd(self):
+        bff_online_osd_response = self.bff_service.get_online_class(OnlineScope.OSD.value)
+        assert_that(bff_online_osd_response.status_code == 200)

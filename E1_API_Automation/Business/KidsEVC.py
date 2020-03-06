@@ -174,3 +174,16 @@ class KidsEVCService():
             {"op": "replace", "path": "/classTime/endDateTimeUtc", "value": end_stamp}
         ]
         return self.mou_tai.patch("/ksdsvc/api/v2/classes/"+str(class_id), json=body)
+
+    # this used by hfv35, to query ksd online classes
+    def get_hfv3plus_student_online_class(self, start_time_utc, end_time_utc, course_type_level_code=''):
+        return self.mou_tai.get("/ksdsvc/api/v2/student/classes?CourseType=HFV3Plus&ClassTypes=Regular&ClassTypes=Demo&CourseTypeLevelCode={0}&StartDateTimeUtc={1}&EndDateTimeUtc={2}"
+                                .format(course_type_level_code, start_time_utc, end_time_utc))
+
+    def get_teacher_info(self, teacher_id_set):
+        teacher_ids = ''
+        for teacher_id in teacher_id_set:
+            teacher_ids = teacher_ids + "ids={0}&".format(teacher_id)
+
+        api_url = "/ksdsvc/api/v2/teachers?" +teacher_ids
+        return self.mou_tai.get(api_url)

@@ -60,6 +60,10 @@ class ContentRepoEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/content-repo"
 
 
+class KidsEVCEnvironment(object):
+    QA = "https://study-qa.ef.cn"
+
+
 class MockTestEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn/mseb"
 
@@ -80,6 +84,7 @@ if os.environ['environment'] == 'QA':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
+    KIDS_EVC_ENVIRONMENT = KidsEVCEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     env_key = 'QA'
     DATABASE = {

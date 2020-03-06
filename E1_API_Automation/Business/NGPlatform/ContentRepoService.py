@@ -27,7 +27,22 @@ class ContentRepoService:
 		api_url = "/api/v1/activities"
 		return self.mou_tai.post(api_url,content_json_body)
 
+	def get_ecas(self,content_json_body):
+		api_url = "/api/v1/eca"
+		return self.mou_tai.post(api_url,content_json_body)
+
 	def get_activities_group(self,content_group_json_body):
 		api_url = "/api/v1/content-groups"
 		return self.mou_tai.post(api_url,content_group_json_body)
+
+	def get_content_groups_by_param(self, content_type, group_type, parent_content_id, parent_content_revision, parent_schema_version):
+		content_group_body = {
+			"contentType": content_type,
+			"groupType": group_type,
+			"parentContentId": parent_content_id,
+			"parentContentRevision": parent_content_revision,
+			"parentSchemaVersion": parent_schema_version
+		}
+		api_url = "/api/v1/content-groups"
+		return self.mou_tai.post(api_url, content_group_body)
 
