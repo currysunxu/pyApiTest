@@ -85,12 +85,6 @@ class HfBffTestBase:
 					activity_field.insert(insert_index, element)
 				insert_index += len(learning_result_entity.details[0])
 
-	# def get_learning_plan_response(self, learning_plan_entity):
-	# 	learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
-	# 	plan_response = learning_plan_service.get_partition_plan_without_limit_page(learning_plan_entity)
-	# 	print("learining plan response is : " + plan_response.text)
-	# 	return plan_response
-
 	def get_learning_result_response(self, learning_result_entity):
 		learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 		result_response = learning_result_service.get_specific_result(learning_result_entity)
