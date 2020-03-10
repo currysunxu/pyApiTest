@@ -3,12 +3,15 @@
 
 #author:Curry
 #date:2019/10/31
+import datetime
 import json
 import random
 import re
 import string
 import time
 import uuid
+
+import jmespath
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffActivityEntity import Hf35BffActivityEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffDetailsEntity import Hf35BffDetailsEntity
@@ -145,3 +148,48 @@ class Hf35BffUtils:
 		p = re.compile(r'([a-z]|\d)([A-Z])')
 		sub = re.sub(p, r'\1_\2', hump_str).lower()
 		return sub
+
+	@staticmethod
+	def verify_ksd_online_class(ksd_online_class_list, expected_evc_online_class_list, evc_teacher_info_list):
+		error_message = ''
+
+		if len(ksd_online_class_list) != len(expected_evc_online_class_list):
+			error_message = "ksd online class size not as expected!"
+
+		for i in range(len(ksd_online_class_list)):
+			actual_ksd_online_class = ksd_online_class_list[i]
+			expected_evc_online_class = expected_evc_online_class_list[i]
+
+			teacher_id = actual_ksd_online_class['teacherId']
+			expected_evc_teacher = {}
+			for evc_teacher_info in evc_teacher_info_list:
+				if evc_teacher_info['teacherId'] == teacher_id:
+					expected_evc_teacher = evc_teacher_info
+					break
+
+			for key in actual_ksd_online_class.keys():
+				actual_value = actual_ksd_online_class[key]
+				if key not in ('teacherName', 'teacherAvatarUrl', 'teacherAccent'):
+					expected_value = expected_evc_online_class[key]
+
+					if 'Time' in key:
+						actual_value = datetime.datetime.strptime(str(actual_value), '%Y-%m-%dT%H:%M:%S.%fZ')
+						expected_value = datetime.datetime.strptime(str(expected_value), '%Y-%m-%dT%H:%M:%SZ')
+				elif key == 'teacherName':
+					expected_value = expected_evc_teacher['displayName']
+				elif key == 'teacherAvatarUrl':
+					expected_value = expected_evc_teacher['avatarUrl']
+				elif key == 'teacherAccent':
+					expected_teacher_english_spoken = expected_evc_teacher['englishSpoken']
+
+					expected_value = ''
+					if expected_teacher_english_spoken == '703539':
+						expected_value = 'British'
+					elif expected_teacher_english_spoken == '703540':
+						expected_value = 'American'
+
+				if str(actual_value) != str(expected_value):
+					error_message = error_message + " In {0} onlineclass, {1} value not as expected, the actual value is {2}, but expected {3}".format(
+						i, key, actual_value, expected_value)
+
+		return error_message

@@ -1,4 +1,6 @@
 import datetime
+
+import jmespath
 from hamcrest import assert_that, equal_to
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
@@ -82,12 +84,6 @@ class HfBffTestBase:
 				for index in range(len(learning_result_entity.details[0])-1):
 					activity_field.insert(insert_index, element)
 				insert_index += len(learning_result_entity.details[0])
-
-	def get_learning_plan_response(self, learning_plan_entity):
-		learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
-		plan_response = learning_plan_service.get_partition_plan_without_limit_page(learning_plan_entity)
-		print("learining plan response is : " + plan_response.text)
-		return plan_response
 
 	def get_learning_result_response(self, learning_result_entity):
 		learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
@@ -200,3 +196,13 @@ class HfBffTestBase:
 			if is_mismatch:
 				break
 		return content_body
+
+	def get_current_book_from_bootstrap(self):
+		response = self.bff_service.get_bootstrap_controller(platform='ios')
+		current_book = jmespath.search('userContext.currentBook', response.json())
+		return current_book
+
+	def get_tree_revision_from_course_structure(self):
+		response = self.bff_service.get_course_structure()
+		tree_revision = response.json()['treeRevision']
+		return tree_revision

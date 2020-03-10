@@ -14,7 +14,7 @@ class BffProduct(Enum):
 class BffUsers:
     BffUserPw = {
         'QA': {
-            BffProduct.HFV35.value: [{'username': 'ptReviewTest06', 'password': '12345'}],
+            BffProduct.HFV35.value: [{'username': 'hf3.cn.01', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.SSV3.value: [{'username': 'ss3.cn.02', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
