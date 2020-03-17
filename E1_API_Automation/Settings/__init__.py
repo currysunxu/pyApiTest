@@ -102,6 +102,11 @@ if os.environ['environment'] == 'QA':
         "User": "svcuser",
         "Password": "Efef@123!"
     }
+    MYSQL_MOCKTEST_DATABASE = {
+        "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
+        "User":"edtechmysqluser",
+        "Password": "edtechdbuserstg123"
+    }
 
 
 elif os.environ['environment'] == 'STG':
