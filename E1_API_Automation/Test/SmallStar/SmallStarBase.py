@@ -17,7 +17,7 @@ class SmallStarBase():
         password = '12345'
         culture_code = 'zh-CN'
     if ENVIRONMENT == Environment.STAGING_SG:
-        user_name = "ss3.ru.01"
+        user_name = "ss3.id.01"
         password = '12345'
         culture_code = 'ru-RU'
     if ENVIRONMENT == Environment.QA:
@@ -25,11 +25,11 @@ class SmallStarBase():
         password = '12345'
         culture_code = 'zh-CN'
     if ENVIRONMENT == Environment.LIVE:
-        user_name = "ss3.cnlive.1"
+        user_name = "ss3.cn.01"
         password = '12345'
         culture_code = 'zh-CN'
     if ENVIRONMENT == Environment.LIVE_SG:
-        user_name = "russia.trial"
+        user_name = "ss3.id.01"
         password = '12345'
         culture_code = 'ru-RU'
 
