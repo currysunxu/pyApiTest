@@ -293,3 +293,10 @@ class SmallStarTestCases(SmallStarBase):
                                  historical_quiz_answer.json())[-1]
 
         assert_that(result['TotalScore'] == result['Score'])
+
+    @Test()
+    def test_athena_student_login_with_v3_token(self):
+        response = self.small_star_service.login(self.user_name, self.password).json()
+        self.lg_token = jmespath.search('Token', response)
+        student_login = self.student.login_student(self.lg_token, self.password)
+        assert_that(student_login.status_code == 200)

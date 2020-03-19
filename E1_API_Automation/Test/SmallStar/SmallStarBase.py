@@ -1,6 +1,7 @@
 import jmespath
 from ptest.decorator import TestClass, BeforeClass, AfterMethod, BeforeMethod
 
+from E1_API_Automation.Business.Athena import Student
 from E1_API_Automation.Business.SmallStarV3 import SmallStarService
 from E1_API_Automation.Settings import ENVIRONMENT, Environment
 
@@ -36,6 +37,7 @@ class SmallStarBase():
     @BeforeClass()
     def set_up(self):
         self.small_star_service = SmallStarService(ENVIRONMENT)
+        self.student = Student(ENVIRONMENT)
         self.set_context()
 
     @AfterMethod()
