@@ -1,6 +1,6 @@
+import time
 import arrow
 import jmespath
-
 
 from E1_API_Automation.Lib.Moutai import Moutai, Token
 from E1_API_Automation.Settings import Environment
@@ -51,18 +51,15 @@ class SmallStarService():
         response = self.mou_tai.post("/api/v2/CourseNode/Synchronize/", json=body)
         return jmespath.search("Upserts", response.json())
 
-    def submit_small_star_student_answers(self, activity_key, student_id, group_id):
-        if completed_activity_perfect is True:
-            body = SubmitActivityAnswerBody.generate_activity_answer_perfect(activity_key, student_id, group_id)
-        else:
-            body = SubmitActivityAnswerBody.generate_activity_answer_not_perfect(activity_key, student_id, group_id)
+    def submit_small_star_student_answers(self, pass_perfect, activity_key, student_id, group_id):
+        body = SubmitActivityAnswerBody.generate_activity_answer(pass_perfect, activity_key, student_id, group_id)
         return self.mou_tai.post("/api/v2/ActivityAnswer/SmallStar/", json=body)
 
 
 class SubmitActivityAnswerBody():
 
     @staticmethod
-    def set_answers_not_perfect(activity_key, activity_course_key, question_key, total_star):
+    def set_answers(pass_perfect, activity_key, activity_course_key, question_key, total_star):
 
         activity_type = get_activity_type(activity_key)
         answers = {
@@ -78,7 +75,10 @@ class SubmitActivityAnswerBody():
             "TotalScore": total_star,
             "TotalStar": total_star,
         }
-        if activity_type == 'ssTracingWord':
+        if pass_perfect:
+            answers["Star"] = total_star
+            answers["Score"] = total_star
+        elif activity_type == 'ssTracingWord':
             answers["Star"] = total_star
             answers["Score"] = total_star
         elif activity_type == 'dialogue':
@@ -99,26 +99,7 @@ class SubmitActivityAnswerBody():
         return answers
 
     @staticmethod
-    def set_answers_perfect(activity_key, activity_course_key, question_key, total_star):
-        answers = {
-            "ActivityCourseKey": activity_course_key,
-            "ActivityKey": activity_key,
-            "Attempts": None,
-            "Detail": {"moduleData": None},
-            "Duration": 2,
-            "LocalEndStamp": arrow.utcnow().format('YYYY-MM-DDTHH:mm:ssZZ'),
-            "LocalStartStamp": None,
-            "QuestionKey": question_key,
-            "Key": None,
-            "Score": total_star,
-            "Star": total_star,
-            "TotalScore": total_star,
-            "TotalStar": total_star,
-        }
-        return answers
-
-    @staticmethod
-    def generate_activity_answer_not_perfect(activity_key, student_id, group_id):
+    def generate_activity_answer(pass_perfect, activity_key, student_id, group_id):
         def split(li: list, new_list=[]):
             for ele in li:
                 if isinstance(ele, list):
@@ -126,6 +107,7 @@ class SubmitActivityAnswerBody():
                 else:
                     new_list.append(ele)
             return new_list
+
         li = get_question_key(activity_key)
         question_keys = split(li)
         activity_answer_body = {
@@ -135,38 +117,14 @@ class SubmitActivityAnswerBody():
             "GroupId": group_id
         }
         answers = [
-            SubmitActivityAnswerBody.set_answers_not_perfect(activity_key,
-                                                             get_activity_course_key(activity_key),
-                                                             question_key,
-                                                             get_total_star(question_key, activity_key))
+            SubmitActivityAnswerBody.set_answers(pass_perfect,
+                                                 activity_key,
+                                                 get_activity_course_key(activity_key),
+                                                 question_key,
+                                                 get_total_star(question_key, activity_key))
             for question_key in question_keys]
         activity_answer_body["Answers"] = answers
-        return activity_answer_body
-
-    @staticmethod
-    def generate_activity_answer_perfect(activity_key, student_id, group_id):
-        def split(li: list, new_list=[]):
-            for ele in li:
-                if isinstance(ele, list):
-                    split(ele)
-                else:
-                    new_list.append(ele)
-            return new_list
-
-        li = get_question_key(activity_key)
-        question_keys = split(li)
-        activity_answer_body = {
-            "ActivityCourseKey": get_activity_course_key(activity_key),
-            "ActivityKey": activity_key,
-            "StudentId": student_id,
-            "GroupId": group_id
-        }
-        answers = [SubmitActivityAnswerBody.set_answers_perfect(activity_key,
-                                                                get_activity_course_key(activity_key),
-                                                                question_key,
-                                                                get_total_star(question_key, activity_key))
-                   for question_key in question_keys]
-        activity_answer_body["Answers"] = answers
+        print(activity_answer_body)
         return activity_answer_body
 
 
@@ -181,7 +139,7 @@ def get_lesson_nodes():
 
 
 def get_lesson_keys_by_unit_key():
-    unit_key = get_unit_keys_by_unit_name(unit_name)
+    unit_key = get_unit_keys_by_unit_name()
     lesson_node = get_lesson_nodes()
     lesson_keys = jmespath.search("@[?ParentNodeKey=='{0}'].Key".format(unit_key), lesson_node)
     return lesson_keys
@@ -192,7 +150,7 @@ def get_unit_nodes():
     return jmespath.search("@[?Level ==`4`]", course_node)
 
 
-def get_unit_keys_by_unit_name(unit_name):
+def get_unit_keys_by_unit_name():
     unit_node = get_unit_nodes()
     unit_key = jmespath.search("@[?Name == '{}'].Key".format(unit_name), unit_node)[0]
     return unit_key
@@ -240,6 +198,7 @@ def get_total_star(question_key, activity_key):
             else:
                 new_list.append(ele)
         return new_list
+
     li = question_answer
     star = split(li)
     if activity_type == 'ssTracingWord':
@@ -257,33 +216,32 @@ def get_total_star(question_key, activity_key):
     return total_star
 
 
-def submit_data(lesson_keys):
+def submit_data(pass_perfect, lesson_keys):
     for lesson_key in lesson_keys:
         activity_keys = get_activity_keys(lesson_key)
         for activity_key in activity_keys:
-            print(SubmitActivityAnswerBody.generate_activity_answer_not_perfect(activity_key, user_id, group_id))
-            print(small_star_service.submit_small_star_student_answers(activity_key, user_id, group_id))
+            print(small_star_service.submit_small_star_student_answers(pass_perfect, activity_key, user_id, group_id))
 
 
-def run():
-
+def run(pass_perfect):
     lesson_keys = get_lesson_keys_by_unit_key()
     unlock_lesson_keys = get_unlock_lesson_keys()
     if lesson_keys[0] in unlock_lesson_keys:
-        submit_data(lesson_keys)
+        submit_data(pass_perfect, lesson_keys)
     elif unit_name == 'Unit 0':
-        submit_data(lesson_keys)
+        submit_data(pass_perfect, lesson_keys)
     else:
         print('This unit is not unlocked. Please use the unlock tool to unlock the unit first!')
 
 
 if __name__ == '__main__':
-    username = 'ss3.cn.02'
-    password = '12345'
-    book_name = 'Book 1'
-    unit_name = 'Unit 0'
-    completed_activity_perfect = False
+    start = time.time()
+    username = 'ss3.cn.02'  # login username
+    password = '12345'  # login password
+    book_name = 'Book 1'  # The book that needs to be executed
+    unit_name = 'Unit 1'  # The unit that needs to be executed
     small_star_service = SmallStarService(Environment.STAGING)
+    # Environment: QA / STAGING / STAGING_SG / LIVE / LIVE_SG
 
     small_star_service.login(username, password)
     response = small_star_service.get_student_profile().json()
@@ -291,6 +249,13 @@ if __name__ == '__main__':
     product_code = jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.ProductCode".format(book_key), response)[0]
     group_id = jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.OdinId".format(book_key), response)[0]
     user_id = jmespath.search('UserId', response)
-    course_plan_key = jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.CoursePlanKey".format(book_key), response)[0]
+    course_plan_key = \
+        jmespath.search("CourseGroups[?Group.BookKey=='{}'].Group.CoursePlanKey".format(book_key), response)[0]
+    #  No changes are needed
 
-    run()
+    run(pass_perfect=False)
+    # pass_perfect = True   make all the activities correct
+    # pass_perfect = False  make all the activities wrong
+
+    end = time.time()
+    print(end - start)
