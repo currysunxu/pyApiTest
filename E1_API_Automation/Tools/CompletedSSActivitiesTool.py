@@ -62,6 +62,7 @@ class SubmitActivityAnswerBody():
     def set_answers(pass_perfect, activity_key, activity_course_key, question_key, total_star):
 
         activity_type = get_activity_type(activity_key)
+        type_list = ['ssTracingWord', 'dialogue', 'reader', 'readerLongText', 'ssTracingLetter']
         answers = {
             "ActivityCourseKey": activity_course_key,
             "ActivityKey": activity_key,
@@ -78,19 +79,7 @@ class SubmitActivityAnswerBody():
         if pass_perfect:
             answers["Star"] = total_star
             answers["Score"] = total_star
-        elif activity_type == 'ssTracingWord':
-            answers["Star"] = total_star
-            answers["Score"] = total_star
-        elif activity_type == 'dialogue':
-            answers["Star"] = total_star
-            answers["Score"] = total_star
-        elif activity_type == 'reader':
-            answers["Star"] = total_star
-            answers["Score"] = total_star
-        elif activity_type == 'readerLongText':
-            answers["Star"] = total_star
-            answers["Score"] = total_star
-        elif activity_type == 'ssTracingLetter':
+        elif activity_type in type_list:
             answers["Star"] = total_star
             answers["Score"] = total_star
         else:
@@ -240,7 +229,7 @@ if __name__ == '__main__':
     start = time.time()
     username = 'ss3.cn.02'  # login username
     password = '12345'  # login password
-    book_name = 'Book 2'  # The book that needs to be executed
+    book_name = 'Book 1'  # The book that needs to be executed
     unit_name = 'Unit 2'  # The unit that needs to be executed
     small_star_service = SmallStarService(Environment.STAGING)
     # Environment: QA / STAGING / STAGING_SG / LIVE / LIVE_SG
