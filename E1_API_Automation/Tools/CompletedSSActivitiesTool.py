@@ -179,6 +179,7 @@ def get_total_star(question_key, activity_key):
     response = small_star_service.get_activity_sync(product_code, book_key)
     question_answer = jmespath.search("@[*].Questions[?Key=='{0}'].Body.answers[]".format(question_key), response)
     activity_type = get_activity_type(activity_key)
+    type_list = ['ssTracingWord', 'dialogue', 'reader', 'readerLongText', 'ssTracingLetter']
 
     def split(li: list, new_list=[]):
         for ele in li:
@@ -190,15 +191,7 @@ def get_total_star(question_key, activity_key):
 
     li = question_answer
     star = split(li)
-    if activity_type == 'ssTracingWord':
-        total_star = 1
-    elif activity_type == 'dialogue':
-        total_star = 1
-    elif activity_type == 'reader':
-        total_star = 1
-    elif activity_type == 'readerLongText':
-        total_star = 1
-    elif activity_type == 'ssTracingLetter':
+    if activity_type in type_list:
         total_star = 1
     else:
         total_star = len(star)
