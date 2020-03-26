@@ -226,8 +226,10 @@ def submit_data(pass_perfect, lesson_keys):
 def run(pass_perfect):
     lesson_keys = get_lesson_keys_by_unit_key()
     unlock_lesson_keys = get_unlock_lesson_keys()
-    if lesson_keys[0] in unlock_lesson_keys:
-        submit_data(pass_perfect, lesson_keys)
+    commonEle = [val for val in lesson_keys if val in unlock_lesson_keys]
+    print(commonEle)
+    if len(commonEle):
+        submit_data(pass_perfect, commonEle)
     elif unit_name == 'Unit 0':
         submit_data(pass_perfect, lesson_keys)
     else:
@@ -238,8 +240,8 @@ if __name__ == '__main__':
     start = time.time()
     username = 'ss3.cn.02'  # login username
     password = '12345'  # login password
-    book_name = 'Book 1'  # The book that needs to be executed
-    unit_name = 'Unit 1'  # The unit that needs to be executed
+    book_name = 'Book 2'  # The book that needs to be executed
+    unit_name = 'Unit 2'  # The unit that needs to be executed
     small_star_service = SmallStarService(Environment.STAGING)
     # Environment: QA / STAGING / STAGING_SG / LIVE / LIVE_SG
 
