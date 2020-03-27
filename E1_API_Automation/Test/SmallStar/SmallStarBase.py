@@ -20,7 +20,7 @@ class SmallStarBase():
     if ENVIRONMENT == Environment.STAGING_SG:
         user_name = "ss3.id.01"
         password = '12345'
-        culture_code = 'ru-RU'
+        culture_code = 'id-ID'
     if ENVIRONMENT == Environment.QA:
         user_name = "ss3.cn.01"
         password = '12345'
