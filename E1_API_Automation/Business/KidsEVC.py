@@ -137,10 +137,6 @@ class KidsEVCService():
         }
         return self.mou_tai.post(url="/ksdsvc/api/v3/block-booking?courseType={0}&courseTypeLevelCode={1}&classType=Regular&regionCode=CN".format(course_type, course_type_level_code), json=json)
 
-    def block_booking_search_by_weekday_timeslot_teacher(self):
-        return
-
-
     def block_booking(self, start_data_time, end_date_time, course_type):
         random_num = random.randint(0, 23)
         json = {
