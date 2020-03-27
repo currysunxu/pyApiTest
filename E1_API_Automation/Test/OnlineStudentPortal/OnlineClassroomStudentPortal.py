@@ -10,6 +10,7 @@ from ...Test.OnlineStudentPortal.EVCBaseClass import EVCBase
 import os
 import arrow
 
+
 class ClassType(Enum):
     DEMO = "Demo"
     REGULAR = "Regular"
@@ -328,7 +329,8 @@ class APITestCases(EVCBase):
                                                     local2utc(self.regular_end_time),
                                                     teacher_id, course_type=course_type,
                                                     class_type=ClassType.REGULAR.value,
-                                                    course_type_level_code="Z", unit_number="2", lesson_number="2", is_reschedule="false")
+                                                    course_type_level_code="Z", unit_number="2", lesson_number="2",
+                                                    is_reschedule="false")
         assert_that(book_response.status_code == 404)
         assert_that(jmespath.search("status", book_response.json()) == 404)
         assert_that(jmespath.search("subStatus", book_response.json()) == 601)
@@ -384,14 +386,15 @@ class APITestCases(EVCBase):
         reschedule_end_time = arrow.now().shift(weeks=1, days=1, hours=1).format('YYYY-MM-DD HH:30:00')
 
         current_available_teachers_response = self.evc_service.get_all_available_teachers(reschedule_start_time,
-                                                                                  reschedule_end_time,
-                                                                                  course_type=course_type,
-                                                                                  class_type=ClassType.REGULAR.value,
-                                                                                  page_index=0, page_size=10)
+                                                                                          reschedule_end_time,
+                                                                                          course_type=course_type,
+                                                                                          class_type=ClassType.REGULAR.value,
+                                                                                          page_index=0, page_size=10)
         teacher_id = jmespath.search("[0].teacherId", current_available_teachers_response.json())
 
         # Reschedule
-        reschedule_response = self.evc_service.reschedule(class_id, teacher_id, reschedule_start_time, reschedule_end_time)
+        reschedule_response = self.evc_service.reschedule(class_id, teacher_id, reschedule_start_time,
+                                                          reschedule_end_time)
         assert_that(reschedule_response.status_code == 200)
         assert_that(int(jmespath.search("classId", reschedule_response.json())) == int(class_id))
 

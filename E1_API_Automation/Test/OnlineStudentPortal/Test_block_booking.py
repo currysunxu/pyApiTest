@@ -30,7 +30,6 @@ class TestBlockBooking():
         teacher_id = "10274591"
         class_list = []
 
-
     if KSD_ENVIRONMENT == KSDEnvironment.STAGING:
         user_info_HF = {
             "UserName": "hf3.cn.03",
@@ -87,7 +86,7 @@ class TestBlockBooking():
         lesson_structure_response = self.service.get_course_lesson_structure('Regular', course_type)
 
         unit = jmespath.search("[?courseTypeLevelCode=='" + book + "'].unitNumber",
-                                 lesson_structure_response.json())
+                               lesson_structure_response.json())
         lesson = jmespath.search("[?courseTypeLevelCode=='" + book + "'].lessonNumber",
                                  lesson_structure_response.json())
         unit_lesson = tuple(zip(unit, lesson))
@@ -124,7 +123,8 @@ class TestBlockBooking():
 
         # search by weekday and time slot
         search_time_slots = self.get_booking_time_slots(course[0], course[1])
-        search_result = self.service.block_booking_search_by_weekday_and_timeslot(self.user_info_HF["course_type"], search_time_slots)
+        search_result = self.service.block_booking_search_by_weekday_and_timeslot(self.user_info_HF["course_type"],
+                                                                                  search_time_slots)
 
         # block booking
         block_booking_response = self.service.block_booking_v3(course[0], course[1], self.teacher_id, search_time_slots)
@@ -185,7 +185,8 @@ class TestBlockBooking():
 
         # search by weekday and teacher
         time_ranges = self.get_booking_time_ranges(course[0], course[1])
-        self.service.block_booking_search_by_weekday_and_teacher(self.user_info_HF["course_type"], self.teacher_id, time_ranges, "Monday")
+        self.service.block_booking_search_by_weekday_and_teacher(self.user_info_HF["course_type"], self.teacher_id,
+                                                                 time_ranges, "Monday")
         book_time_slots = self.get_booking_time_slots(course[0], course[1])
 
         # block booking
@@ -206,7 +207,8 @@ class TestBlockBooking():
 
         # search by time slot and teacher
         time_ranges = self.get_booking_time_ranges(course[0], course[1])
-        self.service.block_booking_search_by_slot_and_teacher(self.user_info_HF["course_type"], self.teacher_id, time_ranges, "16:30")
+        self.service.block_booking_search_by_slot_and_teacher(self.user_info_HF["course_type"], self.teacher_id,
+                                                              time_ranges, "16:30")
         book_time_slots = self.get_booking_time_slots(course[0], course[1])
 
         # block booking
