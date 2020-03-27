@@ -28,6 +28,17 @@ class SmallStarService():
         return self.mou_tai.get(
             "/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreementForMobile/?product=3&cultureCode={}&platformType=ios".format(culture_code))
 
+    def get_student_privacy_policy_content_newapi(self, culture_code):
+        return self.mou_tai.get(
+            "/api/v2/PrivacyPolicy/PrivacyPolicyDocuments/?Product=3&CultureCode={}".format(culture_code))
+
+    def save_student_privacy_policy_content(self, privacy_document_id):
+        body = {
+            "privacyDocumentId": privacy_document_id,
+            "product": 3
+        }
+        return self.mou_tai.post("/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement/", json=body)
+
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
 

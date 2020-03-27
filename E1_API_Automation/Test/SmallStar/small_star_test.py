@@ -18,6 +18,18 @@ class SmallStarTestCases(SmallStarBase):
         assert_that(privacy_content.json(), exist("LatestPrivacyPolicyDocumentResult"))
 
     @Test()
+    def test_get_privacy_policy_newapi(self):
+        privacy_content = self.small_star_service.get_student_privacy_policy_content_newapi(self.culture_code)
+        assert_that(privacy_content.status_code == 200)
+
+    @Test()
+    def test_save_privacy_policy_content(self):
+        privacy_content = self.small_star_service.get_student_privacy_policy_content_newapi(self.culture_code).json()
+        self.privacy_document_id = jmespath.search('Id', privacy_content)
+        save_privacy_content = self.small_star_service.save_student_privacy_policy_content(self.privacy_document_id)
+        assert_that(save_privacy_content.status_code == 204)
+
+    @Test()
     def get_content(self):
         body = {
             "Activity": {
