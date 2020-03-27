@@ -18,14 +18,14 @@ class ClassType(Enum):
 @TestClass()
 class APITestCases(EVCBase):
 
-    @Test(tags='qa, stg,live')
+    @Test(tags='qa, stg,live, stg_sg, live_sg')
     def test_login(self):
         # Login failed was also verified at the lower layer.
         response = self.evc_service.login(user_name=self.user_info["UserName"], password=self.user_info["Password"])
         return response
 
     @Test(tags='qa,stg,live')
-    def test_get_offline_active_groups(self):
+    def test_get_offline_active_group_info(self):
         self.test_login()
 
         group_response = self.evc_service.get_offline_active_groups()
@@ -45,6 +45,19 @@ class APITestCases(EVCBase):
         course.append(book_code)
         return course
 
+    @Test(tags='stg_sg, live_sg')
+    def test_get_offline_active_groups(self):
+        self.test_login()
+        group_response = self.evc_service.get_offline_active_groups()
+        assert_that(group_response.status_code == 200)
+
+    @Test(tags='qa,stg,live, stg_sg, live_sg')
+    def test_offline_classes(self):
+        self.test_login()
+
+        offline_classes_response = self.evc_service.get_offline_classes()
+        assert_that(offline_classes_response.status_code == 200)
+
     @Test(tags='qa,stg,live')
     def test_get_offline_group_sessions(self):
         self.test_login()
@@ -62,7 +75,7 @@ class APITestCases(EVCBase):
         assert_that(session_response.json(), match_to("[*].lessons[0].unitNumber"))
         assert_that(session_response.json(), match_to("[*].lessons[0].lessonNumber"))
 
-    @Test(tags='qa,stg,live')
+    @Test(tags='qa,stg,live, stg_sg, live_sg')
     def test_student_profile(self):
         self.test_login()
         response = self.evc_service.get_user_profile()
@@ -294,7 +307,7 @@ class APITestCases(EVCBase):
                                                     class_type=ClassType.REGULAR.value,
                                                     course_type_level_code=book_code, unit_number="2",
                                                     lesson_number="2", is_reschedule="false")
-        self.evc_service.sign_out()
+        # self.evc_service.sign_out()
         assert_that(book_response.status_code == 409)
         assert_that(jmespath.search("status", book_response.json()) == 409)
         assert_that(jmespath.search("subStatus", book_response.json()) == 600)
@@ -326,12 +339,6 @@ class APITestCases(EVCBase):
 
         response = self.evc_service.cancel_class("30789")
         assert_that(jmespath.search("status", response.json()) == 404)
-
-    @Test(tags='qa,stg,live')
-    def test_save_policy_agreement(self):
-        ba_token = self.evc_service.login_get_v3_token(user_name=self.user_info["UserName"], password=self.user_info["Password"])
-        response = self.evc_service.save_policy_agreement(ba_token, host=self.svcHost)
-        assert_that(response.status_code == 204)
 
     @Test(tags='qa,stg,live')
     def test_evc_student_profile(self):
