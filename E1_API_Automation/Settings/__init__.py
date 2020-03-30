@@ -8,6 +8,12 @@ class Environment(object):
     STAGING_SG = "https://e1svc-staging.ef.com"
     LIVE_SG = "https://e1svc.ef.com"
 
+class KSDEnvironment(object):
+    QA = "https://study-qa.ef.cn"
+    STAGING = "https://study-staging.ef.cn"
+    LIVE = "https://study.ef.cn"
+    STAGING_SG = "https://study-staging.ef.com"
+    LIVE_SG = "https://study.ef.com"
 
 class OSPEnvironment(object):
     QA = "http://internal-e1osp-qa.ef.com"
@@ -75,6 +81,7 @@ except:
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
+    KSD_ENVIRONMENT = KSDEnvironment.QA
     OSP_ENVIRONMENT = OSPEnvironment.QA
     TPI_ENVIRONMENT = TPIEnvironment.QA
     AUTH_ENVIRONMENT = AuthEnvironment.QA
@@ -111,6 +118,7 @@ if os.environ['environment'] == 'QA':
 
 elif os.environ['environment'] == 'STG':
     ENVIRONMENT = Environment.STAGING
+    KSD_ENVIRONMENT = KSDEnvironment.STAGING
     OSP_ENVIRONMENT = OSPEnvironment.STAGING
     TPI_ENVIRONMENT = TPIEnvironment.STAGING
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING
@@ -124,6 +132,7 @@ elif os.environ['environment'] == 'STG':
 
 elif os.environ['environment'] == 'STG_SG':
     ENVIRONMENT = Environment.STAGING_SG
+    KSD_ENVIRONMENT = KSDEnvironment.STAGING_SG
     OSP_ENVIRONMENT = OSPEnvironment.STAGING_SG
     TPI_ENVIRONMENT = TPIEnvironment.STAGING_SG
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING_SG
@@ -138,6 +147,7 @@ elif os.environ['environment'] == 'STG_SG':
 
 elif os.environ['environment'] == 'LIVE':
     ENVIRONMENT = Environment.LIVE
+    KSD_ENVIRONMENT = KSDEnvironment.LIVE
     OSP_ENVIRONMENT = OSPEnvironment.LIVE
     TPI_ENVIRONMENT = TPIEnvironment.LIVE
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE
@@ -151,6 +161,7 @@ elif os.environ['environment'] == 'LIVE':
 
 elif os.environ['environment'] == 'LIVE_SG':
     ENVIRONMENT = Environment.LIVE_SG
+    KSD_ENVIRONMENT = KSDEnvironment.LIVE_SG
     OSP_ENVIRONMENT = OSPEnvironment.LIVE_SG
     TPI_ENVIRONMENT = TPIEnvironment.LIVE_SG
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE_SG

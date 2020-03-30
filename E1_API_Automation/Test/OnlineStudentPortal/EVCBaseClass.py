@@ -9,7 +9,8 @@ from ...Business.KidsEVC import KidsEVCService
 from ...Lib.ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2est, \
     ServiceSubTypeCode, get_UAT_schedule_tool, get_STG_schedule_tool
 from ...Lib.Moutai import Token
-from E1_API_Automation.Settings import ENVIRONMENT, Environment,env_key
+from E1_API_Automation.Settings import ENVIRONMENT, env_key, KSD_ENVIRONMENT, KSDEnvironment
+
 
 class EVCBase():
     token_pattern = Token("X-BA-TOKEN", "Token")
@@ -58,13 +59,11 @@ class EVCBase():
     est_regular_start_time = local2est(regular_start_time)
     est_regular_end_time = local2est(regular_end_time)
 
-    if ENVIRONMENT == Environment.QA:
+    if KSD_ENVIRONMENT == KSDEnvironment.QA:
         try:
             teacher_id = os.environ['Teacher_Id']
         except:
             teacher_id = "10703777"
-        host = "https://study-qa.ef.cn"
-        svcHost = "https://e1svc-qa.ef.cn"
         SIS_SERVICE = 'https://internal-e1-evc-booking-qa-cn.ef.com'
         user_info = {
             "UserName": "hf2.cn.auto1",
@@ -99,7 +98,7 @@ class EVCBase():
         sis_test_student = 12226094
         sis_test_teacher_list = [10703777, 10366576]
         evc_profile_host='https://e1-evc-booking-integration-qa.ef.com'
-    if ENVIRONMENT == Environment.STAGING:
+    if KSD_ENVIRONMENT == KSDEnvironment.STAGING:
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
         Caroline is working on this data.
@@ -110,8 +109,6 @@ class EVCBase():
         except:
 
             teacher_id = "10369666"
-        host = "https://study-staging.ef.cn"
-        svcHost = "https://e1svc-staging.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-stg-cn.ef.com'
         user_info = {
             "UserName": "hf2.cn.02",
@@ -147,7 +144,16 @@ class EVCBase():
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
         evc_profile_host='https://e1-evc-booking-integration-stg.ef.com'
-    if ENVIRONMENT == Environment.LIVE:
+    if KSD_ENVIRONMENT == KSDEnvironment.STAGING_SG:
+        user_info = {
+            "UserName": "hf3.id.02",
+            "Password": "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
+        teacher_id = ""
+
+    if ENVIRONMENT == KSDEnvironment.LIVE:
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
         Caroline is working on this data.
@@ -158,8 +164,6 @@ class EVCBase():
         except:
 
             teacher_id = "10369666"
-        host = "https://study.ef.cn"
-        svcHost = "https://e1svc.ef.cn"
         SIS_SERVICE = 'http://internal-e1-evc-booking-cn.ef.com'
         user_info = {
             "UserName": "hf2.cn.01",
@@ -195,7 +199,15 @@ class EVCBase():
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
         evc_profile_host='https://e1-evc-booking-integration.ef.com'
-        
+
+    if ENVIRONMENT == KSDEnvironment.LIVE_SG:
+        user_info = {
+            "UserName": "hf3.id.02",
+            "Password": "12345",
+            "DeviceType": 0,
+            "Platform": 0
+        }
+        teacher_id = ""
 
     def get_different_teacher(teacher_id, teacher_list):
         for teacher in teacher_list:
@@ -208,7 +220,7 @@ class EVCBase():
     
     @BeforeSuite()
     def set_up(self):
-        self.evc_service = KidsEVCService(host=self.host)
+        self.evc_service = KidsEVCService(host=KSD_ENVIRONMENT)
 
     def create_class(self):
         
