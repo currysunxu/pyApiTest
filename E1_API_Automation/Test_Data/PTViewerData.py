@@ -1,6 +1,6 @@
 class PTViewerData:
     pt_viewer_data = {
-        'STAGING': {
+        'Staging': {
                 'userId': '145719',
                 'ptPrimaryKey': '2E3C64F2-7AE6-49C5-B578-38C856278AFC',
                 'studentsId': '1070',
@@ -14,7 +14,7 @@ class PTViewerData:
             'username': 'pdcc.id@ef.com',
             'password': 'Pass@246'
         },
-        'LIVE': {
+        'Live': {
             'userId': '260868',
             'ptPrimaryKey': 'C96F9256-E51E-44B5-883E-11F932346721',
             'studentsId': '1070',

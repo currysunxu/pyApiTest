@@ -73,6 +73,13 @@ class KidsEVCEnvironment(object):
 class MockTestEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn/mseb"
 
+
+class E1TPIEnvironment(object):
+    STAGING = "https://e1tpi-staging.ef.cn"
+    STAGING_SG = "https://e1tpi-staging.ef.com"
+    LIVE = "https://e1tpi.ef.cn"
+    LIVE_SG = "https://e1tpi.ef.com"
+
 try:
     print(os.environ['environment'])
 except:
@@ -123,6 +130,7 @@ elif os.environ['environment'] == 'STG':
     TPI_ENVIRONMENT = TPIEnvironment.STAGING
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING
     OMNI_ENVIRONMENT = OMNIEnvironment.STAGING
+    E1TPI_ENVIRONMENT = E1TPIEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
@@ -137,6 +145,7 @@ elif os.environ['environment'] == 'STG_SG':
     TPI_ENVIRONMENT = TPIEnvironment.STAGING_SG
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING_SG
     OMNI_ENVIRONMENT = OMNIEnvironment.STAGING_SG
+    E1TPI_ENVIRONMENT = E1TPIEnvironment.STAGING_SG
     env_key = 'Staging_SG'
     DATABASE = {
         "Server": "SGE1STGDB01.e1ef.com,1434",
@@ -152,6 +161,7 @@ elif os.environ['environment'] == 'LIVE':
     TPI_ENVIRONMENT = TPIEnvironment.LIVE
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
+    E1TPI_ENVIRONMENT = E1TPIEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",
@@ -166,6 +176,7 @@ elif os.environ['environment'] == 'LIVE_SG':
     TPI_ENVIRONMENT = TPIEnvironment.LIVE_SG
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE_SG
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
+    E1TPI_ENVIRONMENT = E1TPIEnvironment.LIVE_SG
     env_key = 'Live_SG'
     DATABASE = {
         "Server": "",
