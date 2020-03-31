@@ -3,12 +3,15 @@
 
 #author:Curry
 #date:2019/10/31
+import datetime
 import json
 import random
 import re
 import string
 import time
 import uuid
+
+import jmespath
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffActivityEntity import Hf35BffActivityEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffDetailsEntity import Hf35BffDetailsEntity
@@ -36,15 +39,17 @@ class Hf35BffUtils:
 	def construct_detail_obj(answer_list):
 		"""
 		construct details object by question_id,total_score,score,answer
+		total_score and score will be integer or float by answer_size.
 		:param answer_list:
 		:return: a list include details objects
 		"""
 		details_list = []
+		answer_size = len(answer_list)
 		for answer in answer_list:
 			question_id = uuid.uuid4().__str__()
 			details_entity = Hf35BffDetailsEntity(question_id)
-			details_entity.total_score = random.randint(9,10)
-			details_entity.score = random.randint(1,8)
+			details_entity.total_score = random.randint(9,10) if (answer_size==1) else random.uniform(9,10)
+			details_entity.score = random.randint(1,8) if (answer_size==1) else random.uniform(9,10)
 			details_entity.answer = answer
 			detail_items = details_entity.__dict__
 			detail_items_new = Hf35BffUtils.modify_dict_keys(detail_items)
@@ -80,14 +85,20 @@ class Hf35BffUtils:
 		"""
 		random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
 		learning_content_id = uuid.uuid4().__str__()
-		bff_entity = Hf35BffAttemptEntity(learning_content_id,activity_list)
-		bff_entity.start_time_utc =random_date_time
-		bff_entity.end_time_utc =random_date_time
+		bff_entity = Hf35BffAttemptEntity(learning_content_id, activity_list)
+		bff_entity.start_time = random_date_time
+		bff_entity.end_time = random_date_time
 		bff_entity.book_content_id = uuid.uuid4().__str__()
+		bff_entity.book_content_revision = "BookContentRevision%s" % (random.randint(1, 100))
 		bff_entity.course_content_id = uuid.uuid4().__str__()
+		bff_entity.course_content_revision = "CourseContentRevision%s" % (random.randint(1, 100))
 		bff_entity.unit_content_id = uuid.uuid4().__str__()
+		bff_entity.unit_content_revision = "UnitContentRevision%s" % (random.randint(1, 100))
 		bff_entity.lesson_content_id = uuid.uuid4().__str__()
-		bff_entity.tree_revision = "TestRevision%s"%(random.randint(1,10))
+		bff_entity.lesson_content_revision = "LessonContentRevision%s" % (random.randint(1, 100))
+		bff_entity.learning_unit_content_revision = "LearningUnitContentRevision%s" % (random.randint(1, 100))
+		bff_entity.tree_revision = "TestRevision%s" % (random.randint(1, 10))
+		bff_entity.schema_version = random.randint(1, 10)
 		bff_dict = bff_entity.__dict__
 		bff_dict_new = Hf35BffUtils.modify_dict_keys(bff_dict)
 		return bff_dict_new
@@ -137,3 +148,48 @@ class Hf35BffUtils:
 		p = re.compile(r'([a-z]|\d)([A-Z])')
 		sub = re.sub(p, r'\1_\2', hump_str).lower()
 		return sub
+
+	@staticmethod
+	def verify_ksd_online_class(ksd_online_class_list, expected_evc_online_class_list, evc_teacher_info_list):
+		error_message = ''
+
+		if len(ksd_online_class_list) != len(expected_evc_online_class_list):
+			error_message = "ksd online class size not as expected!"
+
+		for i in range(len(ksd_online_class_list)):
+			actual_ksd_online_class = ksd_online_class_list[i]
+			expected_evc_online_class = expected_evc_online_class_list[i]
+
+			teacher_id = actual_ksd_online_class['teacherId']
+			expected_evc_teacher = {}
+			for evc_teacher_info in evc_teacher_info_list:
+				if evc_teacher_info['teacherId'] == teacher_id:
+					expected_evc_teacher = evc_teacher_info
+					break
+
+			for key in actual_ksd_online_class.keys():
+				actual_value = actual_ksd_online_class[key]
+				if key not in ('teacherName', 'teacherAvatarUrl', 'teacherAccent'):
+					expected_value = expected_evc_online_class[key]
+
+					if 'Time' in key:
+						actual_value = datetime.datetime.strptime(str(actual_value), '%Y-%m-%dT%H:%M:%S.%fZ')
+						expected_value = datetime.datetime.strptime(str(expected_value), '%Y-%m-%dT%H:%M:%SZ')
+				elif key == 'teacherName':
+					expected_value = expected_evc_teacher['displayName']
+				elif key == 'teacherAvatarUrl':
+					expected_value = expected_evc_teacher['avatarUrl']
+				elif key == 'teacherAccent':
+					expected_teacher_english_spoken = expected_evc_teacher['englishSpoken']
+
+					expected_value = ''
+					if expected_teacher_english_spoken == '703539':
+						expected_value = 'British'
+					elif expected_teacher_english_spoken == '703540':
+						expected_value = 'American'
+
+				if str(actual_value) != str(expected_value):
+					error_message = error_message + " In {0} onlineclass, {1} value not as expected, the actual value is {2}, but expected {3}".format(
+						i, key, actual_value, expected_value)
+
+		return error_message

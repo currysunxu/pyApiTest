@@ -7,14 +7,14 @@ from ..Test_Data.GPData import EducationRegion, ShanghaiGradeKey, MoscowGradeKey
 
 class ResetGPGradeTool:
     if E1_API_Automation.Settings.env_key == 'QA':
-        search_url = 'http://internal-e1pss-qa.ef.com//User/UserSource/QA?rand=0.14291181323741897&PageId=0'
-        reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile?userKey=%s&rand=0.17256526783407744&PageId=0'
-        tool_url = 'http://internal-e1pss-qa.ef.com'
+        tool_url = 'http://10.163.28.80:12505'
+        search_url = tool_url + '/User/UserSource/QA?rand=0.14291181323741897&PageId=0'
+        reset_url = tool_url + '/User/SaveStudentProfile?userKey=%s&rand=0.17256526783407744&PageId=0'
 
     elif E1_API_Automation.Settings.env_key == 'Staging':
-        search_url = 'http://internal-e1pss-qa.ef.com/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
-        reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile/STAGING-CN?userKey=%s&rand=0.17256526783407744&PageId=0'
-        tool_url = 'http://internal-e1pss-qa.ef.com'
+        tool_url = 'http://10.163.28.80:12505'
+        search_url = tool_url + '/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
+        reset_url = tool_url + '/User/SaveStudentProfile/STAGING-CN?userKey=%s&rand=0.17256526783407744&PageId=0'
 
     elif E1_API_Automation.Settings.env_key == 'Staging_SG':
         search_url = 'http://internal-e1pss-qa.ef.com/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'

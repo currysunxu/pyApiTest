@@ -1,23 +1,16 @@
-#!/usr/bin/env python
-#-*-coding:utf-8-*-
-
-#author:Curry
-#date:2019/10/29
 import datetime
-import json
 
+import jmespath
 from hamcrest import assert_that, equal_to
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
-from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapService
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
 from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Business.OMNIService import OMNIService
-from E1_API_Automation.Settings import LEARNING_PLAN_ENVIRONMENT, LEARNING_RESULT_ENVIRONMENT, BFF_ENVIRONMENT, env_key, \
-	CONTENT_MAP_ENVIRONMENT, OMNI_ENVIRONMENT
+from E1_API_Automation.Settings import *
 from ptest.decorator import BeforeMethod
 
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
@@ -31,7 +24,7 @@ class HfBffTestBase:
 		self.key = BffProduct.HFV35.value
 		self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
 		self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
-		self.bff_service.login(self.user_name,self.password)
+		self.bff_service.login(self.user_name, self.password)
 		self.omni_service = OMNIService(OMNI_ENVIRONMENT)
 		self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
 
@@ -48,14 +41,15 @@ class HfBffTestBase:
 		assert_that(plan_response.json()[0]["endTime"], equal_to(leanring_plan_entity.end_time))
 
 	def check_bff_compare_learning_result(self, result_response, learning_result_entity, learning_details_entity):
-		assert_that(result_response.json()[0]["productId"], equal_to(learning_result_entity.product))
-		assert_that(result_response.json()[0]["planType"], equal_to(learning_result_entity.product_module))
+		assert_that(result_response.json()[0]["product"], equal_to(learning_result_entity.product))
+		assert_that(result_response.json()[0]["productModule"], equal_to(learning_result_entity.product_module))
 		assert_that(int(result_response.json()[0]["studentKey"]), equal_to(int(learning_result_entity.student_key)))
-		assert_that(result_response.json()[0]["atomicKey"], equal_to(learning_result_entity.atomic_key))
-		assert_that(result_response.json()[0]["planBusinessKey"], equal_to(learning_result_entity.business_key))
-		assert_that(result_response.json()[0]["planSystemKey"], equal_to(learning_result_entity.plan_system_key))
+		assert_that(result_response.json()[0]["businessKey"], equal_to(learning_result_entity.business_key))
 		assert_that(result_response.json()[0]["expectedScore"], equal_to(learning_result_entity.expected_score))
 		assert_that(result_response.json()[0]["actualScore"], equal_to(learning_result_entity.actual_score))
+		assert_that(result_response.json()[0]["startTime"], equal_to(learning_result_entity.start_time))
+		assert_that(result_response.json()[0]["endTime"], equal_to(learning_result_entity.end_time))
+		assert_that(result_response.json()[0]["route"], equal_to(learning_result_entity.route))
 		# check details object
 		index = 0
 		for details in learning_result_entity.details:
@@ -91,15 +85,9 @@ class HfBffTestBase:
 					activity_field.insert(insert_index, element)
 				insert_index += len(learning_result_entity.details[0])
 
-	def get_learning_plan_response(self, learning_plan_entity):
-		learning_plan_service = LearningPlanService(LEARNING_PLAN_ENVIRONMENT)
-		plan_response = learning_plan_service.get_partition_plan_without_limit_page(learning_plan_entity)
-		print("learining plan response is : " + plan_response.text)
-		return plan_response
-
 	def get_learning_result_response(self, learning_result_entity):
 		learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
-		result_response = learning_result_service.get_user_result_without_limit(learning_result_entity)
+		result_response = learning_result_service.get_specific_result(learning_result_entity)
 		print(result_response.json())
 		return result_response
 
@@ -121,11 +109,13 @@ class HfBffTestBase:
 		#Todo need to refactor dynamicly for groupId after add corresponding api in Homework Service
 		learning_plan_entity.route = "treeRevision=%s|%s" % (bff_data_obj.get_attempt_body()["treeRevision"],"groupId=null")
 
-	def setter_learning_result(self,learning_result_entity,bff_data_obj,plan_system):
+	def setter_learning_result(self,learning_result_entity,bff_data_obj):
 		"""set all fields in learning_result_entity
 		:param learning_result_entity: all_question_expected_scores and all_question_actual_scores are both list type
 		:param bff_data_obj: json test data object
 		:param plan_system: from learning plan response
+		learning_result_entity.product_module = 1 means 'homework'
+		learning_result_entity.product = 2 means 'high flyers'
 		"""
 		all_question_expected_scores = sum(
 			Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..totalScore'))
@@ -134,13 +124,30 @@ class HfBffTestBase:
 		all_details = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..details')
 		learning_result_entity.product_module = 1
 		learning_result_entity.product = 2
-		learning_result_entity.business_key = '|'.join(bff_data_obj.get_plan_business())
+		learning_result_entity.business_key = '|'.join(bff_data_obj.get_business_key())
 		learning_result_entity.student_key = int(self.customer_id)
-		learning_result_entity.atomic_key = bff_data_obj.get_attempt_body()["learningUnitContentId"]
-		learning_result_entity.plan_system_key = plan_system
 		learning_result_entity.expected_score = all_question_expected_scores
 		learning_result_entity.actual_score = all_question_actual_scores
 		learning_result_entity.details = all_details
+		learning_result_entity.start_time = bff_data_obj.get_attempt_body()["startTime"]
+		learning_result_entity.end_time = bff_data_obj.get_attempt_body()["endTime"]
+		route = {}
+		route['course'] = 'HIGH_FLYERS_35'
+		route['regionAch'] = 'cn-3'
+		route['treeRevision'] = bff_data_obj.get_attempt_body()["treeRevision"]
+		route['schemaVersion'] = bff_data_obj.get_attempt_body()["schemaVersion"]
+		route['courseContentId'] = bff_data_obj.get_attempt_body()["courseContentId"]
+		route['courseContentRevision'] = bff_data_obj.get_attempt_body()["courseContentRevision"]
+		route['bookContentId'] = bff_data_obj.get_attempt_body()["bookContentId"]
+		route['bookContentRevision'] = bff_data_obj.get_attempt_body()["bookContentRevision"]
+		route['unitContentId'] = bff_data_obj.get_attempt_body()["unitContentId"]
+		route['unitContentRevision'] = bff_data_obj.get_attempt_body()["unitContentRevision"]
+		route['lessonContentId'] = bff_data_obj.get_attempt_body()["lessonContentId"]
+		route['lessonContentRevision'] = bff_data_obj.get_attempt_body()["lessonContentRevision"]
+		route['learningUnitContentId'] = bff_data_obj.get_attempt_body()["learningUnitContentId"]
+		route['learningUnitContentRevision'] = bff_data_obj.get_attempt_body()["learningUnitContentRevision"]
+		learning_result_entity.route = route
+
 
 	def setter_learning_result_details(self,learning_details_entity,bff_data_obj):
 		"""
@@ -189,3 +196,13 @@ class HfBffTestBase:
 			if is_mismatch:
 				break
 		return content_body
+
+	def get_current_book_from_bootstrap(self):
+		response = self.bff_service.get_bootstrap_controller(platform='ios')
+		current_book = jmespath.search('userContext.currentBook', response.json())
+		return current_book
+
+	def get_tree_revision_from_course_structure(self):
+		response = self.bff_service.get_course_structure()
+		tree_revision = response.json()['treeRevision']
+		return tree_revision
