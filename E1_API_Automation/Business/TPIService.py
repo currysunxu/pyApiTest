@@ -17,3 +17,13 @@ class TPIService:
         }
         return self.mou_tai.post("/api/v2/CourseGroup/EnrolledGroupsWithState", body)
 
+    def v3_product_unlock(self, student_id, lesson_key, product_code):
+        self.mou_tai.headers['X-BA-TOKEN'] = "97096cec-091a-486a-9cef-4c1097a33a46"
+        body = {
+            "StudentIdCollection": [student_id],
+            "CourseKeys": [lesson_key]
+        }
+        if product_code == 'SS':
+            return self.mou_tai.put('/api/v2/SmallStarUnlock', json=body)
+        elif product_code == 'TBV3':
+            return self.mou_tai.put('/api/v2/TrailblazerUnlock', json=body)

@@ -312,3 +312,9 @@ class SmallStarTestCases(SmallStarBase):
         self.lg_token = jmespath.search('Token', response)
         student_login = self.student.login_student(self.lg_token, self.password)
         assert_that(student_login.status_code == 200)
+
+    @Test(tags='stg, live')
+    def test_lesson_unlock(self):
+        lesson_key = '080BF3B5-24D0-E811-814A-02BC62143FC0'
+        unlock= self.tpi_service.v3_product_unlock(self.user_id, lesson_key, product_code="SS")
+        assert_that(unlock.status_code == 204)

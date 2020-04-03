@@ -1,9 +1,11 @@
 import os
 
 from ptest.decorator import AfterMethod, BeforeSuite, AfterSuite, BeforeClass, AfterClass
+
+from E1_API_Automation.Business.TPIService import TPIService
 from ...Business.TrailblazerV3 import TrailbazerService
 
-from ...Settings import ENVIRONMENT, env_key, DATABASE
+from ...Settings import ENVIRONMENT, env_key, DATABASE, TPI_ENVIRONMENT
 from ...Test_Data.TBData import TBUsers, TBSQLString
 from ...Lib.db_mssql import MSSQLHelper
 from ...Lib.Utils import *
@@ -15,6 +17,7 @@ class TraiblazerBaseClass():
         self.tb_test = TrailbazerService(ENVIRONMENT, TBUsers.tb_user[env_key]['username'],
                                          TBUsers.tb_user[env_key]['password'])
         self.picked_lesson = None
+        self.tpi_service = TPIService(TPI_ENVIRONMENT)
 
     @AfterClass()
     def sign_out(self):
