@@ -244,3 +244,9 @@ class TBTestCases(TraiblazerBaseClass):
         response = self.tb_test.query_motivation_reward_summary()
         assert_that(response.status_code == 200)
         assert_that(isinstance(response.json(), list))
+
+    @Test(tags='stg, live')
+    def test_lesson_unlock(self):
+        lesson_key = '3fa0e83c-fe8f-4008-bb69-9dcc13f0d6b2'
+        unlock = self.tpi_service.v3_product_unlock(self.tb_test.user_id, lesson_key, product_code="TBV3")
+        assert_that(unlock.status_code == 204)
