@@ -29,3 +29,44 @@ class PTViewerData:
             'password': 'Pass@246'
         }
     }
+
+
+class HomeworkViewerData:
+    homework_viewer_data = {
+        'Staging': {
+            'userId': '260868',
+            'studentsId': '1022',
+            'countryCode': 'CN',
+            'Region': 'China',
+            'courseLevelCode': 'TBv3Bk1',
+            'sessionach': '3',
+            'CourseActivityKeys': '71e95184-043f-42a5-9754-396496596a34'
+        },
+        'Staging_SG': {
+            'userId': '260874',
+            'studentsId': '1028',
+            'countryCode': 'ID',
+            'Region': 'Indonesia',
+            'courseLevelCode': 'TBv3Bk1',
+            'sessionach': '3',
+            'CourseActivityKeys': '9c2de046-5f80-4493-8770-87407363b90c'
+        },
+        'Live': {
+            'userId': '260868',
+            'studentsId': '1022',
+            'countryCode': 'CN',
+            'Region': 'China',
+            'courseLevelCode': 'TBv3Bk1',
+            'sessionach': '3',
+            'CourseActivityKeys': '1e379f13-0755-4928-90be-33d68456aebf'
+        },
+        'Live_SG': {
+            'userId': '260874',
+            'studentsId': '10271',
+            'countryCode': 'RU',
+            'Region': 'Russia',
+            'courseLevelCode': 'TBv3Bk1',
+            'sessionach': '3',
+            'CourseActivityKeys': 'A98F42EB-A07D-4AA7-A69E-43ECFE1180B2'
+        }
+    }
