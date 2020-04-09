@@ -1,3 +1,4 @@
+from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Lib.Moutai import Moutai
 import jmespath
 
@@ -74,6 +75,11 @@ class Hf35BffService:
                   % (book_content_id, book_content_revision, book_schema_version)
         return self.mou_tai.get(api_url)
 
+    def get_vocab_content_groups(self, book_content_id, book_content_revision, book_schema_version):
+        api_url = "/hf3/api/v1/vocab/content-groups?bookContentId=%s&bookContentRevision=%s&bookSchemaVersion=%s" \
+                  % (book_content_id, book_content_revision, book_schema_version)
+        return self.mou_tai.get(api_url)
+
     def get_handout_ecas(self, eca_filter_body):
         api_url = "/hf3/api/v1/eca"
         return self.mou_tai.post(api_url, eca_filter_body)
@@ -97,8 +103,38 @@ class Hf35BffService:
             # expired token
             self.mou_tai.headers['EF-Access-Token'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJqdGkiOiI2Y2QzMjEwMy05MDg4LTRiM2EtYmY1Ni1mZjE0ZjJhZjQ3MTUiLCJzdWIiOiIxMDAyIiwiaWF0IjoxNTgyNjE0NTYwLCJleHAiOjE1ODI2MjUzNjAsImNvcnJlbGF0aW9uX2lkIjoiY2Q5YWQ0ZjgtMjBmMy00YWUzLWE0YzEtMWZiOTBiMjEwOWY2IiwicmVmX2lkIjoiYWQ2MWRlMTQtMzUxMC00YjMxLTk1OTUtMzIyZWJmZjE1ZDMwIn0.sfl4sm7ON58rpUkxZ4g_PPMTb8bp1Vi4CIfYke8DxAfL0nNuQUR6fTfVCeHp71hf7GRPpnGIkgyhCX16aQMIMBZtVQWtYy_35EaCuKHCXoWUeAc6M7TJTp3qAW8UyvxX9Vh1aNvVPWWmWWI2OtvCKs1CLDRCOnVp9pDz2mm-3vUZ2IWeq1Di53tq1L2hp_DLQIK5LveLqHbGb9zesniHfVKVsPae-rOx2154Ffw6-YLxA_HJXlsgci5EQX4eYzlfcyH4jBj_u68IgZA8UflJ3ok_HkBXl2vWCOptEgq74O1o6N1qNBkHjLZZPIyI2CS79KENHYAoNln2lcEVkqjrtA"
 
-    def get_online_class(self, scope, course_type_level_code=''):
-        # get online class api need both X-EF-TOKEN and EF-Access-Token
+    def get_online_pl_class(self, scope, course_type_level_code=''):
+        # get online pl class api need both X-EF-TOKEN and EF-Access-Token
         self.mou_tai.headers['X-EF-TOKEN'] = self.id_token
-        api_url = "/hf3/api/v1/classes/online?scope={0}&courseTypeLevelCode={1}".format(scope, course_type_level_code)
+        api_url = "/hf3/api/v1/classes/online-pl?scope={0}&courseTypeLevelCode={1}".format(scope, course_type_level_code)
+        return self.mou_tai.get(api_url)
+
+    def get_online_gl_class(self):
+        # get online gl class api need both X-EF-TOKEN and EF-Access-Token
+        self.mou_tai.headers['X-EF-TOKEN'] = self.id_token
+        api_url = "/hf3/api/v1/classes/online-gl"
+        return self.mou_tai.get(api_url)
+
+    def get_privacy_policy_document(self):
+        # don't need any token
+        access_token = self.mou_tai.headers.pop('EF-Access-Token')
+        api_url = "/hf3/api/v1/privacy-policy-document"
+        api_response = self.mou_tai.get(api_url)
+        # set back the access token, when sign pp agreement, it needed
+        self.mou_tai.headers['EF-Access-Token'] = access_token
+        return api_response
+
+    def post_privacy_policy_agreement(self, privacy_document_id):
+        body = {
+            "privacyDocumentId": privacy_document_id
+        }
+        api_url = "/hf3/api/v1/privacy-policy-agreement"
+        return self.mou_tai.post(api_url, body)
+
+    def post_vocab_progress(self, word_attempt_list):
+        word_attempt_insert_dict_list = Hf35BffUtils.construct_word_attempts_dict(word_attempt_list)
+        return self.mou_tai.post("/hf3/api/v1/vocab/progress", word_attempt_insert_dict_list)
+
+    def get_vocab_progress(self, book_content_id):
+        api_url = '/hf3/api/v1/vocab/progress?bookContentId={0}'.format(book_content_id)
         return self.mou_tai.get(api_url)
