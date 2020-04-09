@@ -16,6 +16,9 @@ import jmespath
 from E1_API_Automation.Business.HighFlyer35.Hf35BffActivityEntity import Hf35BffActivityEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffDetailsEntity import Hf35BffDetailsEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffAttemptEntity import Hf35BffAttemptEntity
+from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity, \
+	Hf35BffWordAttemptDetailEntity
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
 
 
 class Hf35BffUtils:
@@ -150,7 +153,7 @@ class Hf35BffUtils:
 		return sub
 
 	@staticmethod
-	def verify_ksd_online_class(ksd_online_class_list, expected_evc_online_class_list, evc_teacher_info_list):
+	def verify_ksd_online_pl_class(ksd_online_class_list, expected_evc_online_class_list, evc_teacher_info_list):
 		error_message = ''
 
 		if len(ksd_online_class_list) != len(expected_evc_online_class_list):
@@ -193,3 +196,137 @@ class Hf35BffUtils:
 						i, key, actual_value, expected_value)
 
 		return error_message
+
+	@staticmethod
+	def verify_online_gl_class(actual_gl_online_class_list, expected_gl_online_class_list):
+		error_message = ''
+
+		if len(actual_gl_online_class_list) != len(expected_gl_online_class_list):
+			error_message = "ksd online class size not as expected!"
+
+		for i in range(len(actual_gl_online_class_list)):
+			actual_gl_online_class = actual_gl_online_class_list[i]
+			expected_gl_online_class = expected_gl_online_class_list[i]
+
+			for key in actual_gl_online_class.keys():
+				actual_value = actual_gl_online_class[key]
+				expected_value = expected_gl_online_class[key]
+				if 'Time' in key:
+					actual_value = datetime.datetime.strptime(str(actual_value), '%Y-%m-%dT%H:%M:%S.%fZ')
+					expected_value = datetime.datetime.strptime(str(expected_value), '%Y-%m-%dT%H:%M:%SZ')
+
+				if str(actual_value) != str(expected_value):
+					error_message = error_message + " In {0} onlineclass, {1} value not as expected, the actual value is {2}, but expected {3}".format(
+						i, key, actual_value, expected_value)
+
+		return error_message
+
+	@staticmethod
+	def verify_bootstrap_provision(actual_bootstrap_provision, expected_provision):
+		error_message = ''
+
+		# provisioning service's key was capitalized
+		for key in actual_bootstrap_provision.keys():
+			actual_value = actual_bootstrap_provision[key]
+			expected_value = expected_provision['{}{}'.format(key[0].upper(), key[1:])]
+
+			if str(actual_value) != str(expected_value):
+				error_message = error_message + " {0} value not as expected, the actual value is {1}, but expected {2}"\
+					.format(key, actual_value, expected_value)
+
+		return error_message
+
+	@staticmethod
+	def construct_word_attempts_dict(word_attempts):
+		if word_attempts is not None:
+			word_attempt_dict_list = []
+			for i in range(len(word_attempts)):
+				word_attempt = word_attempts[i]
+				word_attempt_dict = {}
+				word_attempt_items = word_attempt.__dict__
+				for item_key in word_attempt_items.keys():
+					word_attempt_field_name = item_key[
+														len('_' + word_attempt.__class__.__name__ + '__'):]
+					item_value = word_attempt_items[item_key]
+
+					if word_attempt_field_name != 'detail':
+						word_attempt_field_name = \
+							LearningCommonUtils.convert_name_from_lower_case_to_camel_case(
+								word_attempt_field_name)
+						word_attempt_dict[word_attempt_field_name] = item_value
+					else:
+						detail_dict = Hf35BffUtils.construct_word_attempt_detail(item_value)
+						word_attempt_dict[word_attempt_field_name] = detail_dict
+				word_attempt_dict_list.append(word_attempt_dict)
+			return word_attempt_dict_list
+		else:
+			return None
+
+	@staticmethod
+	def construct_word_attempt_detail(word_attempt_detail):
+		word_attempt_detail_dict = {}
+		word_attempt_detail_items = word_attempt_detail.__dict__
+		for item_key in word_attempt_detail_items.keys():
+			word_attempt_detail_field_name = item_key[len('_' + word_attempt_detail.__class__.__name__ + '__'):]
+			item_value = word_attempt_detail_items[item_key]
+
+			word_attempt_detail_field_name = \
+				LearningCommonUtils.convert_name_from_lower_case_to_camel_case(word_attempt_detail_field_name)
+			word_attempt_detail_dict[word_attempt_detail_field_name] = item_value
+
+		return word_attempt_detail_dict
+
+	@staticmethod
+	def construct_vocab_progress_list(word_attempt_template, item_num=1):
+		word_attempt_list = []
+		for index in range(item_num):
+			word_attempt_entity = Hf35BffWordAttemptEntity(word_attempt_template.course_content_id, word_attempt_template.book_content_id)
+			word_attempt_entity.course_content_revision = "CourseContentRevision%s" % (random.randint(1, 100))
+			word_attempt_entity.book_content_revision = "BookContentRevision%s" % (random.randint(1, 100))
+			word_attempt_entity.unit_content_id = str(uuid.uuid1())
+			word_attempt_entity.unit_content_revision = "UnitContentRevision%s" % (random.randint(1, 100))
+			word_attempt_entity.word_content_id = str(uuid.uuid1())
+			word_attempt_entity.word_content_revision = "WordContentRevision%s" % (random.randint(1, 100))
+			word_attempt_entity.tree_revision = "TestRevision%s" % (random.randint(1, 10))
+			word_attempt_entity.schema_version = random.randint(1, 10)
+
+			random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
+			word_attempt_detail_entity = Hf35BffWordAttemptDetailEntity()
+			word_attempt_detail_entity.current_level = random.randint(1, 10)
+			word_attempt_detail_entity.score = random.uniform(50, 100)
+			word_attempt_detail_entity.last_study_time = random_date_time
+
+			word_attempt_entity.detail = word_attempt_detail_entity
+
+			word_attempt_list.append(word_attempt_entity)
+		return word_attempt_list
+
+	@staticmethod
+	def construct_expected_learning_result_by_word_attempt(learning_result_entity, word_attempt):
+		business_keys = []
+		business_keys.append(word_attempt.course_content_id)
+		business_keys.append(word_attempt.book_content_id)
+		business_keys.append(word_attempt.unit_content_id)
+		business_keys.append(word_attempt.word_content_id)
+		learning_result_entity.business_key = '|'.join(business_keys)
+
+		route = {}
+		route['course'] = 'HIGH_FLYERS_35'
+		route['regionAch'] = 'CN_3'
+		route['treeRevision'] = word_attempt.tree_revision
+		route['schemaVersion'] = word_attempt.schema_version
+		route['courseContentId'] = word_attempt.course_content_id
+		route['courseContentRevision'] = word_attempt.course_content_revision
+		route['bookContentId'] = word_attempt.book_content_id
+		route['bookContentRevision'] = word_attempt.book_content_revision
+		route['unitContentId'] = word_attempt.unit_content_id
+		route['unitContentRevision'] = word_attempt.unit_content_revision
+		route['wordContentId'] = word_attempt.word_content_id
+		route['wordContentRevision'] = word_attempt.word_content_revision
+		learning_result_entity.route = route
+
+		extension = {}
+		extension['currentLevel'] = word_attempt.detail.current_level
+		extension['score'] = word_attempt.detail.score
+		extension['lastStudyTime'] = word_attempt.detail.last_study_time
+		learning_result_entity.extension = extension

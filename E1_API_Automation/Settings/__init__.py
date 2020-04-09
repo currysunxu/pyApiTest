@@ -48,26 +48,32 @@ class OMNIEnvironment(object):
 
 class LearningResultEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/learning-result"
+    STAGING = "https://internal-ktsvc-stg-cn.ef.com/learning-result"
+    LIVE = "https://internal-ktsvc-cn.ef.com/learning-result"
 
 
 class BffEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn"
+    STAGING = "https://ktsvc-stg.ef.cn"
+    LIVE = "https://ktsvc.ef.cn"
 
 
 class HomeworkEnvironment(object):
-    QA = "http://internal-ktsvc-qa-cn.ef.com/homework"
+    QA = "http://internal-ktsvc-qa-cn.ef.com/practice"
+    STAGING = "https://internal-ktsvc-stg-cn.ef.com/practice"
+    LIVE = "https://internal-ktsvc-cn.ef.com/practice"
 
 
 class ContentMapEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/content-map"
+    STAGING = "https://internal-ktsvc-stg-cn.ef.com/content-map"
+    LIVE = "https://internal-ktsvc-cn.ef.com/content-map"
 
 
 class ContentRepoEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/content-repo"
-
-
-class KidsEVCEnvironment(object):
-    QA = "https://study-qa.ef.cn"
+    STAGING = "https://internal-ktsvc-stg-cn.ef.com/content-repo"
+    LIVE = "https://internal-ktsvc-cn.ef.com/content-repo"
 
 
 class MockTestEnvironment(object):
@@ -85,7 +91,6 @@ try:
 except:
     os.environ['environment'] = 'QA'
 
-
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
     KSD_ENVIRONMENT = KSDEnvironment.QA
@@ -98,7 +103,6 @@ if os.environ['environment'] == 'QA':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
-    KIDS_EVC_ENVIRONMENT = KidsEVCEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     env_key = 'QA'
     DATABASE = {
@@ -131,6 +135,11 @@ elif os.environ['environment'] == 'STG':
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING
     OMNI_ENVIRONMENT = OMNIEnvironment.STAGING
     E1TPI_ENVIRONMENT = E1TPIEnvironment.STAGING
+    LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.STAGING
+    BFF_ENVIRONMENT = BffEnvironment.STAGING
+    HOMEWORK_ENVIRONMENT = HomeworkEnvironment.STAGING
+    CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
+    CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
@@ -162,6 +171,11 @@ elif os.environ['environment'] == 'LIVE':
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
     E1TPI_ENVIRONMENT = E1TPIEnvironment.LIVE
+    LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.LIVE
+    BFF_ENVIRONMENT = BffEnvironment.LIVE
+    HOMEWORK_ENVIRONMENT = HomeworkEnvironment.LIVE
+    CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
+    CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",

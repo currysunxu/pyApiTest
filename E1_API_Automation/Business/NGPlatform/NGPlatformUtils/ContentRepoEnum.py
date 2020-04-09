@@ -10,3 +10,4 @@ class ContentRepoGroupType(Enum):
 class ContentRepoContentType(Enum):
     TypeHomework = 'HOMEWORK'
     TypeHandout = 'HANDOUT'
+    TypeVocab = 'VOCAB'
