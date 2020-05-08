@@ -23,5 +23,7 @@ class TestIdList:
 
 
 class TestTableSQLString:
-    get_paper_id_by_test_id_sql = "SELECT * FROM mt_test.test " \
+    get_paper_id_by_test_id_sql = "SELECT * FROM mt_test_qa.test " \
                               "where Id = '{0}' limit 1"
+    get_data_from_result_table_by_test_id_sql = "SELECT * FROM mt_result_qa.test_student_compact_result " \
+                              "where test_id = '{0}' limit 1"

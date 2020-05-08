@@ -32,6 +32,11 @@ class MockTestBFFService:
         ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
         return ms_sql_server.exec_query_return_dict_list(TestTableSQLString.get_paper_id_by_test_id_sql.format(test_id))
 
+    @staticmethod
+    def get_result_details_by_test_id_from_db(test_id):
+        ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
+        return ms_sql_server.exec_query_return_dict_list(TestTableSQLString.get_data_from_result_table_by_test_id_sql.format(test_id))
+
     def post_load_user_mt_list(self):
         graphql_body = {
             "operationName": "getCurrentUser",
@@ -118,13 +123,12 @@ class MockTestBFFService:
         elif invalid_jwt_token == "expired" or invalid_jwt_token == "noToken":
             assert_that(jmespath.search("errors[0].extensions.code", mt_response.json()) == 401)
 
-    @staticmethod
-    def check_insert_valid_test(mt_response, test_id):
+    def check_insert_valid_test(self, mt_response, test_id):
         assert_that(jmespath.search("data.startTest.test.id", mt_response.json()), equal_to(test_id))
-        utc_time = arrow.utcnow().format('YYYY-MM-DDTHH:mm')
         started_time = jmespath.search("data.startTest.test.startedDate", mt_response.json())
         started_time = arrow.get(started_time).format('YYYY-MM-DDTHH:mm')
-        assert_that(started_time, equal_to(utc_time))
+        expected_started_time = arrow.get(self.get_result_details_by_test_id_from_db(test_id)[0]["started_date"]).format('YYYY-MM-DDTHH:mm')
+        assert_that(started_time, equal_to(expected_started_time))
 
     @staticmethod
     def check_get_invalid_test_structure(mt_response, invalid_test):
