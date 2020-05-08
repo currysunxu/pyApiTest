@@ -54,8 +54,7 @@ pipeline {
           sh 'ptest3  -t E1_API_Automation.Test.OnlineStudentPortal -i ${case_tag} -x xunit-result-oc.xml' 
           sh 'ptest3  -t E1_API_Automation.Test.TBV3 -i ${case_tag}  -x xunit-result-tb.xml'
           sh 'ptest3  -t E1_API_Automation.Test.PT -x xunit-result-pt.xml'
-          sh 'ptest3  -t E1_API_Automation.Test.MockTest -x xunit-result-mt.xml'
-          sh 'ptest3 -m test-output/xunit-result-ss.xml,test-output/xunit-result-gp.xml,test-output/xunit-result-oc.xml,test-output/xunit-result-tb.xml,test-output/xunit-result-pt.xml,test-output/xunit-result-mt.xml --to test-output/xunit-results.xml'
+          sh 'ptest3 -m test-output/xunit-result-ss.xml,test-output/xunit-result-gp.xml,test-output/xunit-result-oc.xml,test-output/xunit-result-tb.xml,test-output/xunit-result-pt.xml --to test-output/xunit-results.xml'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
