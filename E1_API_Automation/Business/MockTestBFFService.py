@@ -17,7 +17,7 @@ class MockTestBFFService:
         self.mou_tai = Moutai(host=self.host, token=Token("X-EF-ID", "Token"))
 
     def login(self, student_type):
-        auth = AuthService(getattr(AuthEnvironment, env_key))
+        auth = AuthService(getattr(AuthEnvironment, env_key.upper()))
         user_name = MockTestUsers.MTUserPw[env_key][student_type][0]['username']
         password = MockTestUsers.MTUserPw[env_key][student_type][0]['password']
         id_token = auth.login(user_name, password).json()['idToken']
@@ -30,7 +30,12 @@ class MockTestBFFService:
     @staticmethod
     def get_test_details_by_test_id_from_db(test_id):
         ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
-        return ms_sql_server.exec_query_return_dict_list(TestTableSQLString.get_paper_id_by_test_id_sql.format(test_id))
+        return ms_sql_server.exec_query_return_dict_list(TestTableSQLString.get_paper_id_by_test_id_sql[env_key].format(test_id))
+
+    @staticmethod
+    def get_result_details_by_test_id_from_db(test_id):
+        ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
+        return ms_sql_server.exec_query_return_dict_list(TestTableSQLString.get_data_from_result_table_by_test_id_sql[env_key].format(test_id))
 
     def post_load_user_mt_list(self):
         graphql_body = {
@@ -76,14 +81,12 @@ class MockTestBFFService:
         assert_that(mt_response.json(), exist("data.currentUser"))
         assert_that(mt_response.json(), exist("data.currentUser.avatar"))
         assert_that(mt_response.json(), exist("data.currentUser.tests"))
-        assert_that(mt_response.json(), exist("extensions.tracing"))
         custom_id = MockTestUsers.MTUserPw[env_key][student_type][0]['custom_id']
         assert_that(jmespath.search("data.currentUser.id", mt_response.json()), equal_to(custom_id))
 
     def check_bff_get_paper_resource_structure(self, mt_response, test_id):
         assert_that(mt_response.status_code == 200)
         assert_that(mt_response.json(), exist("data.test"))
-        assert_that(mt_response.json(), exist("extensions.tracing"))
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
         assert_that(jmespath.search("data.test.paper.id", mt_response.json()),
                     equal_to(self.get_test_details_by_test_id_from_db(test_id)[0]["paper_id"]))
@@ -92,7 +95,6 @@ class MockTestBFFService:
     def check_bff_get_test_intro_structure(self, mt_response, test_id):
         assert_that(mt_response.status_code == 200)
         assert_that(mt_response.json(), exist("data.test"))
-        assert_that(mt_response.json(), exist("extensions.tracing"))
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
         assert_that(jmespath.search("data.test.title", mt_response.json()),
                     equal_to(self.get_test_details_by_test_id_from_db(test_id)[0]["title"]))
@@ -118,13 +120,12 @@ class MockTestBFFService:
         elif invalid_jwt_token == "expired" or invalid_jwt_token == "noToken":
             assert_that(jmespath.search("errors[0].extensions.code", mt_response.json()) == 401)
 
-    @staticmethod
-    def check_insert_valid_test(mt_response, test_id):
+    def check_insert_valid_test(self, mt_response, test_id):
         assert_that(jmespath.search("data.startTest.test.id", mt_response.json()), equal_to(test_id))
-        utc_time = arrow.utcnow().format('YYYY-MM-DDTHH:mm')
         started_time = jmespath.search("data.startTest.test.startedDate", mt_response.json())
         started_time = arrow.get(started_time).format('YYYY-MM-DDTHH:mm')
-        assert_that(started_time, equal_to(utc_time))
+        expected_started_time = arrow.get(self.get_result_details_by_test_id_from_db(test_id)[0]["started_date"]).format('YYYY-MM-DDTHH:mm')
+        assert_that(started_time, equal_to(expected_started_time))
 
     @staticmethod
     def check_get_invalid_test_structure(mt_response, invalid_test):
