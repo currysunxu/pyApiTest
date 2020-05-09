@@ -5,7 +5,9 @@ pipeline {
   stages {
      stage('build') {
       steps{
+      script {
       docker build -t 10.128.42.216:5000/apipython3:latest .
+      }
       }
      }
   }
