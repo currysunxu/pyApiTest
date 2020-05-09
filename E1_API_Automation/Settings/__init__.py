@@ -78,6 +78,8 @@ class ContentRepoEnvironment(object):
 
 class MockTestEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn/mseb"
+    STAGING = "https://ktsvc-stg.ef.cn/mseb"
+    Live = "https://ktsvc.ef.cn/mseb"
 
 
 class E1TPIEnvironment(object):
@@ -140,11 +142,17 @@ elif os.environ['environment'] == 'STG':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.STAGING
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
+    MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
         "User": "TBV3",
         "Password": "#Bugsfor$"
+    }
+    MYSQL_MOCKTEST_DATABASE = {
+        "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
+        "User":"edtechmysqluser",
+        "Password": "edtechdbuserstg123"
     }
 
 elif os.environ['environment'] == 'STG_SG':
