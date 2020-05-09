@@ -12,3 +12,4 @@ PyJWT==1.7.0
 pytz
 cassandra-driver==3.19.0
 pymongo
+matplotlib==3.2.1
