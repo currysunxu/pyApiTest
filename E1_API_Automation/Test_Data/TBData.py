@@ -3,7 +3,7 @@ class TBUsers:
                'Staging': {'username': 'tb3.cn.01', 'password': '12345'},
                'Staging_SG': {'username': 'tb3.id.auto1', 'password': '12345'},
                'Live':{'username': 'tb.cnlive.1', 'password': '12345'},
-               'Live_SG': {'username': 'tb3.ru.01', 'password': '12345'}
+               'Live_SG': {'username': 'tb3.id.01', 'password': '12345'}
                }
 
 

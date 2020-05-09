@@ -1,0 +1,12 @@
+pipeline {
+  angent {
+  label 'CN_Kids_QA_CI'
+  }
+  stages {
+     stage('build') {
+      steps{
+      docker build -t 10.128.42.216:5000/apipython3:latest .
+      }
+     }
+  }
+}
