@@ -31,7 +31,7 @@ class SmallStarBase():
         password = '12345'
         culture_code = 'zh-CN'
     if ENVIRONMENT == Environment.LIVE_SG:
-        user_name = "ss3.id.01"
+        user_name = "ss3.ru.01"
         password = '12345'
         culture_code = 'ru-RU'
 
