@@ -47,6 +47,7 @@ pipeline {
           }
           }
     }
+    }
      post {
         failure {
                 emailext attachLog: true, attachmentsPattern: 'test-output/*.*,*.log', body: '''<!DOCTYPE html>
@@ -126,6 +127,6 @@ pipeline {
             }
     }
     
-  }
+
   
 }
