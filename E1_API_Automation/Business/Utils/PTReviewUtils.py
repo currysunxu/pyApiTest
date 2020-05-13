@@ -319,7 +319,6 @@ class PTReviewUtils:
         expected_skill_score["Code"] = skill_code
         expected_skill_score["Score"] = score
         expected_skill_score["TotalScore"] = total_score
-        expected_skill_score["TotalScore"] = total_score
 
         return expected_skill_score
 
