@@ -405,7 +405,7 @@ class PTReviewTestCases:
         assert_that(error_message == '', error_message)
 
     # test pt review bff graphql API for all course
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg,live")
     def test_ptr_bff_graphql_all_course(self):
         pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
         pt_review_bff_service.login()
