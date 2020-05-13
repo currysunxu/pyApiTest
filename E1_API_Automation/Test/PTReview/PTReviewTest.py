@@ -6,10 +6,10 @@ from E1_API_Automation.Business.Utils.PTReviewUtils import PTReviewUtils
 from E1_API_Automation.Business.TPIService import TPIService
 from E1_API_Automation.Business.OMNIService import OMNIService
 from ...Settings import OSP_ENVIRONMENT, TPI_ENVIRONMENT, OMNI_ENVIRONMENT, ENVIRONMENT, env_key
-from ...Test_Data.PTReviewData import PTReviewData
+from ...Test_Data.PTReviewData import PTReviewData,PTDATA
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Business.PTSkillScore import SkillCode, SubSkillCode
-from hamcrest import assert_that
+from hamcrest import assert_that, equal_to
 import jmespath
 import json
 
@@ -50,12 +50,14 @@ class PTReviewTestCases:
                 assert_that(len(api_response_json) == len(db_query_result))
 
                 # check if all the data return from API is consistent with DB
-                error_message = PTReviewUtils.verify_allbooks_by_course_api_db_result(api_response_json, db_query_result)
+                error_message = PTReviewUtils.verify_allbooks_by_course_api_db_result(api_response_json,
+                                                                                      db_query_result)
                 assert_that(error_message == '', error_message)
 
     '''
     test the OmniProgressTestAssessment API, verify if the score have been saved correctly
     '''
+
     @Test(tags="qa, stg")
     def test_save_total_score_with_omni_api(self):
         student_id = list(PTReviewData.pt_hf_user_key_book_unit[env_key].keys())[0]
@@ -125,6 +127,7 @@ class PTReviewTestCases:
     overwritten score as score in the API
     for Live: get the info directly with StudentPaperDigitalProgressTestAssessmentMetas API, then do the rest check
     '''
+
     @Test(tags="qa, stg, live")
     def test_pt_assessment_by_skill_api(self):
         student_id = list(PTReviewData.pt_hf_user_key_book_unit[env_key].keys())[0]
@@ -158,6 +161,7 @@ class PTReviewTestCases:
     the case to test the StudentProgressTestAssessmentMetasGroupBySkill API, 
     if the skill & sub skill's overwritten score is null, it will get the value of original score as score in the API 
     '''
+
     @Test(tags="qa, stg")
     def test_pt_assessment_by_skill_api_for_originalscore(self):
         student_id = list(PTReviewData.pt_hf_user_key_book_unit[env_key].keys())[0]
@@ -190,6 +194,7 @@ class PTReviewTestCases:
     '''
     test the unit API, to check if the return result is as expected
     '''
+
     @Test(tags="qa, stg, live")
     def test_pt_assessment_by_unit_api(self):
         student_id = list(PTReviewData.pt_hf_user_key_book_unit[env_key].keys())[0]
@@ -222,6 +227,7 @@ class PTReviewTestCases:
     update skill/subskill original score or total score to check if skill level API will return with 409, 
     and the PTTotalScore is null for Unit API 
     '''
+
     @staticmethod
     def update_score_as_null_then_verify(osp_service, student_id, test_primary_key, book_key,
                                          unit_key, skill_subskill_code, is_total_score):
@@ -231,7 +237,7 @@ class PTReviewTestCases:
 
         # call the skill API, and do the verification, the API will return with 409 for not valid data
         api_pt_assess_by_skill = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key,
-                                                                                      unit_key)
+                                                                                unit_key)
         assert_that(api_pt_assess_by_skill.status_code == 409)
 
         # call the unit API, and do the verification, the pttotalscore should be null for this unit
@@ -249,6 +255,7 @@ class PTReviewTestCases:
     '''
     test the skill and unit API when skill/subskill original score and overwritten score are both null
     '''
+
     @Test(tags="qa, stg")
     def test_pt_assessment_by_skill_unit_for_null_score(self):
         student_id = list(PTReviewData.pt_hf_user_key_book_unit[env_key].keys())[0]
@@ -277,6 +284,7 @@ class PTReviewTestCases:
     '''
     test the skill and unit API when skill/subskill total score is null
     '''
+
     @Test(tags="qa, stg")
     def test_pt_assessment_by_skill_unit_for_null_totalscore(self):
         student_id = list(PTReviewData.pt_hf_user_key_book_unit[env_key].keys())[0]
@@ -314,7 +322,8 @@ class PTReviewTestCases:
             customer_id = omni_service.get_customer_id(user_name, password)
             groups_response = omni_service.get_customer_groups(customer_id)
             expected_course_list = PTReviewUtils.get_expected_default_available_books(groups_response.json())
-            actual_default_available_course_result = tpi_service.post_enrolled_groups_with_state(customer_id, 'highflyers')
+            actual_default_available_course_result = tpi_service.post_enrolled_groups_with_state(customer_id,
+                                                                                                 'highflyers')
             assert_that(actual_default_available_course_result.status_code == 200)
             error_message = \
                 PTReviewUtils.verify_enrolled_groups_with_state(actual_default_available_course_result.json(),
@@ -359,11 +368,13 @@ class PTReviewTestCases:
     @Test(tags="qa, stg, live")
     def test_ptr_bff_graphql_by_book_unit(self):
         pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        pt_review_bff_service.login()
         osp_service = OSPService(OSP_ENVIRONMENT)
+        course_code = 'HF'
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
         unit_key = PTReviewData.ptr_bff_data[env_key]['HF']['UnitKey']
-        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book_unit(student_id, book_key, unit_key)
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book_unit(course_code, book_key, unit_key)
         assert_that(ptr_bff_graphql_response.status_code == 200)
 
         api_pt_assess_by_skill_response = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key, unit_key)
@@ -378,10 +389,11 @@ class PTReviewTestCases:
     @Test(tags="qa, stg, live")
     def test_ptr_bff_graphql_by_book(self):
         pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        pt_review_bff_service.login()
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
         course_code = 'HF'
-        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book(student_id, course_code, book_key)
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book(course_code, book_key)
         assert_that(ptr_bff_graphql_response.status_code == 200)
 
         expected_ptr_result_by_book = \
@@ -393,12 +405,13 @@ class PTReviewTestCases:
         assert_that(error_message == '', error_message)
 
     # test pt review bff graphql API for all course
-    @Test(tags="qa, stg")
+    @Test(tags="qa, stg,live")
     def test_ptr_bff_graphql_all_course(self):
         pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        pt_review_bff_service.login()
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         course_code = 'HF'
-        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_student(student_id, course_code)
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_student(course_code)
         assert_that(ptr_bff_graphql_response.status_code == 200)
 
         expected_ptr_result_all_course = \
@@ -408,5 +421,77 @@ class PTReviewTestCases:
                                                                         expected_ptr_result_all_course)
         assert_that(error_message == '', error_message)
 
+    @Test(tags="qa")
+    def test_pt_web_osp_create_pt_entity(self):
+        osp_service = OSPService(OSP_ENVIRONMENT)
+        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
+        expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
+        actual_result = osp_service.put_create_progress_test_entity(expected_entity_dict)
+        assert_that(actual_result.status_code == 200)
+        print(actual_result.json())
+        assert_that(actual_result.json()["TeacherId"], equal_to(expected_entity_dict["TeacherId"]))
+        assert_that(actual_result.json()["ProgressTestKey"], equal_to(expected_entity_dict["ProgressTestKey"].lower()))
+        assert_that(actual_result.json()["GroupId"], equal_to(expected_entity_dict["GroupId"]))
+        assert_that(actual_result.json()["SchoolCode"], equal_to(expected_entity_dict["SchoolCode"]))
+        assert_that(actual_result.json()["Name"], equal_to("Progress Test"))
+        pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
+        pt_instance_key = str(pt_instance_key)[str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
+        assert_that(actual_result.json()["ProgressTestInstanceKey"], equal_to(pt_instance_key))
+        assert_that(len(actual_result.json()) == 11, "response fields numbers is invalid,please check whether add or "
+                                                     "remove any fields")
 
+    @Test(tags="qa")
+    def test_pt_web_osp_query_test_by_student_and_book(self):
+        osp_service = OSPService(OSP_ENVIRONMENT)
+        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
+        book_key = PTDATA.pt_web_data[env_key]['HFJ']['BookKey']
+        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
+        unit_key = PTDATA.pt_web_data[env_key]['HFJ']['UnitKey']
+        actual_result = osp_service.post_query_pt_by_student_book_state(student_id, book_key)
+        assert_that(actual_result.status_code == 200)
+        print(actual_result.json())
+        assert_that(actual_result.json()[0]["StudentId"], equal_to(str(student_id)))
+        assert_that(actual_result.json()[0]["ProgressTestKey"], equal_to(pt_key.lower()))
+        assert_that(actual_result.json()[0]["UnitKey"], equal_to(unit_key.lower()))
+        pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
+        pt_instance_key = str(pt_instance_key)[str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
+        assert_that(actual_result.json()[0]["ProgressTestInstanceKey"], equal_to(pt_instance_key))
+        assert_that(len(actual_result.json()[0]) == 6, "response fields numbers is invalid,please check whether add or "
+                                                       "remove any fields")
 
+    @Test(tags="qa")
+    def test_pt_web_osp_query_test_by_test_result(self):
+        osp_service = OSPService(OSP_ENVIRONMENT)
+        student_id = PTDATA.pt_web_data[env_key]['HFD']['StudentId']
+        book_key = PTDATA.pt_web_data[env_key]['HFD']['BookKey']
+        pt_key = PTDATA.pt_web_data[env_key]['HFD']['TestPrimaryKey']
+        unit_key = PTDATA.pt_web_data[env_key]['HFD']['UnitKey']
+        actual_result = osp_service.post_query_pt_test_result_by_student_book(student_id, book_key)
+        assert_that(actual_result.status_code == 200)
+        print(" response is : %s" % (json.dumps(actual_result.json(), indent=4)))
+        assert_that(actual_result.json()[0]["PTTotalScore"], equal_to(None))
+        assert_that(actual_result.json()[0]["UnitKey"], equal_to(unit_key.lower()))
+        assert_that(actual_result.json()[0]["ProgressTestKey"], equal_to(pt_key.lower()))
+        assert_that(len(actual_result.json()[0]) == 8,
+                    "response fields numbers is invalid,please check whether add or remove any fields")
+
+    @Test(tags="qa")
+    def test_pt_web_tpi_create_pt_entity(self):
+        tpi_service = TPIService(TPI_ENVIRONMENT)
+        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
+        expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
+        actual_result = tpi_service.pt_web_unlock(expected_entity_dict)
+        assert_that(actual_result.status_code == 200)
+        print(json.dumps(actual_result.json(),indent=4))
+        assert_that(actual_result.json()["TeacherId"], equal_to(expected_entity_dict["TeacherId"]))
+        assert_that(actual_result.json()["ProgressTestKey"], equal_to(expected_entity_dict["ProgressTestKey"].lower()))
+        assert_that(actual_result.json()["GroupId"], equal_to(expected_entity_dict["GroupId"]))
+        assert_that(actual_result.json()["SchoolCode"], equal_to(expected_entity_dict["SchoolCode"]))
+        assert_that(actual_result.json()["Name"], equal_to("Progress Test"))
+        pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
+        pt_instance_key = str(pt_instance_key)[str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
+        assert_that(actual_result.json()["ProgressTestInstanceKey"], equal_to(pt_instance_key))
+        assert_that(len(actual_result.json()) == 11, "response fields numbers is invalid,please check whether add or "
+                                                     "remove any fields")

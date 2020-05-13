@@ -27,3 +27,15 @@ class TPIService:
             return self.mou_tai.put('/api/v2/SmallStarUnlock', json=body)
         elif product_code == 'TBV3':
             return self.mou_tai.put('/api/v2/TrailblazerUnlock', json=body)
+
+    def pt_web_unlock(self,expected_entity_dict):
+        self.mou_tai.headers['X-BA-TOKEN'] = "6C35BA68-AD5C-49C0-943D-5125271EFF46"
+        body_json = {
+            "TeacherId": expected_entity_dict["TeacherId"],
+            "ProgressTestKey": expected_entity_dict["ProgressTestKey"],
+            "GroupId": expected_entity_dict["GroupId"],
+            "StudentIdCollection": [expected_entity_dict["StudentIdCollection"]],
+            "SchoolCode": expected_entity_dict["SchoolCode"]
+        }
+        return self.mou_tai.put("/api/v2/ProgressTestUnlock", body_json)
+
