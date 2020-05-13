@@ -8,16 +8,15 @@ class PTReviewSQLString:
                               "order by [sequence]"
 
     hf_pt_assessment_sql = "select a.StudentId, a.Code, a.TestInstanceKey,a.TestPrimaryKey, a.OriginalScore,a.OverwrittenScore, " \
-                                "a.TotalScore,b.BookKey, b.BookCode, b. BookName, b.UnitKey, b.UnitCode, b.UnitName " \
-                                "from OnlineSchoolPlatform.dbo.TestAssessmentMeta a " \
-                                "inner join OnlineSchoolPlatform.dbo.ProgressTestUnitIndexBookIndex b " \
-                                "on a.TestPrimaryKey = b.TestPrimaryKey " \
-                                "where a.StudentId = {0} " \
-                                "and b.BookKey = '{1}'"
+                           "a.TotalScore,a.TestInstanceKey,b.BookKey, b.BookCode, b. BookName, b.UnitKey, b.UnitCode, b.UnitName " \
+                           "from OnlineSchoolPlatform.dbo.TestAssessmentMeta a " \
+                           "inner join OnlineSchoolPlatform.dbo.ProgressTestUnitIndexBookIndex b " \
+                           "on a.TestPrimaryKey = b.TestPrimaryKey " \
+                           "where a.StudentId = {0} " \
+                           "and b.BookKey = '{1}'"
 
     update_pt_score_sql = "update OnlineSchoolPlatform.dbo.TestAssessmentMeta set {0} " \
                           "where StudentId = {1} and TestPrimaryKey = '{2}'"
-
 
 class PTReviewData:
     pt_hf_user_key_book_unit = {
@@ -127,6 +126,7 @@ class PTReviewData:
             'HF': {
                 'StudentId': 12221442,
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
                 'UnitKey': '50ED3E4D-BF78-4D9D-B6EE-05F6D4D9A260'
             }
         },
@@ -145,3 +145,53 @@ class PTReviewData:
             }
         }
     }
+
+class BffUsers:
+    BffUserPw = {
+        'QA': {'username': 'ptReviewTest01', 'password': '12345'
+        },
+        'Staging': {
+            # Todo need to do data refactor with 100362513
+            'username': 'hf3.cn.01', 'password': '12345',
+        },
+        'Live': {
+            # Todo need to do data refactor with 100201088
+            'username': 'hf3.cn.01', 'password': '12345',
+        }
+    }
+
+class PTDATA:
+    pt_web_data = {
+        'QA': {
+            'HFJ': {
+                # Book J Unit 2
+                'StudentId': 1070,
+                'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
+                'TestPrimaryKey': 'C6F0F367-9ACD-475A-8D55-61CA6C4AD9BF',
+                'UnitKey': '27B6915B-63D6-48DB-8BA5-1A468054DCE8',
+            },
+            'HFD': {
+                # Book D unit 5
+                'StudentId': 1070,
+                'BookKey': '8ADF3ABF-276E-41EE-8502-87E2C8AA4F84',
+                'TestPrimaryKey': '89068F85-5B12-4138-B0C2-6156856D9E2F',
+                'UnitKey': '756D2516-6655-4066-9048-7489D6FEC303',
+            }
+
+        }
+        #ToDo add stg account if staging env is ready
+        # 'Staging': {
+        #     'HF': {
+        #         'StudentId': 100362513,
+        #         'BookKey': '8605C95C-9CF8-418C-8C67-B7A3122C5445',
+        #         'UnitKey': '22CFB67B-1CA2-4E71-A1EE-4FE8B0223FBA'
+        #     }
+        # }
+    }
+
+
+class PtWebSQLString:
+    get_pt_instance_key_sql = "SELECT top 1 [Key] FROM OnlineSchoolPlatform.dbo.ProgressTestEntity " \
+                              "with(nolock) where ProgressTestKey = '{0}' order by CreatedStamp desc"
+
+

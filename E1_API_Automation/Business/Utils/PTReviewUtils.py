@@ -1,10 +1,14 @@
+import string
+
 from E1_API_Automation.Business.PTSkillScore import PTSkillScore, SkillCode, SubSkillCode
 from hamcrest import assert_that
 from E1_API_Automation.Business.TPIService import TPIService
 from E1_API_Automation.Business.OMNIService import CourseGroupStatus, CourseGroupInfo
 from E1_API_Automation.Business.PTReviewService import PTReviewService
 from E1_API_Automation.Business.OSPService import OSPService
-from ...Settings import TPI_ENVIRONMENT, OSP_ENVIRONMENT
+from E1_API_Automation.Lib.db_mssql import MSSQLHelper
+from E1_API_Automation.Test_Data.PTReviewData import PtWebSQLString
+from ...Settings import TPI_ENVIRONMENT, OSP_ENVIRONMENT, DATABASE
 import jmespath
 import datetime
 import random
@@ -315,6 +319,7 @@ class PTReviewUtils:
         expected_skill_score["Code"] = skill_code
         expected_skill_score["Score"] = score
         expected_skill_score["TotalScore"] = total_score
+        expected_skill_score["TotalScore"] = total_score
 
         return expected_skill_score
 
@@ -344,6 +349,11 @@ class PTReviewUtils:
         expected_skill_pt_score_dict["UnitName"] = skill_pt_score_dict["UnitName"]
         expected_skill_pt_score_dict["PTKey"] = pt_key
         expected_skill_pt_score_dict["PTTestBy"] = pt_test_by
+        expected_skill_pt_score_dict["PTInstanceKey"] = skill_pt_score_dict["TestInstanceKey"]
+        if skill_pt_score_dict["OverwrittenScore"] and skill_pt_score_dict["OriginalScore"]:
+            expected_skill_pt_score_dict["IsOverwritten"] = True
+        elif skill_pt_score_dict["OverwrittenScore"] and skill_pt_score_dict["OriginalScore"] is None:
+            expected_skill_pt_score_dict["IsOverwritten"] = False
 
         # calculate the PTTotalScore
         unit_total_accuracy = 0
@@ -374,7 +384,7 @@ class PTReviewUtils:
         error_message = ''
 
         for key in api_pt_assess_by_skill_json.keys():
-            if key != 'SkillScores':
+            if key != 'SkillScores' and key !='PTInstanceKey' and key !='IsOverwritten' :
                 actual_value = api_pt_assess_by_skill_json[key]
                 expected_value = expected_pt_assess_by_skill[key]
 
@@ -646,6 +656,9 @@ class PTReviewUtils:
         expected_ptr_result_by_book_unit['name'] = api_pt_assess_by_skill_json['UnitName']
         expected_ptr_result_by_book_unit['bookName'] = api_pt_assess_by_skill_json['BookName']
         expected_ptr_result_by_book_unit['ptKey'] = api_pt_assess_by_skill_json['PTKey']
+        expected_ptr_result_by_book_unit['ptInstanceKey'] = api_pt_assess_by_skill_json['PTInstanceKey']
+        expected_ptr_result_by_book_unit['__typename'] = 'Test'
+
 
         if api_pt_assess_by_skill_json['PTTestBy'] == 0:
             test_type = 'paper'
@@ -775,9 +788,10 @@ class PTReviewUtils:
                 invalid = False
                 score = api_pt_assess_by_unit['PTTotalScore']
 
-            ptr_bff_test_by_unit['invalid'] = invalid
+            # ptr_bff_test_by_unit['invalid'] = invalid remove during PTWeb
             ptr_bff_test_by_unit['type'] = test_type
             ptr_bff_test_by_unit['score'] = score
+            ptr_bff_test_by_unit['date'] = None
 
             ptr_bff_test_by_unit_list.append(ptr_bff_test_by_unit)
 
@@ -792,6 +806,7 @@ class PTReviewUtils:
         ptr_bff_book_cover['url'] = book_code
         ptr_bff_book_cover['alt'] = book_code
         ptr_bff_book_dict['cover'] = ptr_bff_book_cover
+        ptr_bff_book_dict['__typename'] = book_name.split(" ")[0:][0]
         return ptr_bff_book_dict
 
     # verify pt review bff result for unit level body
@@ -831,17 +846,18 @@ class PTReviewUtils:
                         expected_unit = expected_value[i]
 
                         for unit_dict_key in actual_unit.keys():
-                            actual_tests_unit_value = actual_unit[unit_dict_key]
-                            expected_tests_unit_value = expected_unit[unit_dict_key]
+                            if unit_dict_key not in ['ptKey','status','__typename']:
+                                actual_tests_unit_value = actual_unit[unit_dict_key]
+                                expected_tests_unit_value = expected_unit[unit_dict_key]
 
-                            if unit_dict_key == 'score' and actual_tests_unit_value is not None:
-                                actual_tests_unit_value = int(actual_tests_unit_value)
+                                if unit_dict_key == 'score' and actual_tests_unit_value is not None:
+                                    actual_tests_unit_value = int(actual_tests_unit_value)
 
-                            if str(actual_tests_unit_value) != str(expected_tests_unit_value):
-                                error_message = error_message + " Key in tests result:" + unit_dict_key + \
-                                                "'s api result not equal to expected value, the result return in API is:" \
-                                                + str(actual_tests_unit_value) + ", but the value expected is:" \
-                                                + str(expected_tests_unit_value) + ";"
+                                if str(actual_tests_unit_value) != str(expected_tests_unit_value):
+                                    error_message = error_message + " Key in tests result:" + unit_dict_key + \
+                                                    "'s api result not equal to expected value, the result return in API is:" \
+                                                    + str(actual_tests_unit_value) + ", but the value expected is:" \
+                                                    + str(expected_tests_unit_value) + ";"
         return error_message
 
     # get expected pt review bff result by studentid body, for all courses
@@ -887,3 +903,18 @@ class PTReviewUtils:
                                 PTReviewUtils.verify_ptr_bff_graphql_by_book(actual_ptr_bff_result_by_book,
                                                                              expected_ptr_bff_result_by_book)
         return error_message
+
+    @staticmethod
+    def construct_expected_pt_web_create_entity(pt_key,student_id):
+        expected_pt_web_entity = {}
+        expected_pt_web_entity['TeacherId'] = ''.join(random.sample(string.digits, 4))
+        expected_pt_web_entity['ProgressTestKey'] = pt_key
+        expected_pt_web_entity['GroupId'] = ''.join(random.sample(string.digits, 4))
+        expected_pt_web_entity['StudentIdCollection'] = student_id
+        expected_pt_web_entity['SchoolCode'] = ''.join(random.sample(string.ascii_letters + string.digits, 8))
+        return expected_pt_web_entity
+
+    @staticmethod
+    def get_pt_instance_key_from_db(pt_key):
+        ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')
+        return ms_sql_server.exec_query(PtWebSQLString.get_pt_instance_key_sql.format(pt_key))
