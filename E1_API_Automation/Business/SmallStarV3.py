@@ -42,7 +42,7 @@ class SmallStarService():
     def sign_out(self):
         return self.mou_tai.delete(url="/api/v2/Token/")
 
-    def synchronize_binary_data(self, book_key, course_plan_key, upserts_only=True, amount=123,
+    def synchronize_binary_data(self, book_key, course_plan_key, upserts_only=True, amount=1230000,
                                 last_synchronized_key=None, last_Synchronized_Stamp=None):
         body = {
             "BookKey": book_key,
@@ -56,7 +56,7 @@ class SmallStarService():
             body['LastSynchronizeKey'] = last_synchronized_key
         return self.mou_tai.post("/api/v2/BinaryData/Synchronize/", json=body)
 
-    def synchronize_course_node(self, book_key, course_plan_key,  upserts_only=True, amount=123,
+    def synchronize_course_node(self, book_key, course_plan_key,  upserts_only=True, amount=1230000,
                                 last_synchronized_key=None, last_Synchronized_Stamp=None):
         body = {
             "BookKey": book_key,
@@ -70,7 +70,7 @@ class SmallStarService():
             body['LastSynchronizeKey'] = last_synchronized_key
         return self.mou_tai.post("/api/v2/CourseNode/Synchronize/", json=body)
 
-    def synchronize_activity(self, book_key, course_plan_key, upserts_only=True, amount=123,
+    def synchronize_activity(self, book_key, course_plan_key, upserts_only=True, amount=1230000,
                              last_synchronized_key=None, last_Synchronized_Stamp=None):
         body = {
             "BookKey": book_key,
@@ -84,7 +84,7 @@ class SmallStarService():
             body['LastSynchronizeKey'] = last_synchronized_key
         return self.mou_tai.post("/api/v2/Activity/Synchronize/", json=body)
 
-    def synchronize_digital_article(self, book_key, course_plan_key, upserts_only=True, amount=123,
+    def synchronize_digital_article(self, book_key, course_plan_key, upserts_only=True, amount=1230000,
                                     last_synchronized_key=None, last_Synchronized_Stamp=None):
         body = {
             "BookKey": book_key,
@@ -99,7 +99,7 @@ class SmallStarService():
         return self.mou_tai.post("/api/v2/DigitalArticle/Synchronize/", json=body)
 
     def synchronize_small_star_student_unit_quiz_answer(self, book_key, course_plan_key, upserts_only=True,
-                                                       amount=123, last_Synchronized_Stamp=None, last_synchronized_key=None):
+                                                       amount=12300000, last_Synchronized_Stamp=None, last_synchronized_key=None):
 
         body = {
             "BookKey": book_key,
@@ -113,7 +113,7 @@ class SmallStarService():
         return self.mou_tai.post("/api/v2/HistoricalUnitQuizAnswer/SynchronizeAll", json=body)
 
     def synchronize_small_star_student_activity_answer(self, book_key, course_plan_key, upserts_only=True,
-                                                       amount=123, last_Synchronized_Stamp=None, last_synchronized_key=None):
+                                                       amount=12300000, last_Synchronized_Stamp=None, last_synchronized_key=None):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
@@ -127,7 +127,7 @@ class SmallStarService():
         return self.mou_tai.post("/api/v2/HistoricalActivityAnswer/SynchronizeAll/", json=body)
 
     def synchronize_small_star_student_activity_answer_newapi(self, book_key, course_plan_key, upserts_only=True,
-                                                              amount=123, last_Synchronized_Stamp=None, last_synchronized_key=None):
+                                                              amount=1230000, last_Synchronized_Stamp=None, last_synchronized_key=None):
         body = {
             "BookKey": book_key,
             "CoursePlanKey": course_plan_key,
