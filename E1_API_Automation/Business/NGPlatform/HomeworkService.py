@@ -19,10 +19,6 @@ class HomeworkService:
 		attempt_result = self.mou_tai.post("/api/v1/attempts", attempt_json)
 		return attempt_result
 
-	# def get_unlock_progress(self, student_id, book_content_id):
-	# 	api_url = '/api/v1/unlocked-progress?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)
-	# 	return self.mou_tai.get(api_url)
-
 	def get_vocab_progress(self, student_id, book_content_id):
 		api_url = '/api/v1/vocab/progress?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)
 		return self.mou_tai.get(api_url)
