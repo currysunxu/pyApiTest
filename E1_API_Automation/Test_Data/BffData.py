@@ -26,11 +26,11 @@ class BffUsers:
         },
         'Staging': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'hf3.cn.01', 'password': '12345'}],
+            BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'}],
         },
         'Live': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'hf3.cn.01', 'password': '12345'}],
+            BffProduct.HFV35.value: [{'username': 'hf3.cn.01', 'password': '12345', 'userid': 1070}],
         }
     }
 

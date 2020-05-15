@@ -64,6 +64,12 @@ class HomeworkEnvironment(object):
     LIVE = "https://internal-ktsvc-cn.ef.com/practice"
 
 
+class CourseGroupEnvironment(object):
+    QA = "http://internal-ktsvc-qa-cn.ef.com/course-group"
+    STAGING = "https://internal-ktsvc-stg-cn.ef.com/course-group"
+    LIVE = "https://internal-ktsvc-cn.ef.com/course-group"
+
+
 class ContentMapEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/content-map"
     STAGING = "https://internal-ktsvc-stg-cn.ef.com/content-map"
@@ -103,6 +109,7 @@ if os.environ['environment'] == 'QA':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.QA
     BFF_ENVIRONMENT = BffEnvironment.QA
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.QA
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
@@ -140,6 +147,7 @@ elif os.environ['environment'] == 'STG':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.STAGING
     BFF_ENVIRONMENT = BffEnvironment.STAGING
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.STAGING
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.STAGING
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
@@ -182,6 +190,7 @@ elif os.environ['environment'] == 'LIVE':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.LIVE
     BFF_ENVIRONMENT = BffEnvironment.LIVE
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.LIVE
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.LIVE
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
     env_key = 'Live'

@@ -26,7 +26,12 @@ class HfBffTestBase:
 		self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
 		self.bff_service.login(self.user_name, self.password)
 		self.omni_service = OMNIService(OMNI_ENVIRONMENT)
-		self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+		# self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+		try:
+			self.customer_id = BffUsers.BffUserPw[env_key][self.key][0]['userid']
+		except:
+			self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+
 
 
 	def check_bff_compare_learning_plan(self, plan_response, leanring_plan_entity):
