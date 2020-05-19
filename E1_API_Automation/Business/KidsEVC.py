@@ -24,7 +24,7 @@ class KidsEVCService():
         return id_token
 
     def login_get_v3_token(self, user_name, password):
-        auth = AuthService(getattr(AuthEnvironment, env_key))
+        auth = AuthService(getattr(AuthEnvironment, env_key.upper()))
         id_token = auth.login(user_name, password).json()['idToken']
         ba_token = auth.get_v3_token(id_token)
         headers = {"X-BA-TOKEN": ba_token, "Content-Type": "application/json"}
@@ -74,7 +74,7 @@ class KidsEVCService():
         return self.mou_tai.put("/ksdsvc/api/v2/classes/lesson", json=body)
 
     def sign_out(self):
-        auth = AuthService(getattr(AuthEnvironment, env_key))
+        auth = AuthService(getattr(AuthEnvironment, env_key.upper()))
         auth.sign_out()
         return self.mou_tai.delete(url="/api/v1/Token/")
 
