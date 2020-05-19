@@ -58,13 +58,9 @@ pipeline {
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
-        }
+          }
         }
       }
     }
   }
-
-
-
-  
 }

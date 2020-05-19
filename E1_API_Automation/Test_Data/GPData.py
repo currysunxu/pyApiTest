@@ -40,7 +40,7 @@ class MoscowGradeKey:
 
 
 class GP_user:
-    GPUsers = {'QA': {'username': 'gp.cn.auto4', 'password': '12345', 'culture_code': 'zh-CN'},
+    GPUsers = {'QA': {'username': 'hf3.cn.01', 'password': '12345', 'culture_code': 'zh-CN'},
                'Staging': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
                'Live': {'username': 'gp.cn.auto2', 'password': '12345', 'culture_code': 'zh-CN'},
                'Staging_SG': {'username': 'gp.id.auto1', 'password': '12345', 'culture_code': 'id-ID'},
@@ -57,7 +57,8 @@ class GP_user:
                  'Staging_SG': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth10'},
                  'Live_SG': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth10'}}
 
-    GPVideoUsers = {'Staging': {'username': 'gp.cn.01', 'password': '12345'},
+    GPVideoUsers = {'QA': {'username': 'hf.test1025', 'password': '12345'},
+                    'Staging': {'username': 'gp.cn.01', 'password': '12345'},
                     'Live': {'username': 'gp.cn.auto1', 'password': '12345'},
                     'Staging_SG': {'username': 'gp.ru.auto1', 'password': '12345'},
                     'Live_SG': {'username': 'robin.wang', 'password': '12345'}}

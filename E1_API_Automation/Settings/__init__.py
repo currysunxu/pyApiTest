@@ -64,6 +64,12 @@ class HomeworkEnvironment(object):
     LIVE = "https://internal-ktsvc-cn.ef.com/practice"
 
 
+class CourseGroupEnvironment(object):
+    QA = "http://internal-ktsvc-qa-cn.ef.com/course-group"
+    STAGING = "https://internal-ktsvc-stg-cn.ef.com/course-group"
+    LIVE = "https://internal-ktsvc-cn.ef.com/course-group"
+
+
 class ContentMapEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/content-map"
     STAGING = "https://internal-ktsvc-stg-cn.ef.com/content-map"
@@ -78,6 +84,8 @@ class ContentRepoEnvironment(object):
 
 class MockTestEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn/mseb"
+    STAGING = "https://ktsvc-stg.ef.cn/mseb"
+    Live = "https://ktsvc.ef.cn/mseb"
 
 
 class E1TPIEnvironment(object):
@@ -101,6 +109,7 @@ if os.environ['environment'] == 'QA':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.QA
     BFF_ENVIRONMENT = BffEnvironment.QA
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.QA
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
@@ -138,13 +147,20 @@ elif os.environ['environment'] == 'STG':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.STAGING
     BFF_ENVIRONMENT = BffEnvironment.STAGING
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.STAGING
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.STAGING
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
+    MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
         "User": "TBV3",
         "Password": "#Bugsfor$"
+    }
+    MYSQL_MOCKTEST_DATABASE = {
+        "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
+        "User":"edtechmysqluser",
+        "Password": "edtechdbuserstg123"
     }
 
 elif os.environ['environment'] == 'STG_SG':
@@ -174,6 +190,7 @@ elif os.environ['environment'] == 'LIVE':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.LIVE
     BFF_ENVIRONMENT = BffEnvironment.LIVE
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.LIVE
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.LIVE
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
     env_key = 'Live'

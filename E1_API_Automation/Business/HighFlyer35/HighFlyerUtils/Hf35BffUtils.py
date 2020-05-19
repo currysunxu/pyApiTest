@@ -178,6 +178,8 @@ class Hf35BffUtils:
 					if 'Time' in key:
 						actual_value = datetime.datetime.strptime(str(actual_value), '%Y-%m-%dT%H:%M:%S.%fZ')
 						expected_value = datetime.datetime.strptime(str(expected_value), '%Y-%m-%dT%H:%M:%SZ')
+					elif key == 'classStatus':
+						expected_value = 'Activated'
 				elif key == 'teacherName':
 					expected_value = expected_evc_teacher['displayName']
 				elif key == 'teacherAvatarUrl':
