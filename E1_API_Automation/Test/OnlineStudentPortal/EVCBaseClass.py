@@ -9,7 +9,7 @@ from ...Business.KidsEVC import KidsEVCService
 from ...Lib.ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2est, \
     ServiceSubTypeCode, get_UAT_schedule_tool, get_STG_schedule_tool
 from ...Lib.Moutai import Token
-from E1_API_Automation.Settings import ENVIRONMENT, env_key, KSD_ENVIRONMENT, KSDEnvironment
+from E1_API_Automation.Settings import env_key, KSD_ENVIRONMENT, KSDEnvironment
 
 
 class EVCBase():
@@ -153,7 +153,7 @@ class EVCBase():
         }
         teacher_id = ""
 
-    if ENVIRONMENT == KSDEnvironment.LIVE:
+    if KSD_ENVIRONMENT == KSDEnvironment.LIVE:
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
         Caroline is working on this data.
@@ -200,7 +200,7 @@ class EVCBase():
         sis_test_teacher_list = [10584669, 10427158]
         evc_profile_host='https://e1-evc-booking-integration.ef.com'
 
-    if ENVIRONMENT == KSDEnvironment.LIVE_SG:
+    if KSD_ENVIRONMENT == KSDEnvironment.LIVE_SG:
         user_info = {
             "UserName": "hf3.id.02",
             "Password": "12345",
@@ -216,11 +216,12 @@ class EVCBase():
         return None
 
     evc_service = None
-    another_teacher = get_different_teacher(teacher_id, teacher_list)
+    # another_teacher = get_different_teacher(teacher_id, teacher_list)
     
     @BeforeSuite()
     def set_up(self):
         self.evc_service = KidsEVCService(host=KSD_ENVIRONMENT)
+
 
     def create_class(self):
         

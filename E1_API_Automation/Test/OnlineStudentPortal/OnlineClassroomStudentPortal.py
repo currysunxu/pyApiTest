@@ -25,14 +25,8 @@ class APITestCases(EVCBase):
         response = self.evc_service.login(user_name=self.user_info["UserName"], password=self.user_info["Password"])
         return response
 
-    @Test(tags='qa,stg,live')
-    def test_get_offline_active_group_info(self):
-        self.test_login()
-
+    def get_offline_active_group_info(self):
         group_response = self.evc_service.get_offline_active_groups()
-        assert_that(group_response.json(), match_to("[*].courseType"))
-        assert_that(group_response.json(), match_to("[*].courseTypeLevelCode"))
-
         course_type_list = jmespath.search("[?isCurrentGroup==`true`].courseType", group_response.json())
         book_code_list = jmespath.search("[?isCurrentGroup==`true`].courseTypeLevelCode", group_response.json())
         if course_type_list == []:
@@ -49,7 +43,10 @@ class APITestCases(EVCBase):
     @Test(tags='stg_sg, live_sg')
     def test_get_offline_active_groups(self):
         self.test_login()
+
         group_response = self.evc_service.get_offline_active_groups()
+        assert_that(group_response.json(), match_to("[*].courseType"))
+        assert_that(group_response.json(), match_to("[*].courseTypeLevelCode"))
         assert_that(group_response.status_code == 200)
 
     @Test(tags='qa,stg,live, stg_sg, live_sg')
@@ -94,7 +91,8 @@ class APITestCases(EVCBase):
 
     @Test(tags='qa, stg,live')
     def test_get_all_available_teachers_demo_class(self):
-        course = self.test_get_offline_active_groups()
+        self.test_login()
+        course = self.get_offline_active_group_info()
         course_type = course[0]
 
         available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
@@ -106,7 +104,8 @@ class APITestCases(EVCBase):
 
     @Test(tags='qa, stg,live')
     def test_get_all_available_teachers_regular_class(self):
-        course = self.test_get_offline_active_groups()
+        self.test_login()
+        course = self.get_offline_active_group_info()
         course_type = course[0]
 
         available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
@@ -118,7 +117,8 @@ class APITestCases(EVCBase):
 
     @Test(tags='qa, stg, live')
     def test_get_online_class_booking_history(self):
-        course = self.test_get_offline_active_groups()
+        self.test_login()
+        course = self.get_offline_active_group_info()
         course_type = course[0]
 
         query_booking_history_response = self.evc_service.query_booking_history(course_type,
@@ -143,8 +143,11 @@ class APITestCases(EVCBase):
         *
         :return:
         '''
-        # Login and get active offline groups
-        course = self.test_get_offline_active_groups()
+        # Login
+        self.test_login()
+
+        # Get active offline groups
+        course = self.get_offline_active_group_info()
         course_type = course[0]
         book_code = course[1]
         # Check OCH before book
@@ -315,7 +318,8 @@ class APITestCases(EVCBase):
 
     @Test(tags='qa,stg,live')
     def test_book_class_error_code_with_topic_not_found(self):
-        course = self.test_get_offline_active_groups()
+        self.test_login()
+        course = self.get_offline_active_group_info()
         course_type = course[0]
 
         available_teachers_response = self.evc_service.get_all_available_teachers(local2utc(self.regular_start_time),
@@ -359,7 +363,8 @@ class APITestCases(EVCBase):
     @Test(enabled=os.environ['environment'].lower() in 'qa,stg', tags='qa, stg')
     def test_reschedule(self):
         # Login and get active offline groups
-        course = self.test_get_offline_active_groups()
+        self.test_login()
+        course = self.get_offline_active_group_info()
         course_type = course[0]
         book_code = course[1]
 
