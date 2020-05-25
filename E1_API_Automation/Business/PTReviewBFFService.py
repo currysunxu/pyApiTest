@@ -10,7 +10,7 @@ class PTReviewBFFService:
         self.mou_tai = Moutai(host=self.host, token=Token("x-ef-token", "Token"))
 
     def login(self):
-        auth = AuthService(getattr(AuthEnvironment, env_key))
+        auth = AuthService(getattr(AuthEnvironment, str.upper(env_key)))
         self.user_name = BffUsers.BffUserPw[env_key]['username']
         self.password = BffUsers.BffUserPw[env_key]['password']
         x_ef_token = auth.login(self.user_name, self.password).json()['idToken']

@@ -18,30 +18,31 @@ class PTReviewSQLString:
     update_pt_score_sql = "update OnlineSchoolPlatform.dbo.TestAssessmentMeta set {0} " \
                           "where StudentId = {1} and TestPrimaryKey = '{2}'"
 
+
 class PTReviewData:
     pt_hf_user_key_book_unit = {
         # key is student_id
         'QA': {
-                '12214889': {
-                    'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
-                    'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
-                    'UnitKey': '30E54D73-C793-4F00-AD61-59CBF0423A0F'
-                },
-                # this record is to test the omni API for multiple user,
-                # it need to have same pt key with the first student
-                '12214890': {
-                    'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
-                    'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
-                    'UnitKey': '30E54D73-C793-4F00-AD61-59CBF0423A0F'
-                }
-              },
+            '12214889': {
+                'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
+                'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
+                'UnitKey': '30E54D73-C793-4F00-AD61-59CBF0423A0F'
+            },
+            # this record is to test the omni API for multiple user,
+            # it need to have same pt key with the first student
+            '12214890': {
+                'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
+                'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
+                'UnitKey': '30E54D73-C793-4F00-AD61-59CBF0423A0F'
+            }
+        },
         'Staging': {
-                '100360697': {
-                    'TestPrimaryKey': '30FF9C24-DEB4-49B2-9363-3C433D0B627F',
-                    'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
-                    'UnitKey': '1EC56EC1-A123-4B47-9057-96BE3EE7534D'
-                    }
-                },
+            '100360697': {
+                'TestPrimaryKey': '30FF9C24-DEB4-49B2-9363-3C433D0B627F',
+                'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
+                'UnitKey': '1EC56EC1-A123-4B47-9057-96BE3EE7534D'
+            }
+        },
         'Staging_SG': {
             '10106831': {
                 'TestPrimaryKey': '1B026C66-6ED0-440D-99BF-998507061E28',
@@ -51,14 +52,14 @@ class PTReviewData:
         },
         'Live': {
             '100201088': {
-                'TestPrimaryKey': '', # no need to set TestPrimaryKey for live data
+                'TestPrimaryKey': '',  # no need to set TestPrimaryKey for live data
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
             }
         },
         'Live_SG': {
             '100101406': {
-                'TestPrimaryKey': '', # no need to set TestPrimaryKey for live data
+                'TestPrimaryKey': '',  # no need to set TestPrimaryKey for live data
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
             }
@@ -73,10 +74,10 @@ class PTReviewData:
              {'username': 'ptReviewTest_MixSSHF', 'password': '12345'},
              {'username': 'ptReviewTest_OneCurrent', 'password': '12345'},
              {'username': 'ptReviewTest01', 'password': '12345'},
-            ],
+             ],
         'Staging':
-            [{'username': 'connie.test', 'password': '12345'},
-             {'username': 'siga.papertest', 'password': '12345'}
+            [{'username': 'hf3.cn.02', 'password': '12345'},
+             {'username': 'tb3.cn.02', 'password': '12345'}
              ]
     }
 
@@ -124,7 +125,7 @@ class PTReviewData:
     ptr_bff_data = {
         'QA': {
             'HF': {
-                'StudentId': 12221442,
+                'StudentId': 1070,
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'TestPrimaryKey': 'C1C3AE7A-3368-4FCD-B0B2-0A75EEEA2E73',
                 'UnitKey': '50ED3E4D-BF78-4D9D-B6EE-05F6D4D9A260'
@@ -132,33 +133,33 @@ class PTReviewData:
         },
         'Staging': {
             'HF': {
-                'StudentId': 100362513,
-                'BookKey': '8605C95C-9CF8-418C-8C67-B7A3122C5445',
-                'UnitKey': '22CFB67B-1CA2-4E71-A1EE-4FE8B0223FBA'
+                'StudentId': 101077451,
+                'BookKey': '77f96708-2120-40cd-b6fd-4e063d6d7f33',
+                'UnitKey': 'b9803492-67b6-47c1-a5e8-fc6ea48228d0',
             }
         },
         'Live': {
             'HF': {
-                'StudentId': 100201088,
-                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
-                'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
+                'StudentId': 101521757,
+                'BookKey': '77f96708-2120-40cd-b6fd-4e063d6d7f33',
+                'UnitKey': '9e2a3e47-3889-41e5-b4cb-6ff17bb4bb49'
             }
         }
     }
 
+
 class BffUsers:
     BffUserPw = {
-        'QA': {'username': 'ptReviewTest01', 'password': '12345'
-        },
+        'QA': {'username': 'hf3.cn.01', 'password': '12345'
+               },
         'Staging': {
-            # Todo need to do data refactor with 100362513
-            'username': 'hf3.cn.01', 'password': '12345',
+            'username': 'hf.pt.w1', 'password': '12345',
         },
         'Live': {
-            # Todo need to do data refactor with 100201088
-            'username': 'hf3.cn.01', 'password': '12345',
+            'username': 'gz1.g5.02', 'password': '12345',
         }
     }
+
 
 class PTDATA:
     pt_web_data = {
@@ -176,17 +177,47 @@ class PTDATA:
                 'BookKey': '8ADF3ABF-276E-41EE-8502-87E2C8AA4F84',
                 'TestPrimaryKey': '89068F85-5B12-4138-B0C2-6156856D9E2F',
                 'UnitKey': '756D2516-6655-4066-9048-7489D6FEC303',
+            },
+            'HFJ3': {
+                # Book J unit 3
+                'StudentId': 1070,
+                'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
+                'TestPrimaryKey': 'E53200F3-6B45-4F66-A9BF-A51EE667769D',
+                'UnitKey': '8DA57DB0-9A6C-4FEF-9641-80D5B7A9F0E3',
             }
-
+        },
+        'Staging': {
+            'HFJ': {
+                # Book J Unit 2
+                'StudentId': 101077451,
+                'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
+                'TestPrimaryKey': '8D36EC86-0789-4C0A-B30F-E4A5F4A3F593',
+                'UnitKey': '27B6915B-63D6-48DB-8BA5-1A468054DCE8',
+            },
+            'HFD': {
+                # Book D unit 5
+                'StudentId': 1070,
+                'BookKey': '8ADF3ABF-276E-41EE-8502-87E2C8AA4F84',
+                'TestPrimaryKey': '0CE75CF8-9D92-4DBF-A100-7921B4D8ABA2',
+                'UnitKey': '756D2516-6655-4066-9048-7489D6FEC303',
+            },
+            'HFJ3': {
+                # Book J unit 3
+                'StudentId': 101077451,
+                'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
+                'TestPrimaryKey': '0D70761A-DA33-429C-BD38-6A8709DD1DE7',
+                'UnitKey': '8DA57DB0-9A6C-4FEF-9641-80D5B7A9F0E3',
+            }
+        },
+        'Live': {
+            'HFJ': {
+                # Book J Unit 2
+                'StudentId': 101521757,
+                'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
+                'TestPrimaryKey': 'B201AE4F-558E-42FD-9F87-644381CE5743',
+                'UnitKey': '27B6915B-63D6-48DB-8BA5-1A468054DCE8',
+            }
         }
-        #ToDo add stg account if staging env is ready
-        # 'Staging': {
-        #     'HF': {
-        #         'StudentId': 100362513,
-        #         'BookKey': '8605C95C-9CF8-418C-8C67-B7A3122C5445',
-        #         'UnitKey': '22CFB67B-1CA2-4E71-A1EE-4FE8B0223FBA'
-        #     }
-        # }
     }
 
 
@@ -194,4 +225,11 @@ class PtWebSQLString:
     get_pt_instance_key_sql = "SELECT top 1 [Key] FROM OnlineSchoolPlatform.dbo.ProgressTestEntity " \
                               "with(nolock) where ProgressTestKey = '{0}' order by CreatedStamp desc"
 
+    get_pt_metadata_key_sql = "SELECT top 1 [Key] FROM OnlineSchoolPlatform.dbo.TestAssessmentMeta " \
+                              "with(nolock) where TestPrimaryKey = '{0}' and StudentId = '{1}'"
 
+    delete_pt_paper_version_sql = "DELETE FROM OnlineSchoolPlatform.dbo.TestAssessmentMeta " \
+                                  "where TestPrimaryKey = '{0}' and StudentId = '{1}'"
+
+    insert_pt_paper_version_sql = "INSERT INTO OnlineSchoolPlatform.dbo.TestAssessmentMeta ([Key], StudentId, TestType, TestPrimaryKey, TestInstanceKey, Code, CourseKey, CourseSnapshotKey, OriginalScore, TotalScore, OverwrittenScore, OverwrittenByStaffId, OverwrittenByUserKey, OverwrittenStamp, CreatedStamp, LastUpdatedStamp, CreatedBy, LastUpdatedBy, State)" \
+                                  "VALUES(newid(), '{0}', 1, '{1}', Null, '{2}', Null, Null, Null, 10, 9, Null, Null, Null, getutcdate(), getutcdate(), Null, Null, 0)"
