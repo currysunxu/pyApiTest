@@ -20,7 +20,7 @@ pipeline {
   }
   
   parameters {
-        choice(name:'environment',choices:['QA','STG','LIVE'],description:'')
+        choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
     }
     
   environment {
