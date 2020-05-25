@@ -20,7 +20,7 @@ pipeline {
   
   parameters {
         
-        choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
+        choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
     }
     
   environment {
@@ -39,7 +39,7 @@ pipeline {
       }
       steps {  
       script { 
-          if (env.environment == 'STG')
+          if (env.environment in ('STG','STG_SG'))
               case_tag = 'stg'
           if (env.environment == 'LIVE')
               case_tag = 'live'
