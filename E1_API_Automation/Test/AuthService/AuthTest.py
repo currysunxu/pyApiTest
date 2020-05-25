@@ -100,7 +100,5 @@ class AuthTestCases:
                     assert_that(product_content['value'] == expected_value)
                     assert_that(product_content['level'] == 'PRODUCT')
                     assert_that(product_content['description'] == expected_value)
-                    assert_that(product_content['parent']['identity'] == 'PROGRESSTEST')
-                    assert_that(product_content['parent']['value'] == 'PROGRESSTEST')
                 else:
                     assert_that(product_content is None, "PROGRESSTEST product should not present in Auth ACL!")
