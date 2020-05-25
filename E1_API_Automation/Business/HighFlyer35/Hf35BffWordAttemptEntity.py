@@ -11,6 +11,7 @@ class Hf35BffWordAttemptEntity:
         self.__word_content_revision = None
         self.__tree_revision = None
         self.__schema_version = None
+        self.__parent_content_path = None
         self.__detail = None
 
     @property
@@ -92,6 +93,14 @@ class Hf35BffWordAttemptEntity:
     @schema_version.setter
     def schema_version(self, schema_version):
         self.__schema_version = schema_version
+
+    @property
+    def parent_content_path(self):
+        return self.__parent_content_path
+
+    @parent_content_path.setter
+    def parent_content_path(self, parent_content_path):
+        self.__parent_content_path = parent_content_path
 
     @property
     def detail(self):
