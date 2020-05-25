@@ -133,7 +133,7 @@ class Hf35BffService:
 
     def post_vocab_progress(self, word_attempt_list):
         word_attempt_insert_dict_list = Hf35BffUtils.construct_word_attempts_dict(word_attempt_list)
-        return self.mou_tai.post("/hf3/api/v1/vocab/progress", word_attempt_insert_dict_list)
+        return self.mou_tai.post("/hf3/api/v1/vocab/attempts", word_attempt_insert_dict_list)
 
     def get_vocab_progress(self, book_content_id):
         api_url = '/hf3/api/v1/vocab/progress?bookContentId={0}'.format(book_content_id)
