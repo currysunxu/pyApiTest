@@ -5,6 +5,7 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningDBUtils impor
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.LearningFieldTemplate import FieldValueType
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from ...Settings import LEARNING_RESULT_ENVIRONMENT
 from hamcrest import assert_that
 import random
@@ -16,7 +17,7 @@ import datetime
 class PlanResultTestCases:
 
     # test learning result insert API with single detail
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_valid_single_detail(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -30,7 +31,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # test learning result insert API with multiple details
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_valid_multiple_details(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -44,7 +45,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # test learning result with only required fields
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_valid_only_required(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -59,7 +60,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # test get specific result
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_specific_result(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -69,16 +70,19 @@ class PlanResultTestCases:
 
         learning_result_get_api_response = learning_result_service.get_specific_result(learning_result)
         assert_that(learning_result_get_api_response.status_code == 200)
-        learning_result_list_from_db = LearningDBUtils.get_specific_result(learning_result)
 
-        error_message = \
-            LearningCommonUtils.verify_learning_get_api_data_with_db(learning_result_get_api_response.json(),
-                                                                     learning_result_list_from_db)
+        if not EnvUtils.is_env_live():
+            learning_result_list_from_db = LearningDBUtils.get_specific_result(learning_result)
 
-        assert_that(error_message == '', error_message)
+            error_message = \
+                LearningCommonUtils.verify_learning_get_api_data_with_db(learning_result_get_api_response.json(),
+                                                                         learning_result_list_from_db)
+
+            assert_that(error_message == '', error_message)
+
 
     # Test when all the fields are null
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_null_values(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # all the filed value as null
@@ -93,7 +97,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # Test when all the fields are empty
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_empty_values(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # all the filed value as ''
@@ -109,7 +113,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # test when all the fields, including fields in details are null
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_null_values_including_details_fields(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # all the filed value as null, also with details list with null fields
@@ -125,7 +129,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # test when all the fields, including fields in details are empty
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_empty_values_including_details_fields(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # all the filed value as null, also with details list with null fields
@@ -141,7 +145,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # test when fields with values below min
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_invalid_value_below_min(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # all the filed value below min
@@ -157,7 +161,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # test when fields with values exceed max
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_invalid_value_exceed_max(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # all the filed value as ''
@@ -222,12 +226,12 @@ class PlanResultTestCases:
                                                                 learning_detail_entity, int_type_details_field, is_exceed_int)
 
     # test when int type fields with invalid format value
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_invalid_value_for_int_fields(self):
         self.test_learning_result_insert_invalid_int_fields(False)
 
     # test when int type fields with value exceed int's max value
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_exceed_int_value_for_int_fields(self):
         self.test_learning_result_insert_invalid_int_fields(True)
 
@@ -252,7 +256,7 @@ class PlanResultTestCases:
         setattr(learning_entity, field_name, None)
 
     # test when date type field with invalid format value
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_invalid_date_fields(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # following is the date type fields in details entity
@@ -274,7 +278,7 @@ class PlanResultTestCases:
                                                             learning_detail_entity, date_type_details_field)
 
     # test insert with max values
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_valid_value_max(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # all the filed value with max value
@@ -289,7 +293,7 @@ class PlanResultTestCases:
         assert_that(error_message == '', error_message)
 
     # test insert with min values
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_learning_result_insert_valid_value_min(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
         # all the filed value with max value
@@ -310,20 +314,21 @@ class PlanResultTestCases:
         # get result api need some same fields, so, use it as template
         learning_result_template = LearningResultUtils.construct_learning_result_template(learning_result_query_type)
         # construct valid learning result list
-        for i in range(record_number):
-            details_number = random.randint(1, 8)
-            learning_result = LearningResultUtils.construct_learning_result_valid_by_template(learning_result_template,
-                                                                                              details_number)
-            learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
-            assert_that(learning_result_insert_api_response.status_code == 200)
+        learning_result_list = LearningResultUtils.construct_multiple_results_by_template(record_number,
+                                                                                          learning_result_template)
+        learning_result_batch_insert_api_response = learning_result_service.post_learning_result_batch_insert(
+            learning_result_list)
+        assert_that(learning_result_batch_insert_api_response.status_code == 200,
+                    'batch insert api response status is:' + str(learning_result_batch_insert_api_response.status_code))
 
         # get data from DB
-        if learning_result_query_type == LearningResultQueryType.TypeGetUser:
-            learning_result_list_from_db = LearningDBUtils.get_user_result(learning_result_template)
-        elif learning_result_query_type == LearningResultQueryType.TypeGetPartition:
-            learning_result_list_from_db = LearningDBUtils.get_partition_result(learning_result_template)
-        elif learning_result_query_type == LearningResultQueryType.TypeGetSpecific:
-            learning_result_list_from_db = LearningDBUtils.get_specific_result(learning_result_template)
+        if not EnvUtils.is_env_live():
+            if learning_result_query_type == LearningResultQueryType.TypeGetUser:
+                learning_result_list_from_db = LearningDBUtils.get_user_result(learning_result_template)
+            elif learning_result_query_type == LearningResultQueryType.TypeGetPartition:
+                learning_result_list_from_db = LearningDBUtils.get_partition_result(learning_result_template)
+            elif learning_result_query_type == LearningResultQueryType.TypeGetSpecific:
+                learning_result_list_from_db = LearningDBUtils.get_specific_result(learning_result_template)
 
         # if limit_list is None, means it test the get API without limit
         if limit_list is None:
@@ -339,15 +344,16 @@ class PlanResultTestCases:
 
             assert_that(learning_result_get_api_response.status_code == 200)
 
-            # if there's more than 50 records fit the condition, the get API will by default get 50 records
-            if record_number > 50:
-                learning_result_list_from_db = learning_result_list_from_db[:50]
+            if not EnvUtils.is_env_live():
+                # if there's more than 50 records fit the condition, the get API will by default get 50 records
+                if record_number > 50:
+                    learning_result_list_from_db = learning_result_list_from_db[:50]
 
-            error_message = LearningCommonUtils.verify_learning_get_api_data_with_db(
-                learning_result_get_api_response.json(),
-                learning_result_list_from_db)
+                error_message = LearningCommonUtils.verify_learning_get_api_data_with_db(
+                    learning_result_get_api_response.json(),
+                    learning_result_list_from_db)
 
-            assert_that(error_message == '', error_message)
+                assert_that(error_message == '', error_message)
         else:
             for limit in limit_list:
                 if learning_result_query_type == LearningResultQueryType.TypeGetUser:
@@ -360,39 +366,41 @@ class PlanResultTestCases:
 
                 assert_that(learning_result_get_api_response.status_code == 200)
 
-                expected_learning_result_list_from_db = \
-                    LearningCommonUtils.get_expected_learning_data_from_db_by_limit_page(learning_result_list_from_db,
-                                                                                         limit, None)
+                if not EnvUtils.is_env_live():
+                    expected_learning_result_list_from_db = \
+                        LearningCommonUtils.get_expected_learning_data_from_db_by_limit_page(
+                            learning_result_list_from_db,
+                            limit, None)
 
-                error_message = LearningCommonUtils. \
-                    verify_learning_get_api_data_with_db(learning_result_get_api_response.json(),
-                                                         expected_learning_result_list_from_db)
-                assert_that(error_message == '',
-                            "When limit is:" + str(limit) + ", the error message is:" + error_message)
+                    error_message = LearningCommonUtils. \
+                        verify_learning_get_api_data_with_db(learning_result_get_api_response.json(),
+                                                             expected_learning_result_list_from_db)
+                    assert_that(error_message == '',
+                                "When limit is:" + str(limit) + ", the error message is:" + error_message)
 
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_partition_result_without_limit_less_than_50(self):
         record_number = random.randint(1, 30)
         self.test_get_result_api(record_number, None, LearningResultQueryType.TypeGetPartition)
 
     # when there's more than 50 records in the DB, get API will by default get 50 records
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_partition_result_without_limit_larger_than_50(self):
         record_number = 51
         self.test_get_result_api(record_number, None, LearningResultQueryType.TypeGetPartition)
 
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_user_result_without_limit_less_than_50(self):
         record_number = random.randint(1, 30)
         self.test_get_result_api(record_number, None, LearningResultQueryType.TypeGetUser)
 
     # when there's more than 50 records in the DB, get API will by default get 50 records
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_user_result_without_limit_larger_than_50(self):
         record_number = 51
         self.test_get_result_api(record_number, None, LearningResultQueryType.TypeGetUser)
 
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_partition_result_with_limit_less_than_size(self):
         record_number = 51
         # limit list, default limit value is 50
@@ -400,14 +408,14 @@ class PlanResultTestCases:
 
         self.test_get_result_api(record_number, limit_list, LearningResultQueryType.TypeGetPartition)
 
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_partition_result_with_limit_larger_than_size(self):
         record_number = random.randint(10, 30)
         limit_list = [random.randint(1, record_number-1), record_number, record_number + 1,
                       random.randint(record_number + 2, 50)]
         self.test_get_result_api(record_number, limit_list, LearningResultQueryType.TypeGetPartition)
 
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_user_result_with_limit_less_than_size(self):
         record_number = 51
         # limit list, default limit value is 50
@@ -415,26 +423,26 @@ class PlanResultTestCases:
 
         self.test_get_result_api(record_number, limit_list, LearningResultQueryType.TypeGetUser)
 
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_user_result_with_limit_larger_than_size(self):
         record_number = random.randint(10, 30)
         limit_list = [random.randint(1, record_number - 1), record_number, record_number + 1,
                       random.randint(record_number + 2, 50)]
         self.test_get_result_api(record_number, limit_list, LearningResultQueryType.TypeGetUser)
 
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_specific_result_less_than_50(self):
         record_number = random.randint(1, 20)
         self.test_get_result_api(record_number, None, LearningResultQueryType.TypeGetSpecific)
 
     # when there's more than 50 records in the DB, get API will by default get 50 records
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_specific_result_larger_than_50(self):
         record_number = 51
         self.test_get_result_api(record_number, None, LearningResultQueryType.TypeGetSpecific)
 
     # test when product/student_key is empty for all the query APIs
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_api_with_empty_value(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -477,7 +485,7 @@ class PlanResultTestCases:
                     expected_message + " can't be found in message")
 
     # test when product, product_module value is not int
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_api_with_invalid_format_product_id(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -521,7 +529,7 @@ class PlanResultTestCases:
 
 
     # test when limit value is not int
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_api_with_invalid_format_limit(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -539,7 +547,7 @@ class PlanResultTestCases:
         self.assert_get_api_response_with_invalid_format_for_int(learning_result_get_api_response, limit)
 
     # test when limit value is not allowed int value, that is, below 1, exceed 50
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_api_with_invalid_value_limit(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -558,7 +566,7 @@ class PlanResultTestCases:
             assert_that(learning_result_get_api_response.status_code == 400)
 
     # test when student_key , business_key with invalid format
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_api_with_invalid_value_key(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -606,7 +614,7 @@ class PlanResultTestCases:
             setattr(learning_result, field_name, original_value)
 
     # test when business_key is empty for get specific result
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_specific_result_with_empty_business_key(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -620,7 +628,7 @@ class PlanResultTestCases:
         expected_message + " can't be found in message")
 
     # test when product_module is empty for get user results
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_user_result_with_empty_product_module(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -652,7 +660,7 @@ class PlanResultTestCases:
 
 
     # test when business_key is empty for get specific_result
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_specific_result_with_empty_business_key(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 
@@ -678,7 +686,7 @@ class PlanResultTestCases:
                     'get specific result API return result should be same as user without limit api when business_key is empty')
 
     # test when there's no record can be found with the param
-    @Test(tags="qa")
+    @Test(tags="qa, stg")
     def test_get_api_with_not_existing_record(self):
         learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 

@@ -46,3 +46,7 @@ class LearningResultService:
                                                                                          learning_result.product_module,
                                                                                          learning_result.business_key)
         return self.mou_tai.get(api_url)
+
+    def post_learning_result_batch_insert(self, learning_result_list):
+        learning_result_batch_insert = LearningResultUtils.construct_batch_learning_result_dict(learning_result_list)
+        return self.mou_tai.post("/api/v1/results/batch", learning_result_batch_insert)
