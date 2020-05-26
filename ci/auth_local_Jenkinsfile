@@ -38,12 +38,13 @@ pipeline {
 
       steps {
           script {
-          if (env.environment == 'STG')
+          if (env.environment in ('STG','STG_SG'))
               case_tag = 'stg'
-          if (env.environment == 'LIVE')
+          if (env.environment in ('LIVE','LIVE_SG'))
               case_tag = 'live'
           if (env.environment == 'QA')
               case_tag = 'qa'
+
           sh 'ptest3  -t E1_API_Automation.Test.AuthService -i ${case_tag}'
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
