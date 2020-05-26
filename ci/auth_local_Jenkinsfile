@@ -37,16 +37,18 @@ pipeline {
       }
 
       steps {
+          echo "ENV = ${env.environment}"
+
           script {
-          if (env.environment == 'QA')
+          if (${env.environment} == 'QA')
               case_tag = 'qa'
-          if (env.environment == 'STG')
+          if (${env.environment} == 'STG')
               case_tag = 'stg'
-          if (env.environment == 'STG_SG')
+          if (${env.environment} == 'STG_SG')
               case_tag = 'stg'
-          if (env.environment == 'LIVE')
+          if (${env.environment} == 'LIVE')
               case_tag = 'live'
-          if (env.environment == 'LIVE_SG')
+          if (${env.environment} == 'LIVE_SG')
               case_tag = 'live'
 
           sh 'ptest3  -t E1_API_Automation.Test.AuthService -i ${case_tag}'
