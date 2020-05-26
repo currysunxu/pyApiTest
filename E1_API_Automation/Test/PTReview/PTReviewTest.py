@@ -424,8 +424,8 @@ class PTReviewTestCases:
     @Test(tags="qa,stg")
     def test_pt_web_osp_create_pt_entity(self):
         osp_service = OSPService(OSP_ENVIRONMENT)
-        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
-        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
+        pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
         expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
         actual_result = osp_service.put_create_progress_test_entity(expected_entity_dict)
         assert_that(actual_result.status_code == 200)
@@ -444,10 +444,10 @@ class PTReviewTestCases:
     @Test(tags="qa,stg")
     def test_pt_web_osp_query_test_by_student_and_book(self):
         osp_service = OSPService(OSP_ENVIRONMENT)
-        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
-        book_key = PTDATA.pt_web_data[env_key]['HFJ']['BookKey']
-        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
-        unit_key = PTDATA.pt_web_data[env_key]['HFJ']['UnitKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
+        book_key = PTDATA.pt_web_data[env_key]['HFF']['BookKey']
+        pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
+        unit_key = PTDATA.pt_web_data[env_key]['HFF']['UnitKey']
         actual_result = osp_service.post_query_pt_by_student_book_state(student_id, book_key)
         assert_that(actual_result.status_code == 200)
         print(actual_result.json())
@@ -479,8 +479,8 @@ class PTReviewTestCases:
     @Test(tags="qa,stg,live")
     def test_pt_web_tpi_create_pt_entity(self):
         tpi_service = TPIService(TPI_ENVIRONMENT)
-        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
-        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
+        pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
         expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
         actual_result = tpi_service.pt_web_unlock(expected_entity_dict)
         assert_that(actual_result.status_code == 200)
