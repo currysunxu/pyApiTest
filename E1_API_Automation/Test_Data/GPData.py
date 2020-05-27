@@ -51,7 +51,7 @@ class GP_user:
                  'Staging_SG': {'username': 'gp.ru.01', 'password': '12345', 'culture_code': 'ru-RU'},
                  'Live_SG': {'username': 'gp.ru.auto1', 'password': '12345', 'culture_code': 'ru-RU'}}
 
-    GradeList = {'QA': {'zh-CN':{'lowest_grade': '2nd', 'highest_grade': '12th'}},
+    GradeList = {'QA': {'zh-CN':{'lowest_grade': '2th', 'highest_grade': '12th'}},
                  'Staging': {'zh-CN':{'lowest_grade': '3rd', 'highest_grade': '11th'}},
                  'Live': {'zh-CN':{'lowest_grade': '3rd', 'highest_grade': '11th'}},
                  'Staging_SG': {'id-ID':{'lowest_grade': '1st', 'highest_grade': '11th'},
