@@ -29,7 +29,8 @@ pipeline {
 
       steps {
         script {
-          sh "ptest3  -t E1_API_Automation.Test.AuthService -i ${params.environment,,}"
+          case_tag = "${params.environment}".toLowerCase()
+          sh "ptest3  -t E1_API_Automation.Test.AuthService -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
