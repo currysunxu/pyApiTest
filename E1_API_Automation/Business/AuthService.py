@@ -31,7 +31,6 @@ class AuthService:
         user_info = JWTHelper.decode_token(id_token, project_dir + "/rsa/public_key.pem")
         ba_token = jmespath.search('tokens[?version==`3`].value', user_info)[0]
         return ba_token
-        
 
     def get_auth_token(self):
         token_value = self.mou_tai.headers.pop('X-EF-TOKEN')
@@ -47,6 +46,11 @@ class AuthService:
 
     def get_user_products(self):
         return self.mou_tai.get(url="/api/v1/acl/products")
+
+    def get_custom_id(self):
+        profile_result = self.mou_tai.get(url="/api/v1/profile/basic")
+        custom_id = jmespath.search('userId', profile_result.json())
+        return custom_id
 
     def get_student_profile_from_db(self, customer_id):
         ms_sql_server = MSSQLHelper(DATABASE, 'AuthenticationProfileService')
