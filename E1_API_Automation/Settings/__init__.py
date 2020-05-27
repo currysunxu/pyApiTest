@@ -42,8 +42,9 @@ class AuthEnvironment(object):
 class OMNIEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/omni/apigateway"
     STAGING = "http://omni-apigateway-staging-tccn.ef.com"
-    STAGING_SG = "http://omni-apigateway-tcjp.ef.com"
+    STAGING_SG = "http://omni-apigateway-staging-tcjp.ef.com"
     LIVE = "http://omni-apigateway-tccn.ef.com"
+    LIVE_SG = "http://omni-apigateway-tcjp.ef.com"
 
 
 class LearningResultEnvironment(object):

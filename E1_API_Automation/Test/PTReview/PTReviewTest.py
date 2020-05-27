@@ -6,7 +6,7 @@ from E1_API_Automation.Business.Utils.PTReviewUtils import PTReviewUtils
 from E1_API_Automation.Business.TPIService import TPIService
 from E1_API_Automation.Business.OMNIService import OMNIService
 from ...Settings import OSP_ENVIRONMENT, TPI_ENVIRONMENT, OMNI_ENVIRONMENT, ENVIRONMENT, env_key
-from ...Test_Data.PTReviewData import PTReviewData,PTDATA
+from ...Test_Data.PTReviewData import PTReviewData, PTDATA
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Business.PTSkillScore import SkillCode, SubSkillCode
 from hamcrest import assert_that, equal_to
@@ -421,11 +421,11 @@ class PTReviewTestCases:
                                                                         expected_ptr_result_all_course)
         assert_that(error_message == '', error_message)
 
-    @Test(tags="qa")
+    @Test(tags="qa,stg")
     def test_pt_web_osp_create_pt_entity(self):
         osp_service = OSPService(OSP_ENVIRONMENT)
-        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
-        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
+        pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
         expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
         actual_result = osp_service.put_create_progress_test_entity(expected_entity_dict)
         assert_that(actual_result.status_code == 200)
@@ -441,13 +441,13 @@ class PTReviewTestCases:
         assert_that(len(actual_result.json()) == 11, "response fields numbers is invalid,please check whether add or "
                                                      "remove any fields")
 
-    @Test(tags="qa")
+    @Test(tags="qa,stg")
     def test_pt_web_osp_query_test_by_student_and_book(self):
         osp_service = OSPService(OSP_ENVIRONMENT)
-        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
-        book_key = PTDATA.pt_web_data[env_key]['HFJ']['BookKey']
-        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
-        unit_key = PTDATA.pt_web_data[env_key]['HFJ']['UnitKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
+        book_key = PTDATA.pt_web_data[env_key]['HFF']['BookKey']
+        pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
+        unit_key = PTDATA.pt_web_data[env_key]['HFF']['UnitKey']
         actual_result = osp_service.post_query_pt_by_student_book_state(student_id, book_key)
         assert_that(actual_result.status_code == 200)
         print(actual_result.json())
@@ -460,7 +460,7 @@ class PTReviewTestCases:
         assert_that(len(actual_result.json()[0]) == 6, "response fields numbers is invalid,please check whether add or "
                                                        "remove any fields")
 
-    @Test(tags="qa")
+    @Test(tags="qa,stg")
     def test_pt_web_osp_query_test_by_test_result(self):
         osp_service = OSPService(OSP_ENVIRONMENT)
         student_id = PTDATA.pt_web_data[env_key]['HFD']['StudentId']
@@ -476,22 +476,34 @@ class PTReviewTestCases:
         assert_that(len(actual_result.json()[0]) == 8,
                     "response fields numbers is invalid,please check whether add or remove any fields")
 
-    @Test(tags="qa")
+    @Test(tags="qa,stg,live")
     def test_pt_web_tpi_create_pt_entity(self):
         tpi_service = TPIService(TPI_ENVIRONMENT)
-        pt_key = PTDATA.pt_web_data[env_key]['HFJ']['TestPrimaryKey']
-        student_id = PTDATA.pt_web_data[env_key]['HFJ']['StudentId']
+        pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
         expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
         actual_result = tpi_service.pt_web_unlock(expected_entity_dict)
         assert_that(actual_result.status_code == 200)
-        print(json.dumps(actual_result.json(),indent=4))
+        print(json.dumps(actual_result.json(), indent=4))
         assert_that(actual_result.json()["TeacherId"], equal_to(expected_entity_dict["TeacherId"]))
         assert_that(actual_result.json()["ProgressTestKey"], equal_to(expected_entity_dict["ProgressTestKey"].lower()))
         assert_that(actual_result.json()["GroupId"], equal_to(expected_entity_dict["GroupId"]))
         assert_that(actual_result.json()["SchoolCode"], equal_to(expected_entity_dict["SchoolCode"]))
         assert_that(actual_result.json()["Name"], equal_to("Progress Test"))
-        pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
-        pt_instance_key = str(pt_instance_key)[str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
-        assert_that(actual_result.json()["ProgressTestInstanceKey"], equal_to(pt_instance_key))
+        if not EnvUtils.is_env_live():
+            pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
+            pt_instance_key = str(pt_instance_key)[str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
+            assert_that(actual_result.json()["ProgressTestInstanceKey"], equal_to(pt_instance_key))
         assert_that(len(actual_result.json()) == 11, "response fields numbers is invalid,please check whether add or "
                                                      "remove any fields")
+
+    @Test(tags="qa,stg")
+    def test_pt_web_unlock_pt_after_paper_version_should_403(self):
+        osp_service = OSPService(OSP_ENVIRONMENT)
+        pt_key = PTDATA.pt_web_data[env_key]['HFJ3']['TestPrimaryKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFJ3']['StudentId']
+        PTReviewUtils.set_pt_paper_version_from_db(pt_key, student_id)
+        expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
+        actual_result = osp_service.put_create_progress_test_entity(expected_entity_dict)
+        assert_that(actual_result.status_code == 403)
+        print(actual_result.json())

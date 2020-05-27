@@ -38,14 +38,11 @@ pipeline {
       }
       steps {  
       script {     
-          if (env.environment == 'STG')
+          case_tag = "${params.environment}".toLowerCase()
+          if (case_tag == 'stg_sg') {
               case_tag = 'stg'
-          if (env.environment == 'STG_SG')
-              case_tag = 'stg'
-          if (env.environment == 'LIVE')
-              case_tag = 'live' 
-          if (env.environment == 'LIVE_SG')
-              case_tag = 'live' 
+          } else if (case_tag == 'live_sg')
+              case_tag = 'live'
              
           sh 'ptest3  -t E1_API_Automation.Test.TBV3 -i ${case_tag}'
           junit 'test-output/xunit-results.xml'

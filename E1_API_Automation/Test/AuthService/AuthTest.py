@@ -1,9 +1,8 @@
 from E1_API_Automation.Business.AuthService import AuthService, AuthPlatform, AuthDeviceType
-from E1_API_Automation.Business.OMNIService import OMNIService
 from E1_API_Automation.Test_Data.AuthData import AuthUsers, AuthProduct
 from hamcrest import assert_that
 from ptest.decorator import TestClass, Test
-from E1_API_Automation.Settings import AUTH_ENVIRONMENT, OMNI_ENVIRONMENT, env_key
+from E1_API_Automation.Settings import AUTH_ENVIRONMENT, env_key
 from E1_API_Automation.Business.Utils.AuthUtils import AuthUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from ...Lib.HamcrestMatcher import match_to
@@ -40,15 +39,14 @@ class AuthTestCases:
     @Test(tags="qa, stg, live")
     def test_legacy_logout(self):
         auth_service = AuthService(AUTH_ENVIRONMENT)
-        omni_service = OMNIService(OMNI_ENVIRONMENT)
         product_keys = AuthUsers.AuthUsers[env_key].keys()
 
         # test the legacy logout for all the products
         for key in product_keys:
             user_name = AuthUsers.AuthUsers[env_key][key][0]['username']
             password = AuthUsers.AuthUsers[env_key][key][0]['password']
-            customer_id = omni_service.get_customer_id(user_name, password)
             auth_service.login(user_name, password)
+            customer_id = auth_service.get_custom_id()
             legacy_sign_out_response = auth_service.legacy_sign_out(customer_id)
             assert_that(legacy_sign_out_response.status_code == 200)
 
@@ -86,8 +84,7 @@ class AuthTestCases:
                     assert_that(product_content['level'] == 'PRODUCT')
                     # if it's not Live environment, then do the rest verification with DB
                     if not EnvUtils.is_env_live():
-                        omni_service = OMNIService(OMNI_ENVIRONMENT)
-                        customer_id = omni_service.get_customer_id(user_name, password)
+                        customer_id = auth_service.get_custom_id()
                         student_profile = auth_service.get_student_profile_from_db(customer_id)
                         expected_gp_purchase_type = AuthUtils.get_expected_gp_purchase_type(student_profile[0][0])
                         assert_that(product_content['purchaseType'] == expected_gp_purchase_type)
@@ -100,7 +97,5 @@ class AuthTestCases:
                     assert_that(product_content['value'] == expected_value)
                     assert_that(product_content['level'] == 'PRODUCT')
                     assert_that(product_content['description'] == expected_value)
-                    assert_that(product_content['parent']['identity'] == 'PROGRESSTEST')
-                    assert_that(product_content['parent']['value'] == 'PROGRESSTEST')
                 else:
                     assert_that(product_content is None, "PROGRESSTEST product should not present in Auth ACL!")

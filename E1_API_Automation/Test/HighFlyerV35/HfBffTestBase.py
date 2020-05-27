@@ -149,6 +149,7 @@ class HfBffTestBase:
 		route['lessonContentRevision'] = bff_data_obj.get_attempt_body()["lessonContentRevision"]
 		route['learningUnitContentId'] = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		route['learningUnitContentRevision'] = bff_data_obj.get_attempt_body()["learningUnitContentRevision"]
+		route['parentContentPath'] = bff_data_obj.get_attempt_body()["parentContentPath"]
 		learning_result_entity.route = route
 
 
