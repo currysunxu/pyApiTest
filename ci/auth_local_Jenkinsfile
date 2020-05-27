@@ -28,7 +28,7 @@ pipeline {
       }
 
       steps {
-          sh "ptest3  -t E1_API_Automation.Test.AuthService -i ${params.environment}
+          sh "ptest3  -t E1_API_Automation.Test.AuthService -i ${params.environment}"
           junit 'test-output/xunit-results.xml'
         script {
           if (currentBuild.result =='UNSTABLE')
