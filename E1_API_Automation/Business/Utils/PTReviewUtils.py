@@ -663,6 +663,8 @@ class PTReviewUtils:
             test_type = 'paper'
         elif api_pt_assess_by_skill_json['PTTestBy'] == 1:
             test_type = 'digital'
+        else :
+            test_type = 'web'
 
         expected_ptr_result_by_book_unit['type'] = test_type
 
@@ -780,6 +782,9 @@ class PTReviewUtils:
                 test_type = 'paper'
             elif api_pt_assess_by_unit['PTTestBy'] == 1:
                 test_type = 'digital'
+            else :
+                test_type = 'web'
+
 
             invalid = True
             score = None
@@ -917,3 +922,19 @@ class PTReviewUtils:
     def get_pt_instance_key_from_db(pt_key):
         ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')
         return ms_sql_server.exec_query(PtWebSQLString.get_pt_instance_key_sql.format(pt_key))
+
+    @staticmethod
+    def set_pt_paper_version_from_db(pt_key,student_id):
+        skills =['Speaking-PUNCTUATION','Writing-PUNCTUATION','listening','vocabulary','grammar','reading']
+        try:
+            ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')
+            pt_num = ms_sql_server.exec_query(PtWebSQLString.get_pt_instance_key_sql.format(pt_key))
+            test_metadata_key = ms_sql_server.exec_query(PtWebSQLString.get_pt_metadata_key_sql.format(pt_key,student_id))
+            if len(pt_num) is 0:
+                if len(test_metadata_key) is not 0:
+                    ms_sql_server.exec_non_query(PtWebSQLString.delete_pt_paper_version_sql.format(pt_key,student_id))
+                for skill in skills:
+                        ms_sql_server.exec_non_query(PtWebSQLString.insert_pt_paper_version_sql.format(student_id,pt_key,skill))
+        except Exception as e:
+            print(e)
+
