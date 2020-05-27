@@ -16,7 +16,7 @@ pipeline {
   }
   
   parameters {
-        choice(name:'environment',choices:['qa','stg','stg_sg','live','live_sg'],description:'')
+        choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
     }
   stages { 
     stage('Verify') {   
@@ -28,9 +28,9 @@ pipeline {
       }
 
       steps {
-          sh "ptest3  -t E1_API_Automation.Test.AuthService -i ${params.environment}"
-          junit 'test-output/xunit-results.xml'
         script {
+          sh "ptest3  -t E1_API_Automation.Test.AuthService -i ${params.environment,,}"
+          junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
      }
