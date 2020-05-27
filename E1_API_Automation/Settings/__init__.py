@@ -97,7 +97,7 @@ class E1TPIEnvironment(object):
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'QA'
+    os.environ['environment'] = 'LIVE_SG'
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA

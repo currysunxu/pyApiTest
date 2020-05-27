@@ -44,21 +44,23 @@ class GP_user:
                'Staging': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
                'Live': {'username': 'gp.cn.auto2', 'password': '12345', 'culture_code': 'zh-CN'},
                'Staging_SG': {'username': 'gp.id.auto1', 'password': '12345', 'culture_code': 'id-ID'},
-               'Live_SG': {'username': 'id.grampro', 'password': '12345', 'culture_code': 'id-ID'}}
+               'Live_SG': {'username': 'gp.id.auto1', 'password': '12345', 'culture_code': 'id-ID'}}
     GPDTUsers = {'QA': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
                  'Staging': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
-                 'Live': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
-                 'Staging_SG': {'username': 'gp.ru.auto1', 'password': '12345', 'culture_code': 'ru-RU'},
+                 'Live': {'username': 'hf3.cn.17', 'password': '12345', 'culture_code': 'zh-CN'},
+                 'Staging_SG': {'username': 'gp.ru.01', 'password': '12345', 'culture_code': 'ru-RU'},
                  'Live_SG': {'username': 'gp.ru.auto1', 'password': '12345', 'culture_code': 'ru-RU'}}
 
-    GradeList = {'QA': {'lowest_grade': 'Gth2', 'highest_grade': 'Gth12'},
-                 'Staging': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth11'},
-                 'Live': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth11'},
-                 'Staging_SG': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth10'},
-                 'Live_SG': {'lowest_grade': 'Gth3', 'highest_grade': 'Gth10'}}
+    GradeList = {'QA': {'zh-CN':{'lowest_grade': '2nd', 'highest_grade': '12th'}},
+                 'Staging': {'zh-CN':{'lowest_grade': '3rd', 'highest_grade': '11th'}},
+                 'Live': {'zh-CN':{'lowest_grade': '3rd', 'highest_grade': '11th'}},
+                 'Staging_SG': {'id-ID':{'lowest_grade': '1st', 'highest_grade': '11th'},
+                                'ru-RU':{'lowest_grade': '3rd', 'highest_grade': '10th'}},
+                 'Live_SG': {'id-ID':{'lowest_grade': '1st', 'highest_grade': '11th'},
+                            'ru-RU': {'lowest_grade': '3rd', 'highest_grade': '10th'}}}
 
     GPVideoUsers = {'QA': {'username': 'hf.test1025', 'password': '12345'},
                     'Staging': {'username': 'gp.cn.01', 'password': '12345'},
-                    'Live': {'username': 'gp.cn.auto1', 'password': '12345'},
-                    'Staging_SG': {'username': 'gp.ru.auto1', 'password': '12345'},
-                    'Live_SG': {'username': 'robin.wang', 'password': '12345'}}
+                    'Live': {'username': 'gp_03', 'password': '12345'},
+                    'Staging_SG': {'username': 'gp.id.auto1', 'password': '12345'},
+                    'Live_SG': {'username': 'gp.id.auto1', 'password': '12345'}}

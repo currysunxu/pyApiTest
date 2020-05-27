@@ -17,10 +17,9 @@ class ResetGPGradeTool:
         reset_url = tool_url + '/User/SaveStudentProfile/STAGING-CN?userKey=%s&rand=0.17256526783407744&PageId=0'
 
     elif E1_API_Automation.Settings.env_key == 'Staging_SG':
-        search_url = 'http://internal-e1pss-qa.ef.com/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
-        reset_url = 'http://internal-e1pss-qa.ef.com/User/SaveStudentProfile/STAGING-SG?userKey=%s&rand=0.17256526783407744&PageId=0'
-        tool_url = 'http://internal-e1pss-qa.ef.com'
-
+        tool_url = 'http://10.163.28.80:12505'
+        search_url = tool_url + '/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
+        reset_url = tool_url + '/User/SaveStudentProfile/STAGING-SG?userKey=%s&rand=0.17256526783407744&PageId=0'
 
 
     elif E1_API_Automation.Settings.env_key == 'Live':
@@ -66,31 +65,22 @@ class ResetGPGradeTool:
         print(user_current_grade)
         return user_key, user_current_grade
 
-    def reset_grade(self, student_id):
+    def reset_grade(self, student_id,grade_city,region_grade):
         url = self.reset_url
         user_key, current_grade = self.get_user_key(student_id)
         url = url % user_key
         data_info = {}
-        if E1_API_Automation.Settings.env_key in ('QA', 'Staging', 'Live'):
-            target_value = ShanghaiGradeKey.Gth4[1]
-            if current_grade == ShanghaiGradeKey.Gth4[0]:
-                target_value = ShanghaiGradeKey.Gth5[1]
-            data_info = {
-                'Birthday': '12/27/2003 4:00:00 PM',
-                'EducationGradeKey': target_value,
-                'EducationRegionKey': EducationRegion.cn_city_list['Shanghai'],
-                'StartPointGradeKey': target_value
-            }
-        elif E1_API_Automation.Settings.env_key in ('Staging_SG', 'Live_SG'):
-            target_value = MoscowGradeKey.Gth4[1]
-            if current_grade == MoscowGradeKey.Gth4[0]:
-                target_value = MoscowGradeKey.Gth5[1]
-            data_info = {
-                'Birthday': '12/27/2003 4:00:00 PM',
-                'EducationGradeKey': target_value,
-                'EducationRegionKey': EducationRegion.ru_city_list['Moscow'],
-                'StartPointGradeKey': target_value
-            }
+
+        target_value = region_grade[2]['Key']
+        if current_grade == region_grade[2]['Name']:
+            target_value = region_grade[3]['Key']
+        data_info = {
+            'Birthday': '12/27/2003 4:00:00 PM',
+            'EducationGradeKey': target_value,
+            'EducationRegionKey':  grade_city,
+            'StartPointGradeKey': target_value
+        }
+
 
         s = requests.session()
         data = s.post(url=url, data=data_info, cookies=self.cookie).content.decode('utf-8')
