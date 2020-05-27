@@ -34,9 +34,9 @@ pipeline {
       steps {
         script {
           case_tag = "${params.environment}".toLowerCase()
-          if (case_tag == 'STG_SG') {
+          if (case_tag == 'stg_sg') {
               case_tag = 'stg'
-          } else if (case_tag == 'LIVE_SG')
+          } else if (case_tag == 'live_sg')
               case_tag = 'live'
           sh "ptest3  -t E1_API_Automation.Test.AuthService -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
