@@ -21,6 +21,6 @@ class Categorization(BaseTemplate):
     def get_question_score(self, question_key):
         question_json = jmespath.search("Questions[?Key=='{0}']".format(question_key), self.json)[0]
         answer_ids = jmespath.search("Body.answers", question_json)
-        total_score = reduce(lambda x, y: len(x) + len(y), answer_ids)
+        total_score = reduce(lambda x,y:x+y,(map(lambda x: len(x), answer_ids)))
         return total_score
 
