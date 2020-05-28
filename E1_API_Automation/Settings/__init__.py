@@ -121,9 +121,10 @@ if os.environ['environment'] == 'QA':
         "Password": "#Bugsfor$!"
     }
     CASSANDRA_DATABASE = {
-        "Server": "10.178.86.216",
-        "User": "cassandra",
-        "Password": "cassandra"
+        "Server": "CNEDTECHSTG-CASSANDRA-2471745a408b9ef8.elb.cn-north-1.amazonaws.com.cn",
+        "KeySpace": "kids_qa",
+        "User": "result_app",
+        "Password": "GE^&%*!yrP@$^|cLmFH"
     }
     MONGO_DATABASE = {
         "Server": "10.179.243.73:27017,10.179.243.72:27017,10.179.243.66:27017",
@@ -157,6 +158,12 @@ elif os.environ['environment'] == 'STG':
         "Server": "CNE1STGDB01.e1ef.com,1434",
         "User": "TBV3",
         "Password": "#Bugsfor$"
+    }
+    CASSANDRA_DATABASE = {
+        "Server": "CNEDTECHSTG-CASSANDRA-2471745a408b9ef8.elb.cn-north-1.amazonaws.com.cn",
+        "KeySpace": "kids_stg",
+        "User": "result_app",
+        "Password": "GE^&%*!yrP@$^|cLmFH"
     }
     MYSQL_MOCKTEST_DATABASE = {
         "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",

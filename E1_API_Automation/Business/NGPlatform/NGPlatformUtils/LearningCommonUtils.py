@@ -241,6 +241,8 @@ class LearningCommonUtils:
                     if is_field_exist and actual_time == expected_time:
                         is_value_same = True
                 else:
+                    if isinstance(actual_key_value, float):
+                        expected_field_value = float(expected_field_value)
                     if is_field_exist and str(actual_key_value) == str(expected_field_value):
                         is_value_same = True
 
@@ -267,9 +269,7 @@ class LearningCommonUtils:
                 expected_value = expected_db_learning[key.lower()]
 
                 # some learning result's fields is object type, it can store any type of data
-                if isinstance(expected_value, str) and expected_value.startswith('java.'):
-                    index = expected_value.index('|')
-                    expected_value = expected_value[index+1:]
+                if isinstance(expected_value, str) and key in ('route', 'extension', 'answer'):
                     expected_value = json.loads(expected_value)
 
                 is_value_same = False

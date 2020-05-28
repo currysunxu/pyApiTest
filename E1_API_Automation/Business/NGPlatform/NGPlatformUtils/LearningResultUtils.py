@@ -32,6 +32,18 @@ class LearningResultUtils:
             construct_learning_result_by_template_and_is_only_required(None, details_number, field_value_type, False)
 
     @staticmethod
+    def construct_multiple_results_by_template(record_number, learning_result_template):
+        learning_result_list = []
+
+        for i in range(record_number):
+            details_number = random.randint(1, 8)
+            learning_result = LearningResultUtils.construct_learning_result_valid_by_template(learning_result_template,
+                                                                                              details_number)
+            learning_result_list.append(learning_result)
+
+        return learning_result_list
+
+    @staticmethod
     def construct_learning_result_by_template_and_is_only_required(learning_result_template, details_number,
                                                                    field_value_type, is_only_required):
         field_templates = LearningResultUtils.get_learning_result_field_templates()
@@ -148,6 +160,16 @@ class LearningResultUtils:
                 learning_result_dict[learning_result_field_name] = detail_dict_list
 
         return learning_result_dict
+
+    # construct batch learning plan dict
+    @staticmethod
+    def construct_batch_learning_result_dict(learning_result_list):
+        batch_learning_result_list = []
+        for i in range(len(learning_result_list)):
+            learning_result = learning_result_list[i]
+            learning_result_dict = LearningResultUtils.construct_learning_result_dict(learning_result)
+            batch_learning_result_list.append(learning_result_dict)
+        return batch_learning_result_list
 
     @staticmethod
     def get_learning_result_field_templates():

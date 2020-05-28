@@ -13,8 +13,8 @@ import string
 import uuid
 import datetime
 
-
-@TestClass()
+# plan service has been deprecated, but leave it here for now just in case
+# @TestClass()
 class PlanServiceTestCases:
     # test learning plan insert API with valid fields
     @Test(tags="qa")
