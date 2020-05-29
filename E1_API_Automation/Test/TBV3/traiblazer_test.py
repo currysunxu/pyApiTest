@@ -95,7 +95,7 @@ class TBTestCases(TraiblazerBaseClass):
     def test_reward_summary_status(self):
         response = self.tb_test.query_motivation_reward_summary()
         assert_that(response.status_code == 200)
-    #1
+
     @Test(tags="qa, stg, live")
     def test_student_progress(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
