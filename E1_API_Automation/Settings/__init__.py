@@ -86,7 +86,7 @@ class ContentRepoEnvironment(object):
 class MockTestEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn/mseb"
     STAGING = "https://ktsvc-stg.ef.cn/mseb"
-    Live = "https://ktsvc.ef.cn/mseb"
+    LIVE = "https://ktsvc.ef.cn/mseb"
 
 
 class E1TPIEnvironment(object):
@@ -133,7 +133,7 @@ if os.environ['environment'] == 'QA':
     }
     MYSQL_MOCKTEST_DATABASE = {
         "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
-        "User":"edtechmysqluser",
+        "User": "edtechmysqluser",
         "Password": "edtechdbuserstg123"
     }
 
@@ -167,7 +167,7 @@ elif os.environ['environment'] == 'STG':
     }
     MYSQL_MOCKTEST_DATABASE = {
         "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
-        "User":"edtechmysqluser",
+        "User": "edtechmysqluser",
         "Password": "edtechdbuserstg123"
     }
 
@@ -201,8 +201,14 @@ elif os.environ['environment'] == 'LIVE':
     COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.LIVE
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
+    MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
+        "Server": "",
+        "User": "",
+        "Password": ""
+    }
+    MYSQL_MOCKTEST_DATABASE = {
         "Server": "",
         "User": "",
         "Password": ""
