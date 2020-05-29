@@ -22,10 +22,6 @@ pipeline {
   parameters {
         choice(name:'environment',choices:['QA','STG','LIVE'],description:'')
     }
-    
-  environment {
-     case_tag = 'qa'
-    }
    
   stages { 
     stage('Verify') {   
