@@ -22,10 +22,6 @@ pipeline {
         
         choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
     }
-    
-  environment {
-     case_tag = 'qa'
-    }
    
   stages {
     
@@ -44,7 +40,7 @@ pipeline {
               case_tag = 'stg'
           } else if (case_tag == 'live_sg')
               case_tag = 'live'
-          sh 'ptest3  -t E1_API_Automation.Test.PTReview -i ${case_tag}'
+          sh "ptest3  -t E1_API_Automation.Test.PTReview -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'

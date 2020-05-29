@@ -1,5 +1,6 @@
 from ..Lib.Moutai import Moutai, Token
 from E1_API_Automation.Business.AuthService import AuthService
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import AuthEnvironment, env_key
 from E1_API_Automation.Test_Data.MockTestData import MockTestUsers, TestTableSQLString
 from E1_API_Automation.Lib.HamcrestExister import exist
@@ -146,25 +147,31 @@ class MockTestBFFService:
         assert_that(mt_response.json(), exist("data.currentUser.avatar"))
         custom_id = MockTestUsers.MTUserPw[env_key][student_type][0]['custom_id']
         assert_that(jmespath.search("data.currentUser.id", mt_response.json()), equal_to(custom_id))
-        # Check student can only see tests configured for his city
-        for i in range(len(jmespath.search("data.currentUser.tests", mt_response.json()))):
-            test_id = jmespath.search("data.currentUser.tests[%d].id" % i, mt_response.json())
-            assert_that(self.get_test_details_by_test_id_from_db(test_id)[0]['city'].upper(),
-                        equal_to(MockTestUsers.MTUserPw[env_key][student_type][0]['city'].upper()))
+        # If not Live environment, then will do the DB verification
+        if not EnvUtils.is_env_live():
+            # Check student can only see tests configured for his city
+            for i in range(len(jmespath.search("data.currentUser.tests", mt_response.json()))):
+                test_id = jmespath.search("data.currentUser.tests[%d].id" % i, mt_response.json())
+                assert_that(self.get_test_details_by_test_id_from_db(test_id)[0]['city'].upper(),
+                            equal_to(MockTestUsers.MTUserPw[env_key][student_type][0]['city'].upper()))
 
     def check_bff_get_paper_resource_structure(self, mt_response, test_id):
         assert_that(mt_response.status_code == 200)
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
-        assert_that(jmespath.search("data.test.paper.id", mt_response.json()),
-                    equal_to(self.get_test_details_by_test_id_from_db(test_id)[0]["paper_id"]))
+        # If not Live environment, then will do the DB verification
+        if not EnvUtils.is_env_live():
+            assert_that(jmespath.search("data.test.paper.id", mt_response.json()),
+                        equal_to(self.get_test_details_by_test_id_from_db(test_id)[0]["paper_id"]))
         assert_that(jmespath.search("data.test.paper.parts[*].type", mt_response.json()),
                     equal_to(['LISTENING', 'SYNTHESIS', 'READING']))
 
     def check_bff_get_test_intro_structure(self, mt_response, test_id):
-        expect_details = self.get_test_details_by_test_id_from_db(test_id)[0]
+        # If not Live environment, then will do the DB verification
+        if not EnvUtils.is_env_live():
+            expect_details = self.get_test_details_by_test_id_from_db(test_id)[0]
+            self.check_test_basic_info(expect_details, mt_response)
         assert_that(mt_response.status_code == 200)
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
-        self.check_test_basic_info(expect_details, mt_response)
 
     def set_negative_token(self, negative_token):
         if negative_token == "noToken":
@@ -191,9 +198,12 @@ class MockTestBFFService:
 
     def check_insert_valid_test(self, mt_response, test_id, student_id):
         assert_that(jmespath.search("data.startTest.test.id", mt_response.json()), equal_to(test_id))
-        self.compare_response_date_and_db_date(jmespath.search("data.startTest.test.startedDate", mt_response.json()),
-                                               self.get_result_details_by_test_id_from_db(test_id, student_id)[0][
-                                                   "started_date"])
+        # If not Live environment, then will do the DB verification
+        if not EnvUtils.is_env_live():
+            self.compare_response_date_and_db_date(
+                jmespath.search("data.startTest.test.startedDate", mt_response.json()),
+                self.get_result_details_by_test_id_from_db(test_id, student_id)[0][
+                    "started_date"])
 
     @staticmethod
     def check_get_invalid_test_structure(mt_response, invalid_id):
@@ -217,7 +227,8 @@ class MockTestBFFService:
         assert_that(jmespath.search("data", mt_response.json()) is None)
         assert_that(jmespath.search("errors[0].extensions.code", mt_response.json()) == 500)
         if invalid_id == "":
-            assert_that(jmespath.search("errors[0].message", mt_response.json()), equal_to("java.lang.NullPointerException"))
+            assert_that(jmespath.search("errors[0].message", mt_response.json()),
+                        equal_to("java.lang.NullPointerException"))
         else:
             assert_that(jmespath.search("errors[0].message", mt_response.json()), equal_to("Compact Result Not Found"))
 
@@ -251,41 +262,45 @@ class MockTestBFFService:
         assert_that(mt_response.status_code == 200)
         assert_that(mt_response.json(), exist("data.test"))
         assert_that(len(jmespath.search("data.test.remediations", mt_response.json())) > 0)
-        # Check test data
-        expect_test_data = self.get_test_details_by_test_id_from_db(test_id)[0]
-        self.check_test_basic_info(expect_test_data, mt_response)
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
-        assert_that(jmespath.search("data.test.paper.id", mt_response.json()),
-                    equal_to(expect_test_data["paper_id"]))
-
-        # Check paper data
-        self.check_paper_details(expect_test_data["paper_id"], mt_response)
+        # If not Live environment, then will do the DB verification
+        if not EnvUtils.is_env_live():
+            # Check test data
+            expect_test_data = self.get_test_details_by_test_id_from_db(test_id)[0]
+            self.check_test_basic_info(expect_test_data, mt_response)
+            assert_that(jmespath.search("data.test.paper.id", mt_response.json()),
+                        equal_to(expect_test_data["paper_id"]))
+            # Check paper data
+            self.check_paper_details(expect_test_data["paper_id"], mt_response)
 
     def check_bff_get_test_processing_structure(self, student_type, mt_response, test_id):
         assert_that(mt_response.status_code == 200)
         custom_id = MockTestUsers.MTUserPw[env_key][student_type][0]['custom_id']
         assert_that(jmespath.search("data.currentUser.id", mt_response.json()), equal_to(custom_id))
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
-        # Assert test data
-        test_details = self.get_test_details_by_test_id_from_db(test_id)[0]
-        self.check_test_basic_info(test_details, mt_response)
-        self.compare_response_date_and_db_date(jmespath.search("data.test.availableDate", mt_response.json()),
-                                               test_details["start_date"])
-        self.compare_response_date_and_db_date(jmespath.search("data.test.expiryDate", mt_response.json()),
-                                               test_details["end_date"])
-        # Assert test result data
-        result_details = self.get_result_details_by_test_id_from_db(test_id, custom_id)[0]
-        self.compare_response_date_and_db_date(jmespath.search("data.test.completedDate", mt_response.json()),
-                                               result_details["completed_date"])
-        self.compare_response_date_and_db_date(jmespath.search("data.test.startedDate", mt_response.json()),
-                                               result_details["started_date"])
         assert_that(jmespath.search("data.test.testState", mt_response.json()),
                     equal_to("COMPLETED_WITH_REMEDIATION_AVAILABLE"))
-        assert_that(jmespath.search("data.test.totalSecondsSpent", mt_response.json()),
-                    equal_to(
-                        self.date_diff_in_seconds(result_details["started_date"], result_details["completed_date"])))
-        # Assert paper data
-        self.check_paper_details(result_details["paper_id"], mt_response)
+        # If not Live environment, then will do the DB verification
+        if not EnvUtils.is_env_live():
+            # Assert test data
+            test_details = self.get_test_details_by_test_id_from_db(test_id)[0]
+            self.check_test_basic_info(test_details, mt_response)
+            self.compare_response_date_and_db_date(jmespath.search("data.test.availableDate", mt_response.json()),
+                                                   test_details["start_date"])
+            self.compare_response_date_and_db_date(jmespath.search("data.test.expiryDate", mt_response.json()),
+                                                   test_details["end_date"])
+            # Assert test result data
+            result_details = self.get_result_details_by_test_id_from_db(test_id, custom_id)[0]
+            self.compare_response_date_and_db_date(jmespath.search("data.test.completedDate", mt_response.json()),
+                                                   result_details["completed_date"])
+            self.compare_response_date_and_db_date(jmespath.search("data.test.startedDate", mt_response.json()),
+                                                   result_details["started_date"])
+            assert_that(jmespath.search("data.test.totalSecondsSpent", mt_response.json()),
+                        equal_to(
+                            self.date_diff_in_seconds(result_details["started_date"],
+                                                      result_details["completed_date"])))
+            # Assert paper data
+            self.check_paper_details(result_details["paper_id"], mt_response)
 
     @staticmethod
     def check_test_basic_info(expect_details, mt_response):
@@ -299,14 +314,16 @@ class MockTestBFFService:
 
     def check_paper_details(self, paper_id, mt_response):
         assert_that(mt_response.status_code == 200)
-        expect_paper_data = self.get_paper_details_by_paper_id_from_db(paper_id)[0]
-        assert_that(jmespath.search("data.test.paper.title", mt_response.json()),
-                    equal_to(expect_paper_data["title"]))
-        assert_that(jmespath.search("data.test.paper.questionCount", mt_response.json()),
-                    equal_to(expect_paper_data["question_count"]))
-        assert_that(jmespath.search("data.test.paper.totalScore", mt_response.json()),
-                    equal_to(expect_paper_data["total_score"]))
         assert_that(len(jmespath.search("data.test.paper.parts", mt_response.json())) > 0)
+        # If not Live environment, then will do the DB verification
+        if not EnvUtils.is_env_live():
+            expect_paper_data = self.get_paper_details_by_paper_id_from_db(paper_id)[0]
+            assert_that(jmespath.search("data.test.paper.title", mt_response.json()),
+                        equal_to(expect_paper_data["title"]))
+            assert_that(jmespath.search("data.test.paper.questionCount", mt_response.json()),
+                        equal_to(expect_paper_data["question_count"]))
+            assert_that(jmespath.search("data.test.paper.totalScore", mt_response.json()),
+                        equal_to(expect_paper_data["total_score"]))
 
     @staticmethod
     def check_bff_get_remediation_structure(mt_response, part):

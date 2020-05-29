@@ -21,11 +21,7 @@ pipeline {
         
         choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
     }
-    
-  environment {
-     case_tag = 'qa'
-    }
-   
+
   stages {
     
     stage('Verify') {
@@ -42,7 +38,7 @@ pipeline {
           case_tag = "${params.environment}".toLowerCase()
           sh 'python E1_API_Automation/Tools/jacoco/jacoco_report.py ResultService reset'
            
-          sh 'ptest3  -t E1_API_Automation.Test.NGPlatform.PlanResultTest -i ${case_tag}'
+          sh "ptest3  -t E1_API_Automation.Test.NGPlatform.PlanResultTest -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
