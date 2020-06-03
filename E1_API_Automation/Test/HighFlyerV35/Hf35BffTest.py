@@ -663,7 +663,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(actual_vocab_progress['unitContentId'], equal_to(expected_word_attempt.unit_content_id))
             assert_that(actual_vocab_progress['wordContentId'], equal_to(expected_word_attempt.word_content_id))
             assert_that(actual_vocab_progress['currentLevel'], equal_to(expected_word_attempt.detail.current_level))
-            # assert_that(actual_vocab_progress['parentContentPath'], equal_to(expected_word_attempt.parent_content_path))
+            assert_that(actual_vocab_progress['parentContentPath'], equal_to(expected_word_attempt.parent_content_path))
             assert_that(actual_vocab_progress['lastStudyAt'], equal_to(expected_word_attempt.detail.last_study_time))
             assert_that(actual_vocab_progress, match_to('createdAt'))
             assert_that(actual_vocab_progress, match_to('lastUpdatedAt'))
