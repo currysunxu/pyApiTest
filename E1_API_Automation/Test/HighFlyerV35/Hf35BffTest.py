@@ -177,13 +177,15 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(api_response.status_code, equal_to(400))
             assert_that((api_response.json()['error'] == "Bad Request"))
             assert_that((api_response.json()['message'] == "token required"))
+        elif invalid_type == "expired":
+            # in stg, live, as we have hotfix, for expire token, the status become 401
+            assert_that(api_response.status_code, equal_to(401))
+            assert_that((api_response.json()['error'] == "Unauthorized"))
+            assert_that((api_response.json()['message'] == "token expired"))
         else:
             assert_that(api_response.status_code, equal_to(403))
             assert_that((api_response.json()['error'] == "Forbidden"))
-            if invalid_type == "invalid":
-                assert_that((api_response.json()['message'] == "invalid token"))
-            else:
-                assert_that((api_response.json()['message'] == "token expired"))
+            assert_that((api_response.json()['message'] == "invalid token"))
 
     @Test(tags="qa, stg, live", data_provider=["", "invalid", "noToken", "expired"])
     def test_get_course_structure_with_invalid_token(self, invalid):
