@@ -24,7 +24,7 @@ from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
 from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
-from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService
+from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
     ContentRepoGroupType
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import OnlineScope
@@ -40,17 +40,16 @@ class Hf35BffTest(HfBffTestBase):
         for key in product_keys:
             user_name = BffUsers.BffUserPw[env_key][key][0]['username']
             password = BffUsers.BffUserPw[env_key][key][0]['password']
-            if key.__contains__('HF'):
-                print("HF user is : %s" % (user_name))
-                response = self.bff_service.login(user_name, password)
-                print("Bff login response is : %s" % (response.__str__()))
-                assert_that(response.status_code, equal_to(200))
-                id_token = jmespath.search('idToken', response.json())
-                access_token = jmespath.search('accessToken', response.json())
-                refresh_token = jmespath.search('refreshToken', response.json())
-                assert_that((not id_token == "" and id_token.__str__() is not None))
-                assert_that((not access_token == "" and access_token.__str__() is not None))
-                assert_that((not refresh_token == "" and refresh_token.__str__() is not None))
+            # all type users can login with auth2 successfully
+            response = self.bff_service.login(user_name, password)
+            assert_that(response.status_code, equal_to(200))
+            id_token = jmespath.search('idToken', response.json())
+            access_token = jmespath.search('accessToken', response.json())
+            refresh_token = jmespath.search('refreshToken', response.json())
+            assert_that((not id_token == "" and id_token.__str__() is not None))
+            assert_that((not access_token == "" and access_token.__str__() is not None))
+            assert_that((not refresh_token == "" and refresh_token.__str__() is not None))
+
 
     @Test(tags="qa, stg, live")
     def test_bff_auth_login_invalid_username(self):
@@ -63,6 +62,29 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(response.status_code, equal_to(404))
         else:
             assert_that(response.status_code, equal_to(401))
+
+    # only HFV2, HFV3Plus user can call bff apis successfully, other users can't call bff apis, will return 401
+    @Test(tags="qa, stg, live")
+    def test_auth2_authorization(self):
+        product_keys = BffUsers.BffUserPw[env_key].keys()
+        for key in product_keys:
+            user_name = BffUsers.BffUserPw[env_key][key][0]['username']
+            password = BffUsers.BffUserPw[env_key][key][0]['password']
+            # all type users can login successfully
+            response = self.bff_service.login(user_name, password)
+            assert_that(response.status_code, equal_to(200))
+
+            # only HFV2, HFV3Plus users can call bff apis, others can't
+            response = self.bff_service.get_bootstrap_controller('ios')
+            if key in (BffProduct.HFV2.value, BffProduct.HFV3.value, BffProduct.HFV35.value):
+                assert_that(response.status_code, equal_to(200))
+                assert_that(response.json(), match_to("provision"))
+                assert_that(response.json(), match_to("userContext.availableBooks"))
+                assert_that(response.json(), match_to("userContext.currentBook"))
+            else:
+                assert_that(response.status_code, equal_to(401))
+                assert_that((response.json()['error'] == "Unauthorized"))
+                assert_that((response.json()['message'] == "Unauthorized program."))
 
     @Test(tags="qa, stg, live", data_provider=["noToken"])
     def test_submit_new_attempt_without_auth_token(self, negative_para):
