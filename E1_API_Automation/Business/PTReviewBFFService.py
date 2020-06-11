@@ -34,12 +34,12 @@ class PTReviewBFFService:
 
     def post_ptr_graphql_by_book(self, course, book_key):
         graphql_body = {
-            "operationName": None,
+            "operationName": "getBookWithTests",
             "variables": {
                 "course": course,
                 "bookId": book_key
             },
-            "query": "query getBookWithTests($bookId: String!, $course: String!) {\n  book(bookId: $bookId, course: $course) {\n    id\n    tests {\n      date\n      id\n      ptKey\n      name\n      type\n      score\n      status\n      __typename\n    }\n    title\n    __typename\n  }\n}\n"
+            "query": "query getBookWithTests($bookId: String!, $course: String!) {\n  book(bookId: $bookId, course: $course) {\n    id\n    tests {\n      date\n      id\n      ptKey\n      name\n      type\n      score\n      status\n      ptInstanceKey\n      __typename\n    }\n    title\n    __typename\n  }\n}\n"
         }
         return self.post_ptr_graphql(graphql_body)
 

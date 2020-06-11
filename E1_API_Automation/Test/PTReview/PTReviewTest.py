@@ -130,7 +130,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa, stg, live")
     def test_pt_assessment_by_skill_api(self):
-        student_id = list(PTReviewData.pt_hf_user_key_book_unit[env_key].keys())[0]
+        student_id  = list(PTReviewData.pt_hf_user_key_book_unit[env_key].keys())[0]
         test_primary_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['TestPrimaryKey']
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
@@ -394,6 +394,7 @@ class PTReviewTestCases:
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
         course_code = 'HF'
         ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book(course_code, book_key)
+        print(ptr_bff_graphql_response.json())
         assert_that(ptr_bff_graphql_response.status_code == 200)
 
         expected_ptr_result_by_book = \
@@ -507,3 +508,36 @@ class PTReviewTestCases:
         actual_result = osp_service.put_create_progress_test_entity(expected_entity_dict)
         assert_that(actual_result.status_code == 403)
         print(actual_result.json())
+
+    @Test(tags="qa,stg")
+    def test_pt_web_multiple_students_can_take_test_after_one_of_them_commit(self):
+        pt_key = PTDATA.pt_web_data[env_key]['HFC4']['TestPrimaryKey']
+        students_ids = PTDATA.pt_web_data[env_key]['HFC4']['StudentId']
+        tpi_service = TPIService(TPI_ENVIRONMENT)
+        expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, students_ids)
+        actual_result = tpi_service.pt_web_unlock(expected_entity_dict)
+        pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
+        try:
+            assert_that(actual_result.status_code == 200)
+            print(json.dumps(actual_result.json(), indent=4))
+            assert_that(actual_result.json()["TeacherId"], equal_to(expected_entity_dict["TeacherId"]))
+            assert_that(actual_result.json()["ProgressTestKey"],
+                        equal_to(expected_entity_dict["ProgressTestKey"].lower()))
+            osp_service = OSPService(OSP_ENVIRONMENT)
+            pt_instance_key = str(pt_instance_key)[
+                              str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
+            commit_response = osp_service.put_commit_progress_test_hc(students_ids[0], pt_instance_key)
+            print(commit_response.status_code)
+            assert_that(commit_response.status_code == 204)
+            othe_ther_student_pt_state = PTReviewUtils.get_student_pt_state(students_ids[1],pt_instance_key)
+            assert_that(othe_ther_student_pt_state[0][0],equal_to(1))
+        finally:
+            print("Finally reset student progress test status by update db")
+            PTReviewUtils.set_student_pt_state_to_inital_value(students_ids[0], pt_instance_key)
+
+
+
+
+
+
+

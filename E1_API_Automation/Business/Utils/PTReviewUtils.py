@@ -266,7 +266,7 @@ class PTReviewUtils:
         if len(expected_skill_score_list) != SkillCode.__len__():
             return None
         else:
-            return PTReviewUtils.construct_expected_skill_pt_score_result(student_pt_assessment_dict_list[0],
+            return PTReviewUtils.construct_expected_skill_pt_score_result(list(filter(lambda d:d["Code"] in ("grammar","listening","Reading","Vocabulary"),student_pt_assessment_dict_list))[0],
                                                                           expected_skill_score_list,
                                                                           from_db, test_by)
 
@@ -348,11 +348,12 @@ class PTReviewUtils:
         expected_skill_pt_score_dict["UnitName"] = skill_pt_score_dict["UnitName"]
         expected_skill_pt_score_dict["PTKey"] = pt_key
         expected_skill_pt_score_dict["PTTestBy"] = pt_test_by
-        expected_skill_pt_score_dict["PTInstanceKey"] = skill_pt_score_dict["TestInstanceKey"]
-        if skill_pt_score_dict["OverwrittenScore"] and skill_pt_score_dict["OriginalScore"]:
-            expected_skill_pt_score_dict["IsOverwritten"] = True
-        elif skill_pt_score_dict["OverwrittenScore"] and skill_pt_score_dict["OriginalScore"] is None:
-            expected_skill_pt_score_dict["IsOverwritten"] = False
+        expected_skill_pt_score_dict["PTInstanceKey"] = skill_pt_score_dict["TestInstanceKey"] if from_db else skill_pt_score_dict["PTInstanceKey"]
+        if from_db:
+            if skill_pt_score_dict["OverwrittenScore"] and skill_pt_score_dict["OriginalScore"]:
+                expected_skill_pt_score_dict["IsOverwritten"] = True
+            elif skill_pt_score_dict["OverwrittenScore"] and skill_pt_score_dict["OriginalScore"] is None:
+                expected_skill_pt_score_dict["IsOverwritten"] = False
 
         # calculate the PTTotalScore
         unit_total_accuracy = 0
@@ -476,7 +477,9 @@ class PTReviewUtils:
                     skill_code = unit_pt_assessment_dict["Code"]
                     if skill_code.capitalize() in (SkillCode.Grammar.value, SkillCode.Listening.value,
                                                     SkillCode.Reading.value, SkillCode.Vocabulary.value):
-                        over_written_score = unit_pt_assessment_dict["OverwrittenScore"]
+                        over_written_score = None
+                        if from_db:
+                            over_written_score = unit_pt_assessment_dict["OverwrittenScore"]
 
                         if over_written_score is not None:
                             test_by = 0
@@ -486,7 +489,7 @@ class PTReviewUtils:
 
             expected_pt_score_by_unit_dict = \
                 PTReviewUtils.construct_expected_pt_score_by_unit_dict(unit_total_score,
-                                                                       unit_pt_assessment_dict_list[0],
+                                                                       list(filter(lambda d:d["Code"] in ("grammar","listening","Reading","Vocabulary"),unit_pt_assessment_dict_list))[0],
                                                                        from_db, test_by)
             expected_pt_assessment_by_unit.append(expected_pt_score_by_unit_dict)
 
@@ -850,7 +853,7 @@ class PTReviewUtils:
                         expected_unit = expected_value[i]
 
                         for unit_dict_key in actual_unit.keys():
-                            if unit_dict_key not in ['ptKey','status','__typename']:
+                            if unit_dict_key not in ['ptKey','status','__typename','ptInstanceKey']:
                                 actual_tests_unit_value = actual_unit[unit_dict_key]
                                 expected_tests_unit_value = expected_unit[unit_dict_key]
 
@@ -938,3 +941,22 @@ class PTReviewUtils:
         except Exception as e:
             print(e)
 
+    @staticmethod
+    def set_student_pt_state_to_inital_value(student_id,pt_instance_key):
+        try:
+            ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')
+            update_result = ms_sql_server.exec_non_query(PtWebSQLString.reset_student_pt_state_sql.format(student_id,pt_instance_key))
+            print("reset student progress test status:",update_result)
+        except Exception as e:
+            print(e)
+
+    @staticmethod
+    def get_student_pt_state(student_id, pt_instance_key):
+        try:
+            ms_sql_server = MSSQLHelper(DATABASE, 'OnlineSchoolPlatform')
+            progress_test_state = ms_sql_server.exec_query(
+                PtWebSQLString.get_student_pt_state_sql.format(student_id, pt_instance_key))
+            print("reset student progress test status:", progress_test_state)
+            return progress_test_state
+        except Exception as e:
+            print(e)
