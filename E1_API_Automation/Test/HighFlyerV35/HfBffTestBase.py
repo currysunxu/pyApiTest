@@ -7,7 +7,6 @@ from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapService
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
-from E1_API_Automation.Business.NGPlatform.LearningPlanService import LearningPlanService
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Business.OMNIService import OMNIService
 from E1_API_Automation.Settings import *
@@ -26,7 +25,11 @@ class HfBffTestBase:
 		self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
 		self.bff_service.login(self.user_name, self.password)
 		self.omni_service = OMNIService(OMNI_ENVIRONMENT)
-		self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+		try:
+			self.customer_id = BffUsers.BffUserPw[env_key][self.key][0]['userid']
+		except:
+			self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+
 
 
 	def check_bff_compare_learning_plan(self, plan_response, leanring_plan_entity):
@@ -146,6 +149,7 @@ class HfBffTestBase:
 		route['lessonContentRevision'] = bff_data_obj.get_attempt_body()["lessonContentRevision"]
 		route['learningUnitContentId'] = bff_data_obj.get_attempt_body()["learningUnitContentId"]
 		route['learningUnitContentRevision'] = bff_data_obj.get_attempt_body()["learningUnitContentRevision"]
+		route['parentContentPath'] = bff_data_obj.get_attempt_body()["parentContentPath"]
 		learning_result_entity.route = route
 
 

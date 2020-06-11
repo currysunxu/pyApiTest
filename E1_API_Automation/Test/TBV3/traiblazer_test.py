@@ -5,10 +5,12 @@ from ptest.decorator import TestClass, Test
 from .traiblazer_base import TraiblazerBaseClass
 from ...Lib.HamcrestExister import exist
 from ...Lib.HamcrestMatcher import match_to
+from ...Settings import env_key
 
 
 @TestClass()
 class TBTestCases(TraiblazerBaseClass):
+
     @Test(tags="qa, stg, live")
     def test_student_profile(self):
         response = self.tb_test.get_student_profile().json()
@@ -97,7 +99,10 @@ class TBTestCases(TraiblazerBaseClass):
     @Test(tags="qa, stg, live")
     def test_student_progress(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
-        self.picked_lesson = unlocked_lessons[0]
+        if env_key in('Live','Live_SG'):
+            self.picked_lesson = unlocked_lessons[-1]
+        else:
+            self.picked_lesson = unlocked_lessons[0]
         response = self.tb_test.homework_lesson_answer(self.picked_lesson, pass_lesson=False)
 
         activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(self.picked_lesson)
@@ -140,11 +145,11 @@ class TBTestCases(TraiblazerBaseClass):
         assert_that(self.picked_lesson ==
                     jmespath.search("@[?Balance==`{0}`].Identifier".format(new_added_points[0]), point_audit.json())[0])
 
+
     @Test(tags="qa, stg, live")
     def test_homework_lesson_correction(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
-        self.picked_lesson = unlocked_lessons[0]
-        print(self.picked_lesson)
+        self.picked_lesson = unlocked_lessons[-1]
         activity_nodes = self.tb_test.book_contents.get_child_nodes_by_parent_key(self.picked_lesson)
         for i in range(1, len(activity_nodes) + 1):
             self.tb_test.student_progress(unlocked_lessons[3], i, len(activity_nodes))
@@ -217,14 +222,14 @@ class TBTestCases(TraiblazerBaseClass):
         response = self.tb_test.digital_interaction_info(self.tb_test.active_book)
         assert_that(response.status_code == 200)
 
-    @Test(tags="qa,  stg, live")
+    @Test(tags="qa, stg, live")
     def test_digital_interaction_info_schema(self):
         response = self.tb_test.digital_interaction_info(self.tb_test.active_book)
         assert_that(len(response.json()) > 0)
         assert_that(response.json()[0], exist("Title"))
         assert_that(response.json()[0], match_to("Key"))
 
-    @Test(tags="qa,  stg, live")
+    @Test(tags="qa, stg, live")
     def test_progress_assessment_report(self):
         unlocked_lessons = self.tb_test.course_unlock(self.tb_test.active_book).json()
         response = self.tb_test.progress_assessment__report_by_unit(unlocked_lessons[0])

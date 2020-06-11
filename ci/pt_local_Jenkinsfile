@@ -20,7 +20,7 @@ pipeline {
   
   parameters {
         
-        choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
+        choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
     }
     
   environment {
@@ -46,6 +46,7 @@ pipeline {
                 
           }
           }
+    }
     }
      post {
         failure {
@@ -80,9 +81,7 @@ pipeline {
                     <li>Build&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${BUILD_URL}">${BUILD_URL}</a></li>
                     <li>Working Path&nbsp;：&nbsp;<a href="${PROJECT_URL}ws">${PROJECT_URL}ws</a></li>
                     <li>Project&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${PROJECT_URL}">${PROJECT_URL}</a></li>
-                    <li>Branch Name&nbsp;：&nbsp;${Branch}</li>
-                    <li>Book Name&nbsp;：&nbsp;${BookName}</li>
-                    <li>Book URL&nbsp;：&nbsp;${BookUrl}</li>
+                    <li>Environment&nbsp;：&nbsp;${environment}</li>
                 </ul>
             </td>
         </tr>
@@ -126,6 +125,6 @@ pipeline {
             }
     }
     
-  }
+
   
 }

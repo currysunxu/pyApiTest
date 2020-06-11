@@ -102,6 +102,8 @@ class Hf35BffUtils:
 		bff_entity.learning_unit_content_revision = "LearningUnitContentRevision%s" % (random.randint(1, 100))
 		bff_entity.tree_revision = "TestRevision%s" % (random.randint(1, 10))
 		bff_entity.schema_version = random.randint(1, 10)
+		bff_entity.parent_content_path = "ParentContentPath%s" % (random.randint(1, 10))
+
 		bff_dict = bff_entity.__dict__
 		bff_dict_new = Hf35BffUtils.modify_dict_keys(bff_dict)
 		return bff_dict_new
@@ -178,6 +180,8 @@ class Hf35BffUtils:
 					if 'Time' in key:
 						actual_value = datetime.datetime.strptime(str(actual_value), '%Y-%m-%dT%H:%M:%S.%fZ')
 						expected_value = datetime.datetime.strptime(str(expected_value), '%Y-%m-%dT%H:%M:%SZ')
+					elif key == 'classStatus':
+						expected_value = 'Activated'
 				elif key == 'teacherName':
 					expected_value = expected_evc_teacher['displayName']
 				elif key == 'teacherAvatarUrl':
@@ -289,6 +293,7 @@ class Hf35BffUtils:
 			word_attempt_entity.word_content_revision = "WordContentRevision%s" % (random.randint(1, 100))
 			word_attempt_entity.tree_revision = "TestRevision%s" % (random.randint(1, 10))
 			word_attempt_entity.schema_version = random.randint(1, 10)
+			word_attempt_entity.parent_content_path = "ParentContentPath%s" % (random.randint(1, 10))
 
 			random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
 			word_attempt_detail_entity = Hf35BffWordAttemptDetailEntity()
@@ -323,6 +328,7 @@ class Hf35BffUtils:
 		route['unitContentRevision'] = word_attempt.unit_content_revision
 		route['wordContentId'] = word_attempt.word_content_id
 		route['wordContentRevision'] = word_attempt.word_content_revision
+		route['parentContentPath'] = word_attempt.parent_content_path
 		learning_result_entity.route = route
 
 		extension = {}

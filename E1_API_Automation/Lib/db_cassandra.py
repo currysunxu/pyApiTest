@@ -3,11 +3,11 @@ from cassandra.auth import PlainTextAuthProvider
 
 
 class CassandraHelper(object):
-    def __init__(self, database, key_space):
+    def __init__(self, database):
         self.contact_points = database["Server"].split(",")
         self.user = database["User"]
         self.password = database["Password"]
-        self.key_space = key_space
+        self.key_space = database["KeySpace"]
 
     def __get_connect(self):
         auth_provider = PlainTextAuthProvider(username=self.user, password=self.password)

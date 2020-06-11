@@ -42,8 +42,9 @@ class AuthEnvironment(object):
 class OMNIEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/omni/apigateway"
     STAGING = "http://omni-apigateway-staging-tccn.ef.com"
-    STAGING_SG = "http://omni-apigateway-tcjp.ef.com"
+    STAGING_SG = "http://omni-apigateway-staging-tcjp.ef.com"
     LIVE = "http://omni-apigateway-tccn.ef.com"
+    LIVE_SG = "http://omni-apigateway-tcjp.ef.com"
 
 
 class LearningResultEnvironment(object):
@@ -64,6 +65,12 @@ class HomeworkEnvironment(object):
     LIVE = "https://internal-ktsvc-cn.ef.com/practice"
 
 
+class CourseGroupEnvironment(object):
+    QA = "http://internal-ktsvc-qa-cn.ef.com/course-group"
+    STAGING = "https://internal-ktsvc-stg-cn.ef.com/course-group"
+    LIVE = "https://internal-ktsvc-cn.ef.com/course-group"
+
+
 class ContentMapEnvironment(object):
     QA = "http://internal-ktsvc-qa-cn.ef.com/content-map"
     STAGING = "https://internal-ktsvc-stg-cn.ef.com/content-map"
@@ -79,7 +86,7 @@ class ContentRepoEnvironment(object):
 class MockTestEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn/mseb"
     STAGING = "https://ktsvc-stg.ef.cn/mseb"
-    Live = "https://ktsvc.ef.cn/mseb"
+    LIVE = "https://ktsvc.ef.cn/mseb"
 
 
 class E1TPIEnvironment(object):
@@ -103,6 +110,7 @@ if os.environ['environment'] == 'QA':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.QA
     BFF_ENVIRONMENT = BffEnvironment.QA
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.QA
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
@@ -113,9 +121,10 @@ if os.environ['environment'] == 'QA':
         "Password": "#Bugsfor$!"
     }
     CASSANDRA_DATABASE = {
-        "Server": "10.178.86.216",
-        "User": "cassandra",
-        "Password": "cassandra"
+        "Server": "CNEDTECHSTG-CASSANDRA-2471745a408b9ef8.elb.cn-north-1.amazonaws.com.cn",
+        "KeySpace": "kids_qa",
+        "User": "result_app",
+        "Password": "GE^&%*!yrP@$^|cLmFH"
     }
     MONGO_DATABASE = {
         "Server": "10.179.243.73:27017,10.179.243.72:27017,10.179.243.66:27017",
@@ -124,7 +133,7 @@ if os.environ['environment'] == 'QA':
     }
     MYSQL_MOCKTEST_DATABASE = {
         "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
-        "User":"edtechmysqluser",
+        "User": "edtechmysqluser",
         "Password": "edtechdbuserstg123"
     }
 
@@ -140,6 +149,7 @@ elif os.environ['environment'] == 'STG':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.STAGING
     BFF_ENVIRONMENT = BffEnvironment.STAGING
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.STAGING
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.STAGING
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
@@ -149,9 +159,15 @@ elif os.environ['environment'] == 'STG':
         "User": "TBV3",
         "Password": "#Bugsfor$"
     }
+    CASSANDRA_DATABASE = {
+        "Server": "CNEDTECHSTG-CASSANDRA-2471745a408b9ef8.elb.cn-north-1.amazonaws.com.cn",
+        "KeySpace": "kids_stg",
+        "User": "result_app",
+        "Password": "GE^&%*!yrP@$^|cLmFH"
+    }
     MYSQL_MOCKTEST_DATABASE = {
         "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
-        "User":"edtechmysqluser",
+        "User": "edtechmysqluser",
         "Password": "edtechdbuserstg123"
     }
 
@@ -182,10 +198,17 @@ elif os.environ['environment'] == 'LIVE':
     LEARNING_RESULT_ENVIRONMENT = LearningResultEnvironment.LIVE
     BFF_ENVIRONMENT = BffEnvironment.LIVE
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.LIVE
+    COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.LIVE
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
+    MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
+        "Server": "",
+        "User": "",
+        "Password": ""
+    }
+    MYSQL_MOCKTEST_DATABASE = {
         "Server": "",
         "User": "",
         "Password": ""

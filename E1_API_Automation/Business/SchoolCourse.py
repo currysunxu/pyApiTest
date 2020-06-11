@@ -27,7 +27,7 @@ class CourseBook:
                 "LastSynchronizedStamp": None,
                 "LastSynchronizedKey": None,
                 "UpsertsOnly": False,
-                "Amount": 1000
+                "Amount": 100000
                 }
 
         response = self.session.post("/api/v2/CourseNode/Synchronize", json=body)

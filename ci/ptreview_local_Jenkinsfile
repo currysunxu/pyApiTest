@@ -20,11 +20,7 @@ pipeline {
   
   parameters {
         
-        choice(name:'environment',choices:['QA','STG','LIVE','LIVE_SG'],description:'')
-    }
-    
-  environment {
-     case_tag = 'qa'
+        choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
     }
    
   stages {
@@ -39,13 +35,12 @@ pipeline {
       }
       steps {  
       script { 
-          if (env.environment == 'STG')
+          case_tag = "${params.environment}".toLowerCase()
+          if (case_tag == 'stg_sg') {
               case_tag = 'stg'
-          if (env.environment == 'LIVE')
+          } else if (case_tag == 'live_sg')
               case_tag = 'live'
-          if (env.environment == 'LIVE_SG')
-              case_tag = 'live' 
-          sh 'ptest3  -t E1_API_Automation.Test.PTReview -i ${case_tag}'
+          sh "ptest3  -t E1_API_Automation.Test.PTReview -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
@@ -90,9 +85,7 @@ pipeline {
                     <li>Build&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${BUILD_URL}">${BUILD_URL}</a></li>
                     <li>Working Path&nbsp;：&nbsp;<a href="${PROJECT_URL}ws">${PROJECT_URL}ws</a></li>
                     <li>Project&nbsp;&nbsp;Url&nbsp;：&nbsp;<a href="${PROJECT_URL}">${PROJECT_URL}</a></li>
-                    <li>Branch Name&nbsp;：&nbsp;${Branch}</li>
-                    <li>Book Name&nbsp;：&nbsp;${BookName}</li>
-                    <li>Book URL&nbsp;：&nbsp;${BookUrl}</li>
+                    <li>Environment&nbsp;：&nbsp;${environment}</li>
                 </ul>
             </td>
         </tr>

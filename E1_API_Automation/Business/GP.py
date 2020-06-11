@@ -75,8 +75,9 @@ class GPService():
     def put_dt_save(self, submit_answer):
         return self.mou_tai.put("/api/v2/StudentDiagnosticTest/Save/", submit_answer)
 
-    def get_region_and_grade(self):
-        return self.mou_tai.get("/api/v2/RegionAndGrade/?marketRegion=1&cultureCode=zh-CN")
+    def get_region_and_grade(self, market_region=1, culture_code='zh-CN'):
+        return self.mou_tai.get(
+            "/api/v2/RegionAndGrade/?marketRegion={0}&cultureCode={1}".format(market_region, culture_code))
 
     def put_custom_test_start(self, module_list):
         return self.mou_tai.put("/api/v2/CustomTest/Start/", module_list)
@@ -87,26 +88,18 @@ class GPService():
     def put_student_profile_save(self, submit_data):
         return self.mou_tai.put("/api/v2/StudentProfile/Save/", submit_data)
 
-    def setup_student_profile(self, grade_number, culture_code):
-        student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
-        self.reset_grade(student_id)
-        submit_data = {}
-        if culture_code == 'zh-CN':
-            shanghai_key = (getattr(ShanghaiGradeKey, grade_number))[1]
-            submit_data = {"Birthday": "2003-12-30T16:00:00.340Z",
-                           "EducationRegionKey": '61AEF09D-AFA0-4FC2-96AD-93C72D390653',
-                           "EducationGradeKey": shanghai_key,
-                           "CultureCode": "en-US",
-                           "StartPointGradeKey": shanghai_key,
-                           "PreferLanguageCode": "en-US"}
-        elif culture_code == 'ru-RU':
-            moscow_key = (getattr(MoscowGradeKey, grade_number))[1]
-            submit_data = {"Birthday": "2003-12-30T16:00:00.340Z",
-                           "EducationRegionKey": '045E22BB-E9AB-4BB8-A4FA-F59A7C0A8CDC',
-                           "EducationGradeKey": moscow_key,
-                           "CultureCode": "en-US",
-                           "StartPointGradeKey": moscow_key,
-                           "PreferLanguageCode": "en-US"}
+    def setup_student_profile(self, grade_level = '1st' ,culture_code='en-US'):
+        student_id, grade_city, region_grade = self.find_student_region_grade()
+        # student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
+        grade_key = jmespath.search("[?Name=='{0}'].Key".format(grade_level), region_grade)[0]
+        self.reset_grade(student_id,grade_city,region_grade)
+
+        submit_data = {"Birthday": "2003-12-30T16:00:00.340Z",
+                       "EducationRegionKey": grade_city,
+                       "EducationGradeKey": grade_key,
+                       "CultureCode": culture_code,
+                       "StartPointGradeKey": grade_key,
+                       "PreferLanguageCode": culture_code}
 
         profile_save = self.put_student_profile_save(submit_data)
         assert_that(profile_save.status_code == 204)
@@ -141,18 +134,32 @@ class GPService():
 
         return submit_data
 
-    def get_dt_submit_answer(self, failed_module_number, first_time=True):
+    def find_student_region_grade(self):
+        student_profie = self.get_student_profile_gp().json()
         student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
-        if first_time == True:
-            self.reset_grade(student_id)
+        student_market_region = jmespath.search('MarketRegion', self.get_student_profile_gp().json())
+        region_json = self.get_region_and_grade(student_market_region, 'en-US').json()
+
+        # get student's region first city key
+        grade_city = jmespath.search("[:1].Region.Key", region_json)[0]
+
+        # get student's region first city grade info
+        region_grade = jmespath.search("[:1].Grades[].Grade", region_json)
+        return (student_id,grade_city,region_grade)
+
+    def get_dt_submit_answer(self, failed_module_number, first_time=True):
+
+        student_id,grade_city,region_grade = self.find_student_region_grade()
+
+        if first_time:
+            self.reset_grade(student_id, grade_city, region_grade)
+
         question_list = self.put_dt_start().json()
         response_code = self.put_dt_start()
         if response_code.status_code == 200:
             dt_key = jmespath.search('DiagnosticTestKey', question_list)
             failed_module_list, module_activity_answers = [], []
-            submit_data = {}
-            submit_data['DiagnosticTestKey'] = dt_key
-            submit_data['Studentid'] = student_id
+            submit_data = {'DiagnosticTestKey': dt_key, 'Studentid': student_id}
 
             for index, module in enumerate(jmespath.search('Modules', question_list)):
                 module_key = jmespath.search('ModuleKey', module)
@@ -201,9 +208,9 @@ class GPService():
         module_activity_answer['TemplateType'] = activity_type
         return module_activity_answer
 
-    def reset_grade(self, student_id):
+    def reset_grade(self, student_id, grade_city, region_grade):
         reset_dt = ResetGPGradeTool()
-        reset_dt.reset_grade(student_id)
+        reset_dt.reset_grade(student_id, grade_city, region_grade)
 
     def save_all_module_quiz_answer(self):
         student_progress = self.get_student_progress().json()
@@ -214,8 +221,8 @@ class GPService():
     def save_lower_grade_quiz_answer(self):
         student_progress = self.get_student_progress().json()
         module_key = jmespath.search("RemediationProgress.LessThanSelectedGradeModules[].ModuleKey", student_progress)
-        for single_module_key in module_key:
-            self.save_submit_quiz_answer(single_module_key, False)
+        if module_key is not None:
+            self.save_submit_quiz_answer(module_key[0], False)
 
     def get_quiz_start_info(self):
         student_progress = self.get_student_progress().json()
@@ -332,8 +339,8 @@ class GPService():
             if failed_module_number != 0 and loop % 2 == 0:
                 self.save_all_module_quiz_answer()
 
-    def get_mapping(self):
-        all_module_info = self.get_all_module_info()
+    def get_mapping(self, culture_code):
+        all_module_info = self.get_all_module_info(culture_code)
         grade_ids = jmespath.search("[*].GradeOrdinal", all_module_info)
         mapping = []
         for grade_id in grade_ids:
@@ -393,25 +400,20 @@ class GPService():
             results_list = list(set(results))
             return results_list
 
-    def get_all_module_info(self):
-        culture_code = GP_user.GPDTUsers[env_key]['culture_code']
+    def get_all_module_info(self, culture_code):
 
-        if culture_code == 'zh-CN':
-            city_name = 'Shanghai'
-            region_key = EducationRegion.cn_city_list[city_name]
-        elif culture_code == 'ru-RU':
-            city_name = 'Moscow'
-            region_key = EducationRegion.ru_city_list[city_name]
+        # get student's region and grade key from student's profile info
+        student_id,grade_city,region_grade = self.find_student_region_grade()
 
-        all_module_info = self.get_available_grade(region_key, culture_code).json()
+        all_module_info = self.get_available_grade(grade_city, culture_code).json()
         return all_module_info
 
-    def get_new_recommended_module(self, failed_module_number):
+    def get_new_recommended_module(self, culture_code, failed_module_number):
         student_progress = self.get_student_progress().json()
         latest_dt_modules = jmespath.search("DiagnosticTestProgress.UserDiagnosticTestScoreSummary[*].ModuleKey",
                                             student_progress)
-        mapping = self.get_mapping()
-        all_module_info = self.get_all_module_info()
+        mapping = self.get_mapping(culture_code)
+        all_module_info = self.get_all_module_info(culture_code)
         dt_included_grade = self.get_mapping_result_set(latest_dt_modules, 'grade_id', mapping)
 
         dt_included_grade_key = self.search_module_key_by_gradeid(dt_included_grade, all_module_info)
@@ -491,6 +493,8 @@ class GPService():
         next_grade = dt_included_grade[-1] + 1
         next_grade_module_key_list = self.search_module_key_by_gradeid(next_grade, all_module_info)
         if next_grade_module_key_list == []:
+            if dt_included_grade[-1] == len(all_module_info):
+                dt_included_grade.pop()
             return self.get_higher_grade_module(all_module_info, dt_included_grade, failed_module_number, mapping,
                                                 new_list)
         else:
@@ -503,7 +507,8 @@ class GPService():
 
     def get_all_activity_keys(self):
         student_progress = self.get_student_progress().json()
-        activity_keys = jmespath.search("RemediationProgress.LessThanSelectedGradeModules[].Lessons[].ActivityKeys[]", student_progress)
+        activity_keys = jmespath.search("RemediationProgress.LessThanSelectedGradeModules[].Lessons[].ActivityKeys[]",
+                                        student_progress)
         if activity_keys is None:
             activity_keys = jmespath.search(
                 "RemediationProgress.RemediationModulesResult[].Lessons[].ActivityKeys[]", student_progress)
@@ -533,15 +538,16 @@ class GPService():
             }
         ]
         for video_resource_id in video_resource_ids:
-            video_resource_items = jmespath.search("Resources[?ResourceId=='"+video_resource_id+"']", api_response.json())
-            assert_that(len(video_resource_items) >= 4, "video resource must have more then 4 records in the api response")
+            video_resource_items = jmespath.search("Resources[?ResourceId=='" + video_resource_id + "']",
+                                                   api_response.json())
+            assert_that(len(video_resource_items) >= 4,
+                        "video resource must have more then 4 records in the api response")
 
             # for each resource, check if each resource will have four type width*height,
             # and length and duration should more than 0
             for expected_data in expected_datas:
-                filter_str = "@[?(Width == `{0}` && Height == `{1}` && Quality == '{2}' && Length > `0` && Duration > `0`)]"\
+                filter_str = "@[?(Width == `{0}` && Height == `{1}` && Quality == '{2}' && Length > `0` && Duration > `0`)]" \
                     .format(expected_data['Width'], expected_data['Height'],
-                            str(expected_data['Width'])+'x' + str(expected_data['Height']))
+                            str(expected_data['Width']) + 'x' + str(expected_data['Height']))
                 resource_item = jmespath.search(filter_str, video_resource_items)
                 assert_that(resource_item is not None)
-

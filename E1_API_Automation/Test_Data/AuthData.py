@@ -54,7 +54,7 @@ class AuthUsers:
             AuthProduct.SSV3.value: [{'username': 'ss3.cn.auto1', 'password': '12345'}],
             AuthProduct.FRV1.value: [{'username': 'fr.cn.auto', 'password': '12345'}],
             AuthProduct.HFV3.value: [{'username': 'hf3.cn.auto1', 'password': '12345'}],
-            AuthProduct.GP.value: [{'username': 'gp.cn.auto4', 'password': '12345'}]
+            AuthProduct.GP.value: [{'username': 'gp_03', 'password': '12345'}]
         },
         'Live_SG': {
             AuthProduct.HFV2.value: [{'username': 'hf2.id.auto', 'password': '12345'},

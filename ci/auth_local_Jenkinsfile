@@ -20,9 +20,8 @@ pipeline {
   }
   
   parameters {
-        choice(name:'environment',choices:['QA','STG','LIVE'],description:'')
+        choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
     }
-   
   stages { 
     stage('Verify') {   
     agent {
@@ -35,15 +34,18 @@ pipeline {
       steps {
         script {
           case_tag = "${params.environment}".toLowerCase()
-          sh "ptest3  -t E1_API_Automation.Test.MockTest -i ${case_tag}"
+          if (case_tag == 'stg_sg') {
+              case_tag = 'stg'
+          } else if (case_tag == 'live_sg')
+              case_tag = 'live'
+          sh "ptest3  -t E1_API_Automation.Test.AuthService -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
      }
    }
   }
- }
-
+  }
    post {
         failure {
                 emailext attachLog: true, attachmentsPattern: 'test-output/*.*,*.log', body: '''<!DOCTYPE html>
@@ -120,4 +122,5 @@ pipeline {
 </html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', from: 'qa.testauto@ef.com',to: 'e1pdqa@ef.com'
             }
     }
+
 }

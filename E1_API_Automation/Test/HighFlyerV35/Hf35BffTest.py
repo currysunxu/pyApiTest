@@ -4,7 +4,7 @@ import random
 import uuid
 
 import jmespath
-from hamcrest import assert_that, equal_to, contains_string
+from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity
@@ -13,6 +13,7 @@ from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import H
 from E1_API_Automation.Business.KSDInternalService import KSDInternalService
 from E1_API_Automation.Business.KidsEVC import KidsEVCService
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
+from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroupService
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
@@ -23,34 +24,34 @@ from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
 from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
-from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService
+from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
     ContentRepoGroupType
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import OnlineScope
+from E1_API_Automation.Business.Utils.EVCUtils import EVCUtils
 
 
 @TestClass()
 class Hf35BffTest(HfBffTestBase):
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_bff_auth_login_valid_username(self):
         product_keys = BffUsers.BffUserPw[env_key].keys()
         for key in product_keys:
             user_name = BffUsers.BffUserPw[env_key][key][0]['username']
             password = BffUsers.BffUserPw[env_key][key][0]['password']
-            if key.__contains__('HF'):
-                print("HF user is : %s" % (user_name))
-                response = self.bff_service.login(user_name, password)
-                print("Bff login response is : %s" % (response.__str__()))
-                assert_that(response.status_code, equal_to(200))
-                id_token = jmespath.search('idToken', response.json())
-                access_token = jmespath.search('accessToken', response.json())
-                refresh_token = jmespath.search('refreshToken', response.json())
-                assert_that((not id_token == "" and id_token.__str__() is not None))
-                assert_that((not access_token == "" and access_token.__str__() is not None))
-                assert_that((not refresh_token == "" and refresh_token.__str__() is not None))
+            # all type users can login with auth2 successfully
+            response = self.bff_service.login(user_name, password)
+            assert_that(response.status_code, equal_to(200))
+            id_token = jmespath.search('idToken', response.json())
+            access_token = jmespath.search('accessToken', response.json())
+            refresh_token = jmespath.search('refreshToken', response.json())
+            assert_that((not id_token == "" and id_token.__str__() is not None))
+            assert_that((not access_token == "" and access_token.__str__() is not None))
+            assert_that((not refresh_token == "" and refresh_token.__str__() is not None))
 
-    @Test(tags='qa')
+
+    @Test(tags="qa, stg, live")
     def test_bff_auth_login_invalid_username(self):
         user_name = "invalidUserName%s" % (random.randint(1, 100))
         password = "invalidPassword"
@@ -62,21 +63,30 @@ class Hf35BffTest(HfBffTestBase):
         else:
             assert_that(response.status_code, equal_to(401))
 
-    # @Test(tags='qa')
-    # def test_bff_auth_login_not_HF_username(self):
-    #     product_keys = BffUsers.BffUserPw[env_key].keys()
-    #     for key in product_keys:
-    #         user_name = BffUsers.BffUserPw[env_key][key][0]['username']
-    #         password = BffUsers.BffUserPw[env_key][key][0]['password']
-    #         response = self.bff_service.login(user_name, password)
-    #         print(
-    #             "Product:" + key + ";UserName:" + user_name)
-    #         if not key.__contains__('HF'):
-    #             print("status: %s, message: %s" % (str(response.json()['status']), response.json()['message']))
-    #             assert_that(response.status_code, equal_to(401))
-    #             assert_that((response.json()['error'] == "Unauthorized"))
+    # only HFV2, HFV3Plus user can call bff apis successfully, other users can't call bff apis, will return 401
+    @Test(tags="qa, stg, live")
+    def test_auth2_authorization(self):
+        product_keys = BffUsers.BffUserPw[env_key].keys()
+        for key in product_keys:
+            user_name = BffUsers.BffUserPw[env_key][key][0]['username']
+            password = BffUsers.BffUserPw[env_key][key][0]['password']
+            # all type users can login successfully
+            response = self.bff_service.login(user_name, password)
+            assert_that(response.status_code, equal_to(200))
 
-    @Test(tags='qa', data_provider=["noToken"])
+            # only HFV2, HFV3Plus users can call bff apis, others can't
+            response = self.bff_service.get_bootstrap_controller('ios')
+            if key in (BffProduct.HFV2.value, BffProduct.HFV3.value, BffProduct.HFV35.value):
+                assert_that(response.status_code, equal_to(200))
+                assert_that(response.json(), match_to("provision"))
+                assert_that(response.json(), match_to("userContext.availableBooks"))
+                assert_that(response.json(), match_to("userContext.currentBook"))
+            else:
+                assert_that(response.status_code, equal_to(401))
+                assert_that((response.json()['error'] == "Unauthorized"))
+                assert_that((response.json()['message'] == "Unauthorized program."))
+
+    @Test(tags="qa, stg, live", data_provider=["noToken"])
     def test_submit_new_attempt_without_auth_token(self, negative_para):
         bff_data_obj = Hf35BffCommonData()
         response = self.bff_service.submit_new_attempt_with_negative_auth_token(bff_data_obj.get_attempt_body(),
@@ -85,17 +95,14 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(response.status_code, equal_to(400))
         assert_that((response.json()['error'] == "Bad Request"))
 
-    @Test(tags='qa', data_provider=["", "invalid", "noToken", "expired"])
+    @Test(tags="qa, stg, live", data_provider=["", "invalid", "noToken", "expired"])
     def test_submit_new_attempt_with_invalid_auth_token(self, negative_para):
         bff_data_obj = Hf35BffCommonData()
         response = self.bff_service.submit_new_attempt_with_negative_auth_token(bff_data_obj.get_attempt_body(),
                                                                                 negative_para)
-        # print("Bff login response is : %s" % (response.__str__()))
-        # assert_that(response.status_code, equal_to(401))
-        # assert_that((response.json()['error'] == "Unauthorized"))
         self.verify_bff_api_response_with_invalid_token(negative_para, response)
 
-    @Test(tags='qa', data_provider=[(1, 1), (2, 4), (4, 2)])
+    @Test(tags="qa, stg, live", data_provider=[(1, 1), (2, 4), (4, 2)])
     def test_submit_new_attempt_with_valid_body(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -113,7 +120,7 @@ class Hf35BffTest(HfBffTestBase):
         self.setter_learning_result_details(learning_details_entity, bff_data_obj)
         self.check_bff_compare_learning_result(result_response, learning_result_entity, learning_details_entity)
 
-    @Test(tags='qa', data_provider=[(1, 1), (4, 2)])
+    @Test(tags="qa, stg, live", data_provider=[(1, 1), (4, 2)])
     def test_submit_best_attempt(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -155,7 +162,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(homework_best_score, equal_to(bff_best_score))
         assert_that(best_submit_response.json(), equal_to(homework_best_attempt_response.json()))
 
-    @Test(tags='qa', data_provider=[("HIGH_FLYERS_35", "1")])
+    @Test(tags="qa, stg, live", data_provider=[("HIGH_FLYERS_35", "1")])
     def test_get_course_structure(self, course, scheme_version):
         bff_course_response = self.bff_service.get_course_structure()
         print("Bff get course response is : %s" % (json.dumps(bff_course_response.json(), indent=4)))
@@ -169,7 +176,7 @@ class Hf35BffTest(HfBffTestBase):
         content_map_response = self.get_course_from_content_map(course, scheme_version, json_body)
         assert_that(bff_course_response.json(), equal_to(content_map_response.json()))
 
-    @Test(tags='qa', data_provider=[("HIGH_FLYERS_35", "1")])
+    @Test(tags="qa, stg, live", data_provider=[("HIGH_FLYERS_35", "1")])
     def test_get_book_structure(self, course, scheme_version):
         json_body = {
             "childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
@@ -192,22 +199,24 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(api_response.status_code, equal_to(400))
             assert_that((api_response.json()['error'] == "Bad Request"))
             assert_that((api_response.json()['message'] == "token required"))
+        elif invalid_type == "expired":
+            # in stg, live, as we have hotfix, for expire token, the status become 401
+            assert_that(api_response.status_code, equal_to(401))
+            assert_that((api_response.json()['error'] == "Unauthorized"))
+            assert_that((api_response.json()['message'] == "token expired"))
         else:
             assert_that(api_response.status_code, equal_to(403))
             assert_that((api_response.json()['error'] == "Forbidden"))
-            if invalid_type == "invalid":
-                assert_that((api_response.json()['message'] == "invalid token"))
-            else:
-                assert_that((api_response.json()['message'] == "token expired"))
+            assert_that((api_response.json()['message'] == "invalid token"))
 
-    @Test(tags='qa', data_provider=["", "invalid", "noToken", "expired"])
+    @Test(tags="qa, stg, live", data_provider=["", "invalid", "noToken", "expired"])
     def test_get_course_structure_with_invalid_token(self, invalid):
         bff_course_response = self.bff_service.get_course_structure_with_negative_token(invalid)
         print("Bff get course response is : %s" % (json.dumps(bff_course_response.json(), indent=4)))
         print("Bff get course response : %s" % (bff_course_response.__str__()))
         self.verify_bff_api_response_with_invalid_token(invalid, bff_course_response)
 
-    @Test(tags='qa', data_provider=["", "invalid", "noToken", "expired"])
+    @Test(tags="qa, stg, live", data_provider=["", "invalid", "noToken", "expired"])
     def test_get_book_structure_with_invalid_token(self, invalid):
         json_body = {
             "childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
@@ -223,7 +232,7 @@ class Hf35BffTest(HfBffTestBase):
                                                                                     invalid)
         self.verify_bff_api_response_with_invalid_token(invalid, bff_book_response)
 
-    @Test(tags='qa', data_provider=["no_content_id", "no_tree_revision"])
+    @Test(tags="qa, stg, live", data_provider=["no_content_id", "no_tree_revision"])
     def test_get_book_structure_without_contentId_or_treeRevision(self, invalid):
         json_body = {
             "childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
@@ -253,7 +262,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that((bff_book_response.json()['error'] == ("Bad Request")))
             assert_that((bff_book_response.json()['message'] == ("getBookStructure.treeRevision: must not be empty")))
 
-    @Test(tags='qa', data_provider=["no_uuid"])
+    @Test(tags="qa, stg, live", data_provider=["no_uuid"])
     def test_get_book_structure_with_invalid_contentId(self, invalid):
         json_body = {
             "childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
@@ -273,54 +282,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_book_response.status_code, equal_to(400))
         assert_that((bff_book_response.json()['error'] == "Bad Request"))
 
-    @Test(tags='qa', data_provider=[1, 3, 10])
-    def test_post_homework_activity(self, items):
-        content_repo_data = ContentRepoCommonData(items)
-        # insert content
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
-        content_json_body = content_repo_data.get_activity_content()
-        content_repo_response = content_repo_service.post_content(content_json_body)
-        assert_that(content_repo_response.status_code == 200)
-        content_activities_response = content_repo_service.get_activities(content_repo_response.json()["savedItems"])
-        # bff post
-        bff_activity_response = self.bff_service.get_homework_activities(content_repo_response.json()["savedItems"])
-        assert_that(bff_activity_response.status_code == 200)
-        bff_activity_json = bff_activity_response.json()
-        assert_that(bff_activity_json, equal_to(content_activities_response.json()))
-
-    # activity_and_asset not been used for the verification
-    # @Test(tags='qa', data_provider=[(3, "activity"), (3, "asset"), (2, "activity_and_asset")])
-    @Test(tags='qa', data_provider=[(3, "activity"), (3, "asset")])
-    def test_get_homework_activity_group(self, number, activity_or_asset):
-        content_repo_data = ContentRepoCommonData(number, activity_or_asset)
-        # insert content
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
-        content_json_body = content_repo_data.get_activity_content()
-        content_repo_response = content_repo_service.post_content(content_json_body)
-        assert_that(content_repo_response.status_code == 200)
-        # insert content group
-        content_group_json_body = content_repo_data.get_activity_or_asset_content_group()
-        content_group_repo_response = content_repo_service.post_content_group(content_group_json_body)
-        assert_that(content_group_repo_response.status_code == 200)
-        query_content_group_json_body = content_group_repo_response.json()["savedItems"][0].copy()
-        query_content_group_json_body.pop("savedContentType")
-        query_content_group_json_body["parentContentId"] = query_content_group_json_body.pop("contentId")
-        query_content_group_json_body["parentContentRevision"] = query_content_group_json_body.pop("contentRevision")
-        query_content_group_json_body["parentSchemaVersion"] = query_content_group_json_body.pop("schemaVersion")
-        content_group_activities_response = content_repo_service.get_activities_group(query_content_group_json_body)
-        # bff get activity group
-        bff_activity_response = self.bff_service.get_homework_activity_asset_group(
-            query_content_group_json_body["parentContentRevision"],
-            query_content_group_json_body["parentContentId"],
-            query_content_group_json_body["parentSchemaVersion"])
-        assert_that(bff_activity_response.status_code == 200)
-        bff_activity_json = bff_activity_response.json()
-        if (activity_or_asset == "activity"):
-            assert_that(bff_activity_json["activityGroups"], equal_to(content_group_activities_response.json()))
-        elif (activity_or_asset == "asset"):
-            assert_that(bff_activity_json["assetGroups"], equal_to(content_group_activities_response.json()))
-
-    @Test(tags='qa', data_provider=["", "invalid", "noToken", "expired"])
+    @Test(tags="qa, stg, live", data_provider=["", "invalid", "noToken", "expired"])
     def test_post_homework_activity_with_negative_token(self, negative_token):
         content_repo_data = ContentRepoCommonData()
         # insert content
@@ -333,7 +295,7 @@ class Hf35BffTest(HfBffTestBase):
             content_activities_response.json(), negative_token)
         self.verify_bff_api_response_with_invalid_token(negative_token, bff_invalid_response)
 
-    @Test(tags='qa', data_provider=[{"contentId": ""}, {"contentId": None}, {"contentRevision": ""},
+    @Test(tags="qa, stg, live", data_provider=[{"contentId": ""}, {"contentId": None}, {"contentRevision": ""},
                                     {"contentId": "test_neg"}, {"contentRevision": None},
                                     {"schemaVersion": ""}, {"schemaVersion": None}, {"schemaVersion": "c"}])
     def test_post_homework_activity_with_negative_parameter(self, negative_parameter):
@@ -349,25 +311,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_invalid_response.status_code, equal_to(400))
         assert_that((bff_invalid_response.json()['error'] == "Bad Request"))
 
-    @Test(tags='qa', data_provider=[{"contentId": "f3417c1a-cf92-4257-9cec-3efa911b46da"}])
-    def test_post_homework_activity_with_mismatch_para(self, negative_parameter):
-        content_repo_data = ContentRepoCommonData()
-        # insert content
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
-        content_json_body = content_repo_data.get_activity_content()
-        content_repo_response = content_repo_service.post_content(content_json_body)
-        assert_that(content_repo_response.status_code == 200)
-        content_activities_response = content_repo_service.get_activities(content_repo_response.json()["savedItems"])
-        bff_mismatch_json_body = self.update_content_negative_body(negative_parameter,
-                                                                   content_activities_response.json(), True)
-        bff_mismatch_response = self.bff_service.get_homework_activities(bff_mismatch_json_body)
-        assert_that(bff_mismatch_response.status_code == 200)
-        print(json.dumps(bff_mismatch_response.json(), indent=4))
-        expected_result = content_activities_response.json()
-        del expected_result[0]
-        assert_that(bff_mismatch_response.json(), equal_to(expected_result))
-
-    @Test(tags='qa', data_provider=["", "invalid", "noToken", "expired"])
+    @Test(tags="qa, stg, live", data_provider=["", "invalid", "noToken", "expired"])
     def test_post_homework_activity_group_with_negative_token(self, negative_token):
         content_repo_data = ContentRepoCommonData()
         # insert content
@@ -392,7 +336,7 @@ class Hf35BffTest(HfBffTestBase):
             negative_token)
         self.verify_bff_api_response_with_invalid_token(negative_token, bff_invalid_response)
 
-    @Test(tags='qa', data_provider=[("", "5f99af36-cad7-4a45-b811-02c9076f47f1", 1),
+    @Test(tags="qa, stg, live", data_provider=[("", "5f99af36-cad7-4a45-b811-02c9076f47f1", 1),
                                     ("test_content_revision", "", 1),
                                     ("test_content_revision", "5f99af36-cad7-4a45-b811-02c9076f47f1", ""),
                                     ("testRevision", "non-uuid", 1),
@@ -405,7 +349,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_activity_response.status_code == 400)
         assert_that((bff_activity_response.json()['error'] == "Bad Request"))
 
-    @Test(tags='qa', data_provider=[("test_content_revision", "5f99af36-cad7-4a45-b811-02c9076f47f1", 1)])
+    @Test(tags="qa, stg, live", data_provider=[("test_content_revision", "5f99af36-cad7-4a45-b811-02c9076f47f1", 1)])
     def test_post_homework_activity_asset_group_with_mismatch_para(self, negative_content_revision,
                                                                    negative_content_id, negative_schema_version):
         bff_mismatch_response = self.bff_service.get_homework_activity_asset_group(negative_content_revision,
@@ -418,7 +362,7 @@ class Hf35BffTest(HfBffTestBase):
         }
         assert_that(bff_mismatch_response.json(), equal_to(expected_result))
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_bootstrap_controller_with_wrong_platform_number(self):
         response = self.bff_service.get_bootstrap_controller(platform=None)
         assert_that(response.status_code == 400)
@@ -449,29 +393,29 @@ class Hf35BffTest(HfBffTestBase):
 
         assert_that(json.dumps(response.json()['ocContext']), equal_to(json.dumps(expected_oc_context)))
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_bootstrap_controller_ios_platform(self):
         self.test_bootstrap_controller_by_platform('ios')
 
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_bootstrap_controller_android_platform(self):
         self.test_bootstrap_controller_by_platform('android')
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_unlock_progress(self):
         current_book = self.get_current_book_from_bootstrap()
         print(current_book)
         bff_unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
         assert_that(bff_unlock_response.status_code == 200)
 
-        homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
-        homework_unlock_response = homework_service.get_unlock_progress(self.customer_id, current_book)
-        assert_that(homework_unlock_response.status_code == 200)
+        course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
+        course_group_unlock_response = course_group_service.get_unlock_progress(self.customer_id, current_book)
+        assert_that(course_group_unlock_response.status_code == 200)
 
-        assert_that(bff_unlock_response.json(), equal_to(homework_unlock_response.json()))
+        assert_that(bff_unlock_response.json(), equal_to(course_group_unlock_response.json()))
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_homework_content_groups(self):
         current_book = self.get_current_book_from_bootstrap()
         tree_revision = self.get_tree_revision_from_course_structure()
@@ -504,7 +448,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_homework_content_group_response.json()["assetGroups"],
                     equal_to(homework_asset_group_response.json()))
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_handout_content_groups(self):
         book_content_id = self.get_current_book_from_bootstrap()
         course_structure_response = self.bff_service.get_course_structure()
@@ -538,7 +482,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_handout_content_group_response.json()["assetGroups"],
                     equal_to(handout_asset_group_response.json()))
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_homework_activities(self):
         current_book = self.get_current_book_from_bootstrap()
         tree_revision = self.get_tree_revision_from_course_structure()
@@ -560,10 +504,10 @@ class Hf35BffTest(HfBffTestBase):
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
         content_repo_activity_response = content_repo_service.get_activities(activity_filter_body)
         assert_that(content_repo_activity_response.status_code == 200)
-        # check the bff activity api response will be same to what you get from content repo
-        assert_that(bff_activity_response.json(), equal_to(content_repo_activity_response.json()))
+        # check the bff activity api response will be same to what you get from content repo, order by id
+        assert_that(bff_activity_response.json().sort(key=lambda k:(k.get('id',0))), equal_to(content_repo_activity_response.json().sort(key=lambda k:(k.get('id',0)))))
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_handout_eca(self):
         book_content_id = self.get_current_book_from_bootstrap()
         course_structure_response = self.bff_service.get_course_structure()
@@ -591,56 +535,36 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_eca_response.json(), equal_to(content_repo_eca_response.json()))
 
     # test get online class for ksd
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_online_pl_class_ksd(self):
         bff_online_ksd_response = self.bff_service.get_online_pl_class(OnlineScope.KSD.value)
         assert_that(bff_online_ksd_response.status_code == 200)
-
-        evc_service = KidsEVCService(KSD_ENVIRONMENT)
-        evc_service.mou_tai.headers['X-EF-TOKEN'] = self.bff_service.id_token
-
-        date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
         local_time_utc = datetime.datetime.utcnow()
-
         # if there's no data found, need to create ksd online class first
-        if len(bff_online_ksd_response.json()) == 0:
-            evc_start_time_utc = local_time_utc + datetime.timedelta(hours=1)
-            # make the evc start time with zero minutes, seconds
-            evc_start_time_utc = datetime.datetime(evc_start_time_utc.year, evc_start_time_utc.month,
-                                                   evc_start_time_utc.day, evc_start_time_utc.hour, 0, 0, 0)
-            evc_start_time_utc_str = evc_start_time_utc.strftime(date_time_format)
-            evc_end_time_utc_str = (evc_start_time_utc + datetime.timedelta(minutes=30)).strftime(date_time_format)
-            available_teachers_response = evc_service.get_all_available_teachers(
-                evc_start_time_utc_str,
-                evc_end_time_utc_str,
-                course_type='HFV3Plus',
-                class_type='Regular',
-                page_index=0, page_size=10)
-            # randomly choose a teacher so will not conflict when create another class
-            available_teachers_list = available_teachers_response.json()
-            random_teacher_index = random.randint(0, len(available_teachers_list) - 1)
-            teacher_id = jmespath.search("[{0}].teacherId".format(random_teacher_index),
-                                         available_teachers_response.json())
+        if len(bff_online_ksd_response.json()) == 0 and not EnvUtils.is_env_live():
+            #schedule a pl class base on current date
+            schedule_pl = EVCUtils.schedule_evc_pl(self.bff_service.id_token,local_time_utc,"HFV3Plus")
 
-            book_response = evc_service.book_class(evc_start_time_utc_str,
-                                                   evc_end_time_utc_str,
-                                                   teacher_id, course_type='HFV3Plus',
-                                                   class_type='Regular',
-                                                   course_type_level_code='C', unit_number="1",
-                                                   lesson_number="1", is_reschedule="true")
-            assert_that(book_response.status_code == 201)
             # after insert online data, get hf35 bff data again
             bff_online_ksd_response = self.bff_service.get_online_pl_class(OnlineScope.KSD.value)
             assert_that(bff_online_ksd_response.status_code == 200)
+            #assert new schedule PL in bff online api
+            assert_that(jmespath.search('axisClassId', schedule_pl) in jmespath.search('[].classId',bff_online_ksd_response.json()))
+
+
+        evc_service = KidsEVCService(KSD_ENVIRONMENT)
+        evc_service.mou_tai.headers['X-EF-TOKEN'] = self.bff_service.id_token
+        date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
         # start time is 3 hours before current utc time, end time is 4 weeks after current utc time
         start_time_utc = (local_time_utc - datetime.timedelta(hours=3)).strftime(date_time_format)
         end_time_utc = (local_time_utc + datetime.timedelta(days=28)).strftime(date_time_format)
 
         evc_student_online_class_response = evc_service.get_hfv3plus_student_online_class(start_time_utc, end_time_utc)
-        # code will filter out endDateTimeUtc greater than current utc time data
+        # code will filter out endDateTimeUtc greater than current utc time data, and classStatus in ("Booked", "Ongoing", "Attended")
         evc_student_online_class_expected = jmespath.search(
-            '[?endDateTimeUtc>\'' + local_time_utc.strftime(date_time_format) + '\']',
+            '[?endDateTimeUtc>\'' + local_time_utc.strftime(date_time_format)
+            + '\' && (classStatus == \'Booked\' || classStatus == \'Ongoing\' || classStatus == \'Attended\')]',
             evc_student_online_class_response.json())
         teacher_id_set = set(jmespath.search('[].teacherId', evc_student_online_class_expected))
 
@@ -651,13 +575,12 @@ class Hf35BffTest(HfBffTestBase):
                                                                 evc_teacher_info_response.json())
         assert_that(error_message == '', error_message)
 
-    # test get online class for osd, as we can't manipulate the osd online classes, so, only check status for now
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_online_pl_class_osd(self):
         bff_online_osd_response = self.bff_service.get_online_pl_class(OnlineScope.OSD.value)
         assert_that(bff_online_osd_response.status_code == 200)
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_online_gl_class(self):
         bff_online_gl_response = self.bff_service.get_online_gl_class()
         assert_that(bff_online_gl_response.status_code == 200)
@@ -671,7 +594,7 @@ class Hf35BffTest(HfBffTestBase):
                                                                 evc_group_class_response.json())
         assert_that(error_message == '', error_message)
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_privacy_policy_document(self):
         bff_privacy_policy_document_response = self.bff_service.get_privacy_policy_document()
         assert_that(bff_privacy_policy_document_response.status_code == 200)
@@ -683,9 +606,9 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_privacy_policy_document_response.json()['id'] == ups_pp_document_response.json()['id'])
         assert_that(bff_privacy_policy_document_response.json()['url'] == ups_pp_document_response.json()['url'])
         # currently, this value will be same for all the environment
-        assert_that(bff_privacy_policy_document_response.json()['termsConditionUrl'] == 'https://study.ef.cn/content/tc.pdf')
+        assert_that(bff_privacy_policy_document_response.json()['termsConditionUrl'] == 'https://study.ef.cn/content/terms-and-conditions.htm')
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_post_privacy_policy_agreement(self):
         bff_privacy_policy_document_response = self.bff_service.get_privacy_policy_document()
         assert_that(bff_privacy_policy_document_response.status_code == 200)
@@ -698,11 +621,11 @@ class Hf35BffTest(HfBffTestBase):
         ups_pp_agreement_response = ups_service.get_privacy_policy_agreement_hf35(self.customer_id)
         assert_that(ups_pp_agreement_response.status_code == 200)
 
-        assert_that(str(ups_pp_agreement_response.json()['studentId']) == self.customer_id)
+        assert_that(str(ups_pp_agreement_response.json()['studentId']) == str(self.customer_id))
         assert_that(ups_pp_agreement_response.json()['latestPrivacyPolicyDocumentResult']['id'] == privacy_policy_document_id)
         assert_that(ups_pp_agreement_response.json()['latestPrivacyPolicyDocumentResult']['signed'] == True)
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_vocab_content_groups(self):
         book_content_id = self.get_current_book_from_bootstrap()
         course_structure_response = self.bff_service.get_course_structure()
@@ -736,7 +659,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_vocab_content_group_response.json()["assetGroups"],
                     equal_to(vocab_asset_group_response.json()))
 
-    @Test(tags='qa', )
+    @Test(tags="qa, stg, live")
     def test_submit_vocab_progress(self):
         word_attempt_template = Hf35BffWordAttemptEntity(str(uuid.uuid1()), str(uuid.uuid1()))
         word_attempt_list = Hf35BffUtils.construct_vocab_progress_list(word_attempt_template, 2)
@@ -762,6 +685,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(actual_vocab_progress['unitContentId'], equal_to(expected_word_attempt.unit_content_id))
             assert_that(actual_vocab_progress['wordContentId'], equal_to(expected_word_attempt.word_content_id))
             assert_that(actual_vocab_progress['currentLevel'], equal_to(expected_word_attempt.detail.current_level))
+            assert_that(actual_vocab_progress['parentContentPath'], equal_to(expected_word_attempt.parent_content_path))
             assert_that(actual_vocab_progress['lastStudyAt'], equal_to(expected_word_attempt.detail.last_study_time))
             assert_that(actual_vocab_progress, match_to('createdAt'))
             assert_that(actual_vocab_progress, match_to('lastUpdatedAt'))
@@ -788,7 +712,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(result_response.json()[0]["details"][0]["activityKey"], expected_word_attempt.word_content_id)
             assert_that(result_response.json()[0]["extension"], equal_to(learning_result_entity.extension))
 
-    @Test(tags='qa')
+    @Test(tags="qa, stg, live")
     def test_get_vocab_progress(self):
         course_content_id = str(uuid.uuid1())
         book_content_id = str(uuid.uuid1())
