@@ -30,11 +30,14 @@ class TPIService:
 
     def pt_web_unlock(self,expected_entity_dict):
         self.mou_tai.headers['X-BA-TOKEN'] = "6C35BA68-AD5C-49C0-943D-5125271EFF46"
+        student_id_collection = expected_entity_dict["StudentIdCollection"]
+        if not isinstance(student_id_collection, list):
+            student_id_collection = [expected_entity_dict["StudentIdCollection"]]
         body_json = {
             "TeacherId": expected_entity_dict["TeacherId"],
             "ProgressTestKey": expected_entity_dict["ProgressTestKey"],
             "GroupId": expected_entity_dict["GroupId"],
-            "StudentIdCollection": [expected_entity_dict["StudentIdCollection"]],
+            "StudentIdCollection": student_id_collection,
             "SchoolCode": expected_entity_dict["SchoolCode"]
         }
         return self.mou_tai.put("/api/v2/ProgressTestUnlock", body_json)

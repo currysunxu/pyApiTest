@@ -51,7 +51,7 @@ class PTReviewData:
             }
         },
         'Live': {
-            '100201088': {
+            '101521757': {
                 'TestPrimaryKey': '',  # no need to set TestPrimaryKey for live data
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4'
@@ -133,9 +133,9 @@ class PTReviewData:
         },
         'Staging': {
             'HF': {
-                'StudentId': 101077451,
+                'StudentId': 101075282,
                 'BookKey': '77f96708-2120-40cd-b6fd-4e063d6d7f33',
-                'UnitKey': 'b9803492-67b6-47c1-a5e8-fc6ea48228d0',
+                'UnitKey': '3C136AAE-DE5E-40EE-A786-7662CF5779A9',
             }
         },
         'Live': {
@@ -153,7 +153,7 @@ class BffUsers:
         'QA': {'username': 'hf3.cn.01', 'password': '12345'
                },
         'Staging': {
-            'username': 'hf.pt.w1', 'password': '12345',
+            'username': 'curry.g1.01', 'password': '12345',
         },
         'Live': {
             'username': 'gz1.g5.02', 'password': '12345',
@@ -184,6 +184,13 @@ class PTDATA:
                 'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
                 'TestPrimaryKey': 'E53200F3-6B45-4F66-A9BF-A51EE667769D',
                 'UnitKey': '8DA57DB0-9A6C-4FEF-9641-80D5B7A9F0E3',
+            },
+            'HFC4': {
+                # Book C unit 4
+                'StudentId': [1071,1070],
+                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'TestPrimaryKey': 'DA04B6C8-C46C-4A18-B8AD-D4E44899F3C6',
+                'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4',
             }
         },
         'Staging': {
@@ -207,15 +214,22 @@ class PTDATA:
                 'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
                 'TestPrimaryKey': '0D70761A-DA33-429C-BD38-6A8709DD1DE7',
                 'UnitKey': '8DA57DB0-9A6C-4FEF-9641-80D5B7A9F0E3',
+            },
+            'HFC4': {
+                # Book C unit 4
+                'StudentId': [101077451,1070],
+                'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
+                'TestPrimaryKey': 'C387829C-10EB-4BD9-98C5-B66000F637D1',
+                'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4',
             }
         },
         'Live': {
-            'HFJ': {
-                # Book J Unit 2
+            'HFF': {
+                # Book F Unit 3
                 'StudentId': 101521757,
-                'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
-                'TestPrimaryKey': 'B201AE4F-558E-42FD-9F87-644381CE5743',
-                'UnitKey': '27B6915B-63D6-48DB-8BA5-1A468054DCE8',
+                'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
+                'TestPrimaryKey': '6886D8A8-19E6-4143-9E1D-F93EA38FC848',
+                'UnitKey': 'A0DF2ADA-AF3C-4DD3-932B-6309445FB3A4',
             }
         }
     }
@@ -233,3 +247,9 @@ class PtWebSQLString:
 
     insert_pt_paper_version_sql = "INSERT INTO OnlineSchoolPlatform.dbo.TestAssessmentMeta ([Key], StudentId, TestType, TestPrimaryKey, TestInstanceKey, Code, CourseKey, CourseSnapshotKey, OriginalScore, TotalScore, OverwrittenScore, OverwrittenByStaffId, OverwrittenByUserKey, OverwrittenStamp, CreatedStamp, LastUpdatedStamp, CreatedBy, LastUpdatedBy, State)" \
                                   "VALUES(newid(), '{0}', 1, '{1}', Null, '{2}', Null, Null, Null, 10, 9, Null, Null, Null, getutcdate(), getutcdate(), Null, Null, 0)"
+
+    reset_student_pt_state_sql ="UPDATE OnlineSchoolPlatform.dbo.StudentProgressTest set ProgressTestState=1 " \
+                                 "where StudentId={0} and ProgressTestState=3 and ProgressTestInstanceKey='{1}'"
+
+    get_student_pt_state_sql ="SELECT top 1 ProgressTestState FROM OnlineSchoolPlatform.dbo.StudentProgressTest " \
+                                 "where StudentId={0} and ProgressTestInstanceKey='{1}'"

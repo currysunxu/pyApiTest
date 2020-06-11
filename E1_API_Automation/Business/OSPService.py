@@ -1,3 +1,6 @@
+import random
+import uuid
+
 from ..Lib.Moutai import Moutai
 
 
@@ -57,3 +60,21 @@ class OSPService:
             "BookKey": book_key
         }
         return self.mou_tai.post("/api/v2/StudentProgressTestAssessmentMetasGroupByUnit", body_json)
+
+    def put_commit_progress_test_hc(self,student_id,pt_instance_key):
+        body_json = {
+          "StudentId": student_id,
+          "ProgressTestInstanceKey": pt_instance_key,
+          "Results": [
+            {
+              "ProgressTestInstanceKey": pt_instance_key,
+              "ActivityKey": uuid.uuid4().__str__(),
+              "StudentId": student_id,
+              "GroupId": random.randint(0,20),
+              "Answers": []
+            }
+          ]
+        }
+
+        return self.mou_tai.put("/api/v2/WebProgressTestResult/Commit", body_json)
+
