@@ -115,7 +115,7 @@ class Hf35BffWordAttemptDetailEntity:
     def __init__(self):
         self.__current_level = None
         self.__score = None
-        self.__last_study_time = None
+        self.__last_study_at = None
 
     @property
     def current_level(self):
@@ -134,9 +134,9 @@ class Hf35BffWordAttemptDetailEntity:
         self.__score = score
 
     @property
-    def last_study_time(self):
-        return self.__last_study_time
+    def last_study_at(self):
+        return self.__last_study_at
 
-    @last_study_time.setter
-    def last_study_time(self, last_study_time):
-        self.__last_study_time = last_study_time
+    @last_study_at.setter
+    def last_study_at(self, last_study_at):
+        self.__last_study_at = last_study_at

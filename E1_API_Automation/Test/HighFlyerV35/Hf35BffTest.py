@@ -56,7 +56,6 @@ class Hf35BffTest(HfBffTestBase):
         user_name = "invalidUserName%s" % (random.randint(1, 100))
         password = "invalidPassword"
         response = self.bff_service.login(user_name, password)
-        print("Bff login response is : %s" % (response.__str__()))
         # as QA using mock omni, so the behavior is little different
         if EnvUtils.is_env_qa():
             assert_that(response.status_code, equal_to(404))
@@ -91,7 +90,6 @@ class Hf35BffTest(HfBffTestBase):
         bff_data_obj = Hf35BffCommonData()
         response = self.bff_service.submit_new_attempt_with_negative_auth_token(bff_data_obj.get_attempt_body(),
                                                                                 negative_para)
-        print("Bff login response is : %s" % (response.__str__()))
         assert_that(response.status_code, equal_to(400))
         assert_that((response.json()['error'] == "Bad Request"))
 
@@ -106,8 +104,6 @@ class Hf35BffTest(HfBffTestBase):
     def test_submit_new_attempt_with_valid_body(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
-        print("Bff submit response is : %s" % (submit_response.__str__()))
-        print("Bff submit response is : %s" % (submit_response.text))
         assert_that(submit_response.status_code, equal_to(200))
         assert_that(not submit_response.text == "")
         # check learning result
@@ -124,8 +120,6 @@ class Hf35BffTest(HfBffTestBase):
     def test_submit_best_attempt(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
-        print("Bff submit response is : %s" % (submit_response.__str__()))
-        print("Bff submit response is : %s" % (submit_response.text))
         assert_that(submit_response.status_code, equal_to(200))
         bff_data_obj.set_best_attempt()
         submit_best_response = self.bff_service.submit_new_attempt(bff_data_obj.previous_attempt)
@@ -139,8 +133,6 @@ class Hf35BffTest(HfBffTestBase):
         bff_best_score = sum(
             Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.activities..score"))
         expected_score = sum(Hf35BffCommonData.get_value_by_json_path(bff_data_obj.attempt_json, "$..score"))
-        print("Expected result is : %s" % (bff_data_obj.attempt_json))
-        print("Actual result is : %s" % (best_submit_response.json()[0]))
         assert_that(bff_best_total_score, equal_to(expected_total_score))
         assert_that(bff_best_score, equal_to(expected_score))
 
@@ -165,7 +157,6 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags="qa, stg, live", data_provider=[("HIGH_FLYERS_35", "1")])
     def test_get_course_structure(self, course, scheme_version):
         bff_course_response = self.bff_service.get_course_structure()
-        print("Bff get course response is : %s" % (json.dumps(bff_course_response.json(), indent=4)))
         assert_that(bff_course_response.status_code, equal_to(200))
         json_body = {
             "childTypes": ["COURSE", "BOOK"],
@@ -190,7 +181,6 @@ class Hf35BffTest(HfBffTestBase):
         tree_revision_from_content_map = content_map_response.json()["treeRevision"]
         bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,
                                                                 tree_revision_from_content_map)
-        print("Bff get course response is : %s" % (json.dumps(bff_book_response.json(), indent=4)))
         assert_that(bff_book_response.status_code, equal_to(200))
         assert_that(bff_book_response.json(), equal_to(content_map_response.json()))
 
@@ -212,8 +202,6 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags="qa, stg, live", data_provider=["", "invalid", "noToken", "expired"])
     def test_get_course_structure_with_invalid_token(self, invalid):
         bff_course_response = self.bff_service.get_course_structure_with_negative_token(invalid)
-        print("Bff get course response is : %s" % (json.dumps(bff_course_response.json(), indent=4)))
-        print("Bff get course response : %s" % (bff_course_response.__str__()))
         self.verify_bff_api_response_with_invalid_token(invalid, bff_course_response)
 
     @Test(tags="qa, stg, live", data_provider=["", "invalid", "noToken", "expired"])
@@ -252,8 +240,6 @@ class Hf35BffTest(HfBffTestBase):
 
         bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,
                                                                 tree_revision_from_content_map)
-        print("Bff get book response is : %s" % (json.dumps(bff_book_response.json(), indent=4)))
-        print("Bff get book response : %s" % (bff_book_response.__str__()))
         if invalid == "no_content_id":
             assert_that(bff_book_response.status_code, equal_to(404))
             assert_that((bff_book_response.json()['error'] == ("Not Found")))
@@ -277,8 +263,6 @@ class Hf35BffTest(HfBffTestBase):
 
         bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,
                                                                 tree_revision_from_content_map)
-        print("Bff get book response is : %s" % (json.dumps(bff_book_response.json(), indent=4)))
-        print("Bff get book response : %s" % (bff_book_response.__str__()))
         assert_that(bff_book_response.status_code, equal_to(400))
         assert_that((bff_book_response.json()['error'] == "Bad Request"))
 
@@ -405,7 +389,6 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags="qa, stg, live")
     def test_get_unlock_progress(self):
         current_book = self.get_current_book_from_bootstrap()
-        print(current_book)
         bff_unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
         assert_that(bff_unlock_response.status_code == 200)
 
@@ -627,31 +610,30 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_get_vocab_content_groups(self):
-        book_content_id = self.get_current_book_from_bootstrap()
-        course_structure_response = self.bff_service.get_course_structure()
-
-        book_content_revision = jmespath.search('children[?contentId==\'%s\'].contentRevision| [0]' % (book_content_id),
-                                                course_structure_response.json())
-        book_schema_version = jmespath.search('children[?contentId==\'%s\'].schemaVersion| [0]' % (book_content_id),
-                                              course_structure_response.json())
+        current_book = self.get_current_book_from_bootstrap()
+        tree_revision = self.get_tree_revision_from_course_structure()
+        book_structure_response = self.bff_service.get_book_structure(current_book, tree_revision)
+        unit_content_id = jmespath.search('children[0].contentId', book_structure_response.json())
+        unit_content_revision = jmespath.search('children[0].contentRevision', book_structure_response.json())
+        unit_schema_version = jmespath.search('children[0].schemaVersion', book_structure_response.json())
 
         bff_vocab_content_group_response = \
-            self.bff_service.get_vocab_content_groups(book_content_id, book_content_revision, book_schema_version)
+            self.bff_service.get_vocab_content_groups(unit_content_id, unit_content_revision, unit_schema_version)
         assert_that(bff_vocab_content_group_response.status_code == 200)
 
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
         vocab_eca_group_response = \
             content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeVocab.value,
                                                              ContentRepoGroupType.TypeECAGroup.value,
-                                                             book_content_id, book_content_revision,
-                                                             book_schema_version)
+                                                             unit_content_id, unit_content_revision,
+                                                             unit_schema_version)
         assert_that(vocab_eca_group_response.status_code == 200)
 
         vocab_asset_group_response = \
             content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeVocab.value,
                                                              ContentRepoGroupType.TypeAssetGroup.value,
-                                                             book_content_id, book_content_revision,
-                                                             book_schema_version)
+                                                             unit_content_id, unit_content_revision,
+                                                             unit_schema_version)
         assert_that(vocab_asset_group_response.status_code == 200)
 
         assert_that(bff_vocab_content_group_response.json()["ecaGroups"],
@@ -659,19 +641,20 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_vocab_content_group_response.json()["assetGroups"],
                     equal_to(vocab_asset_group_response.json()))
 
-    @Test(tags="qa, stg, live")
-    def test_submit_vocab_progress(self):
+    @Test(tags="qa, stg, live", data_provider=[1, 2, 4])
+    def test_submit_vocab_progress(self, word_attempt_num):
         word_attempt_template = Hf35BffWordAttemptEntity(str(uuid.uuid1()), str(uuid.uuid1()))
-        word_attempt_list = Hf35BffUtils.construct_vocab_progress_list(word_attempt_template, 2)
+        word_attempt_list = Hf35BffUtils.construct_vocab_progress_list(word_attempt_template, word_attempt_num)
         # submit vocab progress
         submit_response = self.bff_service.post_vocab_progress(word_attempt_list)
         assert_that(submit_response.status_code, equal_to(200))
+        assert_that(len(submit_response.json()), equal_to(word_attempt_num))
 
         # get vocab progress
         vocab_progress_response = self.bff_service.get_vocab_progress(word_attempt_template.book_content_id)
         assert_that(vocab_progress_response.status_code, equal_to(200))
 
-        assert_that(len(vocab_progress_response.json()), equal_to(len(word_attempt_list)))
+        assert_that(len(vocab_progress_response.json()), equal_to(word_attempt_num))
 
         # check vocab progress response
         for i in range(len(vocab_progress_response.json())):
@@ -686,7 +669,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(actual_vocab_progress['wordContentId'], equal_to(expected_word_attempt.word_content_id))
             assert_that(actual_vocab_progress['currentLevel'], equal_to(expected_word_attempt.detail.current_level))
             assert_that(actual_vocab_progress['parentContentPath'], equal_to(expected_word_attempt.parent_content_path))
-            assert_that(actual_vocab_progress['lastStudyAt'], equal_to(expected_word_attempt.detail.last_study_time))
+            assert_that(actual_vocab_progress['lastStudyAt'], equal_to(expected_word_attempt.detail.last_study_at))
             assert_that(actual_vocab_progress, match_to('createdAt'))
             assert_that(actual_vocab_progress, match_to('lastUpdatedAt'))
             assert_that(actual_vocab_progress['createdAt'], equal_to(actual_vocab_progress['lastUpdatedAt']))
@@ -711,6 +694,11 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(result_response.json()[0]["route"], equal_to(learning_result_entity.route))
             assert_that(result_response.json()[0]["details"][0]["activityKey"], expected_word_attempt.word_content_id)
             assert_that(result_response.json()[0]["extension"], equal_to(learning_result_entity.extension))
+            # when submit vocab progress, it will return wordContentId and resultId pair
+            expected_learning_result_key = \
+                jmespath.search("[?wordContentId=='{0}'].resultId|[0]".format(expected_word_attempt.word_content_id),
+                                submit_response.json())
+            assert_that(result_response.json()[0]['resultKey'], equal_to(expected_learning_result_key))
 
     @Test(tags="qa, stg, live")
     def test_get_vocab_progress(self):

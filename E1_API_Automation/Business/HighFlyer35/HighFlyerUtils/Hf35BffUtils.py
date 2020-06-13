@@ -299,7 +299,7 @@ class Hf35BffUtils:
 			word_attempt_detail_entity = Hf35BffWordAttemptDetailEntity()
 			word_attempt_detail_entity.current_level = random.randint(1, 10)
 			word_attempt_detail_entity.score = random.uniform(50, 100)
-			word_attempt_detail_entity.last_study_time = random_date_time
+			word_attempt_detail_entity.last_study_at = random_date_time
 
 			word_attempt_entity.detail = word_attempt_detail_entity
 
@@ -334,5 +334,5 @@ class Hf35BffUtils:
 		extension = {}
 		extension['currentLevel'] = word_attempt.detail.current_level
 		extension['score'] = word_attempt.detail.score
-		extension['lastStudyTime'] = word_attempt.detail.last_study_time
+		extension['lastStudyAt'] = word_attempt.detail.last_study_at
 		learning_result_entity.extension = extension

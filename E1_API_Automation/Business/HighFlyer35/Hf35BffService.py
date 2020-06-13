@@ -76,7 +76,7 @@ class Hf35BffService:
         return self.mou_tai.get(api_url)
 
     def get_vocab_content_groups(self, book_content_id, book_content_revision, book_schema_version):
-        api_url = "/hf3/api/v1/vocab/content-groups?bookContentId=%s&bookContentRevision=%s&bookSchemaVersion=%s" \
+        api_url = "/hf3/api/v1/vocab/content-groups?unitContentId=%s&unitContentRevision=%s&unitSchemaVersion=%s" \
                   % (book_content_id, book_content_revision, book_schema_version)
         return self.mou_tai.get(api_url)
 
