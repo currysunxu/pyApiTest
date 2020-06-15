@@ -91,7 +91,6 @@ class HfBffTestBase:
 	def get_learning_result_response(self, learning_result_entity):
 		learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
 		result_response = learning_result_service.get_specific_result(learning_result_entity)
-		print(result_response.json())
 		return result_response
 
 	def setter_learning_plan(self,learning_plan_entity,bff_data_obj):
