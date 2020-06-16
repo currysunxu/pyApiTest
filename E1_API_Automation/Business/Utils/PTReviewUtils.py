@@ -444,7 +444,7 @@ class PTReviewUtils:
         PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
 
         # if one skill or sub skill's TotalScore is null or if original score and overwritten score are both null,
-        # then the api will return 409
+        # then the api will return 200 after E1SP-814
         if is_total_score:
             PTReviewService.update_pt_assessment_total_score(student_id, test_primary_key, skill_subskill_code)
         else:
