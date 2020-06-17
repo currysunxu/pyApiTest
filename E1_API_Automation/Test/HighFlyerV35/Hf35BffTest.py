@@ -18,6 +18,8 @@ from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkServic
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoCommonData import ContentRepoCommonData
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningResultProduct, \
+    LearningResultProductModule
 from E1_API_Automation.Business.ProvisioningService import ProvisioningService
 from E1_API_Automation.Business.UpsPrivacyService import UpsPrivacyService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
@@ -676,8 +678,9 @@ class Hf35BffTest(HfBffTestBase):
 
         # check learning result
         learning_result_entity = LearningResultEntity(None, None, None)
-        learning_result_entity.product_module = 1
-        learning_result_entity.product = 2
+        # 128 is for vocab product module
+        learning_result_entity.product_module = LearningResultProductModule.VOCABULARY.value
+        learning_result_entity.product = LearningResultProduct.HIGHFLYER.value
         learning_result_entity.student_key = int(self.customer_id)
 
         for i in range(len(word_attempt_list)):
