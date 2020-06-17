@@ -8,6 +8,8 @@ from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData imp
 from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapService
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningResultProduct, \
+	LearningResultProductModule
 from E1_API_Automation.Business.OMNIService import OMNIService
 from E1_API_Automation.Settings import *
 from ptest.decorator import BeforeMethod
@@ -124,8 +126,8 @@ class HfBffTestBase:
 		all_question_actual_scores = sum(
 			Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..score'))
 		all_details = Hf35BffCommonData.get_value_by_json_path(bff_data_obj.get_attempt_body(), '$..details')
-		learning_result_entity.product_module = 1
-		learning_result_entity.product = 2
+		learning_result_entity.product_module = LearningResultProductModule.HOMEWORK.value
+		learning_result_entity.product = LearningResultProduct.HIGHFLYER.value
 		learning_result_entity.business_key = '|'.join(bff_data_obj.get_business_key())
 		learning_result_entity.student_key = int(self.customer_id)
 		learning_result_entity.expected_score = all_question_expected_scores
