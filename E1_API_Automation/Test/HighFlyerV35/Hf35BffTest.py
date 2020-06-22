@@ -1,16 +1,16 @@
 import datetime
-import json
 import random
 import uuid
 
 import jmespath
+import json_tools
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity
+from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import OnlineScope
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
-from E1_API_Automation.Business.KSDInternalService import KSDInternalService
 from E1_API_Automation.Business.KidsEVC import KidsEVCService
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroupService
@@ -18,19 +18,18 @@ from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkServic
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoCommonData import ContentRepoCommonData
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
+    ContentRepoGroupType
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningResultProduct, \
     LearningResultProductModule
 from E1_API_Automation.Business.ProvisioningService import ProvisioningService
 from E1_API_Automation.Business.UpsPrivacyService import UpsPrivacyService
+from E1_API_Automation.Business.Utils.EVCUtils import EVCUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
 from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
-from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
-    ContentRepoGroupType
-from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import OnlineScope
-from E1_API_Automation.Business.Utils.EVCUtils import EVCUtils
 
 
 @TestClass()
@@ -373,11 +372,10 @@ class Hf35BffTest(HfBffTestBase):
         provisioning_response = provisioning_service.get_app_version_by_platform_key(platform_key)
         Hf35BffUtils.verify_bootstrap_provision(response.json()['provision'], provisioning_response.json())
 
-        ksd_internal_service = KSDInternalService(HF35DependService.ksd_internal_service[env_key]['host'])
-        ksd_oc_context_response = ksd_internal_service.get_ksd_oc_context(self.customer_id, platform)
-        expected_oc_context = ksd_oc_context_response.json()
-
-        assert_that(json.dumps(response.json()['ocContext']), equal_to(json.dumps(expected_oc_context)))
+        expected_oc_context = Hf35BffUtils.get_expected_occontext(platform)
+        # check json fields
+        diff_list = json_tools.diff(response.json()['ocContext'], expected_oc_context)
+        assert_that(len(diff_list), equal_to(0))
 
     @Test(tags="qa, stg, live")
     def test_bootstrap_controller_ios_platform(self):
