@@ -115,7 +115,7 @@ class ExpectedData:
     }
     expected_oc_context = {
         'QA': expected_oc_context_qa_stg,
-        'STG': expected_oc_context_qa_stg,
+        'Staging': expected_oc_context_qa_stg,
         'Live': {
             "scope": "OSD",
             "ocConfig": {
