@@ -236,16 +236,19 @@ class PTReviewTestCases:
         PTReviewUtils.update_score_as_null(student_id, test_primary_key, skill_subskill_code,
                                            is_total_score)
 
-        # call the skill API, and do the verification, the API will return with 200 and response data after E1SP-814
+        # call the skill API, and do the verification, the API will return with 200 if overwrite score is null
+        # and response data after E1SP-814
+        # the API will return with 409 if total score is null
         api_pt_assess_by_skill = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key,
                                                                                 unit_key)
-        assert_that(api_pt_assess_by_skill.status_code == 200)
-        assert_that(api_pt_assess_by_skill.json()["PTKey"],equal_to(str.lower(test_primary_key)))
-        if "-" not in skill_subskill_code :
-            assert_that(jsonpath.jsonpath(api_pt_assess_by_skill.json(),"$.SkillScores[?(@.Code=='{0}')].Score".format(skill_subskill_code)),
-        equal_to([None]))
-
-
+        if is_total_score is False:
+            assert_that(api_pt_assess_by_skill.status_code == 200)
+            assert_that(api_pt_assess_by_skill.json()["PTKey"],equal_to(str.lower(test_primary_key)))
+            if "-" not in skill_subskill_code :
+                assert_that(jsonpath.jsonpath(api_pt_assess_by_skill.json(),"$.SkillScores[?(@.Code=='{0}')].Score".format(skill_subskill_code)),
+            equal_to([None]))
+        else:
+            assert_that(api_pt_assess_by_skill.status_code == 409)
 
         # call the unit API, and do the verification, the pttotalscore should be null for this unit
         hf_pt_assess = PTReviewService.get_hf_pt_assessment_by_book_from_db(student_id, book_key)
