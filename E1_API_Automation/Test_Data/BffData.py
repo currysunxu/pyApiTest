@@ -81,3 +81,67 @@ class HF35DependService:
             'host': 'http://internal-e1-ups-privacy-cn.ef.com'
         }
     }
+
+
+class ExpectedData:
+    # for qa and stg, ocContext value in bootstrap is same
+    expected_oc_context_qa_stg = {
+        "scope": "OSD",
+        "ocConfig": {
+            "webUrl": "https://study-online-staging.ef.cn/index.html?platform=webview",
+            "svcDomain": "https://omni-apigateway-tc-staging.ef.cn",
+            "getTechCheckTokenUrl": "/api/v3/Classroom/TechCheck",
+            "getClassEntranceTokenUrl": "/api/v1/classroom/online/link"
+        },
+        "trackingConfig": {
+            "evcTrackingDomain": "https://omni-apigateway-tc-staging.ef.cn",
+            "visitorTrackingUrl": "/school/evclog/tracking/VisitorNonToken",
+            "behaviorTrackingUrl": "/school/evclog/tracking/BehaviorNonToken",
+            "classTrackingUrl": "/school/evclog/tracking/trackevcclass"
+        },
+        "evcConfig": {
+            "webBootstrapUrl": "/evc15/meeting/api/bootstrap",
+            "loggingUrl": "/evc15/meeting/api/log",
+            "evcDomainMappings": {
+                "EvcCN1": "https://qa2-evc.ef.com.cn",
+                "EvcCN2": "https://qa2-evc.ef.com.cn",
+                "EvcUS1": "https://qa-evc.ef.com"
+            }
+        },
+        "staticResource": {
+            "resourceCdnDomain": "http://stg-cns.ef-cdn.com",
+            "webResourceVersionUrl": "/_shared/evc15-fe-ios-bundle_kids/version.json"
+        }
+    }
+    expected_oc_context = {
+        'QA': expected_oc_context_qa_stg,
+        'Staging': expected_oc_context_qa_stg,
+        'Live': {
+            "scope": "OSD",
+            "ocConfig": {
+                "webUrl": "https://study-online.ef.cn/index.html?platform=webview",
+                "svcDomain": "https://omni-apigateway-tc.ef.cn",
+                "getTechCheckTokenUrl": "/api/v3/Classroom/TechCheck",
+                "getClassEntranceTokenUrl": "/api/v1/classroom/online/link"
+            },
+            "trackingConfig": {
+                "evcTrackingDomain": "https://omni-apigateway-tc.ef.cn",
+                "visitorTrackingUrl": "/school/evclog/tracking/VisitorNonToken",
+                "behaviorTrackingUrl": "/school/evclog/tracking/BehaviorNonToken",
+                "classTrackingUrl": "/school/evclog/tracking/trackevcclass"
+            },
+            "evcConfig": {
+                "webBootstrapUrl": "/evc15/meeting/api/bootstrap",
+                "loggingUrl": "/evc15/meeting/api/log",
+                "evcDomainMappings": {
+                    "EvcCN1": "https://evc-ts.ef.com.cn",
+                    "EvcCN2": "https://evc-ts.ef.com.cn",
+                    "EvcUS1": "https://evc.ef.com"
+                }
+            },
+            "staticResource": {
+                "resourceCdnDomain": "http://cns.ef-cdn.com",
+                "webResourceVersionUrl": "/_shared/evc15-fe-ios-bundle_kids/version.json"
+            }
+        }
+    }

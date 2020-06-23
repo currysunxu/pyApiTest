@@ -19,6 +19,9 @@ from E1_API_Automation.Business.HighFlyer35.Hf35BffAttemptEntity import Hf35BffA
 from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity, \
 	Hf35BffWordAttemptDetailEntity
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
+from E1_API_Automation.Settings import env_key
+from E1_API_Automation.Test_Data.BffData import ExpectedData
 
 
 class Hf35BffUtils:
@@ -336,3 +339,10 @@ class Hf35BffUtils:
 		extension['score'] = word_attempt.detail.score
 		extension['lastStudyAt'] = word_attempt.detail.last_study_at
 		learning_result_entity.extension = extension
+
+	@staticmethod
+	def get_expected_occontext(platform):
+		expected_occontext = ExpectedData.expected_oc_context[env_key]
+		expected_occontext['staticResource'][
+			'webResourceVersionUrl'] = "/_shared/evc15-fe-{0}-bundle_kids/version.json".format(platform.lower())
+		return expected_occontext
