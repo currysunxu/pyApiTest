@@ -1,4 +1,4 @@
-import datetime
+import random
 import random
 import uuid
 
@@ -11,7 +11,6 @@ from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import OnlineScope
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
-from E1_API_Automation.Business.KidsEVC import KidsEVCService
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroupService
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
@@ -24,7 +23,6 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import L
     LearningResultProductModule
 from E1_API_Automation.Business.ProvisioningService import ProvisioningService
 from E1_API_Automation.Business.UpsPrivacyService import UpsPrivacyService
-from E1_API_Automation.Business.Utils.EVCUtils import EVCUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
 from E1_API_Automation.Settings import *
@@ -515,48 +513,7 @@ class Hf35BffTest(HfBffTestBase):
         content_repo_eca_response = content_repo_service.get_ecas(eca_filter_body)
         assert_that(content_repo_eca_response.status_code == 200)
         # check the bff eca api response will be same to what you get from content repo
-        assert_that(bff_eca_response.json(), equal_to(content_repo_eca_response.json()))
-
-    # test get online class for ksd
-    @Test(tags="qa, stg, live")
-    def test_get_online_pl_class_ksd(self):
-        bff_online_ksd_response = self.bff_service.get_online_pl_class(OnlineScope.KSD.value)
-        assert_that(bff_online_ksd_response.status_code == 200)
-        local_time_utc = datetime.datetime.utcnow()
-        # if there's no data found, need to create ksd online class first
-        if len(bff_online_ksd_response.json()) == 0 and not EnvUtils.is_env_live():
-            #schedule a pl class base on current date
-            schedule_pl = EVCUtils.schedule_evc_pl(self.bff_service.id_token,local_time_utc,"HFV3Plus")
-
-            # after insert online data, get hf35 bff data again
-            bff_online_ksd_response = self.bff_service.get_online_pl_class(OnlineScope.KSD.value)
-            assert_that(bff_online_ksd_response.status_code == 200)
-            #assert new schedule PL in bff online api
-            assert_that(jmespath.search('axisClassId', schedule_pl) in jmespath.search('[].classId',bff_online_ksd_response.json()))
-
-
-        evc_service = KidsEVCService(KSD_ENVIRONMENT)
-        evc_service.mou_tai.headers['X-EF-TOKEN'] = self.bff_service.id_token
-        date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"
-
-        # start time is 3 hours before current utc time, end time is 4 weeks after current utc time
-        start_time_utc = (local_time_utc - datetime.timedelta(hours=3)).strftime(date_time_format)
-        end_time_utc = (local_time_utc + datetime.timedelta(days=28)).strftime(date_time_format)
-
-        evc_student_online_class_response = evc_service.get_hfv3plus_student_online_class(start_time_utc, end_time_utc)
-        # code will filter out endDateTimeUtc greater than current utc time data, and classStatus in ("Booked", "Ongoing", "Attended")
-        evc_student_online_class_expected = jmespath.search(
-            '[?endDateTimeUtc>\'' + local_time_utc.strftime(date_time_format)
-            + '\' && (classStatus == \'Booked\' || classStatus == \'Ongoing\' || classStatus == \'Attended\')]',
-            evc_student_online_class_response.json())
-        teacher_id_set = set(jmespath.search('[].teacherId', evc_student_online_class_expected))
-
-        evc_teacher_info_response = evc_service.get_teacher_info(teacher_id_set)
-
-        error_message = Hf35BffUtils.verify_ksd_online_pl_class(bff_online_ksd_response.json(),
-                                                                evc_student_online_class_expected,
-                                                                evc_teacher_info_response.json())
-        assert_that(error_message == '', error_message)
+        assert_that(bff_eca_response.json().sort(key=lambda k:(k.get('id',0))), equal_to(content_repo_eca_response.json().sort(key=lambda k:(k.get('id',0)))))
 
     @Test(tags="qa, stg, live")
     def test_get_online_pl_class_osd(self):
@@ -567,15 +524,6 @@ class Hf35BffTest(HfBffTestBase):
     def test_get_online_gl_class(self):
         bff_online_gl_response = self.bff_service.get_online_gl_class()
         assert_that(bff_online_gl_response.status_code == 200)
-
-        evc_service = KidsEVCService(KSD_ENVIRONMENT)
-        evc_service.mou_tai.headers['X-EF-TOKEN'] = self.bff_service.id_token
-        evc_group_class_response = evc_service.get_offline_classes()
-        assert_that(evc_group_class_response.status_code == 200)
-
-        error_message = Hf35BffUtils.verify_online_gl_class(bff_online_gl_response.json(),
-                                                                evc_group_class_response.json())
-        assert_that(error_message == '', error_message)
 
     @Test(tags="qa, stg, live")
     def test_get_privacy_policy_document(self):
