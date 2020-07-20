@@ -105,7 +105,7 @@ class Hf35BffUtils:
 		bff_entity.learning_unit_content_revision = "LearningUnitContentRevision%s" % (random.randint(1, 100))
 		bff_entity.tree_revision = "TestRevision%s" % (random.randint(1, 10))
 		bff_entity.schema_version = random.randint(1, 10)
-		bff_entity.parent_content_path = "ParentContentPath%s" % (random.randint(1, 10))
+		bff_entity.parent_content_path = "highflyers/cn-3/book-2/unit-3/assignment-%s" % (random.randint(1, 10))
 
 		bff_dict = bff_entity.__dict__
 		bff_dict_new = Hf35BffUtils.modify_dict_keys(bff_dict)
