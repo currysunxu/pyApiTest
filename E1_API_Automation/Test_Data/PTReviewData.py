@@ -166,7 +166,7 @@ class PTDATA:
         'QA': {
             'HFF': {
                 # Book F Unit 3
-                'StudentId': 1070,
+                'StudentId': 1002,
                 'BookKey': '2f9b62e5-95eb-4291-9e79-8b2010279ca8',
                 'TestPrimaryKey': '8483cf66-abb4-45ee-b4d4-c4a205d741c7',
                 'UnitKey': 'a0df2ada-af3c-4dd3-932b-6309445fb3a4',
@@ -187,7 +187,7 @@ class PTDATA:
             },
             'HFC4': {
                 # Book C unit 4
-                'StudentId': [1071,1070],
+                'StudentId': [1071,1002],
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'TestPrimaryKey': 'DA04B6C8-C46C-4A18-B8AD-D4E44899F3C6',
                 'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4',
