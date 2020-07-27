@@ -345,4 +345,6 @@ class Hf35BffUtils:
 		expected_occontext = ExpectedData.expected_oc_context[env_key]
 		expected_occontext['staticResource'][
 			'webResourceVersionUrl'] = "/_shared/evc15-fe-{0}-bundle_kids/version.json".format(platform.lower())
+		expected_occontext['staticResource'][
+			'agoraWebResourceVersionUrl'] = "/evc15/meeting/api/clientversion?platform={0}".format(platform.lower())
 		return expected_occontext
