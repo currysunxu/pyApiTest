@@ -31,13 +31,13 @@ class MockTestUsers:
 
 class TestDataList:
     TestId = {
-        'QA': {'finished_test_id': '00000102-0000-0000-0000-000000000001'},
+        'QA': {'finished_test_id': '00000030-0000-0000-0000-000000000001'},
         'Staging': {'finished_test_id': '00000000-0000-0000-0000-000000121023'},
         'Live': {'finished_test_id': '00000101-0000-0000-0000-000000000002'}
     }
 
     Remediation = {
-        'QA': {'learner_vector_key': '1252447094367612929'},
+        'QA': {'learner_vector_key': '1298812346793226242'},
         'Staging': {'learner_vector_key': '1262317729063399425'},
         'Live': {'learner_vector_key': '1265892248264929281'}
     }
