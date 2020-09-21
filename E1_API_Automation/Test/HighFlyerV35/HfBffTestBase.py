@@ -211,3 +211,36 @@ class HfBffTestBase:
 		response = self.bff_service.get_course_structure()
 		tree_revision = response.json()['treeRevision']
 		return tree_revision
+
+	def get_reader_default_level_from_course_structure(self):
+		current_book = self.get_current_book_from_bootstrap()
+		course_structure = self.bff_service.get_course_structure()
+		course_structure_json = course_structure.json()
+		index = 0
+		while 1:
+			content_id_path = 'children[%s].contentId' % index
+			default_level_path = 'children[%s].default_reader_level' % index
+
+			book_content_id = jmespath.search(content_id_path, course_structure_json)
+			if book_content_id == current_book:
+				default_level_id = jmespath.search(default_level_path, course_structure_json)
+				break
+			index += 1
+		return default_level_id
+
+	def get_current_unassigned_level(self):
+		default_level_id = self.get_reader_default_level_from_course_structure()
+		level_focused_response = self.bff_service.get_reader_level_focused(self.customer_id, default_level_id)
+		level_focused_json = level_focused_response.json()
+
+		current_level = jmespath.search("currentLevel", level_focused_json)
+		index = 0
+		while 1:
+			level_code_path = "currentLevel[%s].code" % index
+			code = jmespath.search(level_code_path, level_focused_json)
+			if code == current_level:
+				current_level_id = jmespath.search("currentLevel[%s].contentId" % index, level_focused_json)
+				current_level_content_revision = jmespath.search("currentLevel[%s].contentRevision" % index, \
+																 level_focused_json)
+				break
+		return current_level_id, current_level_content_revision

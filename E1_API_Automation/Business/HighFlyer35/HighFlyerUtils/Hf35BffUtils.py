@@ -13,6 +13,7 @@ import uuid
 
 import jmespath
 
+from E1_API_Automation.Business.HighFlyer35.HF35BffReaderAttemptEntity import Hf35BffReaderAttemptEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffActivityEntity import Hf35BffActivityEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffDetailsEntity import Hf35BffDetailsEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffAttemptEntity import Hf35BffAttemptEntity
@@ -348,3 +349,40 @@ class Hf35BffUtils:
 		expected_occontext['staticResource'][
 			'agoraWebResourceVersionUrl'] = "/evc15/meeting/api/clientversion?platform={0}".format(platform.lower())
 		return expected_occontext
+
+	@staticmethod
+	def construct_reader_attempt(reader_attempt_template, check_update='false'):
+		reader_attempt_entity = Hf35BffReaderAttemptEntity(reader_attempt_template.relevant_content_id)
+		random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
+		reader_attempt_entity.end_time = random_date_time
+		reader_attempt_entity.start_time = random_date_time
+		reader_attempt_entity.need_check_upgrade = check_update
+		reader_attempt_entity.parent_content_path = "ParentContentPath%s" % (random.randint(1, 10))
+		reader_attempt_entity.reader_content_id = str(uuid.uuid1())
+		reader_attempt_entity.reader_content_revision = str(uuid.uuid1())
+		reader_attempt_entity.reader_type = str(random.randint(1,3))
+		reader_attempt_entity.reader_practice = random.choice(["read", "record", "quiz"])
+		if reader_attempt_entity.reader_practice=="read":
+			reader_attempt_entity.reader_progress = {"read": "true", "record": "false", "quiz": "false"}
+		elif reader_attempt_entity.reader_practice == "record":
+			reader_attempt_entity.reader_progress = {"read": "true", "record": "true", "quiz": "false"}
+		else:
+			reader_attempt_entity.reader_progress = {"read": "true", "record": "true", "quiz": "true"}
+		return reader_attempt_entity
+
+	@staticmethod
+	def construct_reader_attempt_dict(reader_attempt):
+		reader_attempt_dict = {}
+		reader_attempt_items = reader_attempt.__dict__
+		for item_key in reader_attempt_items.keys():
+			word_attempt_field_name = item_key[
+									  len('_' + reader_attempt.__class__.__name__ + '__'):]
+			item_value = reader_attempt_items[item_key]
+			# key should consist with BE validation rule, case sensitive
+			word_list = str(word_attempt_field_name).split('_')
+			word = word_list[0]
+			word_list.pop(0)
+			word_list = list(map(lambda x: x.title(), word_list))
+			key = word + ''.join(word_list)
+			reader_attempt_dict[key] = item_value
+		return reader_attempt_dict
