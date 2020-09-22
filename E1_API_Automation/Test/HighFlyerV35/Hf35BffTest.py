@@ -1,4 +1,4 @@
-import random
+
 import random
 import uuid
 
@@ -8,6 +8,7 @@ from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity
+from E1_API_Automation.Business.HighFlyer35.HF35BffReaderAttemptEntity import Hf35BffReaderAttemptEntity
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import OnlineScope
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
@@ -654,7 +655,7 @@ class Hf35BffTest(HfBffTestBase):
         course_content_id = str(uuid.uuid1())
         book_content_id = str(uuid.uuid1())
         word_attempt_template = Hf35BffWordAttemptEntity(course_content_id, book_content_id)
-        word_attempt_list = Hf35BffUtils.construct_vocab_progress_list(word_attempt_template, 3)
+        word_attempt_list = Hf35BffUtils.construct_vocab_progress_list(word_attempt_template, 1)
         # submit vocab progress
         vocab_submit_response = self.bff_service.post_vocab_progress(word_attempt_list)
         assert_that(vocab_submit_response.status_code, equal_to(200))
@@ -669,6 +670,69 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(homework_vocab_progress_response.status_code, equal_to(200))
         assert_that(vocab_progress_response.json(), equal_to(homework_vocab_progress_response.json()))
 
+    @Test(tags="qa, stg, live")
+    def test_get_reader_content_groups_by_book(self):
+        # get current book id and relevant content id
+        current_book = self.get_current_book_from_bootstrap()
+        tree_revision = self.get_tree_revision_from_course_structure()
+        book_structure_response = self.bff_service.get_book_structure(current_book, tree_revision)
+        relevant_content_revision = jmespath.search('contentRevision', book_structure_response.json())
 
+        # get content group
+        content_group_response = self.bff_service.get_reader_content_groups(current_book, relevant_content_revision)
+        assert_that(content_group_response.status_code, equal_to(200))
 
+    @Test(tag="qa, stg, live")
+    def test_get_reader_content_group_by_level(self):
+        default_level_id = self.get_reader_default_level_from_course_structure()
+        level_focused_response = self.bff_service.get_reader_level_focused(self.customer_id, default_level_id)
+        assert_that(level_focused_response.status_code, equal_to(200))
+        level_focused_json = level_focused_response.json()
+
+        # go through all the levels in the response to get content group
+        for level in level_focused_json['levelNodes']:
+            relevant_content_id = level['contentId']
+            relevant_content_revision = level['contentRevision']
+            content_group_response = self.bff_service.get_reader_content_groups(relevant_content_id,
+                                                                                relevant_content_revision)
+            assert_that(content_group_response.status_code, equal_to(200))
+
+    @Test(tag="qa, stg, live")
+    def test_post_reader_progress(self):
+        relevant_content_id = str(uuid.uuid1())
+        reader_attempt_template = Hf35BffReaderAttemptEntity(relevant_content_id)
+        reader_attempt = Hf35BffUtils.construct_reader_attempt(reader_attempt_template)
+        reader_attempt_dict = Hf35BffUtils.construct_reader_attempt_dict(reader_attempt)
+        # submit reader progress
+        attempt_response = self.bff_service.post_reader_progress(reader_attempt_dict)
+        assert_that(attempt_response.status_code, equal_to(200))
+        # get reader progress
+        progress_response = self.bff_service.get_reader_progress(self.customer_id, relevant_content_id)
+        assert_that(progress_response.status_code, equal_to(200))
+
+        progress_data = progress_response.json()
+        assert_that(progress_data[0]["readerContentId"]), equal_to(reader_attempt_dict["readerContentId"])
+        assert_that(progress_data[0]["readerType"]), equal_to(reader_attempt_dict["readerType"])
+        assert_that(progress_data[0]["relevantContentId"]), equal_to(reader_attempt_dict["relevantContentId"])
+        assert_that(progress_data[0]["parentContentPath"]), equal_to(reader_attempt_dict["parentContentPath"])
+        assert_that(progress_data[0]["progress"]), equal_to(reader_attempt_dict["progress"])
+
+    @Test(tag="qa, stg, live")
+    def test_get_reader_progress_by_book(self):
+        current_book = self.get_current_book_from_bootstrap()
+        reader_progress_response = self.bff_service.get_reader_progress(self.customer_id, current_book)
+        assert_that(reader_progress_response.status_code, equal_to(200))
+
+    @Test(tag="qa, stg, live")
+    def test_get_reader_progress_by_level(self):
+        default_level_id = self.get_reader_default_level_from_course_structure()
+        level_focused_response = self.bff_service.get_reader_level_focused(self.customer_id, default_level_id)
+        assert_that(level_focused_response.status_code, equal_to(200))
+        level_focused_json = level_focused_response.json()
+
+        # go through all the levels in the response to get progress
+        for level in level_focused_json['levelNodes']:
+            relevant_content_id = level['contentId']
+            progress_response = self.bff_service.get_reader_progress(self.customer_id, relevant_content_id)
+            assert_that(progress_response.status_code, equal_to(200))
 
