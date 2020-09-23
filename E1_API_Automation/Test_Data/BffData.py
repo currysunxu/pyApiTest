@@ -72,13 +72,13 @@ class HF35DependService:
 
     ups_service = {
         'QA': {
-            'host': 'http://internal-e1-ups-privacy-stg-cn.ef.com'
+            'host': 'https://internal-e1-ups-privacy-stg.ef.cn'
         },
         'Staging': {
-            'host': 'http://internal-e1-ups-privacy-stg-cn.ef.com'
+            'host': 'https://internal-e1-ups-privacy-stg.ef.cn'
         },
         'Live': {
-            'host': 'http://internal-e1-ups-privacy-cn.ef.com'
+            'host': 'https://internal-e1-ups-privacy.ef.cn'
         }
     }
 

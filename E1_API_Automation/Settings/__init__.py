@@ -17,18 +17,18 @@ class KSDEnvironment(object):
 
 class OSPEnvironment(object):
     QA = "https://internal-osp-qa.ef.cn"
-    STAGING = "http://internal-osp-staging-cn.ef.com"
-    LIVE = "http://internal-osp-cn.ef.com"
-    STAGING_SG = "http://internal-osp-staging.ef.com"
+    STAGING = "https://internal-osp-staging.ef.cn"
+    LIVE = "https://internal-osp.ef.cn"
+    STAGING_SG = "https://internal-osp-staging.ef.com"
     LIVE_SG = "http://internal-osp.ef.com"
 
 
 class TPIEnvironment(object):
     QA = "https://internal-tpi-qa.ef.cn"
-    STAGING = "http://internal-tpi-staging-cn.ef.com"
-    STAGING_SG = "http://internal-tpi-staging.ef.com"
-    LIVE = "http://internal-tpi-cn.ef.com"
-    LIVE_SG = "http://internal-tpi.ef.com"
+    STAGING = "https://internal-tpi-staging.ef.cn"
+    STAGING_SG = "https://internal-tpi-staging.ef.com"
+    LIVE = "https://internal-tpi.ef.cn"
+    LIVE_SG = "https://internal-tpi.ef.com"
 
 
 class AuthEnvironment(object):
@@ -41,16 +41,16 @@ class AuthEnvironment(object):
 
 class OMNIEnvironment(object):
     QA = "https://internal-ktsvc-qa.ef.cn/omni/apigateway"
-    STAGING = "http://omni-apigateway-staging-tccn.ef.com"
+    STAGING = "https://omni-apigateway-tc-staging.ef.cn"
     STAGING_SG = "http://omni-apigateway-staging-tcjp.ef.com"
-    LIVE = "http://omni-apigateway-tccn.ef.com"
+    LIVE = "https://omni-apigateway-tc.ef.cn"
     LIVE_SG = "http://omni-apigateway-tcjp.ef.com"
 
 
 class LearningResultEnvironment(object):
     QA = "https://internal-ktsvc-qa.ef.cn/learning-result"
-    STAGING = "https://internal-ktsvc-stg-cn.ef.com/learning-result"
-    LIVE = "https://internal-ktsvc-cn.ef.com/learning-result"
+    STAGING = "https://internal-ktsvc-stg.ef.cn/learning-result"
+    LIVE = "https://internal-ktsvc.ef.cn/learning-result"
 
 
 class BffEnvironment(object):
@@ -61,26 +61,26 @@ class BffEnvironment(object):
 
 class HomeworkEnvironment(object):
     QA = "https://internal-ktsvc-qa.ef.cn/practice"
-    STAGING = "https://internal-ktsvc-stg-cn.ef.com/practice"
-    LIVE = "https://internal-ktsvc-cn.ef.com/practice"
+    STAGING = "https://internal-ktsvc-stg.ef.cn/practice"
+    LIVE = "https://internal-ktsvc.ef.cn/practice"
 
 
 class CourseGroupEnvironment(object):
     QA = "https://internal-ktsvc-qa.ef.cn/course-group"
-    STAGING = "https://internal-ktsvc-stg-cn.ef.com/course-group"
-    LIVE = "https://internal-ktsvc-cn.ef.com/course-group"
+    STAGING = "https://internal-ktsvc-stg.ef.cn/course-group"
+    LIVE = "https://internal-ktsvc.ef.cn/course-group"
 
 
 class ContentMapEnvironment(object):
     QA = "https://internal-ktsvc-qa.ef.cn/content-map"
-    STAGING = "https://internal-ktsvc-stg-cn.ef.com/content-map"
-    LIVE = "https://internal-ktsvc-cn.ef.com/content-map"
+    STAGING = "https://internal-ktsvc-stg.ef.cn/content-map"
+    LIVE = "https://internal-ktsvc.ef.cn/content-map"
 
 
 class ContentRepoEnvironment(object):
     QA = "https://internal-ktsvc-qa.ef.cn/content-repo"
-    STAGING = "https://internal-ktsvc-stg-cn.ef.com/content-repo"
-    LIVE = "https://internal-ktsvc-cn.ef.com/content-repo"
+    STAGING = "https://internal-ktsvc-stg.ef.cn/content-repo"
+    LIVE = "https://internal-ktsvc.ef.cn/content-repo"
 
 
 class MockTestEnvironment(object):
