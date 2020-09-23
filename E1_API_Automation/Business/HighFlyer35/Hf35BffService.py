@@ -138,3 +138,23 @@ class Hf35BffService:
     def get_vocab_progress(self, book_content_id):
         api_url = '/mega/api/v1/vocab/progress?bookContentId={0}'.format(book_content_id)
         return self.mou_tai.get(api_url)
+
+    def get_reader_content_groups(self, relevant_content_id, relevant_content_revision):
+        api_url = "/mega/api/v1/reader/content-groups?relevantContentId=%s&relevantContentRevision=%s" \
+                  % (relevant_content_id, relevant_content_revision)
+        return self.mou_tai.get(api_url)
+
+    def get_reader_progress(self, student_id, relevant_content_id):
+        api_url = "/mega/api/v1/reader/progress?studentId=%s&relevantContentId=%s" \
+                  % (student_id, relevant_content_id)
+        return self.mou_tai.get(api_url)
+
+    def get_reader_level_focused(self, student_id, dafault_reader_level_content_id):
+        api_url = "/mega/api/v1/reader/levels/focused?studentId=%s&defaultReaderLevelContentId=%s" \
+                  % (student_id, dafault_reader_level_content_id)
+        return self.mou_tai.get(api_url)
+
+    def post_reader_progress(self, attempt_json):
+        # self.set_negative_token(negative_token)
+        attempt_result = self.mou_tai.post("/mega/api/v1/reader/attempts", attempt_json)
+        return attempt_result
