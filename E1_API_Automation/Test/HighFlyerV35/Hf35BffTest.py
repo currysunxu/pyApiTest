@@ -736,3 +736,15 @@ class Hf35BffTest(HfBffTestBase):
             progress_response = self.bff_service.get_reader_progress(self.customer_id, relevant_content_id)
             assert_that(progress_response.status_code, equal_to(200))
 
+
+    @Test(tags="qa, stg, live")
+    def test_get_weekly_plan(self):
+        current_book = self.get_current_book_from_bootstrap(self)
+        assert_that(current_book.status_code == 200)
+
+        unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
+        assert_that(unlock_response.status_code == 200)
+        unlock_at_str = jmespath.search('[*].unlockAt', unlock_response.json())
+        for unlock_time in unlock_at_str:
+            weekly_plan = self.bff_service.get_weekly_plan(unlock_time)
+            assert_that(weekly_plan.status_code, equal_to(200))
