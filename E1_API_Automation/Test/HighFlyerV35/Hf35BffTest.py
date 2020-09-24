@@ -585,8 +585,10 @@ class Hf35BffTest(HfBffTestBase):
                                                              unit_schema_version)
         assert_that(vocab_asset_group_response.status_code == 200)
 
+        expected_result = vocab_eca_group_response.json()
+        expected_result[0]["parentRef"].pop("contentIndex")
         assert_that(bff_vocab_content_group_response.json()["ecaGroups"],
-                    equal_to(vocab_eca_group_response.json()))
+                    equal_to(expected_result))
         assert_that(bff_vocab_content_group_response.json()["assetGroups"],
                     equal_to(vocab_asset_group_response.json()))
 
