@@ -739,7 +739,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_get_weekly_plan(self):
-        current_book = self.get_current_book_from_bootstrap(self)
+        current_book = self.get_current_book_from_bootstrap()
         assert_that(current_book.status_code == 200)
 
         unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
