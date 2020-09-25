@@ -247,7 +247,3 @@ class HfBffTestBase:
                 break
         return current_level_id, current_level_content_revision
 
-
-    def get_weekly_plan(self, start_time):
-        api_url = '/mega/api/v1/plans/weekly?startAt={0}'.format(start_time)
-        return self.mou_tai.get(api_url)
