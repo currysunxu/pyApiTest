@@ -741,8 +741,22 @@ class Hf35BffTest(HfBffTestBase):
     def test_get_weekly_plan(self):
         current_book = self.get_current_book_from_bootstrap()
         unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
-        assert_that(unlock_response.status_code == 200)
+        assert_that(unlock_response.status_code, equal_to(200))
         unlock_at_str = jmespath.search('[*].unlockedAt', unlock_response.json())
         for unlock_time in unlock_at_str:
             weekly_plan = self.bff_service.get_weekly_plan(unlock_time)
             assert_that(weekly_plan.status_code, equal_to(200))
+            for each_plan in weekly_plan.json():
+                content_path = each_plan['refContentPath']
+                plan_key = each_plan['studentId'], each_plan['product'], each_plan['productModule'], each_plan['refId']
+                checkProps = self.bff_service.get_content_path(content_path)
+                for each_ref in checkProps.json():
+                    content_key = each_ref['studentId'], each_ref['product'], each_ref['productModule'], each_ref[
+                        'refId']
+                    if content_key == plan_key:
+                        assert_that(each_plan, equal_to(each_ref))
+
+    @Test(tags="qa, stg, live")
+    def test_empty_weekly_plan(self):
+        weekly_plan = self.bff_service.get_weekly_plan("")
+        assert_that(weekly_plan.status_code, equal_to(200))
