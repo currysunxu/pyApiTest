@@ -158,3 +158,11 @@ class Hf35BffService:
         # self.set_negative_token(negative_token)
         attempt_result = self.mou_tai.post("/mega/api/v1/reader/attempts", attempt_json)
         return attempt_result
+
+    def get_weekly_plan(self, start_time):
+        api_url = '/mega/api/v1/plans/weekly?startAt={0}'.format(start_time)
+        return self.mou_tai.get(api_url)
+        
+    def get_content_path(self, content_path):
+        api_url = '/mega/api/v1/plans?contentPath={0}'.format(content_path)
+        return self.mou_tai.get(api_url) 

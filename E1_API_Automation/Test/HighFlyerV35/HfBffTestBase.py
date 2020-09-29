@@ -246,3 +246,4 @@ class HfBffTestBase:
                                                                  level_focused_json)
                 break
         return current_level_id, current_level_content_revision
+
