@@ -31,41 +31,39 @@ class MockTestUsers:
 
 class TestDataList:
     TestId = {
-        'QA': {'finished_test_id': '00000030-0000-0000-0000-000000000001'},
+        'QA': {'finished_test_id': '13f2d48b-9e33-4e7e-b1a4-f82d83b61a93'},
         'Staging': {'finished_test_id': '00000000-0000-0000-0000-000000121023'},
         'Live': {'finished_test_id': '00000101-0000-0000-0000-000000000002'}
     }
 
     Remediation = {
-        'QA': {'learner_vector_key': '1298812346793226242'},
+        'QA': {'learner_vector_key': '1309359812118601730'},
         'Staging': {'learner_vector_key': '1262317729063399425'},
         'Live': {'learner_vector_key': '1265892248264929281'}
     }
 
-
-class TestTableSQLString:
-    get_test_details_by_test_id_sql = {
-        'QA': "SELECT * FROM mt_test_qa.test WHERE Id = '{0}' limit 1",
-        'Staging': "SELECT * FROM mt_test.test WHERE Id = '{0}' limit 1",
-        'Live':""
+    RemediationActivities = {
+        'QA':'[{"activityId":"00000000-0000-0000-0000-000014157425","questions":[{"currentAnswer":[["B"]],"isAnsweredCorrectly":false,"questionId":"mt/14183615/question","key":"mt/14183615/question"}]}]'
     }
 
+
+class TestTableSQLString:
     get_paper_details_by_test_id_sql = {
         'QA': "SELECT * FROM mt_paper_qa.paper WHERE id = '{0}'",
         'Staging': "SELECT * FROM mt_paper.paper WHERE id = '{0}'",
         'Live': ""
     }
 
-    get_result_details_by_test_id_sql = {
-        'QA': "SELECT * FROM mt_result_qa.test_student_compact_result " \
-              "WHERE test_id = '{0}' and student_id ='{1}' limit 1",
-        'Staging': "SELECT * FROM mt_result.test_student_compact_result " \
-                   "WHERE test_id = '{0}' and student_id ='{1}' limit 1",
+    get_test_details_by_test_id_sql = {
+        'QA': "SELECT {0} FROM kt_test_qa.stateful_test " \
+              "WHERE id = '{1}' and student_key ='{2}' limit 1",
+        'Staging': "SELECT '{0}' FROM kt_test_qa.stateful_test " \
+              "WHERE id = '{1}' and student_key ='{2}' limit 1",
         'Live': ""
     }
 
     get_valid_test_id_sql = {
-        'QA': "SELECT id FROM mt_test_qa.test ORDER BY id DESC limit 1",
-        'Staging': "SELECT id FROM mt_test.test ORDER BY id DESC limit 1",
+        'QA': "SELECT id FROM kt_test_qa.stateful_test where student_key ='{0}' and product=32 and product_module=32 ORDER BY created_timestamp DESC limit 1",
+        'Staging': "SELECT id FROM kt_test_qa.stateful_test where student_key ='{0}' and product=32 and product_module=32 ORDER BY created_timestamp DESC limit 1",
         'Live': ""
     }
