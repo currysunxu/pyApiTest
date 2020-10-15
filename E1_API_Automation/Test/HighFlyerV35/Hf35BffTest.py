@@ -787,7 +787,8 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(refProps['unitContentId'], equal_to(content_map['parent']['contentId']))
         assert_that(refProps['unitTitle'], equal_to(content_map['parent']['title']))
         assert_that(refProps['bookTitle'], equal_to(content_map['parent']['parent']['title']))
-
+        
+    @Test(tags="qa, stg, live")
     def test_content_path_unit(self):
         content_path = self.bff_service.get_content_path("highflyers/cn-3/book-1/unit-3")
         assert_that(content_path.status_code, equal_to(200))
