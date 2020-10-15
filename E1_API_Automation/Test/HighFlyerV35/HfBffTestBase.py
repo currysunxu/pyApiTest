@@ -22,6 +22,7 @@ class HfBffTestBase:
     @BeforeMethod()
     def setup(self):
         self.bff_service = Hf35BffService(BFF_ENVIRONMENT)
+        self.cm_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
         self.key = BffProduct.HFV35.value
         self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
         self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']

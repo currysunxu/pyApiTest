@@ -149,3 +149,10 @@ class ExpectedData:
             }
         }
     }
+
+class BffSQLString:
+    get_study_plan_by_student_id_sql = {
+        'QA': "SELECT * FROM study_plan_qa.study_plan WHERE student_id = '{0}' and product_module = '{1}' and ref_content_path = '{2}'",
+        'Staging': "SELECT * FROM study_plan_stg.study_plan WHERE student_id = '{0}' and product_module = '{1}' and ref_content_path = '{2}'",
+        'Live': ""
+    }
