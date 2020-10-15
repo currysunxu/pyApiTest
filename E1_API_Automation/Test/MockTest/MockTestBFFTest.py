@@ -20,7 +20,7 @@ class MockTestCases:
         self.activities = TestDataList.RemediationActivities[env_key]
         self.correct_answer_count = random.randint(0, 5)
         self.total_question_count = random.randint(5, 10)
-        self.total_seconds_spent = random.randint(0,1200)
+        self.total_seconds_spent = random.randint(0, 1200)
         self.has_mt_student = MockTestStudentType.HasMockTest.value
         self.no_mt_student = MockTestStudentType.HasNoMockTest.value
         self.mt_student_id = MockTestUsers.MTUserPw[env_key][self.has_mt_student][0]['custom_id']
@@ -127,7 +127,8 @@ class MockTestCases:
     @Test(tags="qa, stg, live")
     def verify_get_test_processing_with_finished_test_id(self):
         mt_response = self.mt_service.get_test_processing_by_test_id(self.finished_test_id)
-        self.mt_service.check_bff_get_test_processing_structure(self.has_mt_student, mt_response, self.finished_test_id, self.mt_student_id)
+        self.mt_service.check_bff_get_test_processing_structure(self.has_mt_student, mt_response, self.finished_test_id,
+                                                                self.mt_student_id)
 
     @Test(tags="qa, stg, live", data_provider=["invalid", "noToken", "expired"])
     def verify_get_test_processing_with_invalid_auth_token(self, negative_token):
@@ -142,7 +143,7 @@ class MockTestCases:
 
     @Test(tags="qa, stg, live")
     def verify_submit_remediation_with_valid_data(self):
-        mt_response = self.mt_service.submit_remediation_by_test_id(self.finished_test_id, self.learner_vector_key,
+        mt_response = self.mt_service.submit_remediation_by_test_id(self.finished_test_id,
                                                                     self.correct_answer_count,
                                                                     self.total_question_count, self.activities)
         self.mt_service.check_bff_submit_remediation_result_structure(mt_response, self.finished_test_id,
@@ -152,28 +153,22 @@ class MockTestCases:
     @Test(tags="qa, stg, live", data_provider=["invalid", "noToken", "expired"])
     def verify_submit_remediation_with_invalid_auth_token(self, negative_token):
         self.mt_service.set_negative_token(negative_token)
-        mt_response = self.mt_service.submit_remediation_by_test_id(self.finished_test_id, self.learner_vector_key, 1,
-                                                                    10,self.activities)
+        mt_response = self.mt_service.submit_remediation_by_test_id(self.finished_test_id, 1,
+                                                                    10, self.activities)
         self.mt_service.check_bff_with_invalid_auth_structure(mt_response, negative_token)
 
     @Test(tags="qa, stg, live", data_provider=["", "00000000-0000-0000-0000-000000000000"])
     def verify_submit_remediation_with_invalid_test_id(self, invalid_test_id):
-        mt_response = self.mt_service.submit_remediation_by_test_id(invalid_test_id, self.learner_vector_key,
+        mt_response = self.mt_service.submit_remediation_by_test_id(invalid_test_id,
                                                                     self.correct_answer_count,
                                                                     self.total_question_count, self.activities)
         self.mt_service.check_post_invalid_remediation_structure(mt_response, invalid_test_id)
 
-    @Test(tags="qa, stg, live", data_provider=[None])
-    def verify_submit_remediation_with_invalid_vector_key(self, invalid_learner_vector_key):
-        mt_response = self.mt_service.submit_remediation_by_test_id(self.finished_test_id, invalid_learner_vector_key,
-                                                                    self.correct_answer_count,
-                                                                    self.total_question_count, self.activities)
-        assert_that(jmespath.search("errors[0].extensions.code", mt_response.json()) == 500)
-
     @Test(tags="qa, stg")
     def verify_get_remediation_with_valid_data(self):
-        self.mt_service.submit_remediation_by_test_id(self.finished_test_id, self.learner_vector_key,
-                                                      self.correct_answer_count, self.total_question_count, self.activities)
+        self.mt_service.submit_remediation_by_test_id(self.finished_test_id,
+                                                      self.correct_answer_count, self.total_question_count,
+                                                      self.activities)
         mt_response = self.mt_service.get_remediation_result_by_test_id(self.finished_test_id)
         self.mt_service.check_bff_get_remediation_result_structure(mt_response, self.correct_answer_count,
                                                                    self.total_question_count)
@@ -192,7 +187,8 @@ class MockTestCases:
     @Test(tags="qa, stg, live", data_provider=["invalid", "noToken", "expired"])
     def verify_submit_test_with_invalid_auth_token(self, negative_token):
         self.mt_service.set_negative_token(negative_token)
-        mt_response = self.mt_service.post_submit_test_result_by_test_id(self.finished_test_id, self.total_seconds_spent)
+        mt_response = self.mt_service.post_submit_test_result_by_test_id(self.finished_test_id,
+                                                                         self.total_seconds_spent)
         self.mt_service.check_bff_with_invalid_auth_structure(mt_response, negative_token)
 
     @Test(tags="qa, stg, live", data_provider=["", "00000000-0000-0000-0000-000000000000"])

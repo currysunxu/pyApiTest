@@ -32,19 +32,23 @@ class MockTestBFFService:
     @staticmethod
     def get_valid_test_id_by_test_id_from_db(student_id):
         ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
-        return ms_sql_server.exec_query_return_dict_list(TestTableSQLString.get_valid_test_id_sql[env_key].format(student_id))[0]
+        return \
+        ms_sql_server.exec_query_return_dict_list(TestTableSQLString.get_valid_test_id_sql[env_key].format(student_id))[
+            0]
 
     @staticmethod
     def get_test_details_by_test_id_from_db(test_id, student_id):
         ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
         return json.loads(ms_sql_server.exec_query_return_dict_list(
-            TestTableSQLString.get_test_details_by_test_id_sql[env_key].format('meta_data', test_id, student_id))[0]["meta_data"])
+            TestTableSQLString.get_test_details_by_test_id_sql[env_key].format('meta_data', test_id, student_id))[0][
+                              "meta_data"])
 
     @staticmethod
     def get_result_details_by_test_id_from_db(test_id, student_id):
         ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
         return json.loads(ms_sql_server.exec_query_return_dict_list(
-            TestTableSQLString.get_test_details_by_test_id_sql[env_key].format('status_detail', test_id, student_id))[0]["status_detail"])
+            TestTableSQLString.get_test_details_by_test_id_sql[env_key].format('status_detail', test_id, student_id))[
+                              0]["status_detail"])
 
     @staticmethod
     def get_paper_details_by_paper_id_from_db(paper_id):
@@ -112,7 +116,7 @@ class MockTestBFFService:
         graphql_body = {
             "operationName": "getTestResult",
             "variables": {"id": testid},
-            "query": "query getTestResult($id: ID!) {\n  test(id: $id) {\n id\n    score\n    title\n    totalScore\n    totalMinutes\n    completedDate\n    totalSecondsSpent\n    paper {\n      id\n      title\n      parts {\n        title\n        type\n        resources {\n          duration\n          id\n          mimeType\n          sha1\n          size\n          url\n          __typename\n        }\n        sections {\n          id\n          title\n          sectionScore\n          activities {\n            id\n            activityScore\n            activityData\n            questionResults {\n              id\n              key\n              currentAnswer\n              score\n              totalScore\n              isAnsweredCorrectly\n              __typename\n            }\n            __typename\n          }\n          __typename\n        }\n        __typename\n      }\n      questionCount\n      status\n      totalScore\n      __typename\n    }\n    remediations {\n      id\n      part\n      learnerVectorKey\n      statistic {\n        totalQuestionCount\n        correctlyAnsweredQuestionCount\n        __typename\n      }\n      activities {\n        id\n        activityScore\n        activityData\n        extra {\n          sectionKey\n          sectionName\n          sectionSequence\n          part\n          partName\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n"
+            "query": "query getTestResult($id: ID!) {\n  test(id: $id) {\n id\n    score\n    title\n    totalScore\n    totalMinutes\n    completedDate\n    totalSecondsSpent\n    paper {\n      id\n      title\n      parts {\n        title\n        type\n        resources {\n          duration\n          id\n          mimeType\n          sha1\n          size\n          url\n          __typename\n        }\n        sections {\n          id\n          title\n          sectionScore\n          activities {\n            id\n            activityScore\n            activityData\n            questionResults {\n              id\n              key\n              currentAnswer\n              score\n              totalScore\n              isAnsweredCorrectly\n              __typename\n            }\n            __typename\n          }\n          __typename\n        }\n        __typename\n      }\n      questionCount\n      status\n      totalScore\n      __typename\n    }\n    remediations {\n      id\n      part\n     statistic {\n        totalQuestionCount\n        correctlyAnsweredQuestionCount\n        __typename\n      }\n      activities {\n        id\n        activityScore\n        activityData\n        extra {\n          sectionKey\n          sectionName\n          sectionSequence\n          part\n          partName\n          __typename\n        }\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n"
         }
         return self.post_mt_graphql(graphql_body)
 
@@ -120,17 +124,17 @@ class MockTestBFFService:
         graphql_body = {
             "operationName": "getRemediation",
             "variables": {"testId": test_id, "part": part},
-            "query": "query getRemediation($testId: ID!, $part: Int!) {\n  remediation(testId: $testId, part: $part) {\n    id\n    part\n    learnerVectorKey\n    statistic {\n      totalQuestionCount\n      correctlyAnsweredQuestionCount\n      __typename\n    }\n    activities {\n      id\n      activityScore\n      activityData\n      extra {\n        sectionKey\n        sectionName\n        sectionSequence\n        part\n        partName\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n"
+            "query": "query getRemediation($testId: ID!, $part: Int!) {\n  remediation(testId: $testId, part: $part) {\n    id\n    part\n    statistic {\n      totalQuestionCount\n      correctlyAnsweredQuestionCount\n      __typename\n    }\n    activities {\n      id\n      activityScore\n      activityData\n      extra {\n        sectionKey\n        sectionName\n        sectionSequence\n        part\n        partName\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n"
         }
         return self.post_mt_graphql(graphql_body)
 
-    def submit_remediation_by_test_id(self, test_id, learner_vector_key, correct_answer_count, total_question_count, activities):
+    def submit_remediation_by_test_id(self, test_id, correct_answer_count, total_question_count, activities):
         graphql_body = {
             "operationName": "submitRemediationResult",
             "variables": {
-                "input": {"testId": test_id, "part": 2,
-                          "learnerVectorKey": learner_vector_key, "totalQuestionCount": total_question_count,
-                          "correctlyAnsweredQuestionCount": correct_answer_count, "activities": json.loads(activities)}},
+                "input": {"testId": test_id, "part": 2, "totalQuestionCount": total_question_count,
+                          "correctlyAnsweredQuestionCount": correct_answer_count,
+                          "activities": json.loads(activities)}},
             "query": "mutation submitRemediationResult($input: SubmitRemediationResultInput!) {\n  submitRemediationResult(input: $input) {\n    userErrors {\n      message\n      field\n      __typename\n    }\n    remediation {\n      testId\n      part\n      totalQuestionCount\n      correctlyAnsweredQuestionCount\n      __typename\n    }\n    __typename\n  }\n}\n"
         }
         return self.post_mt_graphql(graphql_body)
@@ -231,7 +235,8 @@ class MockTestBFFService:
             assert_that(jmespath.search("errors[0].message", mt_response.json()),
                         equal_to("java.lang.NullPointerException"))
         else:
-            assert_that(jmespath.search("data.submitTestResult.userErrors[0].message", mt_response.json()), equal_to("Test Not Found"))
+            assert_that(jmespath.search("data.submitTestResult.userErrors[0].message", mt_response.json()),
+                        equal_to("Test Not Found"))
 
     @staticmethod
     def check_get_invalid_remediation_structure(mt_response, invalid_part):
