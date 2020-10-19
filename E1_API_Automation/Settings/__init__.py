@@ -8,12 +8,14 @@ class Environment(object):
     STAGING_SG = "https://e1svc-staging.ef.com"
     LIVE_SG = "https://e1svc.ef.com"
 
+
 class KSDEnvironment(object):
     QA = "https://study-qa.ef.cn"
     STAGING = "https://study-staging.ef.cn"
     LIVE = "https://study.ef.cn"
     STAGING_SG = "https://study-staging.ef.com"
     LIVE_SG = "https://study.ef.com"
+
 
 class OSPEnvironment(object):
     QA = "https://internal-osp-qa.ef.cn"
@@ -95,6 +97,13 @@ class E1TPIEnvironment(object):
     LIVE = "https://e1tpi.ef.cn"
     LIVE_SG = "https://e1tpi.ef.com"
 
+
+class StudyPlanEnvironment(object):
+    QA = "https://internal-ktsvc-qa.ef.cn/study-plan"
+    STAGING = "https://internal-ktsvc-qa.ef.cn/study-plan"
+    LIVE = "https://internal-ktsvc-qa.ef.cn/study-plan"
+
+
 try:
     print(os.environ['environment'])
 except:
@@ -112,6 +121,7 @@ if os.environ['environment'] == 'QA':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
     COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.QA
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
+    STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     env_key = 'QA'
@@ -151,6 +161,7 @@ elif os.environ['environment'] == 'STG':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.STAGING
     COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.STAGING
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
+    STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
     env_key = 'Staging'
@@ -200,6 +211,7 @@ elif os.environ['environment'] == 'LIVE':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.LIVE
     COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.LIVE
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
+    STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
     env_key = 'Live'
