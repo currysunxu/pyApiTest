@@ -23,6 +23,9 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils i
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.BffData import ExpectedData
+from E1_API_Automation.Settings import MYSQL_MOCKTEST_DATABASE
+from E1_API_Automation.Lib.db_mysql import MYSQLHelper
+from E1_API_Automation.Test_Data.BffData import BffSQLString
 
 
 class Hf35BffUtils:
@@ -415,3 +418,10 @@ class Hf35BffUtils:
             key = word + ''.join(word_list)
             reader_attempt_dict[key] = item_value
         return reader_attempt_dict
+
+    @staticmethod
+    def get_study_plan_by_student_id_from_db(student_id, product_module, ref_content_path):
+        ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
+        return ms_sql_server.exec_query_return_dict_list(
+            BffSQLString.get_study_plan_by_student_id_sql[env_key].format(student_id, product_module,
+                                                                          ref_content_path))[0]
