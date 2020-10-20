@@ -354,10 +354,6 @@ class Hf35BffUtils:
         route = {}
         route['course'] = 'HIGH_FLYERS_35'
         route['regionAch'] = 'CN_3'
-        # route['treeRevision'] = word_attempt.tree_revision
-        # route['schemaVersion'] = word_attempt.schema_version
-        # route['courseContentId'] = word_attempt.course_content_id
-        # route['courseContentRevision'] = word_attempt.course_content_revision
         route['bookContentId'] = word_attempt.book_content_id
         route['bookContentRevision'] = word_attempt.book_content_revision
         route['unitContentId'] = word_attempt.unit_content_id

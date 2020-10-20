@@ -1,4 +1,5 @@
 import random
+import time
 import uuid
 
 import jmespath
@@ -16,6 +17,7 @@ from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroup
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
+from E1_API_Automation.Business.NGPlatform.StudyPlanEntity import StudyPlanEntity
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoCommonData import ContentRepoCommonData
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
     ContentRepoGroupType
