@@ -283,17 +283,17 @@ class HfBffTestBase:
             session_type += ch
         study_plan_entity.ref_props = {'sessionPurpose': session_purpose, 'totalAccuracy': str(random.randint(0, 100)),
                                        'sessionType': session_type}
-        study_plan_entity.effect_at = self.get_random_date(self,int(time.mktime(time.strptime(time.strftime("%Y-%m-%dT%H:%M"
+        study_plan_entity.effect_at = self.get_random_date(int(time.mktime(time.strptime(time.strftime("%Y-%m-%dT%H:%M"
                                                                                                        ":%S.%jZ",
                                                                                                        time.localtime()),
                                                                                          "%Y-%m-%dT%H:%M:%S.%jZ"))) - 2592000)
-        study_plan_entity.expire_at = self.get_random_date(self,int(time.mktime(time.strptime(study_plan_entity.effect_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))
+        study_plan_entity.expire_at = self.get_random_date(int(time.mktime(time.strptime(study_plan_entity.effect_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))
         tem = random.randint(0, 1)
         if tem == 0:
             study_plan_entity.start_at = None
             study_plan_entity.complete_at = None
         else:
-            study_plan_entity.start_at = self.get_random_date(self,int(time.mktime(time.strptime(time.strftime("%Y-%m-%dT%H:%M"
+            study_plan_entity.start_at = self.get_random_date(int(time.mktime(time.strptime(time.strftime("%Y-%m-%dT%H:%M"
                                                                                                        ":%S.%jZ",
                                                                                                        time.localtime()),
                                                                                          "%Y-%m-%dT%H:%M:%S.%jZ"))) - 2592000)
@@ -301,4 +301,4 @@ class HfBffTestBase:
             if tem1 == 0:
                 study_plan_entity.complete_at = None
             else:
-                study_plan_entity.complete_at = self.get_random_date(self,int(time.mktime(time.strptime(study_plan_entity.start_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))
+                study_plan_entity.complete_at = self.get_random_date(int(time.mktime(time.strptime(study_plan_entity.start_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))
