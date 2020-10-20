@@ -18,7 +18,7 @@ from E1_API_Automation.Business.HighFlyer35.Hf35BffActivityEntity import Hf35Bff
 from E1_API_Automation.Business.HighFlyer35.Hf35BffDetailsEntity import Hf35BffDetailsEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffAttemptEntity import Hf35BffAttemptEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity, \
-    Hf35BffWordAttemptDetailEntity
+    Hf35BffWordAttemptDetailEntity, Hf35BffWordActivitiesEntity
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import env_key
@@ -248,9 +248,31 @@ class Hf35BffUtils:
     @staticmethod
     def construct_word_attempts_dict(word_attempts):
         if word_attempts is not None:
-            word_attempt_dict_list = []
-            for i in range(len(word_attempts)):
-                word_attempt = word_attempts[i]
+            word_attempt_dict = {}
+            word_attempt_items = word_attempts.__dict__
+            for item_key in word_attempt_items.keys():
+                word_attempt_field_name = item_key[
+                                              len('_' + word_attempts.__class__.__name__ + '__'):]
+                item_value = word_attempt_items[item_key]
+
+                if word_attempt_field_name != 'activities':
+                    word_attempt_field_name = \
+                            LearningCommonUtils.convert_name_from_lower_case_to_camel_case(
+                                word_attempt_field_name)
+                    word_attempt_dict[word_attempt_field_name] = item_value
+                else:
+                    activities_dict = Hf35BffUtils.construct_word_attempt_activities(item_value)
+                    word_attempt_dict[word_attempt_field_name] = activities_dict
+            return word_attempt_dict
+        else:
+            return None
+
+    @staticmethod
+    def construct_word_attempt_activities(word_attempt_activities):
+        if word_attempt_activities is not None:
+            word_attempt_activities_list = []
+            for i in range(len(word_attempt_activities)):
+                word_attempt = word_attempt_activities[i]
                 word_attempt_dict = {}
                 word_attempt_items = word_attempt.__dict__
                 for item_key in word_attempt_items.keys():
@@ -266,10 +288,11 @@ class Hf35BffUtils:
                     else:
                         detail_dict = Hf35BffUtils.construct_word_attempt_detail(item_value)
                         word_attempt_dict[word_attempt_field_name] = detail_dict
-                word_attempt_dict_list.append(word_attempt_dict)
-            return word_attempt_dict_list
+                word_attempt_activities_list.append(word_attempt_dict)
+            return word_attempt_activities_list
         else:
             return None
+        return
 
     @staticmethod
     def construct_word_attempt_detail(word_attempt_detail):
@@ -286,36 +309,40 @@ class Hf35BffUtils:
         return word_attempt_detail_dict
 
     @staticmethod
-    def construct_vocab_progress_list(word_attempt_template, item_num=1):
-        word_attempt_list = []
+    def construct_vocab_progress_list(book_content_id, item_num=1):
+        random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
+        word_attempt_entity = Hf35BffWordAttemptEntity()
+        word_attempt_entity.context_content_path = "contextContentPath%s" % (random.randint(1, 10))
+        word_attempt_entity.context_lesson_content_id = str(uuid.uuid1())
+        word_attempt_entity.context_tree_revision = "TreeRevision%s" % (random.randint(1, 10))
+        word_attempt_entity.start_time = random_date_time
+        word_attempt_entity.end_time = random_date_time
+        word_attempt_activities_list = []
         for index in range(item_num):
-            word_attempt_entity = Hf35BffWordAttemptEntity(word_attempt_template.course_content_id,
-                                                           word_attempt_template.book_content_id)
-            word_attempt_entity.course_content_revision = "CourseContentRevision%s" % (random.randint(1, 100))
-            word_attempt_entity.book_content_revision = "BookContentRevision%s" % (random.randint(1, 100))
-            word_attempt_entity.unit_content_id = str(uuid.uuid1())
-            word_attempt_entity.unit_content_revision = "UnitContentRevision%s" % (random.randint(1, 100))
-            word_attempt_entity.word_content_id = str(uuid.uuid1())
-            word_attempt_entity.word_content_revision = "WordContentRevision%s" % (random.randint(1, 100))
-            word_attempt_entity.tree_revision = "TestRevision%s" % (random.randint(1, 10))
-            word_attempt_entity.schema_version = random.randint(1, 10)
-            word_attempt_entity.parent_content_path = "ParentContentPath%s" % (random.randint(1, 10))
+            word_attempt_activities_entity = Hf35BffWordActivitiesEntity()
+            word_attempt_activities_entity.book_content_id = book_content_id
+            word_attempt_activities_entity.book_content_revision = "BookContentRevision%s" % (random.randint(1, 100))
+            word_attempt_activities_entity.unit_content_id = str(uuid.uuid1())
+            word_attempt_activities_entity.unit_content_revision = "UnitContentRevision%s" % (random.randint(1, 100))
+            word_attempt_activities_entity.word_content_id = str(uuid.uuid1())
+            word_attempt_activities_entity.word_content_revision = "WordContentRevision%s" % (random.randint(1, 100))
+            word_attempt_activities_entity.parent_content_path = "parentContentPath%s" % (random.randint(1, 10))
 
-            random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
             word_attempt_detail_entity = Hf35BffWordAttemptDetailEntity()
             word_attempt_detail_entity.current_level = random.randint(1, 10)
             word_attempt_detail_entity.score = random.uniform(50, 100)
             word_attempt_detail_entity.last_study_at = random_date_time
 
-            word_attempt_entity.detail = word_attempt_detail_entity
+            word_attempt_activities_entity.detail = word_attempt_detail_entity
 
-            word_attempt_list.append(word_attempt_entity)
-        return word_attempt_list
+            word_attempt_activities_list.append(word_attempt_activities_entity)
+        word_attempt_entity.activities = word_attempt_activities_list
+        return word_attempt_entity
 
     @staticmethod
     def construct_expected_learning_result_by_word_attempt(learning_result_entity, word_attempt):
         business_keys = []
-        business_keys.append(word_attempt.course_content_id)
+        # business_keys.append(word_attempt.course_content_id)
         business_keys.append(word_attempt.book_content_id)
         business_keys.append(word_attempt.unit_content_id)
         business_keys.append(word_attempt.word_content_id)
@@ -324,10 +351,10 @@ class Hf35BffUtils:
         route = {}
         route['course'] = 'HIGH_FLYERS_35'
         route['regionAch'] = 'CN_3'
-        route['treeRevision'] = word_attempt.tree_revision
-        route['schemaVersion'] = word_attempt.schema_version
-        route['courseContentId'] = word_attempt.course_content_id
-        route['courseContentRevision'] = word_attempt.course_content_revision
+        # route['treeRevision'] = word_attempt.tree_revision
+        # route['schemaVersion'] = word_attempt.schema_version
+        # route['courseContentId'] = word_attempt.course_content_id
+        # route['courseContentRevision'] = word_attempt.course_content_revision
         route['bookContentId'] = word_attempt.book_content_id
         route['bookContentRevision'] = word_attempt.book_content_revision
         route['unitContentId'] = word_attempt.unit_content_id
