@@ -20,5 +20,7 @@ class HomeworkService:
 		return attempt_result
 
 	def get_vocab_progress(self, student_id, book_content_id):
-		api_url = '/api/v1/vocab/progress?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)
+		api_url = '/api/v1/students/{0}/progress?bookContentId={1}'.format(student_id, book_content_id)
+		host = str(self.host).replace('practice','vocab')
+		self.mou_tai = Moutai(host=host, headers={"Content-Type": "application/json;charset=UTF-8"})
 		return self.mou_tai.get(api_url)
