@@ -47,3 +47,7 @@ class ContentMapService:
             "regionAch": region_ach
         }
         return self.mou_tai.post("/admin/api/v1/trees/", insert_body)
+
+    def get_content_map(self, content_path):
+        api_url = '/api/v1/course-nodes?contentPath={0}&traverse=WITH_ANCESTORS'.format(content_path)
+        return self.mou_tai.get(api_url)

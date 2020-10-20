@@ -1,5 +1,6 @@
 
 import random
+import time
 import uuid
 
 import jmespath
@@ -17,6 +18,7 @@ from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroup
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
+from E1_API_Automation.Business.NGPlatform.StudyPlanEntity import StudyPlanEntity
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoCommonData import ContentRepoCommonData
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
     ContentRepoGroupType
@@ -762,3 +764,81 @@ class Hf35BffTest(HfBffTestBase):
     def test_empty_weekly_plan(self):
         weekly_plan = self.bff_service.get_weekly_plan("")
         assert_that(weekly_plan.status_code, equal_to(200))
+
+    @Test(tags="qa, stg, live")
+    def test_content_path_book(self):
+        test_path = "highflyers/cn-3/book-2/unit-1/assignment-1"
+        study_plan_entity = StudyPlanEntity(None, None, None)
+        self.setter_study_plan_entity(study_plan_entity, test_path, 0)
+        self.sp_service.put_study_plan_test_entity(study_plan_entity)
+        study_plan_path = study_plan_entity.ref_content_path
+        content_path = self.bff_service.get_content_path(study_plan_path)
+        assert_that(content_path.status_code, equal_to(200))
+        path = content_path.json()[0]
+        refProps = path['refProps']
+        student_id,product_module= path['studentId'],path['productModule']
+        content_map = self.cm_service.get_content_map(study_plan_path).json()
+        study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id,product_module,study_plan_path)
+        assert_that(path['refId'], equal_to(study_plan['ref_id']))
+        assert_that(path['effectAt'], equal_to(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+        assert_that(path['expireAt'], equal_to(study_plan['expire_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+        if path['startAt'] == None:
+            assert_that(path['startAt'], equal_to(study_plan['start_at']))
+        else:
+            assert_that(path['startAt'], equal_to(study_plan['start_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+        if path['completeAt'] == None:
+            assert_that(path['completeAt'], equal_to(study_plan['complete_at']))
+        else:
+            assert_that(path['completeAt'], equal_to(study_plan['complete_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+        assert_that(refProps['lessonTitle'], equal_to(content_map['title']))
+        assert_that(refProps['unitContentId'], equal_to(content_map['parent']['contentId']))
+        assert_that(refProps['unitTitle'], equal_to(content_map['parent']['title']))
+        assert_that(refProps['bookTitle'], equal_to(content_map['parent']['parent']['title']))
+
+
+
+    @Test(tags="qa, stg, live")
+    def test_content_path_unit(self):
+        test_path = "highflyers/cn-3/book-1/unit-3"
+        study_plan_entity = StudyPlanEntity(None, None, None)
+        self.setter_study_plan_entity(study_plan_entity, test_path, 1)
+        self.sp_service.put_study_plan_test_entity(study_plan_entity)
+        study_plan_path = study_plan_entity.ref_content_path
+        content_path = self.bff_service.get_content_path(study_plan_path)
+        assert_that(content_path.status_code, equal_to(200))
+        path = content_path.json()[0]
+        student_id,product_module= path['studentId'],path['productModule']
+        study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id,product_module,study_plan_path)
+        assert_that(path['refId'], equal_to(study_plan['ref_id']))
+        assert_that(path['effectAt'], equal_to(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+        assert_that(path['expireAt'], equal_to(study_plan['expire_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+        if path['startAt'] == None:
+            assert_that(path['startAt'], equal_to(study_plan['start_at']))
+        else:
+            assert_that(path['startAt'], equal_to(study_plan['start_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+        if path['completeAt'] == None:
+            assert_that(path['completeAt'], equal_to(study_plan['complete_at']))
+        else:
+            assert_that(path['completeAt'], equal_to(study_plan['complete_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+        assert_that(path['refProps'], equal_to(eval(study_plan['ref_props'])))
+
+    @Test(tags="qa, stg, live")
+    def test_content_state(self):
+        test_path = "highflyers/cn-3/book-2/unit-1/assignment-1"
+        study_plan_entity = StudyPlanEntity(None, None, None)
+        self.setter_study_plan_entity(study_plan_entity, test_path, 0)
+        self.sp_service.put_study_plan_test_entity(study_plan_entity)
+        study_plan_path = study_plan_entity.ref_content_path
+        content_path = self.bff_service.get_content_path(study_plan_path)
+        assert_that(content_path.status_code, equal_to(200))
+        path = content_path.json()[0]
+        if path['startAt'] is None:
+            if path['expireAt'] < time.strftime("%Y-%m-%dT%H:%M:%S.%jZ",time.localtime()):
+                assert_that(path['state'],equal_to("ABORTED"))
+            else:
+                assert_that(path['state'],equal_to("PLANNED"))
+        elif path['completeAt'] is None:
+            assert_that(path['state'],equal_to("INPROGRESS"))
+        else:
+            assert_that(path['state'],equal_to("COMPLETED"))
+
