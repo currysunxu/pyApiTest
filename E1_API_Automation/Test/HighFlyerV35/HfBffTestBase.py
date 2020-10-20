@@ -264,12 +264,15 @@ class HfBffTestBase:
         return t
 
 
-    def setter_study_plan_entity(self, study_plan_entity, content_path):
+    def setter_study_plan_entity(self, study_plan_entity, content_path, check_type):
         product_module = [1, 256, 512]
         study_plan_entity.student_id = 1071
         study_plan_entity.product = 2
-        study_plan_entity.product_module = product_module[random.randint(0, 2)]
-        study_plan_entity.ref_id = uuid.uuid4().__str__()
+        if check_type == 0:
+            study_plan_entity.product_module = product_module[random.randint(0, 2)]
+        else:
+            study_plan_entity.product_module = 16
+        study_plan_entity.ref_id = "c84b8137-0de5-4f8b-8a16-4ed6d576e063"
         study_plan_entity.ref_content_path = content_path
         ch = chr(random.randrange(ord('A'), ord('Z') + 1))
         session_purpose = ""
