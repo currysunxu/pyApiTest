@@ -645,6 +645,19 @@ class Hf35BffTest(HfBffTestBase):
             result_response = self.get_learning_result_response(learning_result_entity)
             assert_that(result_response.status_code, equal_to(200))
 
+            assert_that(result_response.json()[0]["product"], equal_to(learning_result_entity.product))
+            assert_that(result_response.json()[0]["productModule"], equal_to(learning_result_entity.product_module))
+            assert_that(int(result_response.json()[0]["studentKey"]), equal_to(int(learning_result_entity.student_key)))
+            assert_that(result_response.json()[0]["businessKey"], equal_to(learning_result_entity.business_key))
+            assert_that(result_response.json()[0]["route"], equal_to(learning_result_entity.route))
+            assert_that(result_response.json()[0]["details"][0]["activityKey"], expected_word_attempt.word_content_id)
+            assert_that(result_response.json()[0]["extension"], equal_to(learning_result_entity.extension))
+            # when submit vocab progress, it will return wordContentId and resultId pair
+            expected_learning_result_key = \
+                jmespath.search("[?wordContentId=='{0}'].resultId|[0]".format(expected_word_attempt.word_content_id),
+                                submit_response.json())
+            assert_that(result_response.json()[0]['resultKey'], equal_to(expected_learning_result_key))
+
     @Test(tags="qa, stg, live")
     def test_get_vocab_progress(self):
         book_content_id = str(uuid.uuid1())
