@@ -838,7 +838,7 @@ class Hf35BffTest(HfBffTestBase):
             else:
                 assert_that(path['state'],equal_to("PLANNED"))
         elif path['completeAt'] is None:
-            assert_that(path['state'],equal_to("IN PROGRESS"))
+            assert_that(path['state'],equal_to("INPROGRESS"))
         else:
             assert_that(path['state'],equal_to("COMPLETED"))
 
