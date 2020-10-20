@@ -769,7 +769,7 @@ class Hf35BffTest(HfBffTestBase):
     def test_content_path_book(self):
         test_path = "highflyers/cn-3/book-2/unit-1/assignment-1"
         study_plan_entity = StudyPlanEntity(None, None, None)
-        self.setter_study_plan_entity(study_plan_entity, test_path)
+        self.setter_study_plan_entity(study_plan_entity, test_path, 0)
         self.sp_service.put_study_plan_test_entity(study_plan_entity)
         study_plan_path = study_plan_entity.ref_content_path
         content_path = self.bff_service.get_content_path(study_plan_path)
@@ -801,7 +801,7 @@ class Hf35BffTest(HfBffTestBase):
     def test_content_path_unit(self):
         test_path = "highflyers/cn-3/book-1/unit-3"
         study_plan_entity = StudyPlanEntity(None, None, None)
-        self.setter_study_plan_entity(study_plan_entity, test_path)
+        self.setter_study_plan_entity(study_plan_entity, test_path, 1)
         self.sp_service.put_study_plan_test_entity(study_plan_entity)
         study_plan_path = study_plan_entity.ref_content_path
         content_path = self.bff_service.get_content_path(study_plan_path)
@@ -826,7 +826,7 @@ class Hf35BffTest(HfBffTestBase):
     def test_content_state(self):
         test_path = "highflyers/cn-3/book-2/unit-1/assignment-1"
         study_plan_entity = StudyPlanEntity(None, None, None)
-        self.setter_study_plan_entity(study_plan_entity, test_path)
+        self.setter_study_plan_entity(study_plan_entity, test_path, 0)
         self.sp_service.put_study_plan_test_entity(study_plan_entity)
         study_plan_path = study_plan_entity.ref_content_path
         content_path = self.bff_service.get_content_path(study_plan_path)
