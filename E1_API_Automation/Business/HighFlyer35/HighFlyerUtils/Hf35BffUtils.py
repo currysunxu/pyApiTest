@@ -379,7 +379,7 @@ class Hf35BffUtils:
         return expected_occontext
 
     @staticmethod
-    def construct_reader_attempt(reader_attempt_template, check_update='false'):
+    def construct_reader_attempt(reader_attempt_template, check_update='false', reader_type=3):
         reader_attempt_entity = Hf35BffReaderAttemptEntity(reader_attempt_template.relevant_content_id)
         random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
         reader_attempt_entity.end_time = random_date_time
@@ -388,7 +388,7 @@ class Hf35BffUtils:
         reader_attempt_entity.parent_content_path = "ParentContentPath%s" % (random.randint(1, 10))
         reader_attempt_entity.reader_content_id = str(uuid.uuid1())
         reader_attempt_entity.reader_content_revision = str(uuid.uuid1())
-        reader_attempt_entity.reader_type = str(random.randint(1, 3))
+        reader_attempt_entity.reader_type = reader_type
         reader_attempt_entity.reader_practice = random.choice(["read", "record", "quiz"])
         if reader_attempt_entity.reader_practice == "read":
             reader_attempt_entity.reader_progress = {"read": "true", "record": "false", "quiz": "false"}
