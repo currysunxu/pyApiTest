@@ -8,6 +8,7 @@ class AuthProduct(Enum):
     SSV3 = 'SSV3'
     FRV1 = 'FRV1'
     HFV3 = 'HFV3'
+    HF35 = 'HF35'
     GP = 'GP'
 
 
@@ -23,7 +24,8 @@ class AuthUsers:
             AuthProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             AuthProduct.SSV3.value: [{'username': 'ss3.cn.01', 'password': '12345'}],
             AuthProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
-            AuthProduct.HFV3.value: [{'username': 'hf3.cn.01', 'password': '12345'}]
+            AuthProduct.HF35.value: [{'username': 'hf3.cn.01', 'password': '12345'}],
+            AuthProduct.HFV3.value: [{'username': 'mt.gz02', 'password': '12345'}]
         },
         'Staging': {
             # For CN,if a highflyer user is Franchise, need to set the BusinessLineCode, otherwise, don't need to set,
