@@ -117,7 +117,7 @@ class StoryBlokTestCases:
         self.test_highflyers_release_by_scope(release_scope)
 
     # test highflyers release by release scope
-    @Test(data_provider=["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j", ])
+    @Test(data_provider=["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j"])
     def test_highflyers_release_by_scope(self, release_scope):
         print('release_scope:' + release_scope)
         storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
