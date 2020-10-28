@@ -91,6 +91,12 @@ class MockTestEnvironment(object):
     LIVE = "https://ktsvc.ef.cn/mseb"
 
 
+class StoryblokReleaseEnvironment(object):
+    QA = "https://internal-ktsvc-qa.ef.cn/storyblok-release"
+    STAGING = "https://internal-ktsvc-stg.ef.cn/storyblok-release"
+    LIVE = "https://internal-ktsvc.ef.cn/storyblok-release"
+
+
 class E1TPIEnvironment(object):
     STAGING = "https://e1tpi-staging.ef.cn"
     STAGING_SG = "https://e1tpi-staging.ef.com"
@@ -124,6 +130,7 @@ if os.environ['environment'] == 'QA':
     STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
+    STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -164,6 +171,7 @@ elif os.environ['environment'] == 'STG':
     STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
+    STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
@@ -214,6 +222,7 @@ elif os.environ['environment'] == 'LIVE':
     STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
+    STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",
