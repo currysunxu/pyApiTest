@@ -7,7 +7,7 @@ class StoryBlokService:
     def __init__(self, host):
         self.host = host
         headers = {"Content-Type": "application/json",
-                   "Authorization": "ZHgwkYfRXQPwgr51hpUsfwtt-42-xPGnwaVbXzZFi9Uuz_SY"}
+                   "Authorization": "9aF9jhvq4wbD2bM0xWbjcwtt-110-gNsaz2QyH_zhAsmzPhz_"}
         self.mou_tai = Moutai(host=self.host, headers=headers)
 
     def get_storyblok_stories(self, starts_with, page_number=1, page_size=25, published_at_start='', published_at_end=''):
