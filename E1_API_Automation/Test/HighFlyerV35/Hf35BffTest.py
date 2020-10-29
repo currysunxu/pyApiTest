@@ -73,7 +73,7 @@ class Hf35BffTest(HfBffTestBase):
             response = self.bff_service.login(user_name, password)
             assert_that(response.status_code, equal_to(200))
 
-            # only HFV2, HFV3Plus users can call bff apis, others can't
+            # only HFV2, HFV3Plus SSV3 users can call bff apis, others can't
             response = self.bff_service.get_bootstrap_controller('ios')
             if key in (BffProduct.HFV2.value, BffProduct.HFV3.value, BffProduct.HFV35.value):
                 assert_that(response.status_code, equal_to(200))
@@ -634,6 +634,8 @@ class Hf35BffTest(HfBffTestBase):
         learning_result_entity.product_module = LearningResultProductModule.VOCABULARY.value
         learning_result_entity.product = LearningResultProduct.HIGHFLYER.value
         learning_result_entity.student_key = int(self.customer_id)
+        learning_result_entity.business_key = word_attempt_list.context_lesson_content_id
+        Hf35BffUtils.construct_expected_learning_result_by_word_attempt(learning_result_entity,word_attempt_list)
 
         for i in range(len(word_attempt_list.activities)):
             expected_word_attempt = word_attempt_list.activities[i]
@@ -642,6 +644,15 @@ class Hf35BffTest(HfBffTestBase):
 
             result_response = self.get_learning_result_response(learning_result_entity)
             assert_that(result_response.status_code, equal_to(200))
+
+            assert_that(result_response.json()[0]["product"], equal_to(learning_result_entity.product))
+            assert_that(result_response.json()[0]["productModule"], equal_to(learning_result_entity.product_module))
+            assert_that(int(result_response.json()[0]["studentKey"]), equal_to(int(learning_result_entity.student_key)))
+            assert_that(result_response.json()[0]["businessKey"], equal_to(learning_result_entity.business_key))
+            assert_that(result_response.json()[0]["route"], equal_to(learning_result_entity.route))
+            assert_that(result_response.json()[0]["details"][0]["activityKey"], expected_word_attempt.word_content_id)
+            assert_that(result_response.json()[0]["details"][0]["extension"], learning_result_entity.details[0]['extension'])
+            assert_that(result_response.json()[0]['resultKey'], equal_to(submit_response.json()))
 
     @Test(tags="qa, stg, live")
     def test_get_vocab_progress(self):
@@ -760,26 +771,27 @@ class Hf35BffTest(HfBffTestBase):
         study_plan_path = study_plan_entity.ref_content_path
         content_path = self.bff_service.get_content_path(study_plan_path)
         assert_that(content_path.status_code, equal_to(200))
-        path = content_path.json()[0]
-        refProps = path['refProps']
-        student_id, product_module = path['studentId'], path['productModule']
-        content_map = self.cm_service.get_content_map(study_plan_path).json()
-        study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id, product_module, study_plan_path)
-        assert_that(path['refId'], equal_to(study_plan['ref_id']))
-        assert_that(path['effectAt'], equal_to(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-        assert_that(path['expireAt'], equal_to(study_plan['expire_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-        if path['startAt'] == None:
-            assert_that(path['startAt'], equal_to(study_plan['start_at']))
-        else:
-            assert_that(path['startAt'], equal_to(study_plan['start_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-        if path['completeAt'] == None:
-            assert_that(path['completeAt'], equal_to(study_plan['complete_at']))
-        else:
-            assert_that(path['completeAt'], equal_to(study_plan['complete_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-        assert_that(refProps['lessonTitle'], equal_to(content_map['title']))
-        assert_that(refProps['unitContentId'], equal_to(content_map['parent']['contentId']))
-        assert_that(refProps['unitTitle'], equal_to(content_map['parent']['title']))
-        assert_that(refProps['bookTitle'], equal_to(content_map['parent']['parent']['title']))
+        if env_key != 'Live':
+            path = content_path.json()[0]
+            refProps = path['refProps']
+            student_id, product_module = path['studentId'], path['productModule']
+            content_map = self.cm_service.get_content_map(study_plan_path).json()
+            study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id, product_module, study_plan_path)
+            assert_that(path['refId'], equal_to(study_plan['ref_id']))
+            assert_that(path['effectAt'], equal_to(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            assert_that(path['expireAt'], equal_to(study_plan['expire_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            if path['startAt'] == None:
+                assert_that(path['startAt'], equal_to(study_plan['start_at']))
+            else:
+                assert_that(path['startAt'], equal_to(study_plan['start_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            if path['completeAt'] == None:
+                assert_that(path['completeAt'], equal_to(study_plan['complete_at']))
+            else:
+                assert_that(path['completeAt'], equal_to(study_plan['complete_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            assert_that(refProps['lessonTitle'], equal_to(content_map['title']))
+            assert_that(refProps['unitContentId'], equal_to(content_map['parent']['contentId']))
+            assert_that(refProps['unitTitle'], equal_to(content_map['parent']['title']))
+            assert_that(refProps['bookTitle'], equal_to(content_map['parent']['parent']['title']))
 
     @Test(tags="qa, stg, live")
     def test_content_path_unit(self):
@@ -790,21 +802,22 @@ class Hf35BffTest(HfBffTestBase):
         study_plan_path = study_plan_entity.ref_content_path
         content_path = self.bff_service.get_content_path(study_plan_path)
         assert_that(content_path.status_code, equal_to(200))
-        path = content_path.json()[0]
-        student_id, product_module = path['studentId'], path['productModule']
-        study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id, product_module, study_plan_path)
-        assert_that(path['refId'], equal_to(study_plan['ref_id']))
-        assert_that(path['effectAt'], equal_to(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-        assert_that(path['expireAt'], equal_to(study_plan['expire_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-        if path['startAt'] == None:
-            assert_that(path['startAt'], equal_to(study_plan['start_at']))
-        else:
-            assert_that(path['startAt'], equal_to(study_plan['start_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-        if path['completeAt'] == None:
-            assert_that(path['completeAt'], equal_to(study_plan['complete_at']))
-        else:
-            assert_that(path['completeAt'], equal_to(study_plan['complete_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-        assert_that(path['refProps'], equal_to(eval(study_plan['ref_props'])))
+        if env_key != 'Live':
+            path = content_path.json()[0]
+            student_id, product_module = path['studentId'], path['productModule']
+            study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id, product_module, study_plan_path)
+            assert_that(path['refId'], equal_to(study_plan['ref_id']))
+            assert_that(path['effectAt'], equal_to(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            assert_that(path['expireAt'], equal_to(study_plan['expire_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            if path['startAt'] == None:
+                assert_that(path['startAt'], equal_to(study_plan['start_at']))
+            else:
+                assert_that(path['startAt'], equal_to(study_plan['start_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            if path['completeAt'] == None:
+                assert_that(path['completeAt'], equal_to(study_plan['complete_at']))
+            else:
+                assert_that(path['completeAt'], equal_to(study_plan['complete_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
+            assert_that(path['refProps'], equal_to(eval(study_plan['ref_props'])))
 
     @Test(tags="qa, stg, live")
     def test_content_state(self):
@@ -815,13 +828,32 @@ class Hf35BffTest(HfBffTestBase):
         study_plan_path = study_plan_entity.ref_content_path
         content_path = self.bff_service.get_content_path(study_plan_path)
         assert_that(content_path.status_code, equal_to(200))
-        path = content_path.json()[0]
-        if path['startAt'] is None:
-            if path['expireAt'] < time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime()):
-                assert_that(path['state'], equal_to("ABORTED"))
+        if env_key != 'Live':
+            path = content_path.json()[0]
+            if path['startAt'] is None:
+                if path['expireAt'] < time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime()):
+                    assert_that(path['state'], equal_to("ABORTED"))
+                else:
+                    assert_that(path['state'], equal_to("PLANNED"))
+            elif path['completeAt'] is None:
+                assert_that(path['state'], equal_to("INPROGRESS"))
             else:
-                assert_that(path['state'], equal_to("PLANNED"))
-        elif path['completeAt'] is None:
-            assert_that(path['state'], equal_to("INPROGRESS"))
+                assert_that(path['state'], equal_to("COMPLETED"))
+
+    @Test(tags="qa, stg,live",data_provider=["unit","lesson"])
+    def test_content_path_rewards(self,level):
+        if level == 'unit':
+            test_path = "highflyers/cn-3/book-2/unit-6"
         else:
-            assert_that(path['state'], equal_to("COMPLETED"))
+            test_path = "highflyers/cn-3/book-2/unit-6/assignment-%s" % (random.randint(1, 10))
+        total_rewards = self.bff_service.get_rewards_by_content_path(test_path)
+        customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+        assert_that(total_rewards.status_code, equal_to(200))
+        if env_key != 'Live':
+            completed_study_plan = Hf35BffUtils.get_count_completed_study_plan_by_student_id_from_db(customer_id, test_path)
+            assert_that(total_rewards.json(), equal_to(completed_study_plan))
+
+    @Test(tags="qa, stg, live")
+    def negative_test_empty_content_path_rewards(self):
+        total_rewards = self.bff_service.get_rewards_by_content_path("")
+        assert_that(total_rewards.status_code, equal_to(400))

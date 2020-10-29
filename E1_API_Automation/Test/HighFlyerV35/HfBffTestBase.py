@@ -263,10 +263,9 @@ class HfBffTestBase:
         t = datetime.datetime.strftime(t, "%Y-%m-%dT%H:%M:%S.%jZ")
         return t
 
-
     def setter_study_plan_entity(self, study_plan_entity, content_path, check_type):
-        product_module = [1, 256, 512]
-        study_plan_entity.student_id = 1071
+        product_module = [1, 128, 256, 512]
+        study_plan_entity.student_id = self.omni_service.get_customer_id(self.user_name, self.password)
         study_plan_entity.product = 2
         if check_type == 0:
             study_plan_entity.product_module = product_module[random.randint(0, 2)]
