@@ -73,7 +73,7 @@ class Hf35BffTest(HfBffTestBase):
             response = self.bff_service.login(user_name, password)
             assert_that(response.status_code, equal_to(200))
 
-            # only HFV2, HFV3Plus SSV3 users can call bff apis, others can't
+            # only HFV2, HFV3Plus users can call bff apis, others can't
             response = self.bff_service.get_bootstrap_controller('ios')
             if key in (BffProduct.HFV2.value, BffProduct.HFV3.value, BffProduct.HFV35.value):
                 assert_that(response.status_code, equal_to(200))
