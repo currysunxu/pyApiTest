@@ -173,5 +173,9 @@ class Hf35BffService:
         api_url = '/mega/api/v1/plans?contentPath={0}'.format(content_path)
         return self.mou_tai.get(api_url)
 
+    def get_rewards_by_content_path(self, content_path):
+        api_url = '/mega/api/v1/rewards/earned-stamps?contentPath={0}'.format(content_path)
+        return self.mou_tai.get(api_url)
+
 
 

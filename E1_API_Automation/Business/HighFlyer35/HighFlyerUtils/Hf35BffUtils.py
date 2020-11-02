@@ -344,30 +344,23 @@ class Hf35BffUtils:
 
     @staticmethod
     def construct_expected_learning_result_by_word_attempt(learning_result_entity, word_attempt):
-        business_keys = []
-        # business_keys.append(word_attempt.course_content_id)
-        business_keys.append(word_attempt.book_content_id)
-        business_keys.append(word_attempt.unit_content_id)
-        business_keys.append(word_attempt.word_content_id)
-        learning_result_entity.business_key = '|'.join(business_keys)
+        if (hasattr(word_attempt , 'context_tree_revision')):
+            route = {}
+            route['contextTreeRevision'] = word_attempt.context_tree_revision
+            route['contextContentPath'] = word_attempt.context_content_path
+            learning_result_entity.route = route
 
-        route = {}
-        route['course'] = 'HIGH_FLYERS_35'
-        route['regionAch'] = 'CN_3'
-        route['bookContentId'] = word_attempt.book_content_id
-        route['bookContentRevision'] = word_attempt.book_content_revision
-        route['unitContentId'] = word_attempt.unit_content_id
-        route['unitContentRevision'] = word_attempt.unit_content_revision
-        route['wordContentId'] = word_attempt.word_content_id
-        route['wordContentRevision'] = word_attempt.word_content_revision
-        route['parentContentPath'] = word_attempt.parent_content_path
-        learning_result_entity.route = route
-
-        extension = {}
-        extension['currentLevel'] = word_attempt.detail.current_level
-        extension['score'] = word_attempt.detail.score
-        extension['lastStudyAt'] = word_attempt.detail.last_study_at
-        learning_result_entity.extension = extension
+        if (hasattr(word_attempt, 'parent_content_path')):
+            extension = {
+                    "extension": {
+                    "currentLevel": word_attempt.detail.current_level,
+                    "parentContentPath": word_attempt.parent_content_path,
+                    "unitContentId": word_attempt.unit_content_id,
+                    "lastStudyAt": word_attempt.detail.last_study_at,
+                    "unitContentRevision": word_attempt.unit_content_revision
+                }
+            }
+            learning_result_entity.details = [extension]
 
     @staticmethod
     def get_expected_occontext(platform):
@@ -421,3 +414,10 @@ class Hf35BffUtils:
         return ms_sql_server.exec_query_return_dict_list(
             BffSQLString.get_study_plan_by_student_id_sql[env_key].format(student_id, product_module,
                                                                           ref_content_path))[0]
+
+    @staticmethod
+    def get_count_completed_study_plan_by_student_id_from_db(student_id, ref_content_path):
+        ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
+        return ms_sql_server.exec_query_return_dict_list(
+            BffSQLString.get_count_completed_study_plan_by_student_id_content_path_sql[env_key].format(student_id,
+                                                                                                       ref_content_path))[0]['count(*)']
