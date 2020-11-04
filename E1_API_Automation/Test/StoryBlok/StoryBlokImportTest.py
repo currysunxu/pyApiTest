@@ -1,4 +1,6 @@
 import tkinter as tk
+
+import jmespath
 from PIL import Image
 import io
 from tkinter import messagebox
@@ -14,18 +16,10 @@ import re
 
 @TestClass()
 class StoryBlokImportTestCases:
+    def __init__(self):
+        self.vocab_root = "Vocabularies"
+        self.env_name = "Oneapp"
 
-    @Test(tags="qa")
-    def reader_or_vocab(self):
-        reader_box = tk.messagebox.askyesno(title='Check reader or vocab',
-                                            message='Choose Yes if you want to test reader, No if you want to test '
-                                                    'vocab')
-        if reader_box:
-            return "reader"
-        else:
-            return "vocab"
-
-    @Test(tags="qa")
     def get_zip_file(self):
         zip_name = askopenfilename()
         if '.zip' not in zip_name:
@@ -34,32 +28,27 @@ class StoryBlokImportTestCases:
         zip_file = zipfile.ZipFile(zip_name, 'r')
         return zip_file
 
-    @Test(tags="qa")
-    def get_vocab_folder_id(self, vocab_path):
-        story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
-        all_folder = story_blok_service.get_all_asset_folder().json()
-        for parent_folder in all_folder["asset_folders"]:
-            if parent_folder["name"] == "Vocabularies" and parent_folder["parent_id"] is None:
-                parent_id = parent_folder["id"]
+    def get_vocab_folder_id(self, vocab_path, all_folder):
+        parent_id = jmespath.search("asset_folders[?name == '{}'].id".format(self.vocab_root), all_folder)[0]
         for path in vocab_path:
-            for parent_folder in all_folder["asset_folders"]:
-                if parent_folder["parent_id"] == parent_id and parent_folder["name"] == path:
-                    parent_id = parent_folder["id"]
+            path_id = jmespath.search("asset_folders[?name == '{0}' && parent_id == `{1}`].id".format(path, parent_id), all_folder)[0]
+            parent_id = path_id
         return parent_id
 
-    @Test(tags="qa")
     def get_asset(self, asset_name, asset_folder_id):
         story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
-        new_asset_name = story_blok_service.get_asset(asset_name).json()
-        for each_asset in new_asset_name["assets"]:
-            if each_asset["asset_folder_id"] == asset_folder_id:
-                return each_asset
-        return None
+        new_asset_name = story_blok_service.get_asset('Oneapp', asset_name).json()
+        asset = jmespath.search("assets[?asset_folder_id == `{0}`] | [0]".format(asset_folder_id), new_asset_name)
+        return asset
 
     @Test(tags="qa")
     def check_vocab_asset(self):
-        zip_file = self.get_zip_file()
-        image_root = zip_file.namelist()[0]
+        error_message = []
+        story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
+        all_folder = story_blok_service.get_all_asset_folder(self.env_name).json()
+        zip_file = self.get_zip_file(self)
+        self.namelist_ = zip_file.namelist()[0]
+        image_root = self.namelist_
         image_root = image_root.strip("/")
         for excel_name in zip_file.namelist():
             if '.xlsx' not in excel_name:
@@ -70,25 +59,37 @@ class StoryBlokImportTestCases:
         nrows = excel_table.nrows
         for i in range(1, nrows):
             row_data = excel_table.row_values(i)
-            image_path = row_data[5]
-            audio_path = row_data[6]
+            image_path = row_data[5]  # column 6 is used to stored the image path of a vocab
+            audio_path = row_data[6]  # column 7 is used to stored the audio path of a vocab
             image_asset_lower = image_path.split('/')[-1]
             image_asset_lower = re.sub(r'\W', "-", image_asset_lower.rsplit('.', 1)[0]) + "." + \
                                 image_asset_lower.rsplit('.', 1)[1]
             audio_asset_lower = audio_path.split('/')[-1]
             audio_asset_lower = re.sub(r'\W', "-", audio_asset_lower.rsplit('.', 1)[0]) + "." + \
                                 audio_asset_lower.rsplit('.', 1)[1]
-            image_folder_id = self.get_vocab_folder_id(image_path.split('/')[1:-1])
-            audio_folder_id = self.get_vocab_folder_id(audio_path.split('/')[1:-1])
-            image_asset = self.get_asset(image_asset_lower, image_folder_id)
-            audio_asset = self.get_asset(audio_asset_lower, audio_folder_id)
-            assert_that(image_asset is not None)
-            assert_that(audio_asset is not None)
-            assert_that(image_asset["title"], equal_to("/Vocabularies" + image_path))
-            assert_that(audio_asset["title"], equal_to("/Vocabularies" + audio_path))
-            image_name = image_root + image_path
-            with zip_file.open(image_name, mode='r') as image_file:
-                content = image_file.read()
-                image_size_check = Image.open(io.BytesIO(bytearray(content)))
-            assert_that(str(image_size_check.width) in image_asset["filename"])
-            assert_that(str(image_size_check.height) in image_asset["filename"])
+            image_folder_id = self.get_vocab_folder_id(self, image_path.split('/')[1:-1], all_folder)
+            audio_folder_id = self.get_vocab_folder_id(self, audio_path.split('/')[1:-1], all_folder)
+            image_asset = self.get_asset(self, image_asset_lower, image_folder_id)
+            audio_asset = self.get_asset(self, audio_asset_lower, audio_folder_id)
+            if image_asset is None:
+                error_message.append("The image at row {0} is not exist".format(i+1))
+            elif image_asset["title"] != ("/" + self.vocab_root + image_path):
+                error_message.append("The title is not correct for the image at row {0}".format(i+1))
+            else:
+                image_name = image_root + image_path
+                with zip_file.open(image_name, mode='r') as image_file:
+                    content = image_file.read()
+                    image_size_check = Image.open(io.BytesIO(bytearray(content)))
+                image_size = str(image_size_check.height) + "x" + str(image_size_check.width)
+                if str(image_size) not in image_asset["filename"]:
+                    error_message.append("The image size is not correct at row {0}".format(i+1))
+            if audio_asset is None:
+                error_message.append("The audio at row {0} is not exist".format(i+1))
+            elif audio_asset["title"] != ("/" + self.vocab_root + audio_path):
+                error_message.append("The title is not correct for the audio at row {0}".format(i+1))
+
+
+if __name__ == '__main__':
+    test = StoryBlokImportTestCases
+    test.__init__(test)
+    error_message_vocab = test.check_vocab_asset(test)

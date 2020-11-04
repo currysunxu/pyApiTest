@@ -53,10 +53,12 @@ class StoryBlokService:
     def get_storyblok_vocab_configs(self, book_release_scope):
         return self.get_storyblok_configs(book_release_scope, 'vocab_config')
 
-    def get_all_asset_folder(self):
-        api_url = "/v1/spaces/187/asset_folders/"
+    def get_all_asset_folder(self, env_name):
+        env = StoryBlokData.StoryBlokEnv[env_name]
+        api_url = "/v1/spaces/{0}/asset_folders/".format(env)
         return self.mou_tai.get(api_url)
 
-    def get_asset(self, asset_name):
-        api_url = "/v1/spaces/187/assets?search={0}".format(asset_name)
+    def get_asset(self, env_name, asset_name):
+        env = StoryBlokData.StoryBlokEnv[env_name]
+        api_url = "/v1/spaces/{0}/assets?search={1}".format(env, asset_name)
         return self.mou_tai.get(api_url)
