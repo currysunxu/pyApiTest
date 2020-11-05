@@ -109,11 +109,14 @@ class StudyPlanEnvironment(object):
     STAGING = "https://internal-ktsvc-qa.ef.cn/study-plan"
     LIVE = "https://internal-ktsvc-qa.ef.cn/study-plan"
 
+class LearningProfileEnvironment(object):
+    STAGING = "https://e1-evc-booking-integration-stg.ef.com"
+    LIVE = "https://e1-evc-booking-integration.ef.com"
 
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'QA'
+    os.environ['environment'] = 'LIVE'
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
@@ -172,6 +175,7 @@ elif os.environ['environment'] == 'STG':
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.STAGING
+    LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
@@ -223,6 +227,7 @@ elif os.environ['environment'] == 'LIVE':
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.LIVE
+    LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",
