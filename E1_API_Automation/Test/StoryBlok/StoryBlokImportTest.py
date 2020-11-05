@@ -7,14 +7,13 @@ from ptest.decorator import TestClass, Test
 from tkinter.filedialog import askopenfilename
 import xlrd
 import zipfile
-from hamcrest import assert_that, equal_to
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData
 import re
 
 
 @TestClass()
-class StoryBlokImportTestCases:
+class StoryBlokImportCheckTool:
     def __init__(self):
         self.vocab_root = "Vocabularies"
         self.env_name = "Oneapp"
@@ -72,15 +71,14 @@ class StoryBlokImportTestCases:
         elif asset["title"] != ("/" + self.vocab_root + path):
             error_message.append("The title is not correct for the {0} at row {1}".format(imagetype, row + 1))
         elif imagetype == "Image":
-            with zip_file.open(name, mode='r') as audio_file:
-                content = audio_file.read()
+            with zip_file.open(name, mode='r') as image_file:
+                content = image_file.read()
             image_size_check = Image.open(io.BytesIO(bytearray(content)))
             image_size = str(image_size_check.height) + "x" + str(image_size_check.width)
             if str(image_size) not in asset["filename"]:
                 error_message.append("The image size is not correct at row {0}".format(row + 1))
         return error_message
 
-    @Test(tags="qa")
     def check_vocab_asset(self):
         error_message = []
         story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
@@ -129,7 +127,7 @@ class StoryBlokImportTestCases:
         return error_message
 
 if __name__ == '__main__':
-    test = StoryBlokImportTestCases
+    test = StoryBlokImportCheckTool
     test.__init__(test)
     test.get_env(test)
     error_message_vocab = test.check_vocab_asset(test)
