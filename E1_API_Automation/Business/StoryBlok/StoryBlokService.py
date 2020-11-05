@@ -10,7 +10,8 @@ class StoryBlokService:
                    "Authorization": "9aF9jhvq4wbD2bM0xWbjcwtt-110-gNsaz2QyH_zhAsmzPhz_"}
         self.mou_tai = Moutai(host=self.host, headers=headers)
 
-    def get_storyblok_stories(self, starts_with, page_number=1, page_size=25, published_at_start='', published_at_end=''):
+    def get_storyblok_stories(self, starts_with, page_number=1, page_size=25, published_at_start='',
+                              published_at_end=''):
         api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         # api_version = StoryBlokUtils.get_storyblok_version_by_env()
         api_version = StoryBlokVersion.PUBLISHED.value
@@ -19,7 +20,8 @@ class StoryBlokService:
         return self.mou_tai.get(api_url)
 
     def get_storyblok_readers(self, page_number=1, page_size=25, published_at_start='', published_at_end=''):
-        return self.get_storyblok_stories('readers/content', page_number, page_size, published_at_start, published_at_end)
+        return self.get_storyblok_stories('readers/content', page_number, page_size, published_at_start,
+                                          published_at_end)
 
     def get_storyblok_reader_levels(self):
         api_token = StoryBlokData.StoryBlokAPIKey[env_key]
@@ -50,3 +52,13 @@ class StoryBlokService:
 
     def get_storyblok_vocab_configs(self, book_release_scope):
         return self.get_storyblok_configs(book_release_scope, 'vocab_config')
+
+    def get_all_asset_folder(self, env_name):
+        env = StoryBlokData.StoryBlokEnv[env_name]
+        api_url = "/v1/spaces/{0}/asset_folders/".format(env)
+        return self.mou_tai.get(api_url)
+
+    def get_asset(self, env_name, asset_name):
+        env = StoryBlokData.StoryBlokEnv[env_name]
+        api_url = "/v1/spaces/{0}/assets?search={1}".format(env, asset_name)
+        return self.mou_tai.get(api_url)

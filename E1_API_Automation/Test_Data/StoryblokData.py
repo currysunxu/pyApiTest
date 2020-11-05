@@ -22,3 +22,8 @@ class StoryBlokData:
         'Staging': 'yFrA18ZTbgK3VkHv0pyk9gtt',
         'Live': '3dm4HVQWmuA7ASgkKixgYQtt'
     }
+
+    StoryBlokEnv = {
+        'Oneapp': '187',
+        'Dev': '215'
+    }
