@@ -63,6 +63,23 @@ class StoryBlokImportTestCases:
         b3.grid(row=2, column=1, padx=2, pady=10)
         self.mywindow.mainloop()
 
+    def asset_check(self, asset, imagetype, zip_file, name, row, path):
+        error_message = []
+        if name not in zip_file.namelist():
+            error_message.append("The {0} at row {1} is not in the zip file".format(imagetype, row + 1))
+        elif not asset:
+            error_message.append("The {0} at row {1} is not exist in the storyblok but it is in the zip file".format(imagetype, row + 1))
+        elif asset["title"] != ("/" + self.vocab_root + path):
+            error_message.append("The title is not correct for the {0} at row {1}".format(imagetype, row + 1))
+        elif imagetype == "Image":
+            with zip_file.open(name, mode='r') as audio_file:
+                content = audio_file.read()
+            image_size_check = Image.open(io.BytesIO(bytearray(content)))
+            image_size = str(image_size_check.height) + "x" + str(image_size_check.width)
+            if str(image_size) not in asset["filename"]:
+                error_message.append("The image size is not correct at row {0}".format(row + 1))
+        return error_message
+
     @Test(tags="qa")
     def check_vocab_asset(self):
         error_message = []
@@ -107,31 +124,8 @@ class StoryBlokImportTestCases:
             audio_asset = self.get_asset(self, audio_asset_lower, audio_folder_id)
             image_name = image_root + image_path
             audio_name = image_root + audio_path
-            if not image_asset:
-                with zip_file.open(image_name, mode='r') as image_file:
-                    content = image_file.read()
-                    if content is None:
-                        error_message.append("The image at row {0} is not in the zip file".format(i + 1))
-                    else:
-                        error_message.append("The image at row {0} is not exist".format(i+1))
-            elif image_asset["title"] != ("/" + self.vocab_root + image_path):
-                error_message.append("The title is not correct for the image at row {0}".format(i+1))
-            else:
-                with zip_file.open(image_name, mode='r') as image_file:
-                    content = image_file.read()
-                    image_size_check = Image.open(io.BytesIO(bytearray(content)))
-                image_size = str(image_size_check.height) + "x" + str(image_size_check.width)
-                if str(image_size) not in image_asset["filename"]:
-                    error_message.append("The image size is not correct at row {0}".format(i+1))
-            if not audio_asset:
-                with zip_file.open(audio_name, mode='r') as audio_file:
-                    content = audio_file.read()
-                    if content is None:
-                        error_message.append("The audio at row {0} is not in the zip file".format(i + 1))
-                    else:
-                        error_message.append("The audio at row {0} is not exist".format(i + 1))
-            elif audio_asset["title"] != ("/" + self.vocab_root + audio_path):
-                error_message.append("The title is not correct for the audio at row {0}".format(i+1))
+            error_message.extend(self.asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path))
+            error_message.extend(self.asset_check(self, audio_asset, "Audio", zip_file, audio_name, i, audio_path))
         return error_message
 
 if __name__ == '__main__':
