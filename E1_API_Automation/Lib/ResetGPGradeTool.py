@@ -7,20 +7,19 @@ from ..Test_Data.GPData import EducationRegion, ShanghaiGradeKey, MoscowGradeKey
 
 class ResetGPGradeTool:
     if E1_API_Automation.Settings.env_key == 'QA':
-        tool_url = 'http://10.163.28.80:12505'
+        tool_url = 'http://10.163.24.164:12505'
         search_url = tool_url + '/User/UserSource/QA?rand=0.14291181323741897&PageId=0'
         reset_url = tool_url + '/User/SaveStudentProfile?userKey=%s&rand=0.17256526783407744&PageId=0'
 
     elif E1_API_Automation.Settings.env_key == 'Staging':
-        tool_url = 'http://10.163.28.80:12505'
+        tool_url = 'http://10.163.24.164:12505'
         search_url = tool_url + '/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
         reset_url = tool_url + '/User/SaveStudentProfile/STAGING-CN?userKey=%s&rand=0.17256526783407744&PageId=0'
 
     elif E1_API_Automation.Settings.env_key == 'Staging_SG':
-        tool_url = 'http://10.163.28.80:12505'
+        tool_url = 'http://10.163.24.164:12505'
         search_url = tool_url + '/User/UserSource/STAGING?rand=0.14291181323741897&PageId=0'
         reset_url = tool_url + '/User/SaveStudentProfile/STAGING-SG?userKey=%s&rand=0.17256526783407744&PageId=0'
-
 
     elif E1_API_Automation.Settings.env_key == 'Live':
         search_url = 'https://pssportal.ef.cn/User/UserSource/PROD?rand=0.9001314632136694&PageId=0'
@@ -32,7 +31,7 @@ class ResetGPGradeTool:
         reset_url = 'https://pssportal.ef.cn/User/SaveStudentProfile/PROD-SG?userKey=%s&rand=0.36498686749677756&PageId=0'
         tool_url = 'https://pssportal.ef.cn'
 
-    login_user = ("qa.testauto@ef.com", "test@456")
+    login_user = ("edtech.testcn@ef.cn", "efef@111")
 
     def __init__(self):
         self.cookie = self.login(self.login_user[0], self.login_user[1])

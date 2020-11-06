@@ -95,6 +95,13 @@ class E1TPIEnvironment(object):
     LIVE = "https://e1tpi.ef.cn"
     LIVE_SG = "https://e1tpi.ef.com"
 
+class StudentProgressServiceWSDL(object):
+    QA = "http://schoolservices-qa.ef.cn/StudentProgressService.svc?wsdl"
+    STAGING = "http://internal-schoolservices-staging.ef.cn/SchoolCourseService.svc?wsdl"
+    STAGING_SG = "http://internal-schoolservices-staging.ef.com/SchoolCourseService.svc?wsdl"
+    LIVE = "http://internal-schoolservices.ef.cn/SchoolCourseService.svc?wsdl"
+    LIVE_SG = "http://internal-schoolservices.ef.com/SchoolCourseService.svc?wsdl"
+
 try:
     print(os.environ['environment'])
 except:
@@ -114,6 +121,7 @@ if os.environ['environment'] == 'QA':
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
+    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -153,6 +161,7 @@ elif os.environ['environment'] == 'STG':
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
+    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
@@ -179,6 +188,7 @@ elif os.environ['environment'] == 'STG_SG':
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING_SG
     OMNI_ENVIRONMENT = OMNIEnvironment.STAGING_SG
     E1TPI_ENVIRONMENT = E1TPIEnvironment.STAGING_SG
+    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.STAGING_SG
     env_key = 'Staging_SG'
     DATABASE = {
         "Server": "SGE1STGDB01.e1ef.com,1434",
@@ -202,6 +212,7 @@ elif os.environ['environment'] == 'LIVE':
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
+    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",
@@ -222,6 +233,7 @@ elif os.environ['environment'] == 'LIVE_SG':
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE_SG
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
     E1TPI_ENVIRONMENT = E1TPIEnvironment.LIVE_SG
+    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.LIVE_SG
     env_key = 'Live_SG'
     DATABASE = {
         "Server": "",
