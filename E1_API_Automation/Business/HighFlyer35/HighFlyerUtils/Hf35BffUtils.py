@@ -18,11 +18,14 @@ from E1_API_Automation.Business.HighFlyer35.Hf35BffActivityEntity import Hf35Bff
 from E1_API_Automation.Business.HighFlyer35.Hf35BffDetailsEntity import Hf35BffDetailsEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffAttemptEntity import Hf35BffAttemptEntity
 from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity, \
-    Hf35BffWordAttemptDetailEntity
+    Hf35BffWordAttemptDetailEntity, Hf35BffWordActivitiesEntity
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.BffData import ExpectedData
+from E1_API_Automation.Settings import MYSQL_MOCKTEST_DATABASE
+from E1_API_Automation.Lib.db_mysql import MYSQLHelper
+from E1_API_Automation.Test_Data.BffData import BffSQLString
 
 
 class Hf35BffUtils:
@@ -248,9 +251,31 @@ class Hf35BffUtils:
     @staticmethod
     def construct_word_attempts_dict(word_attempts):
         if word_attempts is not None:
-            word_attempt_dict_list = []
-            for i in range(len(word_attempts)):
-                word_attempt = word_attempts[i]
+            word_attempt_dict = {}
+            word_attempt_items = word_attempts.__dict__
+            for item_key in word_attempt_items.keys():
+                word_attempt_field_name = item_key[
+                                              len('_' + word_attempts.__class__.__name__ + '__'):]
+                item_value = word_attempt_items[item_key]
+
+                if word_attempt_field_name != 'activities':
+                    word_attempt_field_name = \
+                            LearningCommonUtils.convert_name_from_lower_case_to_camel_case(
+                                word_attempt_field_name)
+                    word_attempt_dict[word_attempt_field_name] = item_value
+                else:
+                    activities_dict = Hf35BffUtils.construct_word_attempt_activities(item_value)
+                    word_attempt_dict[word_attempt_field_name] = activities_dict
+            return word_attempt_dict
+        else:
+            return None
+
+    @staticmethod
+    def construct_word_attempt_activities(word_attempt_activities):
+        if word_attempt_activities is not None:
+            word_attempt_activities_list = []
+            for i in range(len(word_attempt_activities)):
+                word_attempt = word_attempt_activities[i]
                 word_attempt_dict = {}
                 word_attempt_items = word_attempt.__dict__
                 for item_key in word_attempt_items.keys():
@@ -266,10 +291,11 @@ class Hf35BffUtils:
                     else:
                         detail_dict = Hf35BffUtils.construct_word_attempt_detail(item_value)
                         word_attempt_dict[word_attempt_field_name] = detail_dict
-                word_attempt_dict_list.append(word_attempt_dict)
-            return word_attempt_dict_list
+                word_attempt_activities_list.append(word_attempt_dict)
+            return word_attempt_activities_list
         else:
             return None
+        return
 
     @staticmethod
     def construct_word_attempt_detail(word_attempt_detail):
@@ -286,62 +312,55 @@ class Hf35BffUtils:
         return word_attempt_detail_dict
 
     @staticmethod
-    def construct_vocab_progress_list(word_attempt_template, item_num=1):
-        word_attempt_list = []
+    def construct_vocab_progress_list(book_content_id, item_num=1):
+        random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
+        word_attempt_entity = Hf35BffWordAttemptEntity()
+        word_attempt_entity.context_content_path = "contextContentPath%s" % (random.randint(1, 10))
+        word_attempt_entity.context_lesson_content_id = str(uuid.uuid1())
+        word_attempt_entity.context_tree_revision = "TreeRevision%s" % (random.randint(1, 10))
+        word_attempt_entity.start_time = random_date_time
+        word_attempt_entity.end_time = random_date_time
+        word_attempt_activities_list = []
         for index in range(item_num):
-            word_attempt_entity = Hf35BffWordAttemptEntity(word_attempt_template.course_content_id,
-                                                           word_attempt_template.book_content_id)
-            word_attempt_entity.course_content_revision = "CourseContentRevision%s" % (random.randint(1, 100))
-            word_attempt_entity.book_content_revision = "BookContentRevision%s" % (random.randint(1, 100))
-            word_attempt_entity.unit_content_id = str(uuid.uuid1())
-            word_attempt_entity.unit_content_revision = "UnitContentRevision%s" % (random.randint(1, 100))
-            word_attempt_entity.word_content_id = str(uuid.uuid1())
-            word_attempt_entity.word_content_revision = "WordContentRevision%s" % (random.randint(1, 100))
-            word_attempt_entity.tree_revision = "TestRevision%s" % (random.randint(1, 10))
-            word_attempt_entity.schema_version = random.randint(1, 10)
-            word_attempt_entity.parent_content_path = "ParentContentPath%s" % (random.randint(1, 10))
+            word_attempt_activities_entity = Hf35BffWordActivitiesEntity()
+            word_attempt_activities_entity.book_content_id = book_content_id
+            word_attempt_activities_entity.book_content_revision = "BookContentRevision%s" % (random.randint(1, 100))
+            word_attempt_activities_entity.unit_content_id = str(uuid.uuid1())
+            word_attempt_activities_entity.unit_content_revision = "UnitContentRevision%s" % (random.randint(1, 100))
+            word_attempt_activities_entity.word_content_id = str(uuid.uuid1())
+            word_attempt_activities_entity.word_content_revision = "WordContentRevision%s" % (random.randint(1, 100))
+            word_attempt_activities_entity.parent_content_path = "parentContentPath%s" % (random.randint(1, 10))
 
-            random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
             word_attempt_detail_entity = Hf35BffWordAttemptDetailEntity()
             word_attempt_detail_entity.current_level = random.randint(1, 10)
             word_attempt_detail_entity.score = random.uniform(50, 100)
             word_attempt_detail_entity.last_study_at = random_date_time
 
-            word_attempt_entity.detail = word_attempt_detail_entity
+            word_attempt_activities_entity.detail = word_attempt_detail_entity
 
-            word_attempt_list.append(word_attempt_entity)
-        return word_attempt_list
+            word_attempt_activities_list.append(word_attempt_activities_entity)
+        word_attempt_entity.activities = word_attempt_activities_list
+        return word_attempt_entity
 
     @staticmethod
     def construct_expected_learning_result_by_word_attempt(learning_result_entity, word_attempt):
-        business_keys = []
-        business_keys.append(word_attempt.course_content_id)
-        business_keys.append(word_attempt.book_content_id)
-        business_keys.append(word_attempt.unit_content_id)
-        business_keys.append(word_attempt.word_content_id)
-        learning_result_entity.business_key = '|'.join(business_keys)
+        if (hasattr(word_attempt , 'context_tree_revision')):
+            route = {}
+            route['contextTreeRevision'] = word_attempt.context_tree_revision
+            route['contextContentPath'] = word_attempt.context_content_path
+            learning_result_entity.route = route
 
-        route = {}
-        route['course'] = 'HIGH_FLYERS_35'
-        route['regionAch'] = 'CN_3'
-        route['treeRevision'] = word_attempt.tree_revision
-        route['schemaVersion'] = word_attempt.schema_version
-        route['courseContentId'] = word_attempt.course_content_id
-        route['courseContentRevision'] = word_attempt.course_content_revision
-        route['bookContentId'] = word_attempt.book_content_id
-        route['bookContentRevision'] = word_attempt.book_content_revision
-        route['unitContentId'] = word_attempt.unit_content_id
-        route['unitContentRevision'] = word_attempt.unit_content_revision
-        route['wordContentId'] = word_attempt.word_content_id
-        route['wordContentRevision'] = word_attempt.word_content_revision
-        route['parentContentPath'] = word_attempt.parent_content_path
-        learning_result_entity.route = route
-
-        extension = {}
-        extension['currentLevel'] = word_attempt.detail.current_level
-        extension['score'] = word_attempt.detail.score
-        extension['lastStudyAt'] = word_attempt.detail.last_study_at
-        learning_result_entity.extension = extension
+        if (hasattr(word_attempt, 'parent_content_path')):
+            extension = {
+                    "extension": {
+                    "currentLevel": word_attempt.detail.current_level,
+                    "parentContentPath": word_attempt.parent_content_path,
+                    "unitContentId": word_attempt.unit_content_id,
+                    "lastStudyAt": word_attempt.detail.last_study_at,
+                    "unitContentRevision": word_attempt.unit_content_revision
+                }
+            }
+            learning_result_entity.details = [extension]
 
     @staticmethod
     def get_expected_occontext(platform):
@@ -353,7 +372,7 @@ class Hf35BffUtils:
         return expected_occontext
 
     @staticmethod
-    def construct_reader_attempt(reader_attempt_template, check_update='false'):
+    def construct_reader_attempt(reader_attempt_template, check_update='false', reader_type=3):
         reader_attempt_entity = Hf35BffReaderAttemptEntity(reader_attempt_template.relevant_content_id)
         random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
         reader_attempt_entity.end_time = random_date_time
@@ -362,7 +381,7 @@ class Hf35BffUtils:
         reader_attempt_entity.parent_content_path = "ParentContentPath%s" % (random.randint(1, 10))
         reader_attempt_entity.reader_content_id = str(uuid.uuid1())
         reader_attempt_entity.reader_content_revision = str(uuid.uuid1())
-        reader_attempt_entity.reader_type = str(random.randint(1, 3))
+        reader_attempt_entity.reader_type = reader_type
         reader_attempt_entity.reader_practice = random.choice(["read", "record", "quiz"])
         if reader_attempt_entity.reader_practice == "read":
             reader_attempt_entity.reader_progress = {"read": "true", "record": "false", "quiz": "false"}
@@ -388,3 +407,17 @@ class Hf35BffUtils:
             key = word + ''.join(word_list)
             reader_attempt_dict[key] = item_value
         return reader_attempt_dict
+
+    @staticmethod
+    def get_study_plan_by_student_id_from_db(student_id, product_module, ref_content_path):
+        ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
+        return ms_sql_server.exec_query_return_dict_list(
+            BffSQLString.get_study_plan_by_student_id_sql[env_key].format(student_id, product_module,
+                                                                          ref_content_path))[0]
+
+    @staticmethod
+    def get_count_completed_study_plan_by_student_id_from_db(student_id, ref_content_path):
+        ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
+        return ms_sql_server.exec_query_return_dict_list(
+            BffSQLString.get_count_completed_study_plan_by_student_id_content_path_sql[env_key].format(student_id,
+                                                                                                       ref_content_path))[0]['count(*)']

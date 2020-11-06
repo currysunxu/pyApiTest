@@ -1,34 +1,72 @@
 
 class Hf35BffWordAttemptEntity:
-    def __init__(self, course_content_id, book_content_id):
-        self.__course_content_id = course_content_id
-        self.__course_content_revision = None
-        self.__book_content_id = book_content_id
+    def __init__(self):
+        self.__context_tree_revision = None
+        self.__context_content_path = None
+        self.__context_lesson_content_id = None
+        self.__start_time = None
+        self.__end_time = None
+        self.__activities = None
+
+    @property
+    def context_tree_revision(self):
+        return self.__context_tree_revision
+
+    @context_tree_revision.setter
+    def context_tree_revision(self, context_tree_revision):
+        self.__context_tree_revision = context_tree_revision
+
+    @property
+    def context_content_path(self):
+        return self.__context_content_path
+
+    @context_content_path.setter
+    def context_content_path(self, context_content_path):
+        self.__context_content_path = context_content_path
+
+    @property
+    def context_lesson_content_id(self):
+        return self.__context_lesson_content_id
+
+    @context_lesson_content_id.setter
+    def context_lesson_content_id(self, context_lesson_content_id):
+        self.__context_lesson_content_id = context_lesson_content_id
+
+    @property
+    def start_time(self):
+        return self.__start_time
+
+    @start_time.setter
+    def start_time(self, start_time):
+        self.__start_time = start_time
+
+    @property
+    def end_time(self):
+        return self.__end_time
+
+    @end_time.setter
+    def end_time(self, end_time):
+        self.__end_time = end_time
+
+    @property
+    def activities(self):
+        return self.__activities
+
+    @activities.setter
+    def activities(self, activities):
+        self.__activities = activities
+
+
+class Hf35BffWordActivitiesEntity:
+    def __init__(self):
+        self.__parent_content_path = None
+        self.__book_content_id = None
         self.__book_content_revision = None
         self.__unit_content_id = None
         self.__unit_content_revision = None
         self.__word_content_id = None
         self.__word_content_revision = None
-        self.__tree_revision = None
-        self.__schema_version = None
-        self.__parent_content_path = None
         self.__detail = None
-
-    @property
-    def course_content_id(self):
-        return self.__course_content_id
-
-    @course_content_id.setter
-    def course_content_id(self, course_content_id):
-        self.__course_content_id = course_content_id
-
-    @property
-    def course_content_revision(self):
-        return self.__course_content_revision
-
-    @course_content_revision.setter
-    def course_content_revision(self, course_content_revision):
-        self.__course_content_revision = course_content_revision
 
     @property
     def book_content_id(self):
@@ -77,22 +115,6 @@ class Hf35BffWordAttemptEntity:
     @word_content_revision.setter
     def word_content_revision(self, word_content_revision):
         self.__word_content_revision = word_content_revision
-
-    @property
-    def tree_revision(self):
-        return self.__tree_revision
-
-    @tree_revision.setter
-    def tree_revision(self, tree_revision):
-        self.__tree_revision = tree_revision
-
-    @property
-    def schema_version(self):
-        return self.__schema_version
-
-    @schema_version.setter
-    def schema_version(self, schema_version):
-        self.__schema_version = schema_version
 
     @property
     def parent_content_path(self):

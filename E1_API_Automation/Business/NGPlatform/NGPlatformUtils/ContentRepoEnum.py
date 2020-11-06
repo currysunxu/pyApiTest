@@ -11,3 +11,4 @@ class ContentRepoContentType(Enum):
     TypeHomework = 'HOMEWORK'
     TypeHandout = 'HANDOUT'
     TypeVocab = 'VOCAB'
+    TypeReader = 'READER'

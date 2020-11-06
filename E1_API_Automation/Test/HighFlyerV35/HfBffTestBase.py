@@ -1,11 +1,14 @@
 import datetime
-
+import time
+import random
 import jmespath
 from hamcrest import assert_that, equal_to
+import uuid
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapService
+from E1_API_Automation.Business.NGPlatform.StudyPlanService import StudyPlanService
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningResultProduct, \
@@ -17,11 +20,16 @@ from ptest.decorator import BeforeMethod
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
 
 
+
+
+
 class HfBffTestBase:
 
     @BeforeMethod()
     def setup(self):
         self.bff_service = Hf35BffService(BFF_ENVIRONMENT)
+        self.cm_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+        self.sp_service = StudyPlanService(STUDY_TIME_ENVIRONMENT)
         self.key = BffProduct.HFV35.value
         self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
         self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
@@ -110,7 +118,7 @@ class HfBffTestBase:
         learning_plan_entity.end_time = bff_data_obj.get_attempt_body()["endTimeUtc"]
         # Todo need to refactor dynamicly for groupId after add corresponding api in Homework Service
         learning_plan_entity.route = "treeRevision=%s|%s" % (
-        bff_data_obj.get_attempt_body()["treeRevision"], "groupId=null")
+            bff_data_obj.get_attempt_body()["treeRevision"], "groupId=null")
 
     def setter_learning_result(self, learning_result_entity, bff_data_obj):
         """set all fields in learning_result_entity
@@ -246,3 +254,53 @@ class HfBffTestBase:
                                                                  level_focused_json)
                 break
         return current_level_id, current_level_content_revision
+
+    def get_random_date(self, earliest):
+        start_time = earliest
+        end_time = start_time + 5184000
+        t = random.randint(int(start_time), int(end_time))
+        t = datetime.datetime.fromtimestamp(t)
+        t = datetime.datetime.strftime(t, "%Y-%m-%dT%H:%M:%S.%jZ")
+        return t
+
+    def setter_study_plan_entity(self, study_plan_entity, content_path, check_type):
+        product_module = [1, 128, 256, 512]
+        study_plan_entity.student_id = self.omni_service.get_customer_id(self.user_name, self.password)
+        study_plan_entity.product = 2
+        if check_type == 0:
+            study_plan_entity.product_module = product_module[random.randint(0, 2)]
+        else:
+            study_plan_entity.product_module = 16
+        study_plan_entity.ref_id = "c84b8137-0de5-4f8b-8a16-4ed6d576e063"
+        study_plan_entity.ref_content_path = content_path
+        ch = chr(random.randrange(ord('A'), ord('Z') + 1))
+        session_purpose = ""
+        session_purpose += ch
+        for i in range(8):
+            ch = chr(random.randrange(ord('a'), ord('z') + 1))
+            session_purpose += ch
+        session_type = ""
+        for i in range(6):
+            ch = chr(random.randrange(ord('A'), ord('Z') + 1))
+            session_type += ch
+        study_plan_entity.ref_props = {'sessionPurpose': session_purpose, 'totalAccuracy': str(random.randint(0, 100)),
+                                       'sessionType': session_type}
+        study_plan_entity.effect_at = self.get_random_date(int(time.mktime(time.strptime(time.strftime("%Y-%m-%dT%H:%M"
+                                                                                                       ":%S.%jZ",
+                                                                                                       time.localtime()),
+                                                                                         "%Y-%m-%dT%H:%M:%S.%jZ"))) - 2592000)
+        study_plan_entity.expire_at = self.get_random_date(int(time.mktime(time.strptime(study_plan_entity.effect_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))
+        tem = random.randint(0, 1)
+        if tem == 0:
+            study_plan_entity.start_at = None
+            study_plan_entity.complete_at = None
+        else:
+            study_plan_entity.start_at = self.get_random_date(int(time.mktime(time.strptime(time.strftime("%Y-%m-%dT%H:%M"
+                                                                                                       ":%S.%jZ",
+                                                                                                       time.localtime()),
+                                                                                         "%Y-%m-%dT%H:%M:%S.%jZ"))) - 2592000)
+            tem1 = random.randint(0, 1)
+            if tem1 == 0:
+                study_plan_entity.complete_at = None
+            else:
+                study_plan_entity.complete_at = self.get_random_date(int(time.mktime(time.strptime(study_plan_entity.start_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))

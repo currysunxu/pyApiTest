@@ -1,6 +1,6 @@
 
 class ContentMapQueryEntity:
-    def __init__(self, course_name, schema_version, child_types=None, content_id=None, region_ach=None, tree_revision=None):
+    def __init__(self, course_name, schema_version='1', child_types=None, content_id=None, region_ach=None, tree_revision=None):
         self.__course_name = course_name
         self.__schema_version = schema_version
         self.__child_types = child_types

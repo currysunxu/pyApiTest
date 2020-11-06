@@ -8,12 +8,14 @@ class Environment(object):
     STAGING_SG = "https://e1svc-staging.ef.com"
     LIVE_SG = "https://e1svc.ef.com"
 
+
 class KSDEnvironment(object):
     QA = "https://study-qa.ef.cn"
     STAGING = "https://study-staging.ef.cn"
     LIVE = "https://study.ef.cn"
     STAGING_SG = "https://study-staging.ef.com"
     LIVE_SG = "https://study.ef.com"
+
 
 class OSPEnvironment(object):
     QA = "https://internal-osp-qa.ef.cn"
@@ -89,23 +91,32 @@ class MockTestEnvironment(object):
     LIVE = "https://ktsvc.ef.cn/mseb"
 
 
+class StoryblokReleaseEnvironment(object):
+    QA = "https://internal-ktsvc-qa.ef.cn/storyblok-release"
+    STAGING = "https://internal-ktsvc-stg.ef.cn/storyblok-release"
+    LIVE = "https://internal-ktsvc.ef.cn/storyblok-release"
+
+
 class E1TPIEnvironment(object):
     STAGING = "https://e1tpi-staging.ef.cn"
     STAGING_SG = "https://e1tpi-staging.ef.com"
     LIVE = "https://e1tpi.ef.cn"
     LIVE_SG = "https://e1tpi.ef.com"
 
-class StudentProgressServiceWSDL(object):
-    QA = "http://schoolservices-qa.ef.cn/StudentProgressService.svc?wsdl"
-    STAGING = "http://internal-schoolservices-staging.ef.cn/SchoolCourseService.svc?wsdl"
-    STAGING_SG = "http://internal-schoolservices-staging.ef.com/SchoolCourseService.svc?wsdl"
-    LIVE = "http://internal-schoolservices.ef.cn/SchoolCourseService.svc?wsdl"
-    LIVE_SG = "http://internal-schoolservices.ef.com/SchoolCourseService.svc?wsdl"
+
+class StudyPlanEnvironment(object):
+    QA = "https://internal-ktsvc-qa.ef.cn/study-plan"
+    STAGING = "https://internal-ktsvc-qa.ef.cn/study-plan"
+    LIVE = "https://internal-ktsvc-qa.ef.cn/study-plan"
+
+class LearningProfileEnvironment(object):
+    STAGING = "https://e1-evc-booking-integration-stg.ef.com"
+    LIVE = "https://e1-evc-booking-integration.ef.com"
 
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'QA'
+    os.environ['environment'] = 'LIVE'
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
@@ -119,9 +130,10 @@ if os.environ['environment'] == 'QA':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.QA
     COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.QA
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
+    STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
-    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.QA
+    STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -159,9 +171,11 @@ elif os.environ['environment'] == 'STG':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.STAGING
     COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.STAGING
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
+    STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
-    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.STAGING
+    STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.STAGING
+    LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "CNE1STGDB01.e1ef.com,1434",
@@ -188,7 +202,6 @@ elif os.environ['environment'] == 'STG_SG':
     AUTH_ENVIRONMENT = AuthEnvironment.STAGING_SG
     OMNI_ENVIRONMENT = OMNIEnvironment.STAGING_SG
     E1TPI_ENVIRONMENT = E1TPIEnvironment.STAGING_SG
-    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.STAGING_SG
     env_key = 'Staging_SG'
     DATABASE = {
         "Server": "SGE1STGDB01.e1ef.com,1434",
@@ -210,9 +223,11 @@ elif os.environ['environment'] == 'LIVE':
     HOMEWORK_ENVIRONMENT = HomeworkEnvironment.LIVE
     COURSE_GROUP_ENVIRONMENT = CourseGroupEnvironment.LIVE
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
+    STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
-    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.LIVE
+    STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.LIVE
+    LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",
@@ -233,7 +248,6 @@ elif os.environ['environment'] == 'LIVE_SG':
     AUTH_ENVIRONMENT = AuthEnvironment.LIVE_SG
     OMNI_ENVIRONMENT = OMNIEnvironment.LIVE
     E1TPI_ENVIRONMENT = E1TPIEnvironment.LIVE_SG
-    StudentProgressServiceWSDL_ENVIRONMENT = StudentProgressServiceWSDL.LIVE_SG
     env_key = 'Live_SG'
     DATABASE = {
         "Server": "",
