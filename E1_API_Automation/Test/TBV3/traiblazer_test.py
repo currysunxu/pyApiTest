@@ -186,7 +186,7 @@ class TBTestCases(TraiblazerBaseClass):
     @Test(tags="qa, stg, live")
     def test_get_resource(self):
         response = self.tb_test.get_all_books()
-        resource_id = str(response.json()[0]['Body']['thumbnail']['image']).split('//')[1]
+        resource_id = str(response.json()[1]['Body']['thumbnail']['image']).split('//')[1]
         result = self.tb_test.get_resource(resource_id)
         assert_that(result.status_code == 200)
 

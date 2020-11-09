@@ -73,17 +73,18 @@ class Hf35BffTest(HfBffTestBase):
             response = self.bff_service.login(user_name, password)
             assert_that(response.status_code, equal_to(200))
 
-            # only HFV2, HFV3Plus users can call bff apis, others can't
+            # only HFV2, HFV3Plus users' contentscope is Standard, other products, return ONLINE_CLASS
             response = self.bff_service.get_bootstrap_controller('ios')
             if key in (BffProduct.HFV2.value, BffProduct.HFV3.value, BffProduct.HFV35.value):
                 assert_that(response.status_code, equal_to(200))
                 assert_that(response.json(), match_to("provision"))
-                assert_that(response.json(), match_to("userContext.availableBooks"))
-                assert_that(response.json(), match_to("userContext.currentBook"))
+                assert_that(response.json(), exit("userContext.availableBooks"))
+                assert_that(response.json(), exit("userContext.currentBook"))
+                assert_that(jmespath.search('userContext.contentScope', response.json()) == "STANDARD")
             else:
-                assert_that(response.status_code, equal_to(401))
-                assert_that((response.json()['error'] == "Unauthorized"))
-                assert_that((response.json()['message'] == "Unauthorized program."))
+                assert_that(response.status_code, equal_to(200))
+                assert_that(jmespath.search('userContext.contentScope',response.json()) == "ONLINE_CLASS")
+
 
     @Test(tags="qa, stg, live", data_provider=["noToken"])
     def test_submit_new_attempt_without_auth_token(self, negative_para):
