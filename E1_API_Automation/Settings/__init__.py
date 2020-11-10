@@ -85,6 +85,12 @@ class ContentRepoEnvironment(object):
     LIVE = "https://internal-ktsvc.ef.cn/content-repo"
 
 
+class ContentBuilderEnvironment(object):
+    QA = "https://internal-ktsvc-qa.ef.cn/content-builder"
+    STAGING = "https://internal-ktsvc-stg.ef.cn/content-builder"
+    LIVE = "https://internal-ktsvc.ef.cn/content-builder"
+
+
 class MockTestEnvironment(object):
     QA = "https://ktsvc-qa.ef.cn/mseb"
     STAGING = "https://ktsvc-stg.ef.cn/mseb"
@@ -132,6 +138,7 @@ if os.environ['environment'] == 'QA':
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.QA
     STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.QA
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.QA
+    CONTENT_BUILDER_ENVIRONMENT = ContentBuilderEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
     env_key = 'QA'
@@ -173,6 +180,7 @@ elif os.environ['environment'] == 'STG':
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.STAGING
     STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.STAGING
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.STAGING
+    CONTENT_BUILDER_ENVIRONMENT = ContentBuilderEnvironment.STAGING
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.STAGING
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.STAGING
@@ -225,6 +233,7 @@ elif os.environ['environment'] == 'LIVE':
     CONTENT_MAP_ENVIRONMENT = ContentMapEnvironment.LIVE
     STUDY_TIME_ENVIRONMENT = StudyPlanEnvironment.LIVE
     CONTENT_REPO_ENVIRONMENT = ContentRepoEnvironment.LIVE
+    CONTENT_BUILDER_ENVIRONMENT = ContentBuilderEnvironment.LIVE
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.LIVE
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.LIVE
