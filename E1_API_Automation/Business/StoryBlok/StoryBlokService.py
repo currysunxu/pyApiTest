@@ -15,7 +15,7 @@ class StoryBlokService:
         api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         # api_version = StoryBlokUtils.get_storyblok_version_by_env()
         api_version = StoryBlokVersion.PUBLISHED.value
-        api_url = "/v1/cdn/stories?token={0}&starts_with={1}&version={2}&sort_by=id&page={3}&per_page={4}&published_at_gt={5}&published_at_lt={6}".format(
+        api_url = "/v1/cdn/stories?token={0}&starts_with={1}&version={2}&sort_by=published_at&page={3}&per_page={4}&published_at_gt={5}&published_at_lt={6}".format(
             api_token, starts_with, api_version, page_number, page_size, published_at_start, published_at_end)
         return self.mou_tai.get(api_url)
 

@@ -1,3 +1,6 @@
+from datetime import datetime
+from datetime import timedelta
+
 import jmespath
 from ptest.decorator import TestClass, Test
 
@@ -58,13 +61,22 @@ class StoryBlokTestCases:
     def test_storyblok_release(self, release_type):
         storyblok_release_service = StoryBlokReleaseService(STORYBLOK_RELEASE_ENVIRONMENT)
 
+        date_time_format = '%Y-%m-%d %H:%M:%S'
         # storyblok release support incremental release, so, need to find out increased stories from last completed release time
         release_history_response = storyblok_release_service.get_storyblok_release_history(release_type.value)
         release_history_list = jmespath.search('releaseHistory[?status==\'COMPLETED\']',
                                                release_history_response.json())
         expected_release_revision = release_history_list[0]['releaseRevision']
         if len(release_history_list) >= 2:
-            published_at_start_date = release_history_list[1]['startAt']
+            # published_at_start_date = release_history_list[1]['startAt']
+            published_at_start_date = release_history_list[1]['maxContentTime']
+            if published_at_start_date is None:
+                published_at_start_date = '1970-01-01'
+            else:
+                # published_at will start from 1 seconds later than the last maxContentTime
+                published_at_start_date = datetime.strptime(published_at_start_date, date_time_format)
+                published_at_start_date = (published_at_start_date + timedelta(seconds=1)).strftime(date_time_format)
+
             published_at_end_date = release_history_list[0]['startAt']
         else:
             published_at_start_date = ''
@@ -73,6 +85,7 @@ class StoryBlokTestCases:
         storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
         page_number = 1
         page_size = 100
+        total_count = 0
         while True:
             if release_type == StoryblokReleaseProgram.READERS:
                 get_storyblok_stories_response = storyblok_service.get_storyblok_readers(page_number, page_size,
@@ -96,12 +109,13 @@ class StoryBlokTestCases:
             error_message = StoryBlokUtils.verify_storyblok_stories(storyblok_story_list, latest_eca_response.json(),
                                                                     expected_release_revision)
             assert_that(error_message == '', error_message)
-
+            total_count = total_count + len(storyblok_story_list)
             # if content fetched list less than page_size, then end the loop
             if len(storyblok_story_list) < page_size:
                 break
             else:
                 page_number = page_number + 1
+        print('-------------verified total number is:{0}-----------------'.format(str(total_count)))
         return expected_release_revision
 
     # test the latest highflyer release
