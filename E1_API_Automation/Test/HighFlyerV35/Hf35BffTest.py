@@ -30,6 +30,8 @@ from E1_API_Automation.Lib.HamcrestMatcher import match_to
 from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
+from E1_API_Automation.Lib.HamcrestExister import Exist
+
 
 
 @TestClass()
@@ -78,9 +80,12 @@ class Hf35BffTest(HfBffTestBase):
             if key in (BffProduct.HFV2.value, BffProduct.HFV3.value, BffProduct.HFV35.value):
                 assert_that(response.status_code, equal_to(200))
                 assert_that(response.json(), match_to("provision"))
-                assert_that(response.json(), exit("userContext.availableBooks"))
-                assert_that(response.json(), exit("userContext.currentBook"))
+                assert_that(response.json(), Exist("userContext.availableBooks"))
+                assert_that(response.json(), Exist("userContext.currentBook"))
                 assert_that(jmespath.search('userContext.contentScope', response.json()) == "STANDARD")
+            elif key == BffProduct.SSV3.value:
+                assert_that(response.status_code, equal_to(200))
+                assert_that(jmespath.search('userContext.contentScope',response.json()) == "LITE")
             else:
                 assert_that(response.status_code, equal_to(200))
                 assert_that(jmespath.search('userContext.contentScope',response.json()) == "ONLINE_CLASS")
