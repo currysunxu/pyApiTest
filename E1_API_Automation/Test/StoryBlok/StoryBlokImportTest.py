@@ -84,7 +84,6 @@ class StoryBlokImportCheckTool:
         return error_message
 
     def convert_asset_name(self, asset_name):
-        print(asset_name)
         if len(asset_name.rsplit('.', 1)) == 2:
             asset_name = re.sub(r'\W', "-", asset_name.rsplit('.', 1)[0]).rstrip('-') + "." + asset_name.rsplit('.', 1)[1]
             new_asset_name = [""]
@@ -201,7 +200,6 @@ class StoryBlokImportCheckTool:
                 image_name = image_root + image_path
                 error_message.extend(self.reader_asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path))
             elif page_number:
-                print(page_number)
                 if last_page_number != page_number:
                     image_path = row_data[4]
                     image_asset_lower = self.convert_asset_name(self, image_path.split('/')[-1])
