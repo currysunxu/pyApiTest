@@ -72,7 +72,7 @@ class StoryBlokImportCheckTool:
             error_message.append("The {0} at row {1} is not in the zip file".format(imagetype, row + 1))
         elif not asset:
             error_message.append("The {0} at row {1} is not exist in the storyblok but it is in the zip file".format(imagetype, row + 1))
-        elif asset["title"] != ("/" + self.vocab_root + path):
+        elif asset["title"] != ("/" + self.root + path):
             error_message.append("The title is not correct for the {0} at row {1}".format(imagetype, row + 1))
         elif imagetype == "Image":
             with zip_file.open(name, mode='r') as image_file:
