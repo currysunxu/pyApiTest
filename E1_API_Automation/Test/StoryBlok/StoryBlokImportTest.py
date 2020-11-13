@@ -12,9 +12,9 @@ from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import S
 
 #@TestClass()
 class StoryBlokImportCheckTool:
-    def __init__(self):
-        self.root = "Vocabularies"
-        self.env_name = "Oneapp"
+    def __init__(self, test_type = "Vocabularies", env_name = "Oneapp"):
+        self.root = test_type
+        self.env_name = env_name
         self.mywindow = Tk()
 
     def get_folder_id(self, vocab_path, all_folder):
@@ -39,14 +39,13 @@ class StoryBlokImportCheckTool:
                 return real_asset
         return None
 
-    def set_env(self, env):
-        self.env_name = env
 
     def asset_check(self, folder_id, file_type, zip_file, root, row, path, type):
         asset_lower = StoryBlokUtils.convert_asset_name(path.split('/')[-1])
         asset = self.get_asset(asset_lower, folder_id)
         error_message = []
         name = root + path
+        print(name)
         if type == "Vocab":
             new_path = "/" + self.root + path
         else:
@@ -108,7 +107,6 @@ class StoryBlokImportCheckTool:
 
     def check_reader_asset(self):
         global folder_id
-        self.root = "Readers"
         error_message = []
         story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
         all_folder = story_blok_service.get_all_asset_folder(self.env_name).json()
@@ -166,8 +164,9 @@ class StoryBlokImportCheckTool:
 
 if __name__ == '__main__':
     test_type = "Vocab"
+    #ttype = "Readers"
+    #env_name = "Oneapp"
     test = StoryBlokImportCheckTool()
-    test.set_env("Oneapp")
     if test_type == "Reader":
         error_message = test.check_reader_asset()
     else:
