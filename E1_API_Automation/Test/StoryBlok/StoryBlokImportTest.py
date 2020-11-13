@@ -1,7 +1,6 @@
 import jmespath
 from PIL import Image
 import io
-from tkinter import Tk, Button
 from ptest.decorator import TestClass, Test
 import xlrd
 
@@ -10,12 +9,11 @@ from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
 
 
-#@TestClass()
+@TestClass()
 class StoryBlokImportCheckTool:
-    def __init__(self, test_type = "Vocabularies", env_name = "Oneapp"):
-        self.root = test_type
+    def __init__(self, env_name="Oneapp"):
+        self.root = "Vocabularies"
         self.env_name = env_name
-        self.mywindow = Tk()
 
     def get_folder_id(self, vocab_path, all_folder):
         parent_id = jmespath.search("asset_folders[?name == '{}'].id".format(self.root), all_folder)[0]
@@ -38,7 +36,6 @@ class StoryBlokImportCheckTool:
             if asset_filename == asset_name:
                 return real_asset
         return None
-
 
     def asset_check(self, folder_id, file_type, zip_file, root, row, path, type):
         asset_lower = StoryBlokUtils.convert_asset_name(path.split('/')[-1])
@@ -107,6 +104,7 @@ class StoryBlokImportCheckTool:
 
     def check_reader_asset(self):
         global folder_id
+        self.root = "Readers"
         error_message = []
         story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
         all_folder = story_blok_service.get_all_asset_folder(self.env_name).json()
@@ -163,10 +161,9 @@ class StoryBlokImportCheckTool:
 
 
 if __name__ == '__main__':
-    test_type = "Vocab"
-    ttype = "Readers"
-    env_name = "Oneapp"
-    test = StoryBlokImportCheckTool(ttype, env_name)
+    test_type = "Vocab"  # Switch between Reader and Vocab
+    env_name = "Oneapp"  # Switch between Oneapp and Dev
+    test = StoryBlokImportCheckTool(env_name)
     if test_type == "Reader":
         error_message = test.check_reader_asset()
     else:
