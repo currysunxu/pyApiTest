@@ -10,7 +10,7 @@ from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
 
 
-@TestClass()
+#@TestClass()
 class StoryBlokImportCheckTool:
     def __init__(self):
         self.root = "Vocabularies"
@@ -39,31 +39,14 @@ class StoryBlokImportCheckTool:
                 return real_asset
         return None
 
-    def set_env_oneapp(self):
-        self.env_name = "Oneapp"
-
-    def set_env_dev(self):
-        self.env_name = "Dev"
-
-    def get_env(self):
-        self.mywindow.title("Please select the environment")
-        self.mywindow.geometry("%dx%d+%d+%d" % (300, 100, 200, 200))
-        b1 = Button(self.mywindow, text='set env to Oneapp', relief='raised', width=16, height=1,
-                    command=lambda: self.set_env_oneapp(self))
-        b2 = Button(self.mywindow, text='set env to Dev', relief='raised', width=16, height=1,
-                    command=self.set_env_dev(self))
-        b3 = Button(self.mywindow, text='Quit', relief='raised', width=16, height=1, command=self.mywindow.quit)
-        b1.grid(row=1, column=1, padx=2, pady=10)
-        b2.grid(row=1, column=2, padx=2, pady=10)
-        b3.grid(row=2, column=1, padx=2, pady=10)
-        self.mywindow.mainloop()
+    def set_env(self, env):
+        self.env_name = env
 
     def asset_check(self, folder_id, file_type, zip_file, root, row, path, type):
         asset_lower = StoryBlokUtils.convert_asset_name(path.split('/')[-1])
-        asset = self.get_asset(self, asset_lower, folder_id)
+        asset = self.get_asset(asset_lower, folder_id)
         error_message = []
         name = root + path
-        print(name)
         if type == "Vocab":
             new_path = "/" + self.root + path
         else:
@@ -109,8 +92,8 @@ class StoryBlokImportCheckTool:
             if not audio_path:
                 error_message.append("Audio is empty at row {0} ".format(i + 1))
                 continue
-            image_folder_id = self.get_folder_id(self, image_path.split('/')[1:-1], all_folder)
-            audio_folder_id = self.get_folder_id(self, audio_path.split('/')[1:-1], all_folder)
+            image_folder_id = self.get_folder_id(image_path.split('/')[1:-1], all_folder)
+            audio_folder_id = self.get_folder_id(audio_path.split('/')[1:-1], all_folder)
             if not image_folder_id:
                 error_message.append("The image path does not exist in the storyblok at row {0}".format(i + 1))
                 continue
@@ -118,9 +101,9 @@ class StoryBlokImportCheckTool:
                 error_message.append("The audio path does not exist in the storyblok at row {0}".format(i + 1))
                 continue
             error_message.extend(
-                self.asset_check(self, image_folder_id, "Image", zip_file, image_root, i, image_path, "Vocab"))
+                self.asset_check(image_folder_id, "Image", zip_file, image_root, i, image_path, "Vocab"))
             error_message.extend(
-                self.asset_check(self, audio_folder_id, "Audio", zip_file, image_root, i, audio_path, "Vocab"))
+                self.asset_check(audio_folder_id, "Audio", zip_file, image_root, i, audio_path, "Vocab"))
         return error_message
 
     def check_reader_asset(self):
@@ -155,19 +138,18 @@ class StoryBlokImportCheckTool:
                         error_message.append("The image path does not exist in the storyblok at row {0}".format(i + 1))
                         continue
                     error_message.extend(
-                        self.asset_check(self, folder_id, "Image", zip_file, image_root, i, image_path, "Reader"))
+                        self.asset_check(folder_id, "Image", zip_file, image_root, i, image_path, "Reader"))
                     continue
             if int(page_number) == 1:  # Check for cover image
                 image_path = row_data[10]
                 # The asset for each book store in the same folder
-                folder_id = self.get_folder_id(self, folder_path,
+                folder_id = self.get_folder_id(folder_path,
                                                all_folder)  # Only get folder id of the asset when page# is 1 for each book
                 if not folder_id:
                     error_message.append("The image path does not exist in the storyblok at row {0}".format(i + 1))
                     continue
-                image_name = image_root + image_path
                 error_message.extend(
-                    self.asset_check(self, folder_id, "Image", zip_file, image_root, i, image_path, "Reader"))
+                    self.asset_check(folder_id, "Image", zip_file, image_root, i, image_path, "Reader"))
             elif page_number:
                 if last_page_number != page_number:  # Check if there is a new page
                     image_path = row_data[4]
@@ -175,22 +157,21 @@ class StoryBlokImportCheckTool:
                         error_message.append("The image path does not exist in the storyblok at row {0}".format(i + 1))
                         continue
                     error_message.extend(
-                        self.asset_check(self, folder_id, "Image", zip_file, image_root, i, image_path, "Reader"))
+                        self.asset_check(folder_id, "Image", zip_file, image_root, i, image_path, "Reader"))
                 audio_path = row_data[7]
                 error_message.extend(
-                    self.asset_check(self, folder_id, "Audio", zip_file, image_root, i, audio_path, "Reader"))
+                    self.asset_check(folder_id, "Audio", zip_file, image_root, i, audio_path, "Reader"))
                 last_page_number = page_number
 
 
 if __name__ == '__main__':
-    test_type = "Reader"
-    test = StoryBlokImportCheckTool
-    test.__init__(test)
-    test.get_env(test)
+    test_type = "Vocab"
+    test = StoryBlokImportCheckTool()
+    test.set_env("Oneapp")
     if test_type == "Reader":
-        error_message = test.check_reader_asset(test)
+        error_message = test.check_reader_asset()
     else:
-        error_message = test.check_vocab_asset(test)
+        error_message = test.check_vocab_asset()
     if not error_message:
         print("No error")
     else:
