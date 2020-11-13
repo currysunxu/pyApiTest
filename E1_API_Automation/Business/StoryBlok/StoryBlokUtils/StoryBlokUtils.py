@@ -1,5 +1,8 @@
 import jmespath
 import json_tools
+import re
+from tkinter.filedialog import askopenfilename
+import zipfile
 
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
@@ -440,3 +443,24 @@ class StoryBlokUtils:
                 error_message = error_message + 'asset_group childref not as expected, diff:' + str(diff_list)
 
         return error_message
+
+    @staticmethod
+    def get_zip_file():
+        zip_name = askopenfilename()
+        if '.zip' not in zip_name:
+            print("Not a zip file")
+            exit()
+        zip_file = zipfile.ZipFile(zip_name, 'r')
+        return zip_file
+
+    @staticmethod
+    def convert_asset_name(asset_name):
+        if len(asset_name.rsplit('.', 1)) == 2:
+            asset_name = re.sub(r'\W', "-", asset_name.rsplit('.', 1)[0]).rstrip('-') + "." + asset_name.rsplit('.', 1)[1]
+            new_asset_name = [""]
+            for str in asset_name:
+                if str != new_asset_name[-1] or str != '-':
+                    new_asset_name.append(str)
+            convert_name = ''.join(new_asset_name).lower()
+            return convert_name
+        return None

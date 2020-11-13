@@ -1,15 +1,13 @@
-
 import jmespath
 from PIL import Image
 import io
 from tkinter import Tk,Button
 from ptest.decorator import TestClass, Test
-from tkinter.filedialog import askopenfilename
 import xlrd
-import zipfile
+
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData
-import re
+from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
 
 
 @TestClass()
@@ -18,14 +16,6 @@ class StoryBlokImportCheckTool:
         self.root = "Vocabularies"
         self.env_name = "Oneapp"
         self.mywindow = Tk()
-
-    def get_zip_file(self):
-        zip_name = askopenfilename()
-        if '.zip' not in zip_name:
-            print("Not a zip file")
-            exit()
-        zip_file = zipfile.ZipFile(zip_name, 'r')
-        return zip_file
 
     def get_folder_id(self, vocab_path, all_folder):
         parent_id = jmespath.search("asset_folders[?name == '{}'].id".format(self.root), all_folder)[0]
@@ -54,7 +44,6 @@ class StoryBlokImportCheckTool:
     def set_env_dev(self):
         self.env_name = "Dev"
 
-
     def get_env(self):
         self.mywindow.title("Please select the environment")
         self.mywindow.geometry("%dx%d+%d+%d" % (300, 100, 200, 200))
@@ -66,13 +55,17 @@ class StoryBlokImportCheckTool:
         b3.grid(row=2, column=1, padx=2, pady=10)
         self.mywindow.mainloop()
 
-    def vocab_asset_check(self, asset, imagetype, zip_file, name, row, path):
+    def asset_check(self, asset, imagetype, zip_file, name, row, path, type):
         error_message = []
+        if type == "Vocab":
+            new_path = "/" + self.root + path
+        else:
+            new_path = path
         if name not in zip_file.namelist():
             error_message.append("The {0} at row {1} is not in the zip file".format(imagetype, row + 1))
         elif not asset:
             error_message.append("The {0} at row {1} is not exist in the storyblok but it is in the zip file".format(imagetype, row + 1))
-        elif asset["title"] != ("/" + self.root + path):
+        elif asset["title"] != new_path:
             error_message.append("The title is not correct for the {0} at row {1}".format(imagetype, row + 1))
         elif imagetype == "Image":
             with zip_file.open(name, mode='r') as image_file:
@@ -83,23 +76,11 @@ class StoryBlokImportCheckTool:
                 error_message.append("The image size is not correct at row {0}".format(row + 1))
         return error_message
 
-    def convert_asset_name(self, asset_name):
-        print(asset_name)
-        if len(asset_name.rsplit('.', 1)) == 2:
-            asset_name = re.sub(r'\W', "-", asset_name.rsplit('.', 1)[0]).rstrip('-') + "." + asset_name.rsplit('.', 1)[1]
-            new_asset_name = [""]
-            for str in asset_name:
-                if str != new_asset_name[-1] or str != '-':
-                    new_asset_name.append(str)
-            convert_name = ''.join(new_asset_name).lower()
-            return convert_name
-        return None
-
     def check_vocab_asset(self):
         error_message = []
         story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
         all_folder = story_blok_service.get_all_asset_folder(self.env_name).json()
-        zip_file = self.get_zip_file(self)
+        zip_file = StoryBlokUtils.get_zip_file()
         self.namelist_ = zip_file.namelist()[0]
         image_root = self.namelist_
         image_root = image_root.strip("/")
@@ -120,9 +101,8 @@ class StoryBlokImportCheckTool:
             if not audio_path:
                 error_message.append("Audio is empty at row {0} ".format(i+1))
                 continue
-            image_asset_lower = self.convert_asset_name(self, image_path.split('/')[-1])
-            audio_asset_lower = self.convert_asset_name(self, audio_path.split('/')[-1])
-
+            image_asset_lower = StoryBlokUtils.convert_asset_name(image_path.split('/')[-1])
+            audio_asset_lower = StoryBlokUtils.convert_asset_name(audio_path.split('/')[-1])
             image_folder_id = self.get_folder_id(self, image_path.split('/')[1:-1], all_folder)
             audio_folder_id = self.get_folder_id(self, audio_path.split('/')[1:-1], all_folder)
             if not image_folder_id:
@@ -135,41 +115,17 @@ class StoryBlokImportCheckTool:
             audio_asset = self.get_asset(self, audio_asset_lower, audio_folder_id)
             image_name = image_root + image_path
             audio_name = image_root + audio_path
-            error_message.extend(self.vocab_asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path))
-            error_message.extend(self.vocab_asset_check(self, audio_asset, "Audio", zip_file, audio_name, i, audio_path))
-        return error_message
-
-    def check_book(self, folder, book_type):
-        if 'Level' in folder:
-            self.root = "Readers"
-        elif book_type == "Highlights China":
-            self.root = "Assigned readers"
-        else:
-            self.root = "EF readers"
-
-    def reader_asset_check(self, asset, imagetype, zip_file, name, row, path):
-        error_message = []
-        if name not in zip_file.namelist():
-            error_message.append("The {0} at row {1} is not in the zip file".format(imagetype, row + 1))
-        elif not asset:
-            error_message.append("The {0} at row {1} is not exist in the storyblok but it is in the zip file".format(imagetype, row + 1))
-        elif asset["title"] != path:
-            error_message.append("The title is not correct for the {0} at row {1}".format(imagetype, row + 1))
-        elif imagetype == "Image":
-            with zip_file.open(name, mode='r') as image_file:
-                content = image_file.read()
-            image_size_check = Image.open(io.BytesIO(bytearray(content)))
-            image_size = str(image_size_check.width) + "x" + str(image_size_check.height)
-            if str(image_size) not in asset["filename"]:
-                error_message.append("The image size is not correct at row {0}".format(row + 1))
+            error_message.extend(self.asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path, "Vocab"))
+            error_message.extend(self.asset_check(self, audio_asset, "Audio", zip_file, audio_name, i, audio_path, "Vocab"))
         return error_message
 
     def check_reader_asset(self):
         global image_folder_id
+        self.root = "Readers"
         error_message = []
         story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
         all_folder = story_blok_service.get_all_asset_folder(self.env_name).json()
-        zip_file = self.get_zip_file(self)
+        zip_file = StoryBlokUtils.get_zip_file()
         self.namelist_ = zip_file.namelist()[0]
         image_root = self.namelist_
         image_root = image_root.strip("/")
@@ -192,30 +148,30 @@ class StoryBlokImportCheckTool:
                 continue
             if int(page_number) == 1:
                 image_path = row_data[10]
-                image_asset_lower = self.convert_asset_name(self, image_path.split('/')[-1])
+                image_asset_lower = StoryBlokUtils.convert_asset_name(image_path.split('/')[-1])
                 image_folder_id = self.get_folder_id(self, folder_path, all_folder)
                 if not image_folder_id:
                     error_message.append("The image path does not exist in the storyblok at row {0}".format(i + 1))
                     continue
                 image_asset = self.get_asset(self, image_asset_lower, image_folder_id)
                 image_name = image_root + image_path
-                error_message.extend(self.reader_asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path))
+                error_message.extend(self.asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path, "Reader"))
             elif page_number:
                 print(page_number)
                 if last_page_number != page_number:
                     image_path = row_data[4]
-                    image_asset_lower = self.convert_asset_name(self, image_path.split('/')[-1])
+                    image_asset_lower = StoryBlokUtils.convert_asset_name(image_path.split('/')[-1])
                     if not image_folder_id:
                         error_message.append("The image path does not exist in the storyblok at row {0}".format(i + 1))
                         continue
                     image_asset = self.get_asset(self, image_asset_lower, image_folder_id)
                     image_name = image_root + image_path
-                    error_message.extend(self.reader_asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path))
+                    error_message.extend(self.asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path, "Reader"))
                 audio_path = row_data[7]
-                audio_asset_lower = self.convert_asset_name(self, audio_path.split('/')[-1])
+                audio_asset_lower = StoryBlokUtils.convert_asset_name(audio_path.split('/')[-1])
                 audio_asset = self.get_asset(self, audio_asset_lower, image_folder_id)
                 audio_name = image_root + audio_path
-                error_message.extend(self.reader_asset_check(self, audio_asset, "Audio", zip_file, audio_name, i, audio_path))
+                error_message.extend(self.asset_check(self, audio_asset, "Audio", zip_file, audio_name, i, audio_path, "Reader"))
                 last_page_number = page_number
 
 if __name__ == '__main__':
