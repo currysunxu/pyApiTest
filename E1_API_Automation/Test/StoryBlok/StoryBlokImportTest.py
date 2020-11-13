@@ -157,7 +157,6 @@ class StoryBlokImportCheckTool:
                 image_name = image_root + image_path
                 error_message.extend(self.asset_check(self, image_asset, "Image", zip_file, image_name, i, image_path, "Reader"))
             elif page_number:
-                print(page_number)
                 if last_page_number != page_number:
                     image_path = row_data[4]
                     image_asset_lower = StoryBlokUtils.convert_asset_name(image_path.split('/')[-1])
