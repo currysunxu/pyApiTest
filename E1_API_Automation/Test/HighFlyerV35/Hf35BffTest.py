@@ -137,12 +137,6 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_best_total_score, equal_to(expected_total_score))
         assert_that(bff_best_score, equal_to(expected_score))
 
-        # following two fields are hardcoded
-        course = Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.course")
-        region_ach = Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.regionAch")
-        assert_that(course[0], equal_to('HIGH_FLYERS_35'))
-        assert_that(region_ach[0], equal_to('cn-3'))
-
         # check homework service best attempt
         homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
         homework_best_attempt_response = homework_service.get_the_best_attempt(self.customer_id, book_content_id)
