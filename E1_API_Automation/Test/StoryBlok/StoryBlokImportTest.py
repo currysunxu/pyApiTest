@@ -164,9 +164,9 @@ class StoryBlokImportCheckTool:
 
 if __name__ == '__main__':
     test_type = "Vocab"
-    #ttype = "Readers"
-    #env_name = "Oneapp"
-    test = StoryBlokImportCheckTool()
+    ttype = "Readers"
+    env_name = "Oneapp"
+    test = StoryBlokImportCheckTool(ttype, env_name)
     if test_type == "Reader":
         error_message = test.check_reader_asset()
     else:
