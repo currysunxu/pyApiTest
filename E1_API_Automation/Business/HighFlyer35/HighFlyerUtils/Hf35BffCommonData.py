@@ -49,13 +49,11 @@ class Hf35BffCommonData:
         join bussiness key
         :return: bussiness key
         """
-        courseContentId = self.get_attempt_body()["courseContentId"]
         bookContentId = self.get_attempt_body()["bookContentId"]
         unitContentId = self.get_attempt_body()["unitContentId"]
         lessonContentId = self.get_attempt_body()["lessonContentId"]
         learningUnitContentId = self.get_attempt_body()["learningUnitContentId"]
         business_keys = []
-        business_keys.append(courseContentId)
         business_keys.append(bookContentId)
         business_keys.append(unitContentId)
         business_keys.append(lessonContentId)

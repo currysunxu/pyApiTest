@@ -143,12 +143,7 @@ class HfBffTestBase:
         learning_result_entity.start_time = bff_data_obj.get_attempt_body()["startTime"]
         learning_result_entity.end_time = bff_data_obj.get_attempt_body()["endTime"]
         route = {}
-        route['course'] = 'HIGH_FLYERS_35'
-        route['regionAch'] = 'cn-3'
         route['treeRevision'] = bff_data_obj.get_attempt_body()["treeRevision"]
-        route['schemaVersion'] = bff_data_obj.get_attempt_body()["schemaVersion"]
-        route['courseContentId'] = bff_data_obj.get_attempt_body()["courseContentId"]
-        route['courseContentRevision'] = bff_data_obj.get_attempt_body()["courseContentRevision"]
         route['bookContentId'] = bff_data_obj.get_attempt_body()["bookContentId"]
         route['bookContentRevision'] = bff_data_obj.get_attempt_body()["bookContentRevision"]
         route['unitContentId'] = bff_data_obj.get_attempt_body()["unitContentId"]
