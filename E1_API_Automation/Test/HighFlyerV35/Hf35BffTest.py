@@ -352,7 +352,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(response.status_code == 400)
 
         response = self.bff_service.get_bootstrap_controller(platform=2)
-        assert_that(response.status_code == 409)
+        assert_that(response.status_code == 400)
 
     def test_bootstrap_controller_by_platform(self, platform):
         response = self.bff_service.get_bootstrap_controller(platform=platform)
