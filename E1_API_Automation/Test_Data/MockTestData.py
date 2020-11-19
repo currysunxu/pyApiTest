@@ -16,7 +16,7 @@ class MockTestUsers:
         },
         'Staging': {
             MockTestStudentType.HasMockTest.value: [
-                {'username': 'hf.g2.84', 'password': '12345', 'custom_id': '101075163', 'city': 'Hangzhou'}],
+                {'username': 'auto.test', 'password': '12345', 'custom_id': '101521473', 'city': ''}],
             MockTestStudentType.HasNoMockTest.value: [
                 {'username': 'tb3.cn.02', 'password': '12345', 'custom_id': '1023'}]
         },
@@ -31,15 +31,9 @@ class MockTestUsers:
 
 class TestDataList:
     TestId = {
-        'QA': {'finished_test_id': '13f2d48b-9e33-4e7e-b1a4-f82d83b61a93'},
-        'Staging': {'finished_test_id': '00000000-0000-0000-0000-000000121023'},
+        'QA': {'finished_test_id': '249ec74a-28c4-45eb-b523-72257db37d43'},
+        'Staging': {'finished_test_id': '414d3c87-0c77-11eb-9786-405bd819f9ec'},
         'Live': {'finished_test_id': '00000101-0000-0000-0000-000000000002'}
-    }
-
-    Remediation = {
-        'QA': {'learner_vector_key': '1309359812118601730'},
-        'Staging': {'learner_vector_key': '1262317729063399425'},
-        'Live': {'learner_vector_key': '1265892248264929281'}
     }
 
     RemediationActivities = {
