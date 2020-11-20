@@ -468,7 +468,7 @@ class PTReviewTestCases:
         pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
         pt_instance_key = str(pt_instance_key)[str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
         assert_that(actual_result.json()[0]["ProgressTestInstanceKey"], equal_to(pt_instance_key))
-        assert_that(len(actual_result.json()[0]) == 6, "response fields numbers is invalid,please check whether add or "
+        assert_that(len(actual_result.json()[0]) == 7, "response fields numbers is invalid,please check whether add or "
                                                        "remove any fields")
 
     @Test(tags="qa,stg")
@@ -484,7 +484,7 @@ class PTReviewTestCases:
         assert_that(actual_result.json()[0]["PTTotalScore"], equal_to(None))
         assert_that(actual_result.json()[0]["UnitKey"], equal_to(unit_key.lower()))
         assert_that(actual_result.json()[0]["ProgressTestKey"], equal_to(pt_key.lower()))
-        assert_that(len(actual_result.json()[0]) == 8,
+        assert_that(len(actual_result.json()[0]) == 9,
                     "response fields numbers is invalid,please check whether add or remove any fields")
 
     @Test(tags="qa,stg,live")
