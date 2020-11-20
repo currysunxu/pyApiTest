@@ -16,7 +16,6 @@ class MockTestCases:
         self.mt_service = MockTestBFFService(MOCK_TEST_ENVIRONMENT)
         self.finished_test_id = TestDataList.TestId[env_key]['finished_test_id']
         self.part = random.randint(0, 2)
-        self.learner_vector_key = TestDataList.Remediation[env_key]['learner_vector_key']
         self.activities = TestDataList.RemediationActivities[env_key]
         self.correct_answer_count = random.randint(0, 5)
         self.total_question_count = random.randint(5, 10)
