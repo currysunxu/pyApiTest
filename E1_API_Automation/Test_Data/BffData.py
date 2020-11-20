@@ -103,16 +103,16 @@ class ExpectedData:
             "webBootstrapUrl": "/evc15/meeting/api/bootstrap",
             "loggingUrl": "/evc15/meeting/api/log",
             "evcDomainMappings": {
-                "EvcCN1": "https://qa2-evc.ef.com.cn",
-                "EvcCN2": "https://qa2-evc.ef.com.cn",
+                "EvcCN1": "https://evc-ts-qa.bj-englishtown.com",
+                "EvcCN2": "https://evc-ts-qa.bj-englishtown.com",
                 "EvcUS1": "https://qa-evc.ef.com"
             }
         },
         "staticResource": {
-            "resourceCdnDomain": "http://stg-cns.ef-cdn.com",
-            "webResourceVersionUrl": "/_shared/evc15-fe-ios-bundle_kids/version.json",
-            "agoraWebResourceVersionUrl": "/evc15/meeting/api/clientversion?platform=ios",
-            "agoraResourceCdnDomain": "https://qa2-evc.ef.com.cn"
+            "resourceCdnDomain": "https://evc-fe-qa.bj-englishtown.com",
+            "webResourceVersionUrl": "/_shared/evc15-fe-android-bundle_kids/version.json",
+            "agoraWebResourceVersionUrl": "/evc15/meeting/api/clientversion?platform=android",
+            "agoraResourceCdnDomain": "https://evc-ts-qa.bj-englishtown.com"
         }
     }
     expected_oc_context = {
