@@ -1,5 +1,4 @@
 import copy
-import hashlib
 from enum import Enum
 
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
@@ -16,12 +15,6 @@ class PipelinePublishUtils:
         for content_map_course in ContentMapCourse:
             if content_map_course.name == course_enum_name:
                 return content_map_course.value
-
-    @staticmethod
-    def get_asset_sha1(asset_encode):
-        s1 = hashlib.sha1()
-        s1.update(asset_encode)
-        return s1.hexdigest()
 
     @staticmethod
     def remove_duplicate_asset(asset_list):

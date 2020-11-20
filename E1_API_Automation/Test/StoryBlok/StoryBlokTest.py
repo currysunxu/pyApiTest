@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime
 from datetime import timedelta
 
@@ -68,8 +69,8 @@ class StoryBlokTestCases:
                                                release_history_response.json())
         expected_release_revision = release_history_list[0]['releaseRevision']
         if len(release_history_list) >= 2:
-            # published_at_start_date = release_history_list[1]['startAt']
-            published_at_start_date = release_history_list[1]['maxContentTime']
+            published_at_start_date = release_history_list[1]['startAt']
+            # published_at_start_date = release_history_list[1]['maxContentTime']
             if published_at_start_date is None:
                 published_at_start_date = '1970-01-01'
             else:
@@ -128,60 +129,66 @@ class StoryBlokTestCases:
         release_history_list = jmespath.search('releaseHistory[?status==\'COMPLETED\']',
                                                release_history_response.json())
         release_scope = release_history_list[0]['scope']
-        self.test_highflyers_release_by_scope(release_scope)
+        region_achs = release_history_list[0]['regionAchs']
+        self.test_highflyers_release_by_scope([release_scope], region_achs)
 
     # test highflyers release by release scope
-    @Test(data_provider=["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j"])
-    def test_highflyers_release_by_scope(self, release_scope):
-        print('release_scope:' + release_scope)
-        storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
-        get_book_story_response = storyblok_service.get_storyblok_book_by_scope(release_scope)
-        assert_that(get_book_story_response.status_code == 200)
-        storyblok_book_story = jmespath.search('stories|[0]', get_book_story_response.json())
-        storyblok_correlation_path = storyblok_book_story['content']['correlation_path']
-        storyblok_default_reader_level = storyblok_book_story['content']['default_reader_level']
+    @Test(data_provider=(["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j"], ["cn-3", "cn-3-144"]))
+    def test_highflyers_release_by_scope(self, release_scopes, region_achs):
+        for release_scope in release_scopes:
+            for region_ach in region_achs:
+                print('release_scope:{0}, region_ach:{1}'.format(release_scope, region_ach))
+                storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], 'TestingOfOneapp')
+                get_book_story_response = storyblok_service.get_storyblok_book_by_scope(release_scope)
+                assert_that(get_book_story_response.status_code == 200)
+                storyblok_book_story = jmespath.search('stories|[0]', get_book_story_response.json())
+                storyblok_correlation_path = storyblok_book_story['content']['correlation_path']
+                # correlation_path in storyblok is like "highflyers/book-7", need to add region into it to become: highflyers/cn-3/book-7
+                storyblok_correlation_path_with_region = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
+                    storyblok_correlation_path, region_ach)
+                storyblok_default_reader_level = storyblok_book_story['content']['default_reader_level']
 
-        content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
-        content_map_entity = ContentMapQueryEntity('HIGH_FLYERS_35', region_ach='cn-3')
-        highflyer_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
-        book_in_content_map = jmespath.search(
-            'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
-            highflyer_tree_response.json())
+                content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+                content_map_entity = ContentMapQueryEntity('HIGH_FLYERS_35', region_ach=region_ach)
+                highflyer_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
+                book_in_content_map = jmespath.search(
+                    'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path_with_region),
+                    highflyer_tree_response.json())
 
-        assert_that(book_in_content_map['default_reader_level'] == storyblok_default_reader_level,
-                    'default_reader_level value not consistent between content map and storyblok for contentPath:'
-                    + storyblok_correlation_path)
+                assert_that(book_in_content_map['default_reader_level'] == storyblok_default_reader_level,
+                            'default_reader_level value not consistent between content map and storyblok for contentPath:'
+                            + storyblok_correlation_path)
 
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+                content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
-        book_reader_content_groups = \
-            content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeReader.value,
-                                                             ContentRepoGroupType.TypeECAGroup.value,
-                                                             book_in_content_map['contentId'],
-                                                             book_in_content_map['contentRevision'],
-                                                             book_in_content_map['schemaVersion']).json()
+                book_reader_content_groups = \
+                    content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeReader.value,
+                                                                     ContentRepoGroupType.TypeECAGroup.value,
+                                                                     book_in_content_map['contentId'],
+                                                                     book_in_content_map['contentRevision'],
+                                                                     book_in_content_map['schemaVersion']).json()
 
-        # verify reader in this book
-        storyblok_reader_configs_response = storyblok_service.get_storyblok_reader_configs(release_scope).json()
-        storyblok_reader_configs_with_order = sorted(storyblok_reader_configs_response['stories'],
-                                                     key=lambda k: k['full_slug'])
-        error_message = StoryBlokUtils.verify_reader_after_highflyers_release(book_in_content_map,
-                                                                              storyblok_reader_configs_with_order,
-                                                                              book_reader_content_groups)
-        assert_that(error_message == '', error_message)
+                # verify reader in this book
+                storyblok_reader_configs_response = storyblok_service.get_storyblok_reader_configs(release_scope).json()
+                storyblok_reader_configs_with_order = sorted(storyblok_reader_configs_response['stories'],
+                                                             key=lambda k: k['full_slug'])
+                error_message = StoryBlokUtils.verify_reader_after_highflyers_release(book_in_content_map,
+                                                                                      storyblok_reader_configs_with_order,
+                                                                                      book_reader_content_groups)
+                assert_that(error_message == '', error_message)
 
-        # verify vocab in this book
-        book_vocab_content_groups = \
-            content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeVocab.value,
-                                                             None,
-                                                             book_in_content_map['contentId'],
-                                                             book_in_content_map['contentRevision'],
-                                                             book_in_content_map['schemaVersion']).json()
+                # verify vocab in this book
+                book_vocab_content_groups = \
+                    content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeVocab.value,
+                                                                     None,
+                                                                     book_in_content_map['contentId'],
+                                                                     book_in_content_map['contentRevision'],
+                                                                     book_in_content_map['schemaVersion']).json()
 
-        storyblok_vocab_configs_response = storyblok_service.get_storyblok_vocab_configs(release_scope).json()
-        storyblok_vocab_configs_with_order = sorted(storyblok_vocab_configs_response['stories'],
-                                                    key=lambda k: k['full_slug'])
-        error_message = StoryBlokUtils.verify_vocab_after_highflyers_release(book_in_content_map,
-                                                                             storyblok_vocab_configs_with_order,
-                                                                             book_vocab_content_groups)
-        assert_that(error_message == '', error_message)
+                storyblok_vocab_configs_response = storyblok_service.get_storyblok_vocab_configs(release_scope).json()
+                storyblok_vocab_configs_with_order = sorted(storyblok_vocab_configs_response['stories'],
+                                                            key=lambda k: k['full_slug'])
+                error_message = StoryBlokUtils.verify_vocab_after_highflyers_release(book_in_content_map,
+                                                                                     storyblok_vocab_configs_with_order,
+                                                                                     book_vocab_content_groups)
+                assert_that(error_message == '', error_message)

@@ -28,8 +28,8 @@ class StoryBlokImportCheckTool:
         return parent_id
 
     def get_asset(self, asset_name, asset_folder_id):
-        story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
-        new_asset_name = story_blok_service.get_asset(self.env_name, asset_name).json()
+        story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], self.env_name)
+        new_asset_name = story_blok_service.get_asset(asset_name).json()
         asset = jmespath.search("assets[?asset_folder_id == `{0}`]".format(asset_folder_id), new_asset_name)
         for real_asset in asset:
             asset_filename = real_asset["filename"].split('/')[-1]
@@ -65,7 +65,7 @@ class StoryBlokImportCheckTool:
 
     def check_vocab_asset(self):
         error_message = []
-        story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
+        story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], self.env_name)
         all_folder = story_blok_service.get_all_asset_folder(self.env_name).json()
         zip_file = StoryBlokUtils.get_zip_file()
         namelist_ = zip_file.namelist()[0]

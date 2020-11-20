@@ -9,6 +9,7 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum impor
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
     PipelinePublishConstants
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishUtils import PipelinePublishUtils
+from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, BFF_ENVIRONMENT, env_key
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
 
@@ -228,7 +229,7 @@ class PipelinePublishVerifyService:
                     'content asset response status is {0}, not 200 for url: {1}'
                     .format(content_repo_asset_response.status_code, content_repo_asset_url))
         print("end of get media for content asset:" + content_repo_asset_url)
-        content_repo_asset_sha1 = PipelinePublishUtils.get_asset_sha1(content_repo_asset_response.content)
+        content_repo_asset_sha1 = CommonUtils.get_asset_sha1(content_repo_asset_response.content)
 
         if aem_asset_sha1 != content_repo_asset_sha1:
             error_message.append(
