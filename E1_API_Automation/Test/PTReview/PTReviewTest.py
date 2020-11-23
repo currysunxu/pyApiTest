@@ -484,7 +484,7 @@ class PTReviewTestCases:
         assert_that(actual_result.json()[0]["PTTotalScore"], equal_to(None))
         assert_that(actual_result.json()[0]["UnitKey"], equal_to(unit_key.lower()))
         assert_that(actual_result.json()[0]["ProgressTestKey"], equal_to(pt_key.lower()))
-        assert_that(len(actual_result.json()[0]) == 8,
+        assert_that(len(actual_result.json()[0]) == 9,
                     "response fields numbers is invalid,please check whether add or remove any fields")
 
     @Test(tags="qa,stg,live")

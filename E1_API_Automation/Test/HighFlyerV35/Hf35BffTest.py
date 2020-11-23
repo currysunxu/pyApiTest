@@ -31,6 +31,8 @@ from E1_API_Automation.Lib.HamcrestExister import Exist
 from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
+from E1_API_Automation.Lib.HamcrestExister import Exist
+
 
 
 @TestClass()
@@ -82,6 +84,9 @@ class Hf35BffTest(HfBffTestBase):
                 assert_that(response.json(), Exist("userContext.availableBooks"))
                 assert_that(response.json(), Exist("userContext.currentBook"))
                 assert_that(jmespath.search('userContext.contentScope', response.json()) == "STANDARD")
+            elif key == BffProduct.SSV3.value:
+                assert_that(response.status_code, equal_to(200))
+                assert_that(jmespath.search('userContext.contentScope',response.json()) == "LITE")
             else:
                 assert_that(response.status_code, equal_to(200))
                 assert_that(jmespath.search('userContext.contentScope',response.json()) == "ONLINE_CLASS")
@@ -137,12 +142,6 @@ class Hf35BffTest(HfBffTestBase):
         expected_score = sum(Hf35BffCommonData.get_value_by_json_path(bff_data_obj.attempt_json, "$..score"))
         assert_that(bff_best_total_score, equal_to(expected_total_score))
         assert_that(bff_best_score, equal_to(expected_score))
-
-        # following two fields are hardcoded
-        course = Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.course")
-        region_ach = Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.regionAch")
-        assert_that(course[0], equal_to('HIGH_FLYERS_35'))
-        assert_that(region_ach[0], equal_to('cn-3'))
 
         # check homework service best attempt
         homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
@@ -354,7 +353,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(response.status_code == 400)
 
         response = self.bff_service.get_bootstrap_controller(platform=2)
-        assert_that(response.status_code == 409)
+        assert_that(response.status_code == 400)
 
     def test_bootstrap_controller_by_platform(self, platform):
         response = self.bff_service.get_bootstrap_controller(platform=platform)

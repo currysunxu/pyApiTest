@@ -384,7 +384,7 @@ class PTReviewUtils:
         error_message = ''
 
         for key in api_pt_assess_by_skill_json.keys():
-            if key != 'SkillScores' and key !='PTInstanceKey' and key !='IsOverwritten' :
+            if key != 'SkillScores' and key !='PTInstanceKey' and key !='IsOverwritten' and key !='TestKind' :
                 actual_value = api_pt_assess_by_skill_json[key]
                 expected_value = expected_pt_assess_by_skill[key]
 
