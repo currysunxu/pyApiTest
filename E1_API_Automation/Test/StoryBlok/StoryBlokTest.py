@@ -69,8 +69,8 @@ class StoryBlokTestCases:
                                                release_history_response.json())
         expected_release_revision = release_history_list[0]['releaseRevision']
         if len(release_history_list) >= 2:
-            published_at_start_date = release_history_list[1]['startAt']
-            # published_at_start_date = release_history_list[1]['maxContentTime']
+            # published_at_start_date = release_history_list[1]['startAt']
+            published_at_start_date = release_history_list[1]['maxContentTime']
             if published_at_start_date is None:
                 published_at_start_date = '1970-01-01'
             else:
@@ -138,7 +138,7 @@ class StoryBlokTestCases:
         for release_scope in release_scopes:
             for region_ach in region_achs:
                 print('release_scope:{0}, region_ach:{1}'.format(release_scope, region_ach))
-                storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], 'TestingOfOneapp')
+                storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
                 get_book_story_response = storyblok_service.get_storyblok_book_by_scope(release_scope)
                 assert_that(get_book_story_response.status_code == 200)
                 storyblok_book_story = jmespath.search('stories|[0]', get_book_story_response.json())

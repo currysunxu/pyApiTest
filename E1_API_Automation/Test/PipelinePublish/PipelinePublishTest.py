@@ -24,7 +24,7 @@ class PipelinePublishTestCases:
     release_book: indicate the book you want to release from AEM
     region_ach: indicate the region_ach you will verify in content service
     '''
-    @Test(data_provider=[("LIVE", "highflyers", ["book-5", "book-6", "book-7", "book-8"], "cn-3")])
+    @Test(data_provider=[("LIVE", "highflyers", ["book-1", "book-2", "book-3", "book-4", "book-5", "book-6", "book-7", "book-8"], "cn-3")])
     def test_pp_release(self, source_aem_env, course, release_book_list, region_ach):
         for release_book in release_book_list:
             print('-------------------------Start verify book: {0}'.format(release_book))

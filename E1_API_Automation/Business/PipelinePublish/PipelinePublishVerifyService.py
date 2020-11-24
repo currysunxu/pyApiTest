@@ -242,39 +242,48 @@ class PipelinePublishVerifyService:
         error_message = []
         aem_homework_list = aem_lesson_by_unit_dict['homework']
 
+        lesson_content_id = content_map_lesson_by_unit_dict[PipelinePublishConstants.FIELD_CONTENT_ID]
         lesson_homework_content_group = \
             self.content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHomework.value,
                                                                   None,
-                                                                  content_map_lesson_by_unit_dict[
-                                                                      PipelinePublishConstants.FIELD_CONTENT_ID],
+                                                                  lesson_content_id,
                                                                   content_map_lesson_by_unit_dict[
                                                                       PipelinePublishConstants.FIELD_CONTENT_REVISION],
                                                                   content_map_lesson_by_unit_dict[
                                                                       PipelinePublishConstants.FIELD_SCHEMA_REVISION]).json()
+        # for cn-3-144, there's no homework under some lesson, also check if this lesson don't have any content group
+        if len(aem_homework_list) == 0:
+            if len(lesson_homework_content_group) != 0:
+                error_message.append(
+                    'This lesson {0} should not have any content group as AEM don\'t have any homework under this lesson!'.format(
+                        lesson_content_id))
+                return error_message
+        else:
+            lesson_activity_group = jmespath.search('[?groupType==\'ACTIVITY_GROUP\']|[0]',
+                                                    lesson_homework_content_group)
+            lesson_asset_group_list = jmespath.search('[?groupType==\'ASSET_GROUP\']', lesson_homework_content_group)
 
-        lesson_activity_group = jmespath.search('[?groupType==\'ACTIVITY_GROUP\']|[0]', lesson_homework_content_group)
-        lesson_asset_group_list = jmespath.search('[?groupType==\'ASSET_GROUP\']', lesson_homework_content_group)
+            lesson_activity_metadata_list = lesson_activity_group[PipelinePublishConstants.FIELD_CHILDREFS]
+            lesson_activity_list = self.content_repo_service.get_activities(lesson_activity_metadata_list).json()
 
-        lesson_activity_metadata_list = lesson_activity_group[PipelinePublishConstants.FIELD_CHILDREFS]
-        lesson_activity_list = self.content_repo_service.get_activities(lesson_activity_metadata_list).json()
+            if len(aem_homework_list) != len(lesson_activity_metadata_list):
+                error_message.append(
+                    'AEM lesson homework list size not same as content repo lesson activity list size!')
+                return error_message
 
-        if len(aem_homework_list) != len(lesson_activity_metadata_list):
-            error_message.append('AEM lesson homework list size not same as content repo lesson activity list size!')
-            return error_message
+            for i in range(len(aem_homework_list)):
+                aem_homework = aem_homework_list[i]
+                lesson_activity_metadata = lesson_activity_metadata_list[i]
+                lesson_activity = jmespath.search(
+                    "[?contentId == '{0}'] | [0]".format(
+                        lesson_activity_metadata[PipelinePublishConstants.FIELD_CONTENT_ID]),
+                    lesson_activity_list)
+                error_message.extend(self.verify_aem_homework_with_content_repo_activity(
+                    aem_homework, lesson_activity))
 
-        for i in range(len(aem_homework_list)):
-            aem_homework = aem_homework_list[i]
-            lesson_activity_metadata = lesson_activity_metadata_list[i]
-            lesson_activity = jmespath.search(
-                "[?contentId == '{0}'] | [0]".format(
-                    lesson_activity_metadata[PipelinePublishConstants.FIELD_CONTENT_ID]),
-                lesson_activity_list)
-            error_message.extend(self.verify_aem_homework_with_content_repo_activity(
-                aem_homework, lesson_activity))
-
-        # verify the asset_group with the asset exit in the activity list
-        error_message.extend(self.verify_activity_assets_with_asset_group(
-            lesson_activity_list, lesson_asset_group_list))
+            # verify the asset_group with the asset exit in the activity list
+            error_message.extend(self.verify_activity_assets_with_asset_group(
+                lesson_activity_list, lesson_asset_group_list))
 
         return error_message
 
