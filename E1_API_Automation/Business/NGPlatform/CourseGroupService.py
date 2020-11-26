@@ -11,6 +11,6 @@ class CourseGroupService:
 		api_url = '/api/v1/unlocked-progress?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)
 		return self.mou_tai.get(api_url)
 
-	def get_unlock_progress(self, student_id):
+	def get_current_unlock(self, student_id):
 		api_url = '/api/v1/unlocked-progress/current?studentId={0}'.format(student_id)
 		return self.mou_tai.get(api_url)

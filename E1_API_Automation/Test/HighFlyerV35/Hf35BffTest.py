@@ -876,7 +876,7 @@ class Hf35BffTest(HfBffTestBase):
         user_context_response = self.bff_service.get_student_context()
         assert_that(user_context_response.status_code , equal_to(200))
         self.course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
-        unlock_response = self.course_group_service.get_unlock_progress(self.customer_id)
+        unlock_response = self.course_group_service.get_current_unlock(self.customer_id)
         # substring by unit, output contentPath of book level
         content_path_for_book = unlock_response.json()['contentPath'][:unlock_response.json()['contentPath'].index('/unit')]
         # 1.current book will set the first available book without unlock , which covered in mega-bff integration test
