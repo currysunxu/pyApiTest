@@ -4,6 +4,8 @@ import requests
 
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Lib.Moutai import Moutai
+from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
+
 import jmespath
 
 
@@ -192,3 +194,15 @@ class Hf35BffService:
             except requests.exceptions.RequestException:
                 i += 1
                 time.sleep(1)
+
+    def get_bootstrap_controller_v2(self, platform):
+        return self.mou_tai.get("/mega/api/v2/bootstrap?platform={0}".format(platform))
+
+    def get_book_structure_v2(self, content_path):
+        encoded_content_path = CommonUtils.encode_url_content_path(content_path)
+        return self.mou_tai.get("/mega/api/v2/books/{0}/structure".format(encoded_content_path))
+
+    def get_student_context(self):
+        return self.mou_tai.get("/mega/api/v1/student/context")
+
+
