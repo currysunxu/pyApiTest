@@ -808,15 +808,17 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_content_path_unit(self):
-        test_path = "highflyers/cn-3/book-1/unit-3"
+        test_path = "highflyers/cn-3/book-2/unit-3"
         study_plan_entity = StudyPlanEntity(None, None, None)
         self.setter_study_plan_entity(study_plan_entity, test_path, 1)
-        self.sp_service.put_study_plan_test_entity(study_plan_entity)
         study_plan_path = study_plan_entity.ref_content_path
         content_path = self.bff_service.get_content_path(study_plan_path)
         assert_that(content_path.status_code, equal_to(200))
         if env_key != 'Live':
-            path = content_path.json()[0]
+            path = None
+            for plan in content_path.json():
+                if plan['productModule'] ==16:
+                    path = plan
             student_id, product_module = path['studentId'], path['productModule']
             study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id, product_module, study_plan_path)
             assert_that(path['refId'], equal_to(study_plan['ref_id']))
@@ -830,7 +832,7 @@ class Hf35BffTest(HfBffTestBase):
                 assert_that(path['completeAt'], equal_to(study_plan['complete_at']))
             else:
                 assert_that(path['completeAt'], equal_to(study_plan['complete_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-            assert_that(path['refProps'], equal_to(eval(study_plan['ref_props'])))
+            assert_that(path, Exist('refProps'))
 
     @Test(tags="qa, stg, live")
     def test_content_state(self):

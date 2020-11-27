@@ -1,7 +1,5 @@
 from enum import Enum
 
-
-
 class BffProduct(Enum):
     HFV35 = 'HFV35'
     TBV3 = 'TBV3'
@@ -84,8 +82,7 @@ class HF35DependService:
 
 
 class ExpectedData:
-    # for qa and stg, ocContext value in bootstrap is same
-    expected_oc_context_qa_stg = {
+    expected_oc_context_qa = {
         "scope": "OSD",
         "ocConfig": {
             "webUrl": "https://study-online-staging.ef.cn/index.html?platform=webview",
@@ -115,9 +112,41 @@ class ExpectedData:
             "agoraResourceCdnDomain": "https://evc-ts-qa.bj-englishtown.com"
         }
     }
+
+    expected_oc_context_stg = {
+        "scope": "OSD",
+        "ocConfig": {
+            "webUrl": "https://study-online-staging.ef.cn/index.html?platform=webview",
+            "svcDomain": "https://omni-apigateway-tc-staging.ef.cn",
+            "getTechCheckTokenUrl": "/api/v3/Classroom/TechCheck",
+            "getClassEntranceTokenUrl": "/api/v1/classroom/online/link"
+        },
+        "trackingConfig": {
+            "evcTrackingDomain": "https://omni-apigateway-tc-staging.ef.cn",
+            "visitorTrackingUrl": "/school/evclog/tracking/VisitorNonToken",
+            "behaviorTrackingUrl": "/school/evclog/tracking/BehaviorNonToken",
+            "classTrackingUrl": "/school/evclog/tracking/trackevcclass"
+        },
+        "evcConfig": {
+            "webBootstrapUrl": "/evc15/meeting/api/bootstrap",
+            "loggingUrl": "/evc15/meeting/api/log",
+            "evcDomainMappings": {
+                "EvcCN2": "https://evc-ts-staging.ef.com.cn",
+                "EvcCN1": "https://evc-ts-staging.ef.com.cn",
+                "EvcUS1": "https://qa-evc.ef.com"
+            }
+        },
+        "staticResource": {
+            "resourceCdnDomain": "https://evc-fe-staging.bj-englishtown.com",
+            "agoraWebResourceVersionUrl": "/evc15/meeting/api/clientversion?platform=ios",
+            "webResourceVersionUrl": "/_shared/evc15-fe-ios-bundle_kids/version.json",
+            "agoraResourceCdnDomain": "https://evc-fe-staging.bj-englishtown.com"
+        }
+    }
+
     expected_oc_context = {
-        'QA': expected_oc_context_qa_stg,
-        'Staging': expected_oc_context_qa_stg,
+        'QA': expected_oc_context_qa,
+        'Staging': expected_oc_context_stg,
         'Live': {
             "scope": "OSD",
             "ocConfig": {
@@ -149,6 +178,7 @@ class ExpectedData:
             }
         }
     }
+
 
 class BffSQLString:
     get_study_plan_by_student_id_sql = {
