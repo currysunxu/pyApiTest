@@ -10,6 +10,7 @@ class StoryblokReleaseProgram(Enum):
     READERS = 'Readers'
     VOCABULARIES = 'Vocabularies'
     HIGHFLYERS = 'Highflyers'
+    MOCKTEST = 'MockTest'
 
 
 class StoryBlokData:

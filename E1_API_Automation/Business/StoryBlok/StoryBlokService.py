@@ -35,6 +35,9 @@ class StoryBlokService:
     def get_storyblok_vocabs(self, page_number=1, page_size=25, published_at_start='', published_at_end=''):
         return self.get_storyblok_stories('vocabularies', page_number, page_size, published_at_start, published_at_end)
 
+    def get_storyblok_mocktest(self, page_number=1, page_size=25, published_at_start='', published_at_end=''):
+        return self.get_storyblok_stories('mt', page_number, page_size, published_at_start, published_at_end)
+
     def get_storyblok_book_by_scope(self, book_release_scope):
         # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         api_version = StoryBlokVersion.PUBLISHED.value
