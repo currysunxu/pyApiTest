@@ -27,39 +27,68 @@ class StoryBlokUtils:
             return StoryBlokVersion.PUBLISHED.value
 
     @staticmethod
-    def verify_storyblok_stories(storyblok_story_list, content_repo_eca_list, expected_release_revision):
-        content_revision_list = jmespath.search('[].contentRevision', content_repo_eca_list)
+    def verify_storyblok_stories(storyblok_story_list, content_repo_content_list, expected_release_revision,
+                                 release_type=None):
+        content_revision_list = jmespath.search('[].contentRevision', content_repo_content_list)
         content_revision_list = list(set(content_revision_list))
 
-        error_message = ''
+        error_message = []
         if len(content_revision_list) != 1:
-            error_message = 'ecas in content repo should have same content revision!'
+            error_message.append('ecas in content repo should have same content revision!')
             return error_message
 
         if content_revision_list[0] != expected_release_revision:
-            error_message = 'content revision not as expected! release revision should be:' + expected_release_revision
+            error_message.append(
+                'content revision not as expected! release revision should be:' + expected_release_revision)
             return error_message
 
-        if len(storyblok_story_list) != len(content_repo_eca_list):
-            error_message = 'storyblok story list size not same as content repo eca list size!'
+        if len(storyblok_story_list) != len(content_repo_content_list):
+            error_message.append('storyblok story list size not same as content repo eca list size!')
             return error_message
 
         for storyblok_story in storyblok_story_list:
             content_id = storyblok_story['uuid']
-            content_repo_reader = jmespath.search('[?contentId == \'{0}\']|[0]'.format(content_id),
-                                                  content_repo_eca_list)
-            error_message = error_message + StoryBlokUtils.verify_storyblok_story_with_contentrepo(storyblok_story,
-                                                                                                   content_repo_reader)
+            content_repo_content = jmespath.search('[?contentId == \'{0}\']|[0]'.format(content_id),
+                                                   content_repo_content_list)
+            error_message.extend(StoryBlokUtils.verify_storyblok_story_with_contentrepo(storyblok_story,
+                                                                                        content_repo_content,
+                                                                                        release_type))
         return error_message
 
     @staticmethod
-    def verify_storyblok_story_with_contentrepo(storyblok_story, content_repo_eca):
-        error_message = ''
+    def verify_storyblok_story_with_contentrepo(storyblok_story, content_repo_content, release_type=None):
+        error_message = []
         print('start verify storyblok story:' + storyblok_story['name'])
-        content_repo_eca_data = content_repo_eca['data']
+
+        component = ''
+        latest_activity_list = None
+        if release_type == StoryblokReleaseProgram.MOCKTEST:
+            component = storyblok_story['content']['component']
+            if content_repo_content['domainType'] != 'MT':
+                error_message.append('MockTest question\'s domainType in content-repo not equal to MT')
+                return error_message
+
+            # if component is 'mt_activity', then expected value is question, otherwise, it's PAPER
+            expected_entity_type = 'question'
+            if component == 'paper':
+                expected_entity_type = 'PAPER'
+                # for paper, the activity will be converted to latest activity in content-repo
+                content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+                paper_activity_id_list = jmespath.search("content.parts[].sections[].activities[].activity",
+                                                         storyblok_story)
+                latest_activity_list = content_repo_service.get_latest_activities(paper_activity_id_list).json()
+
+            if content_repo_content['entityType'] != expected_entity_type:
+                error_message.append(
+                    'MockTest story\'s entityType in content-repo not equal to {0}'.format(expected_entity_type))
+                return error_message
+
+        content_repo_content_data = content_repo_content['data']
         # content repo source field should be storyblok
-        if content_repo_eca_data['source'] != 'storyblok':
-            return 'reader/vocab eca field \'source\' in content-repo not equal to storyblok'
+        if content_repo_content_data['source'] != 'storyblok':
+            error_message.append(
+                'reader/vocab eca or mocktest activity field \'source\' in content-repo not equal to storyblok')
+            return error_message
 
         for key in storyblok_story.keys():
             if key not in (
@@ -68,65 +97,231 @@ class StoryBlokUtils:
                     'meta_data', 'group_id', 'first_published_at', 'release_id', 'lang', 'path', 'translated_slugs',
                     'parent_id'):
                 storyblock_value = storyblok_story[key]
-                if key == 'uuid':
-                    content_repo_value = content_repo_eca['contentId']
-                elif key == 'id':
-                    content_repo_value = content_repo_eca_data['originID']
-                else:
-                    content_repo_value = content_repo_eca_data[key]
 
-                error_message = error_message + StoryBlokUtils. \
-                    verify_storyblok_fields_with_contentrepo(key, storyblock_value, content_repo_value)
+                if key == 'uuid':
+                    content_repo_value = content_repo_content['contentId']
+                elif key == 'id':
+                    content_repo_value = content_repo_content_data['originID']
+                else:
+                    content_repo_value = content_repo_content_data[key]
+
+                if component == 'paper':
+                    error_message.extend(StoryBlokUtils.
+                                         verify_paper_fields_with_contentrepo(key, storyblock_value, content_repo_value,
+                                                                              latest_activity_list))
+                else:
+                    error_message.extend(StoryBlokUtils.
+                                         verify_storyblok_fields_with_contentrepo(key, storyblock_value,
+                                                                                  content_repo_value,
+                                                                                  release_type))
+            else:
+                # otherwise those key should not present in content_repo
+                if key in content_repo_content_data.keys():
+                    error_message.append(' key:{0} should not exist in content-repo.')
         if len(error_message) != 0:
             print(error_message)
         return error_message
 
     @staticmethod
-    def verify_storyblok_fields_with_contentrepo(key, storyblock_value, content_repo_value):
-        error_message = ''
+    def verify_storyblok_fields_with_contentrepo(key, storyblock_value, content_repo_value, release_type=None):
+        error_message = []
+
+        ''' 
+        if it's mock test question, and key in specific list, it's customized plugin in storyblok, the value is storyblok_story[key][key]
+        e.g.
+        "body": {
+                 "body": {
+                        "mappings": []
+                        },
+                        "plugin": "body"
+                }
+        '''
+        if release_type == StoryblokReleaseProgram.MOCKTEST and key in (
+                'body', 'tags', 'stimulus', 'questions', 'resources', 'explanation'):
+            if isinstance(storyblock_value, dict) and 'plugin' in storyblock_value.keys():
+                storyblock_value = storyblock_value[key]
 
         if key.endswith('image'):
-            error_message = error_message + StoryBlokUtils.verify_content_repo_asset(True, storyblock_value,
-                                                                                     content_repo_value)
+            error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
+                                                                          content_repo_value, True))
         elif key.endswith('audio'):
-            error_message = error_message + StoryBlokUtils.verify_content_repo_asset(False, storyblock_value,
-                                                                                     content_repo_value)
+            error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
+                                                                          content_repo_value, False))
         else:
             if isinstance(storyblock_value, list):
-                for i in range(len(storyblock_value)):
-                    storyblok_list_item = storyblock_value[i]
-                    content_repo_list_item = content_repo_value[i]
-                    error_message = error_message + StoryBlokUtils. \
-                        verify_storyblok_fields_with_contentrepo(key, storyblok_list_item, content_repo_list_item)
-
+                if len(storyblock_value) != len(content_repo_value):
+                    error_message.append(
+                        'length for key:{0} not consistent between storyblok and content_repo'.format(key))
+                else:
+                    for i in range(len(storyblock_value)):
+                        storyblok_list_item = storyblock_value[i]
+                        content_repo_list_item = content_repo_value[i]
+                        error_message.extend(StoryBlokUtils.
+                                             verify_storyblok_fields_with_contentrepo(key,
+                                                                                      storyblok_list_item,
+                                                                                      content_repo_list_item,
+                                                                                      release_type))
             elif isinstance(storyblock_value, dict):
                 for key in storyblock_value.keys():
                     if key not in (
                             '_uid', '_editable'):
                         storyblock_field_value = storyblock_value[key]
                         content_repo_field_value = content_repo_value[key]
-                        error_message = error_message + StoryBlokUtils. \
-                            verify_storyblok_fields_with_contentrepo(key, storyblock_field_value,
-                                                                     content_repo_field_value)
+                        error_message.extend(StoryBlokUtils.
+                                             verify_storyblok_fields_with_contentrepo(key, storyblock_field_value,
+                                                                                      content_repo_field_value,
+                                                                                      release_type))
+                    else:
+                        # otherwise those key should not present in content_repo
+                        if key in content_repo_value.keys():
+                            error_message.append(' key:{0} should not exist in content-repo.')
             else:
                 if str(storyblock_value) != str(content_repo_value):
-                    error_message = error_message + " key:" + key + "'s value in storyblok not equal to the value in content-repo." \
-                                                                    "The storyblok value is:" + str(
-                        storyblock_value) \
-                                    + ", but the value in content-repo is:" + str(content_repo_value)
+                    error_message.append(" key:" + key + "'s value in storyblok not equal to the value in content-repo." \
+                                                         "The storyblok value is:" + str(storyblock_value)
+                                         + ", but the value in content-repo is:" + str(content_repo_value))
 
         return error_message
 
     @staticmethod
-    def verify_content_repo_asset(is_asset_image, storyblok_asset_dict, content_repo_asset_dict):
-        error_message = ''
+    def verify_paper_activities_with_contentrepo(paper_activities, content_repo_activities, latest_activity_list):
+        error_message = []
+        if len(paper_activities) != len(content_repo_activities):
+            error_message.append('length for activities not consistent between storyblok and content_repo')
+        else:
+            for i in range(len(paper_activities)):
+                storyblok_activity = paper_activities[i]
+                content_repo_activity = content_repo_activities[i]
+
+                if content_repo_activity['activitySequence'] != (i + 1):
+                    error_message.append('activitySequence not as expected as {0}'.format(str(i + 1)))
+
+                for key in storyblok_activity.keys():
+                    if key not in ('_uid', 'component'):
+                        storyblok_activity_value = storyblok_activity[key]
+                        if key == 'activity':
+                            # activity field in storyblok will be converted to latest activity's contentId, contentRevision, schemaVersion
+                            expected_latest_activity = jmespath.search(
+                                "[?contentId == '{0}'] | [0]".format(storyblok_activity_value),
+                                latest_activity_list)
+                            expected_content_revision = expected_latest_activity['contentRevision']
+                            expected_schema_revision = expected_latest_activity['schemaVersion']
+                            if content_repo_activity['contentId'] != storyblok_activity_value:
+                                error_message.append(
+                                    ' contentId in content-repo not as expected:' + storyblok_activity_value)
+
+                            if content_repo_activity['contentRevision'] != expected_content_revision:
+                                error_message.append(
+                                    ' contentRevision in content-repo not as expected:' + expected_content_revision)
+
+                            if content_repo_activity['schemaVersion'] != expected_schema_revision:
+                                error_message.append(
+                                    ' schemaRevision in content-repo not as expected:' + expected_schema_revision)
+                        else:
+                            content_repo_activity_value = content_repo_activity[key]
+                            if str(storyblok_activity_value) != str(content_repo_activity_value):
+                                error_message.append(
+                                    " key:" + key + "'s value in storyblok not equal to the value in content-repo." \
+                                                    "The storyblok value is:" + str(
+                                        storyblok_activity_value) \
+                                    + ", but the value in content-repo is:" + str(content_repo_activity_value))
+                    else:
+                        # otherwise those key should not present in content_repo
+                        if key in content_repo_activity.keys():
+                            error_message.append(' key:{0} should not exist in content-repo activity')
+        return error_message
+
+    @staticmethod
+    def verify_paper_sections_with_contentrepo(paper_sections, content_repo_sections, latest_activity_list):
+        error_message = []
+        if len(paper_sections) != len(content_repo_sections):
+            error_message.append('length for sections not consistent between storyblok and content_repo')
+        else:
+            for i in range(len(paper_sections)):
+                storyblok_section = paper_sections[i]
+                content_repo_section = content_repo_sections[i]
+
+                if content_repo_section['sectionSequence'] != (i + 1):
+                    error_message.append(' sectionSequence not as expected as {0}'.format(str(i + 1)))
+
+                for key in storyblok_section.keys():
+                    storyblok_section_value = storyblok_section[key]
+                    if key == 'activities':
+                        expected_content_repo_value = content_repo_section[key]
+                        error_message.extend(StoryBlokUtils.verify_paper_activities_with_contentrepo(
+                            storyblok_section_value, expected_content_repo_value, latest_activity_list))
+                    else:
+                        # paper section's _uid will be converted to id into content-repo
+                        if key == '_uid':
+                            expected_content_repo_value = content_repo_section['id']
+                        else:
+                            expected_content_repo_value = content_repo_section[key]
+                        if str(storyblok_section_value) != str(expected_content_repo_value):
+                            error_message.append(
+                                " key:" + key + "'s value in storyblok not equal to the value in content-repo." \
+                                                "The storyblok value is:" + str(
+                                    storyblok_section_value) \
+                                + ", but the value in content-repo is:" + str(
+                                    expected_content_repo_value))
+        return error_message
+
+    @staticmethod
+    def verify_paper_fields_with_contentrepo(key, storyblock_value, content_repo_value, latest_activity_list=None):
+        error_message = []
+
+        if key == 'resource':
+            error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
+                                                                          content_repo_value))
+        elif key == 'sections':
+            error_message.extend(StoryBlokUtils.verify_paper_sections_with_contentrepo(storyblock_value,
+                                                                                       content_repo_value,
+                                                                                       latest_activity_list))
+        else:
+            if isinstance(storyblock_value, list):
+                if len(storyblock_value) != len(content_repo_value):
+                    error_message.append('length for key:{0} not consistent between storyblok and content_repo'.format(
+                        key))
+                else:
+                    for i in range(len(storyblock_value)):
+                        storyblok_list_item = storyblock_value[i]
+                        content_repo_list_item = content_repo_value[i]
+                        error_message.extend(StoryBlokUtils. \
+                                             verify_paper_fields_with_contentrepo(key, storyblok_list_item,
+                                                                                  content_repo_list_item,
+                                                                                  latest_activity_list))
+            elif isinstance(storyblock_value, dict):
+                for key in storyblock_value.keys():
+                    if key not in (
+                            '_uid', '_editable'):
+                        storyblock_field_value = storyblock_value[key]
+                        content_repo_field_value = content_repo_value[key]
+                        error_message.extend(StoryBlokUtils. \
+                                             verify_paper_fields_with_contentrepo(key, storyblock_field_value,
+                                                                                  content_repo_field_value,
+                                                                                  latest_activity_list))
+                    else:
+                        # otherwise those key should not present in content_repo
+                        if key in content_repo_value.keys():
+                            error_message.append(' key:{0} should not exist in content-repo.')
+            else:
+                if str(storyblock_value) != str(content_repo_value):
+                    error_message.append(" key:" + key + "'s value in storyblok not equal to the value in content-repo." \
+                                                         "The storyblok value is:" + str(
+                        storyblock_value) \
+                                         + ", but the value in content-repo is:" + str(content_repo_value))
+
+        return error_message
+
+    @staticmethod
+    def verify_content_repo_asset(storyblok_asset_dict, content_repo_asset_dict, is_asset_image=None):
+        error_message = []
 
         if isinstance(storyblok_asset_dict, str):
             if len(storyblok_asset_dict) == 0 and len(content_repo_asset_dict) == 0:
-                return ''
+                return []
             elif len(storyblok_asset_dict) == 0 and len(content_repo_asset_dict) != 0:
-                error_message = "asset section in content repo should be empty, is the asset image?" + str(
-                    is_asset_image)
+                error_message.append("asset section in content repo should be empty, is the asset image?" + str(
+                    is_asset_image))
                 return error_message
 
         storyblok_file_name = storyblok_asset_dict['filename']
@@ -135,8 +330,7 @@ class StoryBlokUtils:
 
             for key in content_repo_asset_dict.keys():
                 if key not in expected_filed_list:
-                    error_message = error_message + ' {0} is not a expected field in content repo asset section'.format(
-                        key)
+                    error_message.append(' {0} is not a expected field in content repo asset section'.format(key))
 
             if len(error_message) != 0:
                 return error_message
@@ -146,10 +340,9 @@ class StoryBlokUtils:
                     expected_value = 0
                 else:
                     expected_value = ''
-                error_message = error_message + StoryBlokUtils.verify_content_repo_asset_field(key,
-                                                                                               content_repo_asset_dict[
-                                                                                                   key],
-                                                                                               expected_value)
+                error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(key,
+                                                                                    content_repo_asset_dict[key],
+                                                                                    expected_value))
         else:
             expected_url = storyblok_file_name
             sha1_end_index = expected_url.rfind('/')
@@ -157,22 +350,22 @@ class StoryBlokUtils:
             expected_sha1 = expected_url[sha1_start_index + 1:sha1_end_index]
 
             compare_key = 'url'
-            error_message = error_message + StoryBlokUtils.verify_content_repo_asset_field(compare_key,
-                                                                                           content_repo_asset_dict[
-                                                                                               compare_key],
-                                                                                           expected_url)
+            error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
+                                                                                content_repo_asset_dict[
+                                                                                    compare_key],
+                                                                                expected_url))
             compare_key = 'sha1'
-            error_message = error_message + StoryBlokUtils.verify_content_repo_asset_field(compare_key,
-                                                                                           content_repo_asset_dict[
-                                                                                               compare_key],
-                                                                                           expected_sha1)
+            error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
+                                                                                content_repo_asset_dict[
+                                                                                    compare_key],
+                                                                                expected_sha1))
 
             # this value is set harcoded
             compare_key = 'size'
-            error_message = error_message + StoryBlokUtils.verify_content_repo_asset_field(compare_key,
-                                                                                           content_repo_asset_dict[
-                                                                                               compare_key],
-                                                                                           1024)
+            error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
+                                                                                content_repo_asset_dict[
+                                                                                    compare_key],
+                                                                                1024))
             if expected_url.endswith('.png'):
                 expected_mime_type = 'image/png'
             elif expected_url.endswith('.mp3'):
@@ -181,10 +374,16 @@ class StoryBlokUtils:
                 expected_mime_type = 'image/jpeg'
 
             compare_key = 'mimeType'
-            error_message = error_message + StoryBlokUtils.verify_content_repo_asset_field(compare_key,
-                                                                                           content_repo_asset_dict[
-                                                                                               compare_key],
-                                                                                           expected_mime_type)
+            error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
+                                                                                content_repo_asset_dict[
+                                                                                    compare_key],
+                                                                                expected_mime_type))
+
+            if is_asset_image is None:
+                if expected_mime_type == 'audio/mpeg':
+                    is_asset_image = False
+                else:
+                    is_asset_image = True
 
             if is_asset_image:
                 image_size_end_index = sha1_start_index
@@ -195,32 +394,33 @@ class StoryBlokUtils:
                 expected_height_value = image_size[split_index + 1:]
 
                 compare_key = 'width'
-                error_message = error_message + StoryBlokUtils.verify_content_repo_asset_field(compare_key,
-                                                                                               content_repo_asset_dict[
-                                                                                                   compare_key],
-                                                                                               expected_width_value)
+                error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
+                                                                                    content_repo_asset_dict[
+                                                                                        compare_key],
+                                                                                    expected_width_value))
 
                 compare_key = 'height'
-                error_message = error_message + StoryBlokUtils.verify_content_repo_asset_field(compare_key,
-                                                                                               content_repo_asset_dict[
-                                                                                                   compare_key],
-                                                                                               expected_height_value)
+                error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
+                                                                                    content_repo_asset_dict[
+                                                                                        compare_key],
+                                                                                    expected_height_value))
             else:
                 # for audio, there's no width and height, but have duration field
                 compare_key = 'duration'
-                error_message = error_message + StoryBlokUtils.verify_content_repo_asset_field(compare_key,
-                                                                                               content_repo_asset_dict[
-                                                                                                   compare_key],
-                                                                                               0)
+                error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
+                                                                                    content_repo_asset_dict[
+                                                                                        compare_key],
+                                                                                    0))
         return error_message
 
     @staticmethod
     def verify_content_repo_asset_field(field_name, content_repo_value, expected_value):
-        error_message = ''
+        error_message = []
         if str(content_repo_value) != str(expected_value):
-            error_message = "asset field:" + field_name + "'s value in content repo not as expected." \
-                                                          "The content_repo_value value is:" + str(content_repo_value) \
-                            + ", but expected value is:" + str(expected_value)
+            error_message.append("asset field:" + field_name + "'s value in content repo not as expected." \
+                                                               "The content_repo_value value is:" + str(
+                content_repo_value) \
+                                 + ", but expected value is:" + str(expected_value))
         return error_message
 
     @staticmethod
@@ -230,13 +430,13 @@ class StoryBlokUtils:
 
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
-        error_message = ''
+        error_message = []
         if len(content_revision_list) != 1:
-            error_message = 'reader levels in content map should have same content revision!'
+            error_message.append('reader levels in content map should have same content revision!')
             return error_message
 
         if len(storyblok_reader_level_list) != len(content_map_reader_level_list):
-            error_message = 'storyblok reader level list size not same as content map reader level list size!'
+            error_message.append('storyblok reader level list size not same as content map reader level list size!')
             return error_message
 
         for i in range(len(content_map_reader_level_list)):
@@ -256,8 +456,9 @@ class StoryBlokUtils:
 
             for key in expected_reader_level.keys():
                 if expected_reader_level[key] != content_map_reader_level[key]:
-                    error_message = error_message + 'key:{0} value not consistent between expected and content map for reader level {1}' \
-                        .format(key, expected_reader_level['title'])
+                    error_message.append(
+                        'key:{0} value not consistent between expected and content map for reader level {1}' \
+                            .format(key, expected_reader_level['title']))
 
             # verify unassigned readers under reader level
             storyblok_unassigned_readers = storyblok_reader_level['content']['unassigned_readers']
@@ -274,10 +475,11 @@ class StoryBlokUtils:
                                                                  content_map_reader_level['schemaVersion'])
             content_group_reader_metadata_list = reader_eca_group_response.json()[0]['childRefs']
 
-            error_message = error_message + StoryBlokUtils. \
-                verify_reader_vocab_content_groups(storyblok_unassigned_reader_uuid_list,
-                                                   unassigned_reader_latest_eca_list,
-                                                   content_group_reader_metadata_list, StoryblokReleaseProgram.READERS)
+            error_message.extend(StoryBlokUtils. \
+                                 verify_reader_vocab_content_groups(storyblok_unassigned_reader_uuid_list,
+                                                                    unassigned_reader_latest_eca_list,
+                                                                    content_group_reader_metadata_list,
+                                                                    StoryblokReleaseProgram.READERS))
 
         return error_message
 
@@ -285,10 +487,10 @@ class StoryBlokUtils:
     @staticmethod
     def verify_reader_vocab_content_groups(storyblok_reader_vocab_uuid_list, latest_eca_list,
                                            content_group_childref_list, type):
-        error_message = ''
+        error_message = []
 
         if len(storyblok_reader_vocab_uuid_list) != len(content_group_childref_list):
-            error_message = 'storyblok reader/vocab list size not same as content repo childref list size!'
+            error_message.append('storyblok reader/vocab list size not same as content repo childref list size!')
             return error_message
 
         for i in range(len(storyblok_reader_vocab_uuid_list)):
@@ -316,19 +518,20 @@ class StoryBlokUtils:
 
             for key in actual_content_group_childref.keys():
                 if str(actual_content_group_childref[key]) != str(expected_content_group_childref[key]):
-                    error_message = error_message + 'key:{0} value not consistent between expected and content repo for reader {1}' \
-                        .format(key, reader_vocab_uuid)
+                    error_message.append('key:{0} value not consistent between expected and content repo for reader {1}' \
+                                         .format(key, reader_vocab_uuid))
         return error_message
 
     @staticmethod
     def verify_reader_after_highflyers_release(book_in_content_map, storyblok_reader_config_list,
                                                book_reader_content_group_list):
-        error_message = ''
+        error_message = []
         region_ach = book_in_content_map['regionAch']
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
         if len(storyblok_reader_config_list) != len(book_reader_content_group_list):
-            error_message = 'storyblok reader config list size not same as book\'s reader content group list size!'
+            error_message.append(
+                'storyblok reader config list size not same as book\'s reader content group list size!')
             return error_message
 
         unit_content_path_list_in_content_map = jmespath.search('children[].contentPath', book_in_content_map)
@@ -358,8 +561,7 @@ class StoryBlokUtils:
             # verify the eca group's parentRef
             diff_list = json_tools.diff(actual_eca_group_parent_ref, expected_content_group_parent_ref)
             if len(diff_list) != 0:
-                error_message = error_message + 'eca_group parentref not as expected, diff:' + str(diff_list)
-
+                error_message.append('eca_group parentref not as expected, diff:' + str(diff_list))
 
             # verfiy all the assigned readers and ef readers in storyblok consistent with content group
             storyblok_assigned_reader_uuid_list = jmespath.search('content.assigned_readers[].reader',
@@ -368,10 +570,10 @@ class StoryBlokUtils:
             reader_uuid_list = storyblok_assigned_reader_uuid_list + ef_reader_uuid_list
 
             reader_latest_eca_list = content_repo_service.get_latest_ecas(reader_uuid_list).json()
-            error_message = error_message + \
-                            StoryBlokUtils.verify_reader_vocab_content_groups(reader_uuid_list, reader_latest_eca_list,
-                                                                              book_reader_content_group['childRefs'],
-                                                                              StoryblokReleaseProgram.READERS)
+            error_message.extend(
+                StoryBlokUtils.verify_reader_vocab_content_groups(reader_uuid_list, reader_latest_eca_list,
+                                                                  book_reader_content_group['childRefs'],
+                                                                  StoryblokReleaseProgram.READERS))
 
             # check ef_reader's reader_provider is EF
             for ef_reader_uuid in ef_reader_uuid_list:
@@ -379,13 +581,13 @@ class StoryBlokUtils:
                                                              .format(ef_reader_uuid), book_reader_content_group)
 
                 if ef_reader_in_content_group['metadata']['reader_provider'] != 'EF':
-                    error_message = error_message + 'ef reader:{0} \'s reader_provider is not EF!'
+                    error_message.append('ef reader:{0} \'s reader_provider is not EF!')
         return error_message
 
     @staticmethod
     def verify_vocab_after_highflyers_release(book_in_content_map, storyblok_vocab_config_list,
                                               book_vocab_content_group_list):
-        error_message = ''
+        error_message = []
         region_ach = book_in_content_map['regionAch']
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
@@ -393,7 +595,7 @@ class StoryBlokUtils:
         vocab_asset_group_list = jmespath.search('[?groupType==\'ASSET_GROUP\']', book_vocab_content_group_list)
 
         if len(storyblok_vocab_config_list) != len(vocab_eca_group_list):
-            error_message = 'storyblok vocab config list size not same as book\'s vocab eca group list size!'
+            error_message.append('storyblok vocab config list size not same as book\'s vocab eca group list size!')
             return error_message
 
         unit_content_path_list_in_content_map = jmespath.search('children[].contentPath', book_in_content_map)
@@ -424,23 +626,22 @@ class StoryBlokUtils:
             # verify the eca group's parentRef
             diff_list = json_tools.diff(actual_eca_group_parent_ref, expected_content_group_parent_ref)
             if len(diff_list) != 0:
-                error_message = error_message + 'eca_group parentref not as expected, diff:' + str(diff_list)
+                error_message.append('eca_group parentref not as expected, diff:' + str(diff_list))
 
             actual_asset_group_parent_ref = vocab_asset_group['parentRef']
             # verify the asset group's parentRef
             diff_list = json_tools.diff(actual_asset_group_parent_ref, expected_content_group_parent_ref)
             if len(diff_list) != 0:
-                error_message = error_message + 'asset_group parentref not as expected, diff:' + str(diff_list)
+                error_message.append('asset_group parentref not as expected, diff:' + str(diff_list))
 
             # verfiy related vocabs in storyblok consistent with content group
             storyblok_vocab_uuid_list = jmespath.search('content.vocabularies[]', storyblok_vocab_config)
 
             vocab_latest_eca_list = content_repo_service.get_latest_ecas(storyblok_vocab_uuid_list).json()
-            error_message = error_message + \
-                            StoryBlokUtils.verify_reader_vocab_content_groups(storyblok_vocab_uuid_list,
-                                                                              vocab_latest_eca_list,
-                                                                              vocab_eca_group['childRefs'],
-                                                                              StoryblokReleaseProgram.VOCABULARIES)
+            error_message.extend(StoryBlokUtils.verify_reader_vocab_content_groups(storyblok_vocab_uuid_list,
+                                                                                   vocab_latest_eca_list,
+                                                                                   vocab_eca_group['childRefs'],
+                                                                                   StoryblokReleaseProgram.VOCABULARIES))
 
             expected_asset_list = jmespath.search('[].data.content.image',
                                                   vocab_latest_eca_list) + jmespath.search('[].data.content.audio',
@@ -452,7 +653,7 @@ class StoryBlokUtils:
             actual_asset_group_childrefs = sorted(vocab_asset_group['childRefs'], key=lambda k: k['url'])
             diff_list = json_tools.diff(actual_asset_group_childrefs, expected_asset_list)
             if len(diff_list) != 0:
-                error_message = error_message + 'asset_group childref not as expected, diff:' + str(diff_list)
+                error_message.append('asset_group childref not as expected, diff:' + str(diff_list))
 
         return error_message
 
@@ -468,7 +669,8 @@ class StoryBlokUtils:
     @staticmethod
     def convert_asset_name(asset_name):
         if len(asset_name.rsplit('.', 1)) == 2:
-            asset_name = re.sub(r'\W', "-", asset_name.rsplit('.', 1)[0]).rstrip('-') + "." + asset_name.rsplit('.', 1)[1]
+            asset_name = re.sub(r'\W', "-", asset_name.rsplit('.', 1)[0]).rstrip('-') + "." + asset_name.rsplit('.', 1)[
+                1]
             new_asset_name = [""]
             for str in asset_name:
                 if str != new_asset_name[-1] or str != '-':
@@ -526,7 +728,8 @@ class StoryBlokUtils:
 
         for key in mt_tpl_data.keys():
             error_message.extend(StoryBlokUtils.verify_mt_fields_with_storyblok_question(key, mt_tpl_data[key],
-                                                                                         storyblok_question_content[key]))
+                                                                                         storyblok_question_content[
+                                                                                             key]))
         return error_message
 
     @staticmethod
@@ -556,7 +759,8 @@ class StoryBlokUtils:
                 storyblok_question_value = storyblok_question_value[key]
 
         if key == 'url':
-            error_message.extend(StoryBlokUtils.verify_mt_resource_with_storyblok(mt_acvitity_value, storyblok_question_value))
+            error_message.extend(
+                StoryBlokUtils.verify_mt_resource_with_storyblok(mt_acvitity_value, storyblok_question_value))
         else:
             if isinstance(mt_acvitity_value, list):
                 # if it's empty list for mt, then it should be empty list for storyblok too
@@ -567,7 +771,7 @@ class StoryBlokUtils:
                         mt_list_item = mt_acvitity_value[i]
                         storyblok_list_item = storyblok_question_value[i]
                         error_message.extend(StoryBlokUtils.verify_mt_fields_with_storyblok_question(key, mt_list_item,
-                                                                                           storyblok_list_item))
+                                                                                                     storyblok_list_item))
 
             elif isinstance(mt_acvitity_value, dict):
                 for key in mt_acvitity_value.keys():
@@ -575,12 +779,13 @@ class StoryBlokUtils:
                     # print("verify key:" + key)
                     storyblok_field_value = storyblok_question_value[key]
                     error_message.extend(StoryBlokUtils.verify_mt_fields_with_storyblok_question(key, mt_field_value,
-                                                                                  storyblok_field_value))
+                                                                                                 storyblok_field_value))
             else:
                 if str(mt_acvitity_value) != str(storyblok_question_value):
-                    error_message.append(" key:" + key + "'s value in mt_activity not equal to the value in storyblok question." \
-                                                         "The aem value is:" + str(mt_acvitity_value) \
-                                         + ", but the value in storyblok question is:" + str(storyblok_question_value))
+                    error_message.append(
+                        " key:" + key + "'s value in mt_activity not equal to the value in storyblok question." \
+                                        "The aem value is:" + str(mt_acvitity_value) \
+                        + ", but the value in storyblok question is:" + str(storyblok_question_value))
 
         return error_message
 

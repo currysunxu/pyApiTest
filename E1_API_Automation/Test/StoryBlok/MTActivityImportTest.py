@@ -59,7 +59,7 @@ class MTActivityImportTest:
         #         page_number = page_number + 1
         #
         # print('-------------get question total number is:{0}-----------------'.format(str(total_count)))
-
+        count = 0
         for mt_activity in valid_activity_list:
             mt_activity_id = mt_activity['id']
             mt_tpl_data = mt_activity['tpl_data']
@@ -83,4 +83,6 @@ class MTActivityImportTest:
             storyblok_question = storyblok_question_response.json()['story']
             error_message = StoryBlokUtils.verify_mt_activity_with_storyblok_question(mt_activity, storyblok_question)
             assert_that(len(error_message) == 0, error_message)
+            count = count + 1
             print('-----------------------End of verify mt_activity:' + str(mt_activity_id))
+        print('----Verified total activity number is:' + str(count))
