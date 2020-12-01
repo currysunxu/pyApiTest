@@ -88,11 +88,11 @@ class StoryBlokImportCheckTool:
                 error_message.append(
                     "The translation of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
                         vocab_entity.vocab_name, row))
-            if not vocab_entity.image_filename or vocab_entity.image_filename not in story['content']['image']['filename']:
+            if not vocab_entity.image_filename or vocab_entity.image_filename != story['content']['image']['filename']:
                 error_message.append(
                     "The image asset of the word {0} in the excel is not same as it in the storyblok at row {1}".format(
                         vocab_entity.vocab_name, row))
-            if not vocab_entity.audio_filename or vocab_entity.audio_filename not in story['content']['audio']['filename']:
+            if not vocab_entity.audio_filename or vocab_entity.audio_filename != story['content']['audio']['filename']:
                 error_message.append(
                     "The audio asset of the word {0} in the excel is not same as it in the storyblok at row {1}".format(
                         vocab_entity.vocab_name, row))
