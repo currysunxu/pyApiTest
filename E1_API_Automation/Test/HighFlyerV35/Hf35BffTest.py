@@ -27,6 +27,7 @@ from E1_API_Automation.Business.ProvisioningService import ProvisioningService
 from E1_API_Automation.Business.UpsPrivacyService import UpsPrivacyService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
+from E1_API_Automation.Lib.HamcrestExister import Exist
 from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct

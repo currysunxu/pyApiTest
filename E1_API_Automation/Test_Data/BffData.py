@@ -109,7 +109,7 @@ class ExpectedData:
             "resourceCdnDomain": "https://evc-fe-qa.bj-englishtown.com",
             "webResourceVersionUrl": "/_shared/evc15-fe-android-bundle_kids/version.json",
             "agoraWebResourceVersionUrl": "/evc15/meeting/api/clientversion?platform=android",
-            "agoraResourceCdnDomain": "https://evc-ts-qa.bj-englishtown.com"
+            "agoraResourceCdnDomain": "https://evc-fe.bj-englishtown.com"
         }
     }
 
@@ -171,10 +171,10 @@ class ExpectedData:
                 }
             },
             "staticResource": {
-                "resourceCdnDomain": "http://cns.ef-cdn.com",
+                "resourceCdnDomain": "https://evc-fe.bj-englishtown.com",
                 "webResourceVersionUrl": "/_shared/evc15-fe-ios-bundle_kids/version.json",
                 "agoraWebResourceVersionUrl": "/evc15/meeting/api/clientversion?platform=ios",
-                "agoraResourceCdnDomain": "https://evc-ts.ef.com.cn"
+                "agoraResourceCdnDomain": "https://evc-fe.bj-englishtown.com"
             }
         }
     }

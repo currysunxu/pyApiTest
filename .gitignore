@@ -2,3 +2,6 @@ __pycache__
 test_out_put
 .idea
 test-output/
+venv
+venv/
+/venv/
