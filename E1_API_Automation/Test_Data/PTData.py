@@ -4,7 +4,9 @@ class PTUsers:
                'Staging': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNBJS21",
                            'ss_scheduledDate': [{"day": 12, "month": 6, "year": 2019}],'hf_scheduledDate': [{"day": 19, "month": 5, "year": 2019}]},
                'Live': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNTES01",
-                        'scheduledDate': [{"day": 12, "month": 6, "year": 2019}]}
+                        'scheduledDate': [{"day": 12, "month": 6, "year": 2019}]},
+               'Live_SG': {'username': 'edtech.test1@ef.id', 'password': 'efef@111', 'school': "DIDTES01",
+                        'ss_scheduledDate': [{"day": 2, "month": 12, "year": 2020}]}
                }
 
     RootCourseKey = {"HF": "0fd4253a-7727-491a-9a68-cf9f8d88179f",
