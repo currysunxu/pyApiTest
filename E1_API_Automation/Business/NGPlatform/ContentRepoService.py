@@ -46,6 +46,10 @@ class ContentRepoService:
 		api_url = "/api/v1/content-groups"
 		return self.mou_tai.post(api_url, content_group_body)
 
-	def get_latest_ecas(self,content_id_list):
+	def get_latest_ecas(self, content_id_list):
 		api_url = "/api/v1/eca/latest"
-		return self.mou_tai.post(api_url,content_id_list)
+		return self.mou_tai.post(api_url, content_id_list)
+
+	def get_latest_activities(self, content_id_list):
+		api_url = "/api/v1/activities/latest"
+		return self.mou_tai.post(api_url, content_id_list)

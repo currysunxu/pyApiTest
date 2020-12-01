@@ -1,8 +1,8 @@
-import hashlib
 from datetime import datetime
 from datetime import timedelta
 
 import jmespath
+from hamcrest import assert_that
 from ptest.decorator import TestClass, Test
 
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
@@ -12,10 +12,9 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum impor
     ContentRepoGroupType
 from E1_API_Automation.Business.StoryBlok.StoryBlokReleaseService import StoryBlokReleaseService
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
+from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
 from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, CONTENT_MAP_ENVIRONMENT, STORYBLOK_RELEASE_ENVIRONMENT
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData, StoryblokReleaseProgram
-from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
-from hamcrest import assert_that
 
 
 @TestClass()
@@ -51,7 +50,7 @@ class StoryBlokTestCases:
 
         error_message = StoryBlokUtils.verify_storyblok_reader_levels(storyblok_reader_level_list,
                                                                       content_map_reader_level_list)
-        assert_that(error_message == '', error_message)
+        assert_that(len(error_message) == 0, error_message)
 
     # test vocab release, also support incremental release verification
     @Test(tags="qa")
@@ -69,7 +68,6 @@ class StoryBlokTestCases:
                                                release_history_response.json())
         expected_release_revision = release_history_list[0]['releaseRevision']
         if len(release_history_list) >= 2:
-            # published_at_start_date = release_history_list[1]['startAt']
             published_at_start_date = release_history_list[1]['maxContentTime']
             if published_at_start_date is None:
                 published_at_start_date = '1970-01-01'
@@ -82,7 +80,6 @@ class StoryBlokTestCases:
         else:
             published_at_start_date = ''
             published_at_end_date = ''
-
         storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
         page_number = 1
         page_size = 100
@@ -92,10 +89,14 @@ class StoryBlokTestCases:
                 get_storyblok_stories_response = storyblok_service.get_storyblok_readers(page_number, page_size,
                                                                                          published_at_start_date,
                                                                                          published_at_end_date)
-            else:
+            elif release_type == StoryblokReleaseProgram.VOCABULARIES:
                 get_storyblok_stories_response = storyblok_service.get_storyblok_vocabs(page_number, page_size,
                                                                                         published_at_start_date,
                                                                                         published_at_end_date)
+            else:
+                get_storyblok_stories_response = storyblok_service.get_storyblok_mocktest(page_number, page_size,
+                                                                                          published_at_start_date,
+                                                                                          published_at_end_date)
             assert_that(get_storyblok_stories_response.status_code == 200)
             content_id_list = jmespath.search('stories[].uuid', get_storyblok_stories_response.json())
             storyblok_story_list = jmespath.search('stories', get_storyblok_stories_response.json())
@@ -105,11 +106,15 @@ class StoryBlokTestCases:
                 break
 
             content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
-            latest_eca_response = content_repo_service.get_latest_ecas(content_id_list)
-            assert_that(latest_eca_response.status_code == 200)
-            error_message = StoryBlokUtils.verify_storyblok_stories(storyblok_story_list, latest_eca_response.json(),
-                                                                    expected_release_revision)
-            assert_that(error_message == '', error_message)
+            if release_type == StoryblokReleaseProgram.MOCKTEST:
+                latest_content_response = content_repo_service.get_latest_activities(content_id_list)
+            else:
+                latest_content_response = content_repo_service.get_latest_ecas(content_id_list)
+            assert_that(latest_content_response.status_code == 200)
+            error_message = StoryBlokUtils.verify_storyblok_stories(storyblok_story_list,
+                                                                    latest_content_response.json(),
+                                                                    expected_release_revision, release_type)
+            assert_that(len(error_message) == 0, error_message)
             total_count = total_count + len(storyblok_story_list)
             # if content fetched list less than page_size, then end the loop
             if len(storyblok_story_list) < page_size:
@@ -133,7 +138,8 @@ class StoryBlokTestCases:
         self.test_highflyers_release_by_scope([release_scope], region_achs)
 
     # test highflyers release by release scope
-    @Test(data_provider=(["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j"], ["cn-3", "cn-3-144"]))
+    @Test(data_provider=(
+    ["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j"], ["cn-3", "cn-3-144"]))
     def test_highflyers_release_by_scope(self, release_scopes, region_achs):
         for release_scope in release_scopes:
             for region_ach in region_achs:
@@ -175,7 +181,7 @@ class StoryBlokTestCases:
                 error_message = StoryBlokUtils.verify_reader_after_highflyers_release(book_in_content_map,
                                                                                       storyblok_reader_configs_with_order,
                                                                                       book_reader_content_groups)
-                assert_that(error_message == '', error_message)
+                assert_that(len(error_message) == 0, error_message)
 
                 # verify vocab in this book
                 book_vocab_content_groups = \
@@ -191,4 +197,8 @@ class StoryBlokTestCases:
                 error_message = StoryBlokUtils.verify_vocab_after_highflyers_release(book_in_content_map,
                                                                                      storyblok_vocab_configs_with_order,
                                                                                      book_vocab_content_groups)
-                assert_that(error_message == '', error_message)
+                assert_that(len(error_message) == 0, error_message)
+
+    @Test(tags="qa")
+    def test_mt_question_release(self):
+        self.test_storyblok_release(StoryblokReleaseProgram.MOCKTEST)
