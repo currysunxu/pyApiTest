@@ -1,12 +1,18 @@
+import json
+
 import jmespath
 import json_tools
 import re
 from tkinter.filedialog import askopenfilename
 import zipfile
 
+from hamcrest import assert_that
+
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
     ContentRepoGroupType
+from E1_API_Automation.Business.StoryBlok.StoryBlokImportService import StoryBlokImportService
+from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokVersion, StoryblokReleaseProgram
@@ -318,6 +324,7 @@ class StoryBlokUtils:
     def verify_reader_after_highflyers_release(book_in_content_map, storyblok_reader_config_list,
                                                book_reader_content_group_list):
         error_message = ''
+        region_ach = book_in_content_map['regionAch']
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
         if len(storyblok_reader_config_list) != len(book_reader_content_group_list):
@@ -332,6 +339,8 @@ class StoryBlokUtils:
             book_reader_content_group = book_reader_content_group_list[i]
 
             storyblok_correlation_path = storyblok_reader_config['content']['parent']['content']['correlation_path']
+            storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
+                storyblok_correlation_path, region_ach)
             unit_in_content_map = jmespath.search(
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
@@ -377,6 +386,7 @@ class StoryBlokUtils:
     def verify_vocab_after_highflyers_release(book_in_content_map, storyblok_vocab_config_list,
                                               book_vocab_content_group_list):
         error_message = ''
+        region_ach = book_in_content_map['regionAch']
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
         vocab_eca_group_list = jmespath.search('[?groupType==\'ECA_GROUP\']', book_vocab_content_group_list)
@@ -395,6 +405,8 @@ class StoryBlokUtils:
             vocab_asset_group = vocab_asset_group_list[i]
 
             storyblok_correlation_path = storyblok_vocab_config['content']['parent']['content']['correlation_path']
+            storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
+                storyblok_correlation_path, region_ach)
             unit_in_content_map = jmespath.search(
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
@@ -464,3 +476,132 @@ class StoryBlokUtils:
             convert_name = ''.join(new_asset_name).lower()
             return convert_name
         return None
+
+    @staticmethod
+    def get_storyblok_correlation_path_wth_region(storyblok_correlation_path, region_ach):
+        slash_index = storyblok_correlation_path.index('/')
+        # correlation_path in storyblok is like "highflyers/book-7", need to add region into it to become: highflyers/cn-3/book-7
+        return storyblok_correlation_path[:slash_index] + '/' + region_ach + storyblok_correlation_path[slash_index:]
+
+    def convert_n_bytes(self, n, b):
+        bits = b * 8
+        return (n + 2 ** (bits - 1)) % 2 ** bits - 2 ** (bits - 1)
+
+    def convert_4_bytes(self, n):
+        return self.convert_n_bytes(n, 4)
+
+    # inorder to generate hashcode value same as JAVA's string.hashcode()
+    @classmethod
+    def getHashCode(cls, s):
+        h = 0
+        n = len(s)
+        for i, c in enumerate(s):
+            h = h + ord(c) * 31 ** (n - 1 - i)
+        return cls().convert_4_bytes(h)
+
+    @staticmethod
+    def get_folder_slug(folder_name):
+        pattern = re.compile(r'[A-Za-z0-9]+', re.I)
+
+        folder_slug = pattern.search(folder_name)
+        # for chinese name folder, feature will convert it into hashcode value
+        if folder_slug is None:
+            return StoryBlokUtils.getHashCode(folder_name)
+        else:
+            return folder_slug.group().lower()
+
+    @staticmethod
+    def verify_mt_activity_with_storyblok_question(mt_activity, storyblok_question):
+        mt_tpl_data = mt_activity['tpl_data']
+        mt_tpl_data = json.loads(mt_tpl_data)
+
+        error_message = []
+        if str(storyblok_question['slug']) != str(mt_activity['id']):
+            error_message.append('question slug not expected as:' + mt_activity['id'])
+
+        storyblok_question_content = storyblok_question['content']
+
+        if storyblok_question_content['component'] != 'mt_activity':
+            error_message.append('question component should be mt_activity for question: {0}'.format(mt_activity['id']))
+
+        for key in mt_tpl_data.keys():
+            error_message.extend(StoryBlokUtils.verify_mt_fields_with_storyblok_question(key, mt_tpl_data[key],
+                                                                                         storyblok_question_content[key]))
+        return error_message
+
+    @staticmethod
+    def verify_mt_fields_with_storyblok_question(key, mt_acvitity_value, storyblok_question_value):
+        error_message = []
+
+        '''for those keys, in storyblok, it have been configured as plugin, so, the actual value is storyblok_question_value[key]
+        e.g.
+            "body": {
+                "body": {
+                    "mappings": []
+                },
+                "plugin": "body"
+            }
+        '''
+        if key in ('body', 'tags', 'stimulus', 'questions', 'resources', 'explanation'):
+            # only when storyblok value is dict and there's plugin field exist, then do this logic, otherwise, it's normal field
+            if isinstance(storyblok_question_value, dict) and 'plugin' in storyblok_question_value.keys():
+                if key != 'questions':
+                    if storyblok_question_value['plugin'] != key:
+                        error_message.append('{0}\'s plugin value not expected as {1}'.format(key, key))
+                else:
+                    # questions field's plugin value is mt-questions
+                    if storyblok_question_value['plugin'] != 'mt-questions':
+                        error_message.append('{0}\'s plugin value not expected as mt-questions'.format(key))
+
+                storyblok_question_value = storyblok_question_value[key]
+
+        if key == 'url':
+            error_message.extend(StoryBlokUtils.verify_mt_resource_with_storyblok(mt_acvitity_value, storyblok_question_value))
+        else:
+            if isinstance(mt_acvitity_value, list):
+                # if it's empty list for mt, then it should be empty list for storyblok too
+                if len(mt_acvitity_value) != len(storyblok_question_value):
+                    error_message.append('length for key:{0} not consistent between mt and storyblok'.format(key))
+                else:
+                    for i in range(len(mt_acvitity_value)):
+                        mt_list_item = mt_acvitity_value[i]
+                        storyblok_list_item = storyblok_question_value[i]
+                        error_message.extend(StoryBlokUtils.verify_mt_fields_with_storyblok_question(key, mt_list_item,
+                                                                                           storyblok_list_item))
+
+            elif isinstance(mt_acvitity_value, dict):
+                for key in mt_acvitity_value.keys():
+                    mt_field_value = mt_acvitity_value[key]
+                    # print("verify key:" + key)
+                    storyblok_field_value = storyblok_question_value[key]
+                    error_message.extend(StoryBlokUtils.verify_mt_fields_with_storyblok_question(key, mt_field_value,
+                                                                                  storyblok_field_value))
+            else:
+                if str(mt_acvitity_value) != str(storyblok_question_value):
+                    error_message.append(" key:" + key + "'s value in mt_activity not equal to the value in storyblok question." \
+                                                         "The aem value is:" + str(mt_acvitity_value) \
+                                         + ", but the value in storyblok question is:" + str(storyblok_question_value))
+
+        return error_message
+
+    @staticmethod
+    def verify_mt_resource_with_storyblok(mt_resource_url, storyblok_resource_url):
+        print("start verify url:" + mt_resource_url)
+        error_message = []
+        mt_resource_response = StoryBlokImportService.get_mt_resource(mt_resource_url)
+        assert_that(mt_resource_response.status_code == 200,
+                    'mt resource response status is not 200:' + mt_resource_url)
+        mt_resource_sha1 = CommonUtils.get_asset_sha1(mt_resource_response.content)
+
+        storyblok_resource_response = StoryBlokImportService.get_storyblok_resource(storyblok_resource_url)
+        assert_that(storyblok_resource_response.status_code == 200,
+                    'storyblok resource response status is {0}, not 200 for url: {1}'
+                    .format(storyblok_resource_response.status_code, storyblok_resource_url))
+        storyblok_resource_sha1 = CommonUtils.get_asset_sha1(storyblok_resource_response.content)
+
+        if mt_resource_sha1 != storyblok_resource_sha1:
+            error_message.append(
+                "resource in MT not consistent with Storyblok, MT resource url is:{0}, storyblok resource url is:{1}, sha1 is:{2}".format(
+                    mt_resource_url, storyblok_resource_url, storyblok_resource_sha1))
+        print("enf of verify url:" + mt_resource_url)
+        return error_message

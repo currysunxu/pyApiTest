@@ -103,6 +103,11 @@ class StoryblokReleaseEnvironment(object):
     LIVE = "https://internal-ktsvc.ef.cn/storyblok-release"
 
 
+class StoryblokImportEnvironment(object):
+    QA = "https://internal-ktsvc-qa.ef.cn/storyblok-import"
+    LIVE = "https://internal-ktsvc.ef.cn/storyblok-import"
+
+
 class E1TPIEnvironment(object):
     STAGING = "https://e1tpi-staging.ef.cn"
     STAGING_SG = "https://e1tpi-staging.ef.com"
@@ -122,7 +127,7 @@ class LearningProfileEnvironment(object):
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'QA'
+    os.environ['environment'] = 'STG'
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
@@ -141,6 +146,7 @@ if os.environ['environment'] == 'QA':
     CONTENT_BUILDER_ENVIRONMENT = ContentBuilderEnvironment.QA
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
+    STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -236,6 +242,7 @@ elif os.environ['environment'] == 'LIVE':
     CONTENT_BUILDER_ENVIRONMENT = ContentBuilderEnvironment.LIVE
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.LIVE
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.LIVE
+    STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.LIVE
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {

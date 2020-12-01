@@ -168,22 +168,32 @@ class Hf35BffTest(HfBffTestBase):
         content_map_response = self.get_course_from_content_map(course, scheme_version, json_body)
         assert_that(bff_course_response.json(), equal_to(content_map_response.json()))
 
-    @Test(tags="qa, stg, live", data_provider=[("HIGH_FLYERS_35", "1")])
-    def test_get_book_structure(self, course, scheme_version):
+    @Test(tags="qa, stg, live", data_provider=[("HIGH_FLYERS_35", "1","cn-3"),("HIGH_FLYERS_35", "1","cn-3-144")])
+    def test_get_book_structure(self, course, scheme_version,region_ach):
         json_body = {
             "childTypes": ["COURSE", "BOOK", "UNIT", "LESSON"],
             "contentId": None,
-            "regionAch": "cn-3",
+            "regionAch": region_ach,
             "treeRevision": None
         }
         content_map_response = self.get_course_from_content_map(course, scheme_version, json_body)
         assert_that(content_map_response.status_code == 200)
         content_id_from_content_map = content_map_response.json()["contentId"]
         tree_revision_from_content_map = content_map_response.json()["treeRevision"]
-        bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,
-                                                                tree_revision_from_content_map)
-        assert_that(bff_book_response.status_code, equal_to(200))
-        assert_that(bff_book_response.json(), equal_to(content_map_response.json()))
+        first_book_content_path = content_map_response.json()["children"][0]["contentPath"]
+        treeRevision = content_map_response.json()['treeRevision']
+        if region_ach == "cn-3":
+            bff_book_response = self.bff_service.get_book_structure(content_id_from_content_map,
+                                                                    tree_revision_from_content_map)
+            assert_that(bff_book_response.status_code, equal_to(200))
+            assert_that(bff_book_response.json(), equal_to(content_map_response.json()))
+        else:
+            bff_book_response_v2 = self.bff_service.get_book_structure_v2(first_book_content_path)
+            # join treeRevision to book level in contentMap's children response
+            content_map_response_for_first_book = content_map_response.json()["children"][0]
+            content_map_response_for_first_book['treeRevision'] = treeRevision
+            assert_that(bff_book_response_v2.status_code, equal_to(200))
+            assert_that(bff_book_response_v2.json(), equal_to(content_map_response_for_first_book))
 
     def verify_bff_api_response_with_invalid_token(self, invalid_type, api_response):
         if invalid_type in ("noToken", ""):
@@ -355,11 +365,14 @@ class Hf35BffTest(HfBffTestBase):
         response = self.bff_service.get_bootstrap_controller(platform=2)
         assert_that(response.status_code == 400)
 
-    def test_bootstrap_controller_by_platform(self, platform):
-        response = self.bff_service.get_bootstrap_controller(platform=platform)
-        assert_that(response.json(), match_to("provision"))
-        assert_that(response.json(), match_to("userContext.availableBooks"))
-        assert_that(response.json(), match_to("userContext.currentBook"))
+    def test_bootstrap_controller_by_platform(self, platform,version):
+        if version == 1:
+            response = self.bff_service.get_bootstrap_controller(platform=platform)
+            assert_that(response.json(), match_to("provision"))
+            assert_that(response.json(), match_to("userContext.availableBooks"))
+            assert_that(response.json(), match_to("userContext.currentBook"))
+        else:
+            response = self.bff_service.get_bootstrap_controller_v2(platform=platform)
         # assert_that(jmespath.search('provision.name', response.json()), contains_string('iOS APP'))
         if platform == 'ios':
             platform_type = 1
@@ -377,13 +390,13 @@ class Hf35BffTest(HfBffTestBase):
         diff_list = json_tools.diff(response.json()['ocContext'], expected_oc_context)
         assert_that(len(diff_list), equal_to(0))
 
-    @Test(tags="qa, stg, live")
-    def test_bootstrap_controller_ios_platform(self):
-        self.test_bootstrap_controller_by_platform('ios')
+    @Test(tags="qa, stg, live",data_provider=[1, 2])
+    def test_bootstrap_controller_ios_platform(self,version):
+        self.test_bootstrap_controller_by_platform('ios',version)
 
-    @Test(tags="qa, stg, live")
-    def test_bootstrap_controller_android_platform(self):
-        self.test_bootstrap_controller_by_platform('android')
+    @Test(tags="qa, stg, live",data_provider=[1, 2])
+    def test_bootstrap_controller_android_platform(self,version):
+        self.test_bootstrap_controller_by_platform('android',version)
 
     @Test(tags="qa, stg, live")
     def test_get_unlock_progress(self):
@@ -796,15 +809,17 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_content_path_unit(self):
-        test_path = "highflyers/cn-3/book-1/unit-3"
+        test_path = "highflyers/cn-3/book-2/unit-3"
         study_plan_entity = StudyPlanEntity(None, None, None)
         self.setter_study_plan_entity(study_plan_entity, test_path, 1)
-        self.sp_service.put_study_plan_test_entity(study_plan_entity)
         study_plan_path = study_plan_entity.ref_content_path
         content_path = self.bff_service.get_content_path(study_plan_path)
         assert_that(content_path.status_code, equal_to(200))
         if env_key != 'Live':
-            path = content_path.json()[0]
+            path = None
+            for plan in content_path.json():
+                if plan['productModule'] ==16:
+                    path = plan
             student_id, product_module = path['studentId'], path['productModule']
             study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id, product_module, study_plan_path)
             assert_that(path['refId'], equal_to(study_plan['ref_id']))
@@ -818,7 +833,7 @@ class Hf35BffTest(HfBffTestBase):
                 assert_that(path['completeAt'], equal_to(study_plan['complete_at']))
             else:
                 assert_that(path['completeAt'], equal_to(study_plan['complete_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
-            assert_that(path['refProps'], equal_to(eval(study_plan['ref_props'])))
+            assert_that(path, Exist('refProps'))
 
     @Test(tags="qa, stg, live")
     def test_content_state(self):
@@ -858,3 +873,17 @@ class Hf35BffTest(HfBffTestBase):
     def negative_test_empty_content_path_rewards(self):
         total_rewards = self.bff_service.get_rewards_by_content_path("")
         assert_that(total_rewards.status_code, equal_to(400))
+
+    @Test(tags="qa,stg,live")
+    def test_student_context(self):
+        user_context_response = self.bff_service.get_student_context()
+        assert_that(user_context_response.status_code , equal_to(200))
+        self.course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
+        unlock_response = self.course_group_service.get_current_unlock(self.customer_id)
+        # substring by unit, output contentPath of book level
+        content_path_for_book = unlock_response.json()['contentPath'][:unlock_response.json()['contentPath'].index('/unit')]
+        # 1.current book will set the first available book without unlock , which covered in mega-bff integration test
+        # 2.current book will set the current unlock book from available book , which covered in mega-bff integration test
+        assert_that(user_context_response.json()['contentScope'] , equal_to("STANDARD"))
+        assert_that(user_context_response.json()['currentBook'] , equal_to(content_path_for_book))
+        assert_that(user_context_response.json()['availableBooks'][0]['contentId'] , equal_to(unlock_response.json()['bookContentId']))

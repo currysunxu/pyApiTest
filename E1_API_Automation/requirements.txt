@@ -14,3 +14,5 @@ cassandra-driver==3.19.0
 pymongo
 pymysql==0.9.3
 json_tools
+xlrd
+Pillow==8.0.1
