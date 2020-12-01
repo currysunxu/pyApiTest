@@ -1,4 +1,5 @@
 import jmespath
+import requests
 from PIL import Image
 import io
 from ptest.decorator import TestClass, Test
@@ -7,7 +8,7 @@ import xlrd
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
-
+from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryblokVocabImportEntity import StoryblokVocabImportEntity
 
 @TestClass()
 class StoryBlokImportCheckTool:
@@ -42,7 +43,6 @@ class StoryBlokImportCheckTool:
         asset = self.get_asset(asset_lower, folder_id)
         error_message = []
         name = root + path
-        print(name)
         if type == "Vocab":
             new_path = "/" + self.root + path
         else:
@@ -63,10 +63,54 @@ class StoryBlokImportCheckTool:
                 error_message.append("The image size is not correct at row {0}".format(row + 1))
         return error_message
 
+    def vocab_story_check(self, story, vocab_entity, row):
+        error_message = []
+        if 'story' not in story:
+            error_message.append("There is no word named {0} at row {1} in storyblok".format(vocab_entity.vocab_name, row))
+        else:
+            story = story['story']
+            if vocab_entity.vocab_name.strip() != story['name']:
+                error_message.append(
+                    "The name of the word in the excel is not same as it in the storyblok at row {0}.".format(row))
+            if vocab_entity.category != story['content']['category']:
+                error_message.append(
+                    "The category of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
+                        vocab_entity.vocab_name, row))
+            if vocab_entity.priority != story['content']['priority']:
+                error_message.append(
+                    "The priority of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
+                        vocab_entity.vocab_name, row))
+            if vocab_entity.phonetics.strip() != story['content']['phonetics'].strip():
+                error_message.append(
+                    "The phonetics of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
+                        vocab_entity.vocab_name, row))
+            if vocab_entity.translation != story['content']['translation_zh']:
+                error_message.append(
+                    "The translation of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
+                        vocab_entity.vocab_name, row))
+            if not vocab_entity.image_filename or vocab_entity.image_filename != story['content']['image']['filename']:
+                error_message.append(
+                    "The image asset of the word {0} in the excel is not same as it in the storyblok at row {1}".format(
+                        vocab_entity.vocab_name, row))
+            if not vocab_entity.audio_filename or vocab_entity.audio_filename != story['content']['audio']['filename']:
+                error_message.append(
+                    "The audio asset of the word {0} in the excel is not same as it in the storyblok at row {1}".format(
+                        vocab_entity.vocab_name, row))
+        return error_message
+
+    def get_asset_filename(self,vocab_path, all_folder, asset_name):
+        asset_folder_id = self.get_folder_id(vocab_path, all_folder)
+        if asset_folder_id:
+            if asset_name:
+                filename = self.get_asset(asset_name, asset_folder_id)
+        if not filename:
+            return None
+        return filename['filename']
+
     def check_vocab_asset(self):
         error_message = []
         story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], self.env_name)
-        all_folder = story_blok_service.get_all_asset_folder(self.env_name).json()
+        all_folder = story_blok_service.get_all_asset_folder().json()
         zip_file = StoryBlokUtils.get_zip_file()
         namelist_ = zip_file.namelist()[0]
         image_root = namelist_
@@ -107,7 +151,7 @@ class StoryBlokImportCheckTool:
         self.root = "Readers"
         error_message = []
         story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
-        all_folder = story_blok_service.get_all_asset_folder(self.env_name).json()
+        all_folder = story_blok_service.get_all_asset_folder().json()
         zip_file = StoryBlokUtils.get_zip_file()
         namelist_ = zip_file.namelist()[0]
         image_root = namelist_
@@ -159,11 +203,42 @@ class StoryBlokImportCheckTool:
                     self.asset_check(folder_id, "Audio", zip_file, image_root, i, audio_path, "Reader"))
                 last_page_number = page_number
 
+    def check_vocab_story(self):
+        error_message = []
+        excel_table = StoryBlokUtils.get_excel_file()
+        nrows = excel_table.nrows
+        story_blok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], self.env_name)
+        all_folder = story_blok_service.get_all_asset_folder().json()
+        for i in range(1, nrows):
+            row_data = excel_table.row_values(i)
+            full_slug = "vocabularies/content/"
+            full_slug += StoryBlokUtils.convert_slug_name(row_data[0]) + "/" + StoryBlokUtils.convert_slug_name(
+                row_data[1]) + "/" + StoryBlokUtils.convert_slug_name(
+                row_data[2]) + "/" + StoryBlokUtils.convert_slug_name(row_data[3])
+            vocab_story = story_blok_service.get_story_by_full_slug(full_slug).json()
+            image_path = row_data[5]  # column 6 is used to stored the image path of a vocab
+            audio_path = row_data[6]  # column 7 is used to stored the audio path of a vocab
+            image_asset = StoryBlokUtils.convert_asset_name(row_data[5].split('/')[-1])
+            audio_asset = StoryBlokUtils.convert_asset_name(row_data[6].split('/')[-1])
+            image_asset_filename = self.get_asset_filename(image_path.split('/')[1:-1], all_folder, image_asset)
+            audio_asset_filename = self.get_asset_filename(audio_path.split('/')[1:-1], all_folder, audio_asset)
+            vocab_entity = StoryblokVocabImportEntity(row_data[3])
+            # assign values to each word
+            vocab_entity.category = row_data[11]
+            vocab_entity.priority = row_data[13]
+            vocab_entity.phonetics = row_data[4]
+            vocab_entity.translation = row_data[8]
+            vocab_entity.image_filename = image_asset_filename
+            vocab_entity.audio_filename = audio_asset_filename
+            error_message.extend(self.vocab_story_check(vocab_story, vocab_entity, i))
+        return error_message
+
 
 if __name__ == '__main__':
     test_type = "Vocab"  # Switch between Reader and Vocab
     env_name = "Oneapp"  # Switch between Oneapp and Dev
     test = StoryBlokImportCheckTool(env_name)
+    '''
     if test_type == "Reader":
         error_message = test.check_reader_asset()
     else:
@@ -173,3 +248,14 @@ if __name__ == '__main__':
     else:
         for error_message in error_message:
             print("Error %d" % error_message.index(error_message) + ": " + error_message)
+    error_message = []
+    '''
+    if test_type == "Reader":
+        error_message = test.check_reader_asset()
+    else:
+        error_message = test.check_vocab_story()
+    if not error_message:
+        print("No error")
+    else:
+        for each_error_message in error_message:
+            print("Error %d" % error_message.index(each_error_message) + ": " + each_error_message)
