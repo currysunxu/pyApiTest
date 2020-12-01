@@ -200,5 +200,5 @@ class StoryBlokTestCases:
                 assert_that(len(error_message) == 0, error_message)
 
     @Test(tags="qa")
-    def test_mt_question_release(self):
+    def test_mocktest_release(self):
         self.test_storyblok_release(StoryblokReleaseProgram.MOCKTEST)
