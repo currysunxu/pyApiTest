@@ -8,18 +8,13 @@ import xlrd
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
-from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
+from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryblokVocabImportEntity import StoryblokVocabImportEntity
 
 @TestClass()
 class StoryBlokImportCheckTool:
     def __init__(self, env_name="Oneapp"):
         self.root = "Vocabularies"
         self.env_name = env_name
-        self.vocab_name = None
-        self.category = None
-        self.priority = None
-        self.phonetics = None
-        self.translation = None
 
     def get_folder_id(self, vocab_path, all_folder):
         parent_id = jmespath.search("asset_folders[?name == '{}'].id".format(self.root), all_folder)[0]
@@ -68,39 +63,39 @@ class StoryBlokImportCheckTool:
                 error_message.append("The image size is not correct at row {0}".format(row + 1))
         return error_message
 
-    def vocab_story_check(self, story, image_asset, audio_asset,row):
+    def vocab_story_check(self, story, vocab_entity, row):
         error_message = []
         if 'story' not in story:
-            error_message.append("There is no word named {0} at row {1} in storyblok".format(name, row))
+            error_message.append("There is no word named {0} at row {1} in storyblok".format(vocab_entity.vocab_name, row))
         else:
             story = story['story']
-            if self.vocab_name.strip() != story['name']:
+            if vocab_entity.vocab_name.strip() != story['name']:
                 error_message.append(
                     "The name of the word in the excel is not same as it in the storyblok at row {0}.".format(row))
-            if self.category != story['content']['category']:
+            if vocab_entity.category != story['content']['category']:
                 error_message.append(
                     "The category of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
-                        self.vocab_name, row))
-            if self.priority != story['content']['priority']:
+                        vocab_entity.vocab_name, row))
+            if vocab_entity.priority != story['content']['priority']:
                 error_message.append(
                     "The priority of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
-                        self.vocab_name, row))
-            if self.phonetics.strip() != story['content']['phonetics'].strip():
+                        vocab_entity.vocab_name, row))
+            if vocab_entity.phonetics.strip() != story['content']['phonetics'].strip():
                 error_message.append(
                     "The phonetics of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
-                        self.vocab_name, row))
-            if self.translation != story['content']['translation_zh']:
+                        vocab_entity.vocab_name, row))
+            if vocab_entity.translation != story['content']['translation_zh']:
                 error_message.append(
                     "The translation of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
-                        self.vocab_name, row))
-            if not image_asset or image_asset not in story['content']['image']['filename']:
+                        vocab_entity.vocab_name, row))
+            if not vocab_entity.image_filename or vocab_entity.image_filename not in story['content']['image']['filename']:
                 error_message.append(
                     "The image asset of the word {0} in the excel is not same as it in the storyblok at row {1}".format(
-                        self.vocab_name, row))
-            if not audio_asset or audio_asset not in story['content']['audio']['filename']:
+                        vocab_entity.vocab_name, row))
+            if not vocab_entity.audio_filename or vocab_entity.audio_filename not in story['content']['audio']['filename']:
                 error_message.append(
                     "The audio asset of the word {0} in the excel is not same as it in the storyblok at row {1}".format(
-                        self.vocab_name, row))
+                        vocab_entity.vocab_name, row))
         return error_message
 
     def get_asset_filename(self,vocab_path, all_folder, asset_name):
@@ -227,13 +222,15 @@ class StoryBlokImportCheckTool:
             audio_asset = StoryBlokUtils.convert_asset_name(row_data[6].split('/')[-1])
             image_asset_filename = self.get_asset_filename(image_path.split('/')[1:-1], all_folder, image_asset)
             audio_asset_filename = self.get_asset_filename(audio_path.split('/')[1:-1], all_folder, audio_asset)
+            vocab_entity = StoryblokVocabImportEntity(row_data[3])
             # assign values to each word
-            self.vocab_name = row_data[3]
-            self.category = row_data[11]
-            self.priority = row_data[13]
-            self.phonetics = row_data[4]
-            self.translation = row_data[8]
-            error_message.extend(self.vocab_story_check(vocab_story,image_asset_filename, audio_asset_filename, i))
+            vocab_entity.category = row_data[11]
+            vocab_entity.priority = row_data[13]
+            vocab_entity.phonetics = row_data[4]
+            vocab_entity.translation = row_data[8]
+            vocab_entity.image_filename = image_asset_filename
+            vocab_entity.audio_filename = audio_asset_filename
+            error_message.extend(self.vocab_story_check(vocab_story, vocab_entity, i))
         return error_message
 
 
