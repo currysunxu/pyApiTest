@@ -15,7 +15,7 @@ class SmallStarBase():
     course_plan_key = None
     un_lock_lesson_keys = None
     if ENVIRONMENT == Environment.STAGING:
-        user_name = "lara.1111"
+        user_name = "ss3.cn.01"
         password = '12345'
         culture_code = 'zh-CN'
     if ENVIRONMENT == Environment.STAGING_SG:
