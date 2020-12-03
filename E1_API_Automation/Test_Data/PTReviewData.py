@@ -153,7 +153,7 @@ class BffUsers:
         'QA': {'username': 'hf3.cn.01', 'password': '12345'
                },
         'Staging': {
-            'username': 'curry.g1.01', 'password': '12345',
+            'username': 'auto.test', 'password': '12345',
         },
         'Live': {
             'username': 'gz1.g5.02', 'password': '12345',
@@ -178,12 +178,12 @@ class PTDATA:
                 'TestPrimaryKey': '89068F85-5B12-4138-B0C2-6156856D9E2F',
                 'UnitKey': '756D2516-6655-4066-9048-7489D6FEC303',
             },
-            'HFJ3': {
-                # Book J unit 3
+            'HFH3': {
+                # Book H unit 3
                 'StudentId': 1070,
-                'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
-                'TestPrimaryKey': 'E53200F3-6B45-4F66-A9BF-A51EE667769D',
-                'UnitKey': '8DA57DB0-9A6C-4FEF-9641-80D5B7A9F0E3',
+                'BookKey': '8605C95C-9CF8-418C-8C67-B7A3122C5445',
+                'TestPrimaryKey': 'BE0416C5-6609-48DA-88EC-8108D717DF62',
+                'UnitKey': '4A88F685-91A1-4F15-BB3B-1C4870D4B018',
             },
             'HFC4': {
                 # Book C unit 4
@@ -196,28 +196,28 @@ class PTDATA:
         'Staging': {
             'HFF': {
                 # Book F Unit 3
-                'StudentId': 101077451,
+                'StudentId': 102041266,
                 'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
                 'TestPrimaryKey': '97CD8506-84D4-4030-932E-CD064CA940E0',
                 'UnitKey': 'A0DF2ADA-AF3C-4DD3-932B-6309445FB3A4',
             },
             'HFD': {
                 # Book D unit 5
-                'StudentId': 1070,
+                'StudentId': 102041266,
                 'BookKey': '8ADF3ABF-276E-41EE-8502-87E2C8AA4F84',
                 'TestPrimaryKey': '0CE75CF8-9D92-4DBF-A100-7921B4D8ABA2',
                 'UnitKey': '756D2516-6655-4066-9048-7489D6FEC303',
             },
             'HFJ3': {
                 # Book J unit 3
-                'StudentId': 101077451,
+                'StudentId': 102041266,
                 'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
                 'TestPrimaryKey': '0D70761A-DA33-429C-BD38-6A8709DD1DE7',
                 'UnitKey': '8DA57DB0-9A6C-4FEF-9641-80D5B7A9F0E3',
             },
             'HFC4': {
                 # Book C unit 4
-                'StudentId': [101077451,1070],
+                'StudentId': [102041266,102040492],
                 'BookKey': '77F96708-2120-40CD-B6FD-4E063D6D7F33',
                 'TestPrimaryKey': 'C387829C-10EB-4BD9-98C5-B66000F637D1',
                 'UnitKey': 'FE57BA80-ADEB-4933-A415-BB6C1B72F2C4',
@@ -226,7 +226,7 @@ class PTDATA:
         'Live': {
             'HFF': {
                 # Book F Unit 3
-                'StudentId': 101521757,
+                'StudentId': 102041266,
                 'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
                 'TestPrimaryKey': '6886D8A8-19E6-4143-9E1D-F93EA38FC848',
                 'UnitKey': 'A0DF2ADA-AF3C-4DD3-932B-6309445FB3A4',

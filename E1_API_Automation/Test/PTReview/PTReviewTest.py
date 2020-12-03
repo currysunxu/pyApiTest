@@ -6,7 +6,7 @@ from E1_API_Automation.Business.PTReviewBFFService import PTReviewBFFService
 from E1_API_Automation.Business.Utils.PTReviewUtils import PTReviewUtils
 from E1_API_Automation.Business.TPIService import TPIService
 from E1_API_Automation.Business.OMNIService import OMNIService
-from ...Settings import OSP_ENVIRONMENT, TPI_ENVIRONMENT, OMNI_ENVIRONMENT, ENVIRONMENT, env_key
+from ...Settings import BFF_ENVIRONMENT, OSP_ENVIRONMENT, TPI_ENVIRONMENT, OMNI_ENVIRONMENT, ENVIRONMENT, env_key
 from ...Test_Data.PTReviewData import PTReviewData, PTDATA
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Business.PTSkillScore import SkillCode, SubSkillCode
@@ -377,14 +377,15 @@ class PTReviewTestCases:
     # test pt review bff graphql API by book and unit
     @Test(tags="qa, stg, live")
     def test_ptr_bff_graphql_by_book_unit(self):
-        pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        pt_review_bff_service = PTReviewBFFService(BFF_ENVIRONMENT)
         pt_review_bff_service.login()
         osp_service = OSPService(OSP_ENVIRONMENT)
         course_code = 'HF'
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
         unit_key = PTReviewData.ptr_bff_data[env_key]['HF']['UnitKey']
-        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book_unit(course_code, book_key, unit_key)
+        test_primary_key = PTReviewData.ptr_bff_data[env_key]['HF']['TestPrimaryKey']
+        ptr_bff_graphql_response = pt_review_bff_service.post_ptr_graphql_by_book_unit(course_code, test_primary_key)
         assert_that(ptr_bff_graphql_response.status_code == 200)
 
         api_pt_assess_by_skill_response = osp_service.post_hf_student_pt_assess_by_skill(student_id, book_key, unit_key)
@@ -398,7 +399,7 @@ class PTReviewTestCases:
     # test pt review bff graphql API by book
     @Test(tags="qa, stg, live")
     def test_ptr_bff_graphql_by_book(self):
-        pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        pt_review_bff_service = PTReviewBFFService(BFF_ENVIRONMENT)
         pt_review_bff_service.login()
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
@@ -418,7 +419,7 @@ class PTReviewTestCases:
     # test pt review bff graphql API for all course
     @Test(tags="qa, stg,live")
     def test_ptr_bff_graphql_all_course(self):
-        pt_review_bff_service = PTReviewBFFService(ENVIRONMENT)
+        pt_review_bff_service = PTReviewBFFService(BFF_ENVIRONMENT)
         pt_review_bff_service.login()
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         course_code = 'HF'
@@ -511,8 +512,8 @@ class PTReviewTestCases:
     @Test(tags="qa,stg")
     def test_pt_web_unlock_pt_after_paper_version_should_403(self):
         osp_service = OSPService(OSP_ENVIRONMENT)
-        pt_key = PTDATA.pt_web_data[env_key]['HFJ3']['TestPrimaryKey']
-        student_id = PTDATA.pt_web_data[env_key]['HFJ3']['StudentId']
+        pt_key = PTDATA.pt_web_data[env_key]['HFH3']['TestPrimaryKey']
+        student_id = PTDATA.pt_web_data[env_key]['HFH3']['StudentId']
         PTReviewUtils.set_pt_paper_version_from_db(pt_key, student_id)
         expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
         actual_result = osp_service.put_create_progress_test_entity(expected_entity_dict)

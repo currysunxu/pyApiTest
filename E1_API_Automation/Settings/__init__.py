@@ -192,7 +192,7 @@ elif os.environ['environment'] == 'STG':
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
-        "Server": "CNE1STGDB01.e1ef.com,1434",
+        "Server": "10.163.24.124,1434",
         "User": "TBV3",
         "Password": "#Bugsfor$"
     }

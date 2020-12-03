@@ -654,7 +654,7 @@ class PTReviewUtils:
     @staticmethod
     def get_expected_ptr_bff_result_by_book_unit(api_pt_assess_by_skill_json):
         expected_ptr_result_by_book_unit = {}
-        expected_ptr_result_by_book_unit['id'] = api_pt_assess_by_skill_json['UnitKey']
+        expected_ptr_result_by_book_unit['id'] = api_pt_assess_by_skill_json['PTKey']
         expected_ptr_result_by_book_unit['name'] = api_pt_assess_by_skill_json['UnitName']
         expected_ptr_result_by_book_unit['bookName'] = api_pt_assess_by_skill_json['BookName']
         expected_ptr_result_by_book_unit['ptKey'] = api_pt_assess_by_skill_json['PTKey']
@@ -778,7 +778,7 @@ class PTReviewUtils:
         for i in range(len(api_pt_assess_by_unit_list)):
             ptr_bff_test_by_unit = {}
             api_pt_assess_by_unit = api_pt_assess_by_unit_list[i]
-            ptr_bff_test_by_unit['id'] = api_pt_assess_by_unit['UnitKey']
+            ptr_bff_test_by_unit['id'] = api_pt_assess_by_unit['ProgressTestKey']
             ptr_bff_test_by_unit['name'] = api_pt_assess_by_unit['UnitName']
 
             if api_pt_assess_by_unit['PTTestBy'] == 0:

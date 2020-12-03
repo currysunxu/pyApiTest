@@ -20,15 +20,14 @@ class PTReviewBFFService:
     def post_ptr_graphql(self, graphql_body):
         return self.mou_tai.post("/ptr/graphql", graphql_body)
 
-    def post_ptr_graphql_by_book_unit(self, course, book_key, unit_key):
+    def post_ptr_graphql_by_book_unit(self, course, test_primary_key):
         graphql_body = {
-            "operationName": None,
+            "operationName": "getPtInstanceKey",
             "variables": {
-                "bookId": book_key,
-                "testId": unit_key,
+                "testId": test_primary_key,
                 "course": course
             },
-            "query": "query getPtInstanceKey($course: String!, $bookId: String!, $testId: String!) {\n  test(course: $course, bookId: $bookId, testId: $testId) {\n    id\n    ptInstanceKey\n    __typename\n  }\n}\n"
+            "query": "query getPtInstanceKey($course: String!, $testId: String!) {\n  test(course: $course, testId: $testId) {\n    id\n    ptInstanceKey\n    __typename\n  }\n}\n"
         }
         return self.post_ptr_graphql(graphql_body)
 
@@ -45,7 +44,7 @@ class PTReviewBFFService:
 
     def post_ptr_graphql_by_student(self, course):
         graphql_body = {
-            "operationName": None,
+            "operationName": "getUserWithBooks",
             "variables": {
                 "course": course
             },
