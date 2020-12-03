@@ -18,19 +18,19 @@ class KSDEnvironment(object):
 
 
 class OSPEnvironment(object):
-    QA = "https://internal-osp-qa.ef.cn"
-    STAGING = "https://internal-osp-staging.ef.cn"
-    LIVE = "https://internal-osp.ef.cn"
-    STAGING_SG = "https://internal-osp-staging.ef.com"
-    LIVE_SG = "http://internal-osp.ef.com"
+    QA = "https://internal-osp-qa.english1.cn"
+    STAGING = "https://internal-osp-stg.english1.cn"
+    LIVE = "https://internal-osp.english1.cn"
+    STAGING_SG = "https://internal-osp-stg.english1.com"
+    LIVE_SG = "http://internal-osp.english1.com"
 
 
 class TPIEnvironment(object):
-    QA = "https://internal-tpi-qa.ef.cn"
-    STAGING = "https://internal-tpi-staging.ef.cn"
-    STAGING_SG = "https://internal-tpi-staging.ef.com"
-    LIVE = "https://internal-tpi.ef.cn"
-    LIVE_SG = "https://internal-tpi.ef.com"
+    QA = "https://internal-tpi-qa.english1.cn"
+    STAGING = "https://internal-tpi-stg.english1.cn"
+    STAGING_SG = "https://internal-tpi-stg.english1.com"
+    LIVE = "https://internal-tpi.english1.cn"
+    LIVE_SG = "https://internal-tpi.english1.com"
 
 
 class AuthEnvironment(object):
@@ -42,7 +42,7 @@ class AuthEnvironment(object):
 
 
 class OMNIEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/omni/apigateway"
+    QA = "https://internal-ktsvc-qa.english1.cn/omni/apigateway"
     STAGING = "https://omni-apigateway-tc-staging.ef.cn"
     STAGING_SG = "http://omni-apigateway-staging-tcjp.ef.com"
     LIVE = "https://omni-apigateway-tc.ef.cn"
@@ -50,9 +50,9 @@ class OMNIEnvironment(object):
 
 
 class LearningResultEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/learning-result"
-    STAGING = "https://internal-ktsvc-stg.ef.cn/learning-result"
-    LIVE = "https://internal-ktsvc.ef.cn/learning-result"
+    QA = "https://internal-ktsvc-qa.english1.cn/learning-result"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/learning-result"
+    LIVE = "https://internal-ktsvc.english1.cn/learning-result"
 
 
 class BffEnvironment(object):
@@ -62,33 +62,33 @@ class BffEnvironment(object):
 
 
 class HomeworkEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/practice"
-    STAGING = "https://internal-ktsvc-stg.ef.cn/practice"
-    LIVE = "https://internal-ktsvc.ef.cn/practice"
+    QA = "https://internal-ktsvc-qa.english1.cn/practice"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/practice"
+    LIVE = "https://internal-ktsvc.english1.cn/practice"
 
 
 class CourseGroupEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/course-group"
-    STAGING = "https://internal-ktsvc-stg.ef.cn/course-group"
-    LIVE = "https://internal-ktsvc.ef.cn/course-group"
+    QA = "https://internal-ktsvc-qa.english1.cn/course-group"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/course-group"
+    LIVE = "https://internal-ktsvc.english1.cn/course-group"
 
 
 class ContentMapEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/content-map"
-    STAGING = "https://internal-ktsvc-stg.ef.cn/content-map"
-    LIVE = "https://internal-ktsvc.ef.cn/content-map"
+    QA = "https://internal-ktsvc-qa.english1.cn/content-map"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/content-map"
+    LIVE = "https://internal-ktsvc.english1.cn/content-map"
 
 
 class ContentRepoEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/content-repo"
-    STAGING = "https://internal-ktsvc-stg.ef.cn/content-repo"
-    LIVE = "https://internal-ktsvc.ef.cn/content-repo"
+    QA = "https://internal-ktsvc-qa.english1.cn/content-repo"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/content-repo"
+    LIVE = "https://internal-ktsvc.english1.cn/content-repo"
 
 
 class ContentBuilderEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/content-builder"
-    STAGING = "https://internal-ktsvc-stg.ef.cn/content-builder"
-    LIVE = "https://internal-ktsvc.ef.cn/content-builder"
+    QA = "https://internal-ktsvc-qa.english1.cn/content-builder"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/content-builder"
+    LIVE = "https://internal-ktsvc.english1.cn/content-builder"
 
 
 class MockTestEnvironment(object):
@@ -98,14 +98,14 @@ class MockTestEnvironment(object):
 
 
 class StoryblokReleaseEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/storyblok-release"
-    STAGING = "https://internal-ktsvc-stg.ef.cn/storyblok-release"
-    LIVE = "https://internal-ktsvc.ef.cn/storyblok-release"
+    QA = "https://internal-ktsvc-qa.english1.cn/storyblok-release"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/storyblok-release"
+    LIVE = "https://internal-ktsvc.english1.cn/storyblok-release"
 
 
 class StoryblokImportEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/storyblok-import"
-    LIVE = "https://internal-ktsvc.ef.cn/storyblok-import"
+    QA = "https://internal-ktsvc-qa.english1.cn/storyblok-import"
+    LIVE = "https://internal-ktsvc.english1.cn/storyblok-import"
 
 
 class E1TPIEnvironment(object):
@@ -116,9 +116,9 @@ class E1TPIEnvironment(object):
 
 
 class StudyPlanEnvironment(object):
-    QA = "https://internal-ktsvc-qa.ef.cn/study-plan"
-    STAGING = "https://internal-ktsvc-qa.ef.cn/study-plan"
-    LIVE = "https://internal-ktsvc-qa.ef.cn/study-plan"
+    QA = "https://internal-ktsvc-qa.english1.cn/study-plan"
+    STAGING = "https://internal-ktsvc-english1.cn/study-plan"
+    LIVE = "https://internal-ktsvc-english1.cn/study-plan"
 
 class LearningProfileEnvironment(object):
     STAGING = "https://e1-evc-booking-integration-stg.ef.com"
@@ -127,7 +127,7 @@ class LearningProfileEnvironment(object):
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'STG'
+    os.environ['environment'] = 'QA'
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA

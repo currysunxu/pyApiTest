@@ -109,7 +109,7 @@ class ExpectedData:
             "resourceCdnDomain": "https://evc-fe-qa.bj-englishtown.com",
             "webResourceVersionUrl": "/_shared/evc15-fe-android-bundle_kids/version.json",
             "agoraWebResourceVersionUrl": "/evc15/meeting/api/clientversion?platform=android",
-            "agoraResourceCdnDomain": "https://evc-fe.bj-englishtown.com"
+            "agoraResourceCdnDomain": "https://evc-fe-qa.bj-englishtown.com"
         }
     }
 
