@@ -884,6 +884,5 @@ class Hf35BffTest(HfBffTestBase):
         content_path_for_book = unlock_response.json()['contentPath'][:unlock_response.json()['contentPath'].index('/unit')]
         # 1.current book will set the first available book without unlock , which covered in mega-bff integration test
         # 2.current book will set the current unlock book from available book , which covered in mega-bff integration test
-        assert_that(user_context_response.json()['contentScope'] , equal_to("STANDARD"))
         assert_that(user_context_response.json()['currentBook'] , equal_to(content_path_for_book))
         assert_that(user_context_response.json()['availableBooks'][0]['contentId'] , equal_to(unlock_response.json()['bookContentId']))
