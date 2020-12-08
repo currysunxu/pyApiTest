@@ -37,7 +37,7 @@ class PTReviewData:
             }
         },
         'Staging': {
-            '100360697': {
+            '102041266': {
                 'TestPrimaryKey': '30FF9C24-DEB4-49B2-9363-3C433D0B627F',
                 'BookKey': '2F9B62E5-95EB-4291-9E79-8B2010279CA8',
                 'UnitKey': '1EC56EC1-A123-4B47-9057-96BE3EE7534D'
@@ -133,8 +133,9 @@ class PTReviewData:
         },
         'Staging': {
             'HF': {
-                'StudentId': 101075282,
+                'StudentId': 101521473,
                 'BookKey': '77f96708-2120-40cd-b6fd-4e063d6d7f33',
+                'TestPrimaryKey': '20F8B12D-E053-428B-8878-22E54A3B6EC8',
                 'UnitKey': '3C136AAE-DE5E-40EE-A786-7662CF5779A9',
             }
         },
@@ -208,12 +209,12 @@ class PTDATA:
                 'TestPrimaryKey': '0CE75CF8-9D92-4DBF-A100-7921B4D8ABA2',
                 'UnitKey': '756D2516-6655-4066-9048-7489D6FEC303',
             },
-            'HFJ3': {
-                # Book J unit 3
+            'HFH3': {
+                # Book H unit 3
                 'StudentId': 102041266,
-                'BookKey': 'ECCCB7B0-4EF6-4B1F-853C-3585F72C941C',
-                'TestPrimaryKey': '0D70761A-DA33-429C-BD38-6A8709DD1DE7',
-                'UnitKey': '8DA57DB0-9A6C-4FEF-9641-80D5B7A9F0E3',
+                'BookKey': '8605C95C-9CF8-418C-8C67-B7A3122C5445',
+                'TestPrimaryKey': '32E05BE6-2C21-464B-93B6-2FF836562AA0',
+                'UnitKey': '4A88F685-91A1-4F15-BB3B-1C4870D4B018',
             },
             'HFC4': {
                 # Book C unit 4
