@@ -16,7 +16,7 @@ class MockTestUsers:
         },
         'Staging': {
             MockTestStudentType.HasMockTest.value: [
-                {'username': 'auto.test', 'password': '12345', 'custom_id': '101521473', 'city': ''}],
+                {'username': 'auto.test', 'password': '12345', 'custom_id': '101521473', 'city': 'Foshan'}],
             MockTestStudentType.HasNoMockTest.value: [
                 {'username': 'tb3.cn.02', 'password': '12345', 'custom_id': '1023'}]
         },
@@ -37,7 +37,8 @@ class TestDataList:
     }
 
     RemediationActivities = {
-        'QA':'[{"activityId":"00000000-0000-0000-0000-000014157425","questions":[{"currentAnswer":[["B"]],"isAnsweredCorrectly":false,"questionId":"mt/14183615/question","key":"mt/14183615/question"}]}]'
+        'QA':'[{"activityId":"00000000-0000-0000-0000-000014157425","questions":[{"currentAnswer":[["B"]],"isAnsweredCorrectly":false,"questionId":"mt/14183615/question","key":"mt/14183615/question"}]}]',
+        'Staging': '[{"activityId":"00000001-0000-0000-0000-000003623549","questions":[{"currentAnswer":[["C"]],"isAnsweredCorrectly":false,"questionId":"mt/5370803/question","key":"mt/5370803/question"}]}]'
     }
 
 
@@ -51,13 +52,13 @@ class TestTableSQLString:
     get_test_details_by_test_id_sql = {
         'QA': "SELECT {0} FROM kt_test_qa.stateful_test " \
               "WHERE id = '{1}' and student_key ='{2}' limit 1",
-        'Staging': "SELECT '{0}' FROM kt_test_qa.stateful_test " \
+        'Staging': "SELECT {0} FROM kt_test.stateful_test " \
               "WHERE id = '{1}' and student_key ='{2}' limit 1",
         'Live': ""
     }
 
     get_valid_test_id_sql = {
         'QA': "SELECT id FROM kt_test_qa.stateful_test where student_key ='{0}' and product=32 and product_module=32 ORDER BY created_timestamp DESC limit 1",
-        'Staging': "SELECT id FROM kt_test_qa.stateful_test where student_key ='{0}' and product=32 and product_module=32 ORDER BY created_timestamp DESC limit 1",
+        'Staging': "SELECT id FROM kt_test.stateful_test where student_key ='{0}' and product=32 and product_module=32 ORDER BY created_timestamp DESC limit 1",
         'Live': ""
     }
