@@ -14,7 +14,6 @@ class StoryBlokService:
 
     def get_storyblok_stories(self, starts_with, page_number=1, page_size=25, published_at_start='',
                               published_at_end=''):
-        # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         # api_version = StoryBlokUtils.get_storyblok_version_by_env()
         api_version = StoryBlokVersion.PUBLISHED.value
         api_url = "/v1/cdn/stories?token={0}&starts_with={1}&version={2}&sort_by=published_at&page={3}&per_page={4}&published_at_gt={5}&published_at_lt={6}".format(
@@ -26,7 +25,6 @@ class StoryBlokService:
                                           published_at_end)
 
     def get_storyblok_reader_levels(self):
-        # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         api_version = StoryBlokVersion.PUBLISHED.value
         api_url = "/v1/cdn/stories?token={0}&starts_with=readers/course-config&version={1}&resolve_relations=parent&filter_query[component][in]=reader_level&sort_by=content.code&page=1&per_page=100".format(
             self.api_token, api_version)
@@ -39,19 +37,13 @@ class StoryBlokService:
         return self.get_storyblok_stories('mt', page_number, page_size, published_at_start, published_at_end)
 
     def get_storyblok_book_by_scope(self, course_config_path, book_release_scope):
-        # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         api_version = StoryBlokVersion.PUBLISHED.value
-        # api_url = "/v1/cdn/stories?token={0}&starts_with=highflyers/course-config/{1}&filter_query[component][in]=book&version={2}".format(
-        #     self.api_token, book_release_scope, api_version)
         api_url = "/v1/cdn/stories?token={0}&starts_with={1}/{2}&filter_query[component][in]=book&version={3}".format(
             self.api_token, course_config_path.lower(), book_release_scope, api_version)
         return self.mou_tai.get(api_url)
 
     def get_storyblok_configs(self, course_config_path, book_release_scope, filter_component):
-        # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         api_version = StoryBlokVersion.PUBLISHED.value
-        # api_url = "/v1/cdn/stories?token={0}&starts_with=highflyers/course-config/{1}&version={2}&resolve_relations=parent&filter_query[component][in]={3}".format(
-        #     self.api_token, book_release_scope, api_version, filter_component)
         api_url = "/v1/cdn/stories?token={0}&starts_with={1}/{2}&version={3}&resolve_relations=parent&filter_query[component][in]={4}".format(
             self.api_token, course_config_path.lower(), book_release_scope, api_version, filter_component)
         return self.mou_tai.get(api_url)

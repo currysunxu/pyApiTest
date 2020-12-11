@@ -143,7 +143,6 @@ class StoryBlokTestCases:
         release_scope = release_history_list[0]['scope']
         region_achs = release_history_list[0]['regionAchs']
         release_program = release_history_list[0]['program']
-        # target_program = release_history_list[0]['targetProgramName']
         self.test_course_release_by_scope([release_scope], region_achs, release_program)
 
     @Test()
@@ -175,7 +174,6 @@ class StoryBlokTestCases:
         release_scope = release_history_list[0]['scope']
         region_achs = release_history_list[0]['regionAchs']
         release_program = release_history_list[0]['program']
-        # target_program = release_history_list[0]['targetProgramName']
         self.test_course_release_by_scope([release_scope], region_achs, release_program)
 
     # test course release by release scope

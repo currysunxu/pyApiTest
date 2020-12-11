@@ -30,8 +30,6 @@ class MTActivityImportTest:
             valid_activity_list = StoryBlokImportService.get_valid_activities_from_mt_db(mt_activity_table_name,
                                                                                          version)
 
-        # valid_activity_list = StoryBlokImportService.get_activity_by_uuid_from_mt_db(mt_activity_table_name, '00000001-0000-0000-0000-000007045141')
-
         storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], 'MT')
         # logic to get all storyblok questions
         # page_number = 1
