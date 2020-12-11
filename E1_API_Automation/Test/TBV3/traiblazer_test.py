@@ -255,3 +255,9 @@ class TBTestCases(TraiblazerBaseClass):
         lesson_key = '3fa0e83c-fe8f-4008-bb69-9dcc13f0d6b2'
         unlock = self.tpi_service.v3_product_unlock(self.tb_test.user_id, lesson_key, product_code="TBV3")
         assert_that(unlock.status_code == 204)
+
+    @Test(tags='stg, live')
+    def test_content_path_unlock(self):
+        content_path = 'tb16/cn-3/book-1/unit-1/assignment-2'
+        unlock = self.tpi_service.lite_product_unlock(self.tb_test.user_id, content_path, product_code="TBV3")
+        assert_that(unlock.status_code == 204)

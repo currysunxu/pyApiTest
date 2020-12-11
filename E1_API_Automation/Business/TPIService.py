@@ -43,3 +43,13 @@ class TPIService:
         }
         return self.session.put(url = self.host + "/api/v2/ProgressTestUnlock", verify=False, json=body_json,headers =self.header)
 
+    def lite_product_unlock(self, student_id, content_path, product_code):
+        self.header['X-BA-TOKEN'] = "97096cec-091a-486a-9cef-4c1097a33a46"
+        body = {
+            "StudentIdCollection": [student_id],
+            "ContentPaths": [content_path]
+        }
+        if product_code == 'SS':
+            return self.session.put(self.host + '/api/v2/SmallStarUnlockByContentPath', json=body,verify=False, headers =self.header)
+        elif product_code == 'TBV3':
+            return self.session.put(self.host + '/api/v2/TrailblazerUnlockByContentPath', json=body,verify=False, headers =self.header)

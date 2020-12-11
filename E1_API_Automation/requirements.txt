@@ -16,3 +16,4 @@ pymysql==0.9.3
 json_tools
 xlrd
 Pillow==8.0.1
+kafka
