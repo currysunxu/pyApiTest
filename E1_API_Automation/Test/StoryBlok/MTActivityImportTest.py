@@ -21,16 +21,18 @@ class MTActivityImportTest:
         storyblok_import_service = StoryBlokImportService(STORYBLOK_IMPORT_ENVIRONMENT)
         activity_import_status_response = storyblok_import_service.get_storyblok_import_status()
         activity_import_status_list = jmespath.search('[?status==\'COMPLETE\']', activity_import_status_response.json())
-        # if release_history_list size is 1, means it's not been imported before, otherwise, get the previous import status as check version
-        # if len(activity_import_status_list) == 1:
-        #     version = MockTestData.MockTest['ActivityInitVersion']
-        # else:
-        #     version = activity_import_status_list[1]['max_version'] + 1
-        version = activity_import_status_list[0]['min_version']
-        # version = 2000
-        valid_activity_list = StoryBlokImportService.get_valid_activities_from_mt_db(mt_activity_table_name, version)
+        if 'specified_uuid' in activity_import_status_list[0].keys():
+            # this is the import by uuid history
+            valid_activity_list = StoryBlokImportService.get_activity_by_uuid_from_mt_db(mt_activity_table_name,
+                                                                                         activity_import_status_list[0]['specified_uuid'])
+        else:
+            version = activity_import_status_list[0]['min_version']
+            valid_activity_list = StoryBlokImportService.get_valid_activities_from_mt_db(mt_activity_table_name,
+                                                                                         version)
 
-        storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], 'Dev')
+        # valid_activity_list = StoryBlokImportService.get_activity_by_uuid_from_mt_db(mt_activity_table_name, '00000001-0000-0000-0000-000007045141')
+
+        storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], 'MT')
         # logic to get all storyblok questions
         # page_number = 1
         # page_size = 100
