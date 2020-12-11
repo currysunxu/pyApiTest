@@ -30,9 +30,8 @@ class Kafka_consumer():
     use Kafka—python consumer
     '''
 
-    def __init__(self, kafkahost, kafkaport, kafkatopic, groupid):
+    def __init__(self, kafkahost, kafkatopic, groupid):
         self.kafkaHost = kafkahost
-        self.kafkaPort = kafkaport
         self.kafkatopic = kafkatopic
         self.groupid = groupid
         self.consumer = KafkaConsumer(self.kafkatopic, api_version=(0, 10, 0), auto_offset_reset='earliest')

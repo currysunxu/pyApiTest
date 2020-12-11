@@ -21,7 +21,7 @@ class KafkaData:
         return online_homework_unlock_message
 
     @staticmethod
-    def build_omni_sessions_message():
+    def build_omni_sessions_message(group_type):
         omni_sessions_message = {
             "payload": {
                 "Content__c": {
@@ -61,7 +61,7 @@ class KafkaData:
                         }
                     ],
                     "isRemoved": False,
-                    "groupType": "Online Classroom",
+                    "groupType": group_type,
                     "groupNumber": None,
                     "groupId": "a0B2x000000fWZeEAM",
                     "evcToken": None,

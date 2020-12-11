@@ -7,8 +7,6 @@ from hamcrest import assert_that, equal_to
 import time
 
 
-
-
 @TestClass()
 class Hf35KafkaTest():
 
@@ -22,11 +20,12 @@ class Hf35KafkaTest():
         study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(message['StudentId'], 1, content_path)
         assert_that(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(message['UnlockAt'][:message['UnlockAt'].index('.')]))
 
-    @Test(tags="qa, stg",data_provider = ["highflyers/cn-3/book-2/unit-6/assignment-1"])
-    def test_from_omni_student_sessions_to_student_sessions_study_plan(self,content_path):
+    @Test(tags="qa, stg",data_provider = [("highflyers/cn-3/book-2/unit-6/assignment-1","City-Wide Classroom"),("highflyers/cn-3/book-2/unit-6/assignment-1","Online Classroom")])
+    def test_from_omni_student_sessions_to_student_sessions_study_plan(self,content_path,group_type):
         host = KafkaData.BOOTSTRAP_SERVERS[env_key]
         producer = Kafka_producer(host,'OMNI-StudentSession')
-        message = KafkaData.build_omni_sessions_message()
+        # group type distinguish gl and pl
+        message = KafkaData.build_omni_sessions_message(group_type)
         producer.sendjsondata(message)
         time.sleep(5)
         payload_message = message['payload']['Content__c']
