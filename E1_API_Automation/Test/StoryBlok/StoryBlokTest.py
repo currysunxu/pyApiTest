@@ -13,6 +13,7 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum impor
 from E1_API_Automation.Business.StoryBlok.StoryBlokReleaseService import StoryBlokReleaseService
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, CONTENT_MAP_ENVIRONMENT, STORYBLOK_RELEASE_ENVIRONMENT
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData, StoryblokReleaseProgram
 
@@ -124,42 +125,84 @@ class StoryBlokTestCases:
         print('-------------verified total number is:{0}-----------------'.format(str(total_count)))
         return expected_release_revision
 
-    # test the latest highflyer release
+    '''
+    There's two ways of verification, one is to verify the latest course history, it may be any course. e.g. test_latest_course_release()
+    The other way is to specify the release type, run this specific course release directly, e.g. test_highflyers_release()
+    '''
+    # test the latest course release
+    @Test()
+    def test_latest_course_release(self):
+        storyblok_release_service = StoryBlokReleaseService(STORYBLOK_RELEASE_ENVIRONMENT)
+
+        # fetch out all the release history
+        release_history_response = storyblok_release_service.get_storyblok_release_history()
+        # filter out the latest course release history, it can be any course
+        release_history_list = jmespath.search('releaseHistory[?status==\'COMPLETED\' && program != \'{0}\' && program != \'{1}\' && program != \'{2}\']'
+                                               .format(StoryblokReleaseProgram.READERS.value, StoryblokReleaseProgram.VOCABULARIES.value, StoryblokReleaseProgram.MOCKTEST.value),
+                                               release_history_response.json())
+        release_scope = release_history_list[0]['scope']
+        region_achs = release_history_list[0]['regionAchs']
+        release_program = release_history_list[0]['program']
+        self.test_course_release_by_scope([release_scope], region_achs, release_program)
+
     @Test()
     def test_highflyers_release(self):
+        if EnvUtils.is_env_qa():
+            release_type = StoryblokReleaseProgram.HIGHFLYERS_35
+        else:
+            # for staging and live, the storyblok release program haven't been changed, so, still using the old name
+            release_type = StoryblokReleaseProgram.HIGHFLYERS
+
+        self.test_course_release_by_type(release_type)
+
+    @Test()
+    def test_smallstars_30_release(self):
+        self.test_course_release_by_type(StoryblokReleaseProgram.SMALLSTARS_30)
+
+    @Test()
+    def test_smallstars_35_release(self):
+        self.test_course_release_by_type(StoryblokReleaseProgram.SMALLSTARS_35)
+
+    # test the course release by type
+    def test_course_release_by_type(self, release_type):
         storyblok_release_service = StoryBlokReleaseService(STORYBLOK_RELEASE_ENVIRONMENT)
 
         release_history_response = storyblok_release_service.get_storyblok_release_history(
-            StoryblokReleaseProgram.HIGHFLYERS.value)
+            release_type.value)
         release_history_list = jmespath.search('releaseHistory[?status==\'COMPLETED\']',
                                                release_history_response.json())
         release_scope = release_history_list[0]['scope']
         region_achs = release_history_list[0]['regionAchs']
-        self.test_highflyers_release_by_scope([release_scope], region_achs)
+        release_program = release_history_list[0]['program']
+        self.test_course_release_by_scope([release_scope], region_achs, release_program)
 
-    # test highflyers release by release scope
+    # test course release by release scope
     @Test(data_provider=(
-    ["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j"], ["cn-3", "cn-3-144"]))
-    def test_highflyers_release_by_scope(self, release_scopes, region_achs):
+    ["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j"], ["cn-3", "cn-3-144"], 'Highflyers35'))
+    def test_course_release_by_scope(self, release_scopes, region_achs, release_program):
+        course_config_path = StoryBlokData.StoryBlokProgram[release_program]['course-config-path']
+        course_source_name = StoryBlokData.StoryBlokProgram[release_program]['source-name']
+        target_program = StoryBlokData.StoryBlokProgram[release_program]['target-name']
+
         for release_scope in release_scopes:
             for region_ach in region_achs:
-                print('release_scope:{0}, region_ach:{1}'.format(release_scope, region_ach))
+                print('release_program:{0}, release_scope:{1}, region_ach:{2}'.format(release_program, release_scope, region_ach))
                 storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
-                get_book_story_response = storyblok_service.get_storyblok_book_by_scope(release_scope)
+                get_book_story_response = storyblok_service.get_storyblok_book_by_scope(course_config_path, release_scope)
                 assert_that(get_book_story_response.status_code == 200)
                 storyblok_book_story = jmespath.search('stories|[0]', get_book_story_response.json())
                 storyblok_correlation_path = storyblok_book_story['content']['correlation_path']
                 # correlation_path in storyblok is like "highflyers/book-7", need to add region into it to become: highflyers/cn-3/book-7
                 storyblok_correlation_path_with_region = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
-                    storyblok_correlation_path, region_ach)
+                    storyblok_correlation_path, course_source_name, region_ach)
                 storyblok_default_reader_level = storyblok_book_story['content']['default_reader_level']
 
                 content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
-                content_map_entity = ContentMapQueryEntity('HIGH_FLYERS_35', region_ach=region_ach)
-                highflyer_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
+                content_map_entity = ContentMapQueryEntity(target_program, region_ach=region_ach)
+                course_map_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
                 book_in_content_map = jmespath.search(
                     'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path_with_region),
-                    highflyer_tree_response.json())
+                    course_map_tree_response.json())
 
                 assert_that(book_in_content_map['default_reader_level'] == storyblok_default_reader_level,
                             'default_reader_level value not consistent between content map and storyblok for contentPath:'
@@ -175,12 +218,12 @@ class StoryBlokTestCases:
                                                                      book_in_content_map['schemaVersion']).json()
 
                 # verify reader in this book
-                storyblok_reader_configs_response = storyblok_service.get_storyblok_reader_configs(release_scope).json()
+                storyblok_reader_configs_response = storyblok_service.get_storyblok_reader_configs(course_config_path, release_scope).json()
                 storyblok_reader_configs_with_order = sorted(storyblok_reader_configs_response['stories'],
                                                              key=lambda k: k['full_slug'])
-                error_message = StoryBlokUtils.verify_reader_after_highflyers_release(book_in_content_map,
-                                                                                      storyblok_reader_configs_with_order,
-                                                                                      book_reader_content_groups)
+                error_message = StoryBlokUtils.verify_reader_after_course_release(book_in_content_map,
+                                                                                  storyblok_reader_configs_with_order,
+                                                                                  book_reader_content_groups)
                 assert_that(len(error_message) == 0, error_message)
 
                 # verify vocab in this book
@@ -191,12 +234,12 @@ class StoryBlokTestCases:
                                                                      book_in_content_map['contentRevision'],
                                                                      book_in_content_map['schemaVersion']).json()
 
-                storyblok_vocab_configs_response = storyblok_service.get_storyblok_vocab_configs(release_scope).json()
+                storyblok_vocab_configs_response = storyblok_service.get_storyblok_vocab_configs(course_config_path, release_scope).json()
                 storyblok_vocab_configs_with_order = sorted(storyblok_vocab_configs_response['stories'],
                                                             key=lambda k: k['full_slug'])
-                error_message = StoryBlokUtils.verify_vocab_after_highflyers_release(book_in_content_map,
-                                                                                     storyblok_vocab_configs_with_order,
-                                                                                     book_vocab_content_groups)
+                error_message = StoryBlokUtils.verify_vocab_after_course_release(book_in_content_map,
+                                                                                 storyblok_vocab_configs_with_order,
+                                                                                 book_vocab_content_groups)
                 assert_that(len(error_message) == 0, error_message)
 
     @Test(tags="qa")

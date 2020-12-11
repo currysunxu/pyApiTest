@@ -19,6 +19,12 @@ class StoryBlokImportService:
                 MTTableSQLString.get_valid_activity_sql.format(table_name, version, MockTestData.MockTest['ActivityInitVersion']))
 
     @staticmethod
+    def get_activity_by_uuid_from_mt_db(table_name, uuid):
+        ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
+        return ms_sql_server.exec_query_return_dict_list(
+            MTTableSQLString.get_activity_by_uuid_sql.format(table_name, uuid))
+
+    @staticmethod
     def get_mt_resource(mt_resource_url):
         api_url = MockTestData.MockTest['ResourceHost'] + mt_resource_url
         return requests.get(api_url)
