@@ -1,0 +1,786 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "required": [
+        "schemaVersion",
+        "originID",
+        "data",
+        "extra",
+        "contentId",
+        "title",
+        "type",
+        "url",
+        "contentRevision",
+        "id"
+    ],
+    "properties": {
+        "schemaVersion": {
+            "$id": "#/properties/schemaVersion",
+            "type": "integer",
+            "title": "The schemaVersion schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0
+        },
+        "originID": {
+            "$id": "#/properties/originID",
+            "type": "string",
+            "title": "The originID schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": ""
+        },
+        "data": {
+            "$id": "#/properties/data",
+            "type": "object",
+            "title": "The data schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "required": [
+                "Key",
+                "Title",
+                "Type",
+                "Body",
+                "Stimulus",
+                "Questions",
+                "TotalScore"
+            ],
+            "properties": {
+                "Key": {
+                    "$id": "#/properties/data/properties/Key",
+                    "type": "string",
+                    "title": "The Key schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": ""
+                },
+                "Title": {
+                    "$id": "#/properties/data/properties/Title",
+                    "type": "string",
+                    "title": "The Title schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": ""
+                },
+                "Type": {
+                    "$id": "#/properties/data/properties/Type",
+                    "type": "string",
+                    "title": "The Type schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": ""
+                },
+                "Body": {
+                    "$id": "#/properties/data/properties/Body",
+                    "type": "object",
+                    "title": "The Body schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "required": [
+                        "tags",
+                        "mappings"
+                    ],
+                    "properties": {
+                        "tags": {
+                            "$id": "#/properties/data/properties/Body/properties/tags",
+                            "type": "object",
+                            "title": "The tags schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": {},
+                            "required": [
+                                "key",
+                                "intent",
+                                "cefr",
+                                "age-from",
+                                "age-to"
+                            ],
+                            "properties": {
+                                "key": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/key",
+                                    "type": "string",
+                                    "title": "The key schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": ""
+                                },
+                                "intent": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/intent",
+                                    "type": "array",
+                                    "title": "The intent schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/intent/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/data/properties/Body/properties/tags/properties/intent/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        ]
+                                    }
+                                },
+                                "outcome": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/outcome",
+                                    "type": "array",
+                                    "title": "The outcome schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/outcome/items"
+                                    }
+                                },
+                                "cefr": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/cefr",
+                                    "type": "array",
+                                    "title": "The cefr schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/cefr/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/data/properties/Body/properties/tags/properties/cefr/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        ]
+                                    }
+                                },
+                                "age-from": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/age-from",
+                                    "type": "array",
+                                    "title": "The age-from schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/age-from/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/data/properties/Body/properties/tags/properties/age-from/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        ]
+                                    }
+                                },
+                                "age-to": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/age-to",
+                                    "type": "array",
+                                    "title": "The age-to schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/age-to/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/data/properties/Body/properties/tags/properties/age-to/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        ]
+                                    }
+                                },
+                                "primary-skill-set": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/primary-skill-set",
+                                    "type": "array",
+                                    "title": "The primary-skill-set schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/primary-skill-set/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/data/properties/Body/properties/tags/properties/primary-skill-set/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        ]
+                                    }
+                                },
+                                "primary-lexical-set-p1": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/primary-lexical-set-p1",
+                                    "type": "array",
+                                    "title": "The primary-lexical-set-p1 schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/primary-lexical-set-p1/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/data/properties/Body/properties/tags/properties/primary-lexical-set-p1/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        ]
+                                    }
+                                },
+                                "secondary-skill-set": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/secondary-skill-set",
+                                    "type": "array",
+                                    "title": "The secondary-skill-set schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/secondary-skill-set/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/data/properties/Body/properties/tags/properties/secondary-skill-set/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        ]
+                                    }
+                                },
+                                "secondary-lexical-set-p2": {
+                                    "$id": "#/properties/data/properties/Body/properties/tags/properties/secondary-lexical-set-p2",
+                                    "type": "array",
+                                    "title": "The secondary-lexical-set-p2 schema",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "default": [],
+                                    "additionalItems": true,
+                                    "items": {
+                                        "$id": "#/properties/data/properties/Body/properties/tags/properties/secondary-lexical-set-p2/items",
+                                        "anyOf": [
+                                            {
+                                                "$id": "#/properties/data/properties/Body/properties/tags/properties/secondary-lexical-set-p2/items/anyOf/0",
+                                                "type": "string",
+                                                "title": "The first anyOf schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            "additionalProperties": true
+                        },
+                        "mappings": {
+                            "$id": "#/properties/data/properties/Body/properties/mappings",
+                            "type": "array",
+                            "title": "The mappings schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": [],
+                            "additionalItems": true,
+                            "items": {
+                                "$id": "#/properties/data/properties/Body/properties/mappings/items",
+                                "anyOf": [
+                                    {
+                                        "$id": "#/properties/data/properties/Body/properties/mappings/items/anyOf/0",
+                                        "type": "object",
+                                        "title": "The first anyOf schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "required": [
+                                            "s",
+                                            "q"
+                                        ],
+                                        "properties": {
+                                            "s": {
+                                                "$id": "#/properties/data/properties/Body/properties/mappings/items/anyOf/0/properties/s",
+                                                "type": "string",
+                                                "title": "The s schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            },
+                                            "q": {
+                                                "$id": "#/properties/data/properties/Body/properties/mappings/items/anyOf/0/properties/q",
+                                                "type": "string",
+                                                "title": "The q schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": ""
+                                            }
+                                        },
+                                        "additionalProperties": true
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "additionalProperties": true
+                },
+                "Stimulus": {
+                    "$id": "#/properties/data/properties/Stimulus",
+                    "type": "array",
+                    "title": "The Stimulus schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/data/properties/Stimulus/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/data/properties/Stimulus/items/anyOf/0",
+                                "type": "object",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": {},
+                                "required": [
+                                    "key",
+                                    "body"
+                                ],
+                                "properties": {
+                                    "key": {
+                                        "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/key",
+                                        "type": "string",
+                                        "title": "The key schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": ""
+                                    },
+                                    "body": {
+                                        "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body",
+                                        "type": "object",
+                                        "title": "The body schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "required": [
+                                            "item"
+                                        ],
+                                        "properties": {
+                                            "item": {
+                                                "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body/properties/item",
+                                                "type": "object",
+                                                "title": "The item schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": {},
+                                                "required": [
+                                                ],
+                                                "properties": {
+                                                    "text": {
+                                                        "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body/properties/item/properties/text",
+                                                        "type": "string",
+                                                        "title": "The text schema",
+                                                        "description": "An explanation about the purpose of this instance.",
+                                                        "default": ""
+                                                    },
+                                                    "audio": {
+                                                        "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body/properties/item/properties/audio",
+                                                        "type": "object",
+                                                        "title": "The audio schema",
+                                                        "description": "An explanation about the purpose of this instance.",
+                                                        "default": {},
+                                                        "required": [
+                                                            "url",
+                                                            "size",
+                                                            "sha1",
+                                                            "mimeType",
+                                                            "duration"
+                                                        ],
+                                                        "properties": {
+                                                            "url": {
+                                                                "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body/properties/item/properties/audio/properties/url",
+                                                                "type": "string",
+                                                                "title": "The url schema",
+                                                                "description": "An explanation about the purpose of this instance.",
+                                                                "default": ""
+                                                            },
+                                                            "size": {
+                                                                "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body/properties/item/properties/audio/properties/size",
+                                                                "type": "integer",
+                                                                "title": "The size schema",
+                                                                "description": "An explanation about the purpose of this instance.",
+                                                                "default": 0
+                                                            },
+                                                            "sha1": {
+                                                                "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body/properties/item/properties/audio/properties/sha1",
+                                                                "type": "string",
+                                                                "title": "The sha1 schema",
+                                                                "description": "An explanation about the purpose of this instance.",
+                                                                "default": ""
+                                                            },
+                                                            "mimeType": {
+                                                                "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body/properties/item/properties/audio/properties/mimeType",
+                                                                "type": "string",
+                                                                "title": "The mimeType schema",
+                                                                "description": "An explanation about the purpose of this instance.",
+                                                                "default": ""
+                                                            },
+                                                            "duration": {
+                                                                "$id": "#/properties/data/properties/Stimulus/items/anyOf/0/properties/body/properties/item/properties/audio/properties/duration",
+                                                                "type": "integer",
+                                                                "title": "The duration schema",
+                                                                "description": "An explanation about the purpose of this instance.",
+                                                                "default": 0
+                                                            }
+                                                        },
+                                                        "additionalProperties": true
+                                                    }
+                                                },
+                                                "additionalProperties": false
+                                            }
+                                        },
+                                        "additionalProperties": true
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        ]
+                    }
+                },
+                "Questions": {
+                    "$id": "#/properties/data/properties/Questions",
+                    "type": "array",
+                    "title": "The Questions schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": [],
+                    "additionalItems": true,
+                    "items": {
+                        "$id": "#/properties/data/properties/Questions/items",
+                        "anyOf": [
+                            {
+                                "$id": "#/properties/data/properties/Questions/items/anyOf/0",
+                                "type": "object",
+                                "title": "The first anyOf schema",
+                                "description": "An explanation about the purpose of this instance.",
+                                "default": {},
+                                "required": [
+                                    "key",
+                                    "body"
+                                ],
+                                "properties": {
+                                    "key": {
+                                        "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/key",
+                                        "type": "string",
+                                        "title": "The key schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": ""
+                                    },
+                                    "body": {
+                                        "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body",
+                                        "type": "object",
+                                        "title": "The body schema",
+                                        "description": "An explanation about the purpose of this instance.",
+                                        "default": {},
+                                        "required": [
+                                            "version",
+                                            "tags",
+                                            "tests",
+                                            "answers",
+                                            "options",
+                                            "totalScore"
+                                        ],
+                                        "properties": {
+                                            "version": {
+                                                "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/version",
+                                                "type": "integer",
+                                                "title": "The version schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": 0
+                                            },
+                                            "tags": {
+                                                "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tags",
+                                                "type": "array",
+                                                "title": "The tags schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tags/items"
+                                                }
+                                            },
+                                            "tests": {
+                                                "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests",
+                                                "type": "array",
+                                                "title": "The tests schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items",
+                                                    "anyOf": [
+                                                        {
+                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0",
+                                                            "type": "object",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": {},
+                                                            "required": [
+                                                                "id"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/id",
+                                                                    "type": "string",
+                                                                    "title": "The id schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "default": ""
+                                                                },
+                                                                "text": {
+                                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/text",
+                                                                    "type": "string",
+                                                                    "title": "The text schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "default": ""
+                                                                },
+                                                                "image": {
+                                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/image",
+                                                                    "type": "object",
+                                                                    "title": "The image schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "default": {},
+                                                                    "required": [
+                                                                        "url",
+                                                                        "size",
+                                                                        "sha1",
+                                                                        "mimeType",
+                                                                        "width",
+                                                                        "height"
+                                                                    ],
+                                                                    "properties": {
+                                                                        "url": {
+                                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/image/properties/url",
+                                                                            "type": "string",
+                                                                            "title": "The url schema",
+                                                                            "description": "An explanation about the purpose of this instance.",
+                                                                            "default": ""
+                                                                        },
+                                                                        "size": {
+                                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/image/properties/size",
+                                                                            "type": "integer",
+                                                                            "title": "The size schema",
+                                                                            "description": "An explanation about the purpose of this instance.",
+                                                                            "default": 0
+                                                                        },
+                                                                        "sha1": {
+                                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/image/properties/sha1",
+                                                                            "type": "string",
+                                                                            "title": "The sha1 schema",
+                                                                            "description": "An explanation about the purpose of this instance.",
+                                                                            "default": ""
+                                                                        },
+                                                                        "mimeType": {
+                                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/image/properties/mimeType",
+                                                                            "type": "string",
+                                                                            "title": "The mimeType schema",
+                                                                            "description": "An explanation about the purpose of this instance.",
+                                                                            "default": ""
+                                                                        },
+                                                                        "width": {
+                                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/image/properties/width",
+                                                                            "type": "integer",
+                                                                            "title": "The width schema",
+                                                                            "description": "An explanation about the purpose of this instance.",
+                                                                            "default": 0
+                                                                        },
+                                                                        "height": {
+                                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/tests/items/anyOf/0/properties/image/properties/height",
+                                                                            "type": "integer",
+                                                                            "title": "The height schema",
+                                                                            "description": "An explanation about the purpose of this instance.",
+                                                                            "default": 0
+                                                                        }
+                                                                    },
+                                                                    "additionalProperties": true
+                                                                }
+                                                            },
+                                                            "additionalProperties": false
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "answers": {
+                                                "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/answers",
+                                                "type": "array",
+                                                "title": "The answers schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/answers/items",
+                                                    "anyOf": [
+                                                        {
+                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/answers/items/anyOf/0",
+                                                            "type": "array",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": [],
+                                                            "additionalItems": true,
+                                                            "items": {
+                                                                "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/answers/items/anyOf/0/items",
+                                                                "anyOf": [
+                                                                    {
+                                                                        "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/answers/items/anyOf/0/items/anyOf/0",
+                                                                        "type": "string",
+                                                                        "title": "The first anyOf schema",
+                                                                        "description": "An explanation about the purpose of this instance.",
+                                                                        "default": ""
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "options": {
+                                                "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/options",
+                                                "type": "array",
+                                                "title": "The options schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": [],
+                                                "additionalItems": true,
+                                                "items": {
+                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/options/items",
+                                                    "anyOf": [
+                                                        {
+                                                            "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/options/items/anyOf/0",
+                                                            "type": "object",
+                                                            "title": "The first anyOf schema",
+                                                            "description": "An explanation about the purpose of this instance.",
+                                                            "default": {},
+                                                            "required": [
+                                                                "id",
+                                                                "text"
+                                                            ],
+                                                            "properties": {
+                                                                "id": {
+                                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/options/items/anyOf/0/properties/id",
+                                                                    "type": "string",
+                                                                    "title": "The id schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "default": ""
+                                                                },
+                                                                "text": {
+                                                                    "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/options/items/anyOf/0/properties/text",
+                                                                    "type": "string",
+                                                                    "title": "The text schema",
+                                                                    "description": "An explanation about the purpose of this instance.",
+                                                                    "default": ""
+                                                                }
+                                                            },
+                                                            "additionalProperties": true
+                                                        }
+                                                    ]
+                                                }
+                                            },
+                                            "totalScore": {
+                                                "$id": "#/properties/data/properties/Questions/items/anyOf/0/properties/body/properties/totalScore",
+                                                "type": "integer",
+                                                "title": "The totalScore schema",
+                                                "description": "An explanation about the purpose of this instance.",
+                                                "default": 0
+                                            }
+                                        },
+                                        "additionalProperties": true
+                                    }
+                                },
+                                "additionalProperties": true
+                            }
+                        ]
+                    }
+                },
+                "TotalScore": {
+                    "$id": "#/properties/data/properties/TotalScore",
+                    "type": "integer",
+                    "title": "The TotalScore schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": 0
+                }
+            },
+            "additionalProperties": true
+        },
+        "extra": {
+            "$id": "#/properties/extra",
+            "type": "object",
+            "title": "The extra schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "required": [
+                "com-ef-kt"
+            ],
+            "properties": {
+                "com-ef-kt": {
+                    "$id": "#/properties/extra/properties/com-ef-kt",
+                    "type": "object",
+                    "title": "The com-ef-kt schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": {},
+                    "required": [
+                        "sourceID",
+                        "sourcePath"
+                    ],
+                    "properties": {
+                        "sourceID": {
+                            "$id": "#/properties/extra/properties/com-ef-kt/properties/sourceID",
+                            "type": "string",
+                            "title": "The sourceID schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": ""
+                        },
+                        "sourcePath": {
+                            "$id": "#/properties/extra/properties/com-ef-kt/properties/sourcePath",
+                            "type": "string",
+                            "title": "The sourcePath schema",
+                            "description": "An explanation about the purpose of this instance.",
+                            "default": ""
+                        }
+                    },
+                    "additionalProperties": true
+                }
+            },
+            "additionalProperties": true
+        },
+        "contentId": {
+            "$id": "#/properties/contentId",
+            "type": "string",
+            "title": "The contentId schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": ""
+        },
+        "title": {
+            "$id": "#/properties/title",
+            "type": "string",
+            "title": "The title schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": ""
+        },
+        "type": {
+            "$id": "#/properties/type",
+            "type": "string",
+            "title": "The type schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": ""
+        },
+        "url": {
+            "$id": "#/properties/url",
+            "type": "string",
+            "title": "The url schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": ""
+        },
+        "contentRevision": {
+            "$id": "#/properties/contentRevision",
+            "type": "string",
+            "title": "The contentRevision schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": ""
+        },
+        "id": {
+            "$id": "#/properties/id",
+            "type": "string",
+            "title": "The id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": ""
+        }
+    },
+    "additionalProperties": true
+}

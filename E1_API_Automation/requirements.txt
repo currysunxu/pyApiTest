@@ -17,3 +17,4 @@ json_tools
 xlrd
 Pillow==8.0.1
 kafka-python==2.0.2
+jsonschema
