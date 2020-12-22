@@ -120,9 +120,22 @@ class StudyPlanEnvironment(object):
     STAGING = "https://internal-ktsvc-english1.cn/study-plan"
     LIVE = "https://internal-ktsvc-english1.cn/study-plan"
 
+
 class LearningProfileEnvironment(object):
     STAGING = "https://e1-evc-booking-integration-stg.ef.com"
     LIVE = "https://e1-evc-booking-integration.ef.com"
+
+
+class EVCContentEnvironment(object):
+    QA = "https://qa.englishtown.cn"
+    STAGING = "https://evc-content-staging.bj-englishtown.com"
+    LIVE = "https://evc-fe.bj-englishtown.com"
+
+
+class EVCCDNEnvironment(object):
+    STAGING = "https://evc-fe-staging.bj-englishtown.com"
+    LIVE = "https://evc-fe.bj-englishtown.com"
+
 
 try:
     print(os.environ['environment'])
@@ -147,6 +160,7 @@ if os.environ['environment'] == 'QA':
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
     STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.QA
+    EVC_CONTENT_ENVIRONMENT = EVCContentEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -190,6 +204,8 @@ elif os.environ['environment'] == 'STG':
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.STAGING
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.STAGING
+    EVC_CONTENT_ENVIRONMENT = EVCContentEnvironment.STAGING
+    EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "10.163.24.124,1434",
@@ -244,6 +260,8 @@ elif os.environ['environment'] == 'LIVE':
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.LIVE
     STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.LIVE
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.LIVE
+    EVC_CONTENT_ENVIRONMENT = EVCContentEnvironment.LIVE
+    EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",
