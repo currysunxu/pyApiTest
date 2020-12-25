@@ -127,7 +127,7 @@ class LearningProfileEnvironment(object):
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'STG'
+    os.environ['environment'] = 'QA'
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA

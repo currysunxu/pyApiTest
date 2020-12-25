@@ -73,7 +73,7 @@ class StoryBlokService:
         return self.mou_tai.get(api_url)
 
     def get_asset(self, asset_name):
-        api_url = "/v1/spaces/{0}/assets?search={1}".format(self.storyblok_space_id, asset_name)
+        api_url = "/v1/spaces/{0}/assets?search={1}&page=1&per_page=1000".format(self.storyblok_space_id, asset_name)
         return self.mou_tai.get(api_url)
 
     def get_story_by_full_slug(self, full_slug):
