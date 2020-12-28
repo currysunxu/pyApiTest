@@ -8,6 +8,8 @@ class StoryblokReaderImportEntity:
         self.__page_layout = None
         self.__layout_group = None
         self.__sentence_text = None
+        self.__page_number = None
+        self.__sentence_number = None
         self.__image_filename = None
         self.__double_image_filename = None
         self.__audio_filename = None
@@ -19,6 +21,9 @@ class StoryblokReaderImportEntity:
         self.__answer_2 = None
         self.__answer_3 = None
         self.__answer_4 = None
+        self.__correct_answer = None
+        self.__quiz_number = None
+        self.__row = None
 
     @property
     def reader_name(self):
@@ -75,6 +80,22 @@ class StoryblokReaderImportEntity:
     @sentence_text.setter
     def sentence_text(self, sentence_text):
         self.__sentence_text = sentence_text
+
+    @property
+    def page_number(self):
+        return self.__page_number
+
+    @page_number.setter
+    def page_number(self, page_number):
+        self.__page_number = page_number
+
+    @property
+    def sentence_number(self):
+        return self.__sentence_number
+
+    @sentence_number.setter
+    def sentence_number(self, sentence_number):
+        self.__sentence_number = sentence_number
 
     @property
     def image_filename(self):
@@ -164,5 +185,28 @@ class StoryblokReaderImportEntity:
     def answer_4(self, answer_4):
         self.__answer_4 = answer_4
 
+    @property
+    def correct_answer(self):
+        return self.__correct_answer
+
+    @correct_answer.setter
+    def correct_answer(self, correct_answer):
+        self.__correct_answer = correct_answer
+
+    @property
+    def quiz_number(self):
+        return self.__quiz_number
+
+    @quiz_number.setter
+    def quiz_number(self, quiz_number):
+        self.__quiz_number = quiz_number
+
+    @property
+    def row(self):
+        return self.__row
+
+    @row.setter
+    def row(self, row):
+        self.__row = row
 
 
