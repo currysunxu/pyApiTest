@@ -816,19 +816,3 @@ class StoryBlokUtils:
                     mt_resource_url, storyblok_resource_url, storyblok_resource_sha1))
         print("enf of verify url:" + mt_resource_url)
         return error_message
-
-    @staticmethod
-    def get_excel_file():
-        excel_name = askopenfilename()
-        excel_data = xlrd.open_workbook(excel_name)
-        return excel_data.sheets()[0]
-
-    @staticmethod
-    def convert_slug_name(slug_name):
-        slug_name = re.sub(r'\W', "-", slug_name).rstrip('-')
-        new_asset_name = [""]
-        for str in slug_name:
-            if str != new_asset_name[-1] or str != '-':
-                new_asset_name.append(str)
-        convert_name = ''.join(new_asset_name).lower()
-        return convert_name
