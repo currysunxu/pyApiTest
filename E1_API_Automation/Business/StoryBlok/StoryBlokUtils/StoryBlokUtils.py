@@ -524,10 +524,12 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
-    def verify_reader_after_highflyers_release(book_in_content_map, storyblok_reader_config_list,
-                                               book_reader_content_group_list):
+    def verify_reader_after_course_release(book_in_content_map, storyblok_reader_config_list,
+                                           book_reader_content_group_list):
         error_message = []
         region_ach = book_in_content_map['regionAch']
+        book_content_path = book_in_content_map['contentPath']
+        course_source_name = book_content_path[:book_content_path.index('/')]
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
         if len(storyblok_reader_config_list) != len(book_reader_content_group_list):
@@ -544,7 +546,7 @@ class StoryBlokUtils:
 
             storyblok_correlation_path = storyblok_reader_config['content']['parent']['content']['correlation_path']
             storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
-                storyblok_correlation_path, region_ach)
+                storyblok_correlation_path, course_source_name, region_ach)
             unit_in_content_map = jmespath.search(
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
@@ -586,10 +588,12 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
-    def verify_vocab_after_highflyers_release(book_in_content_map, storyblok_vocab_config_list,
-                                              book_vocab_content_group_list):
+    def verify_vocab_after_course_release(book_in_content_map, storyblok_vocab_config_list,
+                                          book_vocab_content_group_list):
         error_message = []
         region_ach = book_in_content_map['regionAch']
+        book_content_path = book_in_content_map['contentPath']
+        course_source_name = book_content_path[:book_content_path.index('/')]
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
         vocab_eca_group_list = jmespath.search('[?groupType==\'ECA_GROUP\']', book_vocab_content_group_list)
@@ -609,7 +613,7 @@ class StoryBlokUtils:
 
             storyblok_correlation_path = storyblok_vocab_config['content']['parent']['content']['correlation_path']
             storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
-                storyblok_correlation_path, region_ach)
+                storyblok_correlation_path, course_source_name, region_ach)
             unit_in_content_map = jmespath.search(
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
@@ -659,12 +663,34 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
+    def get_zip_file():
+        zip_name = askopenfilename()
+        if '.zip' not in zip_name:
+            print("Not a zip file")
+            exit()
+        zip_file = zipfile.ZipFile(zip_name, 'r')
+        return zip_file
+
+    @staticmethod
+    def convert_asset_name(asset_name):
+        if len(asset_name.rsplit('.', 1)) == 2:
+            asset_name = re.sub(r'\W', "-", asset_name.rsplit('.', 1)[0]).rstrip('-') + "." + asset_name.rsplit('.', 1)[
+                1]
+            new_asset_name = [""]
+            for str in asset_name:
+                if str != new_asset_name[-1] or str != '-':
+                    new_asset_name.append(str)
+            convert_name = ''.join(new_asset_name).lower()
+            return convert_name
+        return None
+
+    @staticmethod
     def get_storyblok_correlation_path_wth_region(storyblok_correlation_path, course_source_name, region_ach):
         slash_index = storyblok_correlation_path.index('/')
         # correlation_path in storyblok is like "highflyers/book-7", need to add region into it to become: highflyers/cn-3/book-7
         # return storyblok_correlation_path[:slash_index] + '/' + region_ach + storyblok_correlation_path[slash_index:]
         return course_source_name + '/' + region_ach + storyblok_correlation_path[slash_index:]
-    
+
     def convert_n_bytes(self, n, b):
         bits = b * 8
         return (n + 2 ** (bits - 1)) % 2 ** bits - 2 ** (bits - 1)
@@ -791,3 +817,18 @@ class StoryBlokUtils:
         print("enf of verify url:" + mt_resource_url)
         return error_message
 
+    @staticmethod
+    def get_excel_file():
+        excel_name = askopenfilename()
+        excel_data = xlrd.open_workbook(excel_name)
+        return excel_data.sheets()[0]
+
+    @staticmethod
+    def convert_slug_name(slug_name):
+        slug_name = re.sub(r'\W', "-", slug_name).rstrip('-')
+        new_asset_name = [""]
+        for str in slug_name:
+            if str != new_asset_name[-1] or str != '-':
+                new_asset_name.append(str)
+        convert_name = ''.join(new_asset_name).lower()
+        return convert_name
