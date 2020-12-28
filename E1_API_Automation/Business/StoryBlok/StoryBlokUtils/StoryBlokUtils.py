@@ -659,11 +659,12 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
-    def get_storyblok_correlation_path_wth_region(storyblok_correlation_path, region_ach):
+    def get_storyblok_correlation_path_wth_region(storyblok_correlation_path, course_source_name, region_ach):
         slash_index = storyblok_correlation_path.index('/')
         # correlation_path in storyblok is like "highflyers/book-7", need to add region into it to become: highflyers/cn-3/book-7
-        return storyblok_correlation_path[:slash_index] + '/' + region_ach + storyblok_correlation_path[slash_index:]
-
+        # return storyblok_correlation_path[:slash_index] + '/' + region_ach + storyblok_correlation_path[slash_index:]
+        return course_source_name + '/' + region_ach + storyblok_correlation_path[slash_index:]
+    
     def convert_n_bytes(self, n, b):
         bits = b * 8
         return (n + 2 ** (bits - 1)) % 2 ** bits - 2 ** (bits - 1)
