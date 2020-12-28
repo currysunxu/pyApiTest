@@ -43,3 +43,22 @@ class StoryBlokImportUtils:
                 new_asset_name.append(str)
         convert_name = ''.join(new_asset_name).lower()
         return convert_name
+
+    @staticmethod
+    def get_reader_type(row_data):
+        folder_path = [row_data[0].strip(), row_data[3].strip()]  # folder name and title
+        if row_data[13] == "EF":
+            root = "EF readers"
+            folder_path = [row_data[1]] + folder_path
+            full_slug = "readers/content/" + StoryBlokImportUtils.convert_slug_name(
+                root) + "/" + StoryBlokImportUtils.convert_slug_name(row_data[1])
+        elif not row_data[16]:
+            root = "Assigned readers"
+            folder_path = [row_data[1]] + folder_path
+            full_slug = "readers/content/" + StoryBlokImportUtils.convert_slug_name(
+                root) + "/" + StoryBlokImportUtils.convert_slug_name(row_data[1])
+        else:
+            root = "Unassigned readers"
+            full_slug = "readers/content/" + StoryBlokImportUtils.convert_slug_name(
+                root)
+        return folder_path, full_slug, root

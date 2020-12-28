@@ -1,17 +1,3 @@
-import jmespath
-import requests
-from PIL import Image
-import io
-from ptest.decorator import TestClass, Test
-import xlrd
-
-from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
-from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData
-from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokImportUtils import StoryBlokImportUtils
-from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryblokVocabImportEntity import StoryblokVocabImportEntity
-from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryblokReaderImportEntity import StoryblokReaderImportEntity
-
-
 class StoryBlokImportVerification:
 
     @staticmethod
@@ -42,8 +28,6 @@ class StoryBlokImportVerification:
                     "The translation of the word {0} in the excel is not same as it in the storyblok at row {1}.".format(
                         vocab_entity.vocab_name, vocab_entity.row))
             if not vocab_entity.image_filename or vocab_entity.image_filename != story['content']['image']['filename']:
-                print(vocab_entity.image_filename)
-                print(story['content']['image']['filename'])
                 error_message.append(
                     "The image asset of the word {0} in the excel is not same as it in the storyblok at row {1}".format(
                         vocab_entity.vocab_name, vocab_entity.row))
@@ -68,7 +52,7 @@ class StoryBlokImportVerification:
                 error_message.append(
                     "The cover image of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
                         reader_entity.reader_name, reader_entity.row))
-            if reader_entity.level:
+            if reader_entity.level or story['level']:
                 if int(reader_entity.level) != int(story['level']):
                     error_message.append(
                         "The level of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
@@ -77,7 +61,7 @@ class StoryBlokImportVerification:
                 error_message.append(
                     "The provider of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
                         reader_entity.reader_name, reader_entity.row))
-            if reader_entity.title_audio:
+            if reader_entity.title_audio or story['title_audio']:
                 if reader_entity.title_audio != story['title_audio']['filename']:
                     error_message.append(
                         "The title audio of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
@@ -91,35 +75,48 @@ class StoryBlokImportVerification:
             error_message.append(
                 "There is no reader named {0} at row {1} in storyblok".format(reader_entity.reader_name, reader_entity.row))
         else:
-            page = reader_entity.reader_story['story']['content']['pages'][reader_entity.page_number]
-            sentence = page['sentences'][reader_entity.sentence_number]
-            if reader_entity.sentence_number == 0:
-                if reader_entity.image_filename != page['page_image']['filename']:
-                    error_message.append(
-                        "The page image of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
-                            reader_entity.reader_name, reader_entity.row))
-                if reader_entity.page_layout != page['page_layout']:
-                    error_message.append(
-                        "The page layout of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
-                            reader_entity.reader_name, reader_entity.row))
-                elif reader_entity.page_layout == "doublespread":
-                    if reader_entity.double_image_filename != page['page_image_doublespread']['filename']:
+            if int(reader_entity.page_number) >= len(reader_entity.reader_story['story']['content']['pages']):
+                error_message.append("The page number for the reader is not correct at row {0}".format(reader_entity.row))
+            else:
+                page = reader_entity.reader_story['story']['content']['pages'][int(reader_entity.page_number)]
+                if int(reader_entity.sentence_number) >= len(page['sentences']):
+                    error_message.append("The number of sentences in page {0} for reader {1} is not same as the "
+                                         "number in storyblok".format(reader_entity.page_number,
+                                                                      reader_entity.reader_name, reader_entity.row))
+                else:
+                    sentence = page['sentences'][int(reader_entity.sentence_number)]
+                    if reader_entity.sentence_number == 0:
+                        if reader_entity.image_filename != page['page_image']['filename']:
+                            error_message.append(
+                                "The page image of reader {0} in the excel is not same as it in the storyblok at row "
+                                "{1}.".format(
+                                    reader_entity.reader_name, reader_entity.row))
+                        if reader_entity.page_layout != page['page_layout']:
+                            error_message.append(
+                                "The page layout of reader {0} in the excel is not same as it in the storyblok at row "
+                                "{1}.".format(
+                                    reader_entity.reader_name, reader_entity.row))
+                        elif reader_entity.page_layout == "doublespread":
+                            if reader_entity.double_image_filename != page['page_image_doublespread']['filename']:
+                                error_message.append(
+                                    "The double spread page image of reader {0} in the excel is not same as it in the "
+                                    "storyblok at row {1}.".format(
+                                        reader_entity.reader_name, reader_entity.row))
+                            if reader_entity.layout_group != sentence['layout_group']:
+                                error_message.append(
+                                    "The layout group of reader {0} in the excel is not same as it in the storyblok "
+                                    "at row {1}.".format(
+                                        reader_entity.reader_name, reader_entity.row))
+                    if reader_entity.sentence_text.strip() != sentence['sentence_text'].strip():
                         error_message.append(
-                            "The double spread page image of reader {0} in the excel is not same as it in the "
-                            "storyblok at row {1}.".format(
+                            "The sentence text of reader {0} in the excel is not same as it in the storyblok at row {"
+                            "1}.".format(
                                 reader_entity.reader_name, reader_entity.row))
-                    if reader_entity.layout_group != sentence['layout_group']:
+                    if reader_entity.audio_filename != sentence['sentence_audio']['filename']:
                         error_message.append(
-                            "The layout group of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
+                            "The sentence audio of reader {0} in the excel is not same as it in the storyblok at row "
+                            "{1}.".format(
                                 reader_entity.reader_name, reader_entity.row))
-            if reader_entity.sentence_text.strip() != sentence['sentence_text'].strip():
-                error_message.append(
-                    "The sentence text of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
-                        reader_entity.reader_name, reader_entity.row))
-            if reader_entity.audio_filename != sentence['sentence_audio']['filename']:
-                error_message.append(
-                    "The sentence audio of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
-                        reader_entity.reader_name, reader_entity.row))
         return error_message
 
     @staticmethod
@@ -156,7 +153,7 @@ class StoryBlokImportVerification:
                 error_message.append(
                     "The answer of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(
                         reader_entity.reader_name, reader_entity.row))
-            if reader_entity.question_image:
+            if reader_entity.question_image or quiz['question_image']['filename']:
                 if reader_entity.question_image != quiz['question_image']['filename']:
                     error_message.append(
                         "The question image of reader {0} in the excel is not same as it in the storyblok at row {1}.".format(

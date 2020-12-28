@@ -53,7 +53,10 @@ class StoryBlokImportCheckTool:
             else:
                 return None
 
-    def get_asset_filename(self, path, all_folder, asset_name):
+    def get_asset_filename(self, path, all_folder, asset_path):
+        asset_name = StoryBlokImportUtils.convert_asset_name(asset_path.split('/')[-1])
+        if asset_name:
+            asset_name = asset_name.strip()
         asset_folder_id = self.get_folder_id(path, all_folder)
         filename = None
         if asset_folder_id:
@@ -64,24 +67,6 @@ class StoryBlokImportCheckTool:
         if not filename:
             return None
         return filename['filename']
-
-    def get_reader_type(self, row_data):
-        folder_path = [row_data[0].strip(), row_data[3].strip()]  # folder name and title
-        if row_data[13] == "EF":
-            self.root = "EF readers"
-            folder_path = [row_data[1]] + folder_path
-            full_slug = "readers/content/" + StoryBlokImportUtils.convert_slug_name(
-                self.root) + "/" + StoryBlokImportUtils.convert_slug_name(row_data[1])
-        elif not row_data[16]:
-            self.root = "Assigned readers"
-            folder_path = [row_data[1]] + folder_path
-            full_slug = "readers/content/" + StoryBlokImportUtils.convert_slug_name(
-                self.root) + "/" + StoryBlokImportUtils.convert_slug_name(row_data[1])
-        else:
-            self.root = "Unassigned readers"
-            full_slug = "readers/content/" + StoryBlokImportUtils.convert_slug_name(
-                self.root)
-        return folder_path, full_slug
 
     def asset_check(self, folder_id, file_type, zip_file, root, row, path):
         asset_lower = StoryBlokImportUtils.convert_asset_name(path.split('/')[-1])
@@ -179,7 +164,7 @@ class StoryBlokImportCheckTool:
                         self.asset_check(folder_id, "Image", zip_file, image_root, i, image_path.strip()))
                     continue
             if int(page_number) == 1:  # Check for cover image
-                folder_path, full_slug = self.get_reader_type(row_data)
+                folder_path, full_slug, self.root = StoryBlokImportUtils.get_reader_type(row_data)
                 image_path = row_data[14].strip()
                 # The asset for each book store in the same folder
                 folder_id = self.get_folder_id(folder_path,
@@ -227,21 +212,17 @@ class StoryBlokImportCheckTool:
             vocab_story = story_blok_service.get_story_by_full_slug(full_slug).json()
             image_path = row_data[5].strip()  # column 6 is used to stored the image path of a vocab
             audio_path = row_data[6].strip()  # column 7 is used to stored the audio path of a vocab
-            image_asset = StoryBlokImportUtils.convert_asset_name(row_data[5].split('/')[-1]).strip()
-            audio_asset = StoryBlokImportUtils.convert_asset_name(row_data[6].split('/')[-1]).strip()
             course = row_data[0]
-            image_asset_filename = self.get_asset_filename([course] + image_path.split('/')[1:-1], all_folder,
-                                                           image_asset)
-            audio_asset_filename = self.get_asset_filename([course] + audio_path.split('/')[1:-1], all_folder,
-                                                           audio_asset)
             vocab_entity = StoryblokVocabImportEntity(row_data[3])
             # assign values to each word
             vocab_entity.category = row_data[11]
             vocab_entity.priority = row_data[13]
             vocab_entity.phonetics = row_data[4]
             vocab_entity.translation = row_data[8]
-            vocab_entity.image_filename = image_asset_filename
-            vocab_entity.audio_filename = audio_asset_filename
+            vocab_entity.image_filename = self.get_asset_filename([course] + image_path.split('/')[1:-1], all_folder,
+                                                           row_data[5])
+            vocab_entity.audio_filename = self.get_asset_filename([course] + audio_path.split('/')[1:-1], all_folder,
+                                                           row_data[6])
             vocab_entity.row = i
             error_message.extend(StoryBlokImportVerification.vocab_story_check(vocab_story, vocab_entity))
         return error_message
@@ -267,20 +248,16 @@ class StoryBlokImportCheckTool:
                     last_page_number = 0
                     quiz_number = 0
                     reader_entity = StoryblokReaderImportEntity()
-                    folder_path, full_slug = self.get_reader_type(row_data)
+                    folder_path, full_slug, self.root = StoryBlokImportUtils.get_reader_type(row_data)
                     if row_data[4]:
-                        title_audio = StoryBlokImportUtils.convert_asset_name(row_data[4].split('/')[-1])
-                        title_audio_filename = self.get_asset_filename(folder_path, all_folder, title_audio)
-                        reader_entity.title_audio = title_audio_filename
+                        reader_entity.title_audio = self.get_asset_filename(folder_path, all_folder, row_data[4])
                     image_path = row_data[14]
                     full_slug += "/" + StoryBlokImportUtils.convert_slug_name(
                         row_data[0]) + "/" + StoryBlokImportUtils.convert_slug_name(row_data[3])
                     reader_story = story_blok_service.get_story_by_full_slug(full_slug).json()
                     reader_entity.reader_story = reader_story
                     reader_entity.reader_name = row_data[3]
-                    cover_image = StoryBlokImportUtils.convert_asset_name(image_path.split('/')[-1])
-                    cover_image_filename = self.get_asset_filename(folder_path, all_folder, cover_image)
-                    reader_entity.cover_image = cover_image_filename
+                    reader_entity.cover_image = self.get_asset_filename(folder_path, all_folder, image_path)
                     reader_entity.level = row_data[16]
                     reader_entity.reader_provider = row_data[13]
                     reader_entity.row = i
@@ -290,27 +267,20 @@ class StoryBlokImportCheckTool:
                     if last_page_number != page_number:
                         sentence_number = 0
                         image_path = row_data[6]
-                        page_image = StoryBlokImportUtils.convert_asset_name(image_path.split('/')[-1])
-                        page_image_filename = self.get_asset_filename(folder_path, all_folder, page_image)
-                        reader_entity.image_filename = page_image_filename
+                        reader_entity.image_filename = self.get_asset_filename(folder_path, all_folder, image_path)
                         if row_data[7]:
-                            double_image = StoryBlokImportUtils.convert_asset_name(row_data[7].split('/')[-1])
-                            double_image_filename = self.get_asset_filename(folder_path, all_folder, double_image)
-                            reader_entity.double_image_filename = double_image_filename
-                    else:
-                        sentence_number += 1
-                        reader_entity.sentence_text = row_data[9]
-                        reader_entity.page_layout = row_data[8]
-                        reader_entity.layout_group = row_data[10]
-                        audio_path = row_data[11]
-                        sentence_audio = StoryBlokImportUtils.convert_asset_name(audio_path.split('/')[-1])
-                        sentence_audio_filename = self.get_asset_filename(folder_path, all_folder, sentence_audio)
-                        reader_entity.audio_filename = sentence_audio_filename
-                        reader_entity.page_number = page_number
-                        reader_entity.sentence_number = sentence_number
-                        reader_entity.row = i
-                        error_message.extend(StoryBlokImportVerification.page_check(reader_entity))
-                        last_page_number = page_number
+                            reader_entity.double_image_filename = self.get_asset_filename(folder_path, all_folder, row_data[7])
+                    reader_entity.sentence_text = row_data[9]
+                    reader_entity.page_layout = row_data[8]
+                    reader_entity.layout_group = row_data[10]
+                    audio_path = row_data[11]
+                    reader_entity.audio_filename = self.get_asset_filename(folder_path, all_folder, audio_path)
+                    reader_entity.page_number = page_number - 2
+                    reader_entity.sentence_number = sentence_number
+                    reader_entity.row = i
+                    error_message.extend(StoryBlokImportVerification.page_check(reader_entity))
+                    last_page_number = page_number
+                    sentence_number += 1
             elif page_number == '':     # check for quiz
                 reader_entity.question_text = row_data[22]
                 reader_entity.answer_1 = row_data[23]
@@ -319,9 +289,7 @@ class StoryBlokImportCheckTool:
                 reader_entity.answer_4 = row_data[26]
                 answer = ord(row_data[27].lower()) - 97
                 if row_data[28]:
-                    question_image = StoryBlokImportUtils.convert_asset_name(row_data[28].split('/')[-1])
-                    question_image_filename = self.get_asset_filename(folder_path, all_folder, question_image)
-                    reader_entity.question_image = question_image_filename
+                    reader_entity.question_image = self.get_asset_filename(folder_path, all_folder, row_data[28])
                 reader_entity.correct_answer = answer
                 reader_entity.quiz_number = quiz_number
                 reader_entity.row = i
@@ -333,9 +301,9 @@ class StoryBlokImportCheckTool:
 
 if __name__ == '__main__':
     test_type = "Reader"  # Switch between Reader and Vocab
-    env_name = "Oneapp"  # Switch between Oneapp and Dev
+    env_name = "Dev"  # Switch between Oneapp and Dev
     test = StoryBlokImportCheckTool(env_name)
-
+    '''
     if test_type == "Reader":
         error_message = test.check_reader_asset()
     else:
@@ -345,6 +313,7 @@ if __name__ == '__main__':
     else:
         for each_error_message in error_message:
             print("Error %d" % error_message.index(each_error_message) + ": " + each_error_message)
+    '''
     error_message = []
     if test_type == "Reader":
         error_message = test.check_reader_story()
