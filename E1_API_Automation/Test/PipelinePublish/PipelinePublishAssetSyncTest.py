@@ -75,7 +75,7 @@ class PipelinePublishAssetSyncCheck:
 
 if __name__ == '__main__':
     source_env = 'QA'
-    target_env = 'STG_SG'
+    target_env = 'Staging_SG'
     test = PipelinePublishAssetSyncCheck(source_env, target_env)
     path = os.getcwd()
 
