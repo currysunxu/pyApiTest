@@ -337,8 +337,7 @@ class StoryBlokUtils:
             if len(storyblok_asset_dict) == 0 and len(content_repo_asset_dict) == 0:
                 return []
             elif len(storyblok_asset_dict) == 0 and len(content_repo_asset_dict) != 0:
-                error_message.append("asset section in content repo should be empty, is the asset image?" + str(
-                    is_asset_image))
+                error_message.append("asset section in content repo should be empty")
                 return error_message
 
         storyblok_file_name = storyblok_asset_dict['filename']
@@ -368,11 +367,11 @@ class StoryBlokUtils:
             asset_name = storyblok_file_name[sha1_end_index+1:]
 
             expected_mime_type = ''
-            if expected_url.endswith('.png'):
+            if expected_url.lower().endswith('.png'):
                 expected_mime_type = 'image/png'
-            elif expected_url.endswith('.mp3'):
+            elif expected_url.lower().endswith('.mp3'):
                 expected_mime_type = 'audio/mpeg'
-            elif expected_url.endswith('.jpg') or expected_url.endswith('.jpeg'):
+            elif expected_url.lower().endswith('.jpg') or expected_url.lower().endswith('.jpeg'):
                 expected_mime_type = 'image/jpeg'
 
             aws_s3_subfolder = expected_mime_type[:expected_mime_type.find('/')]
@@ -399,6 +398,9 @@ class StoryBlokUtils:
                                                                                     compare_key],
                                                                                 expected_url))
 
+            if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
+                expected_sha1 = '{0}_{1}'.format(expected_sha1, StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION)
+
             compare_key = 'sha1'
             error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
                                                                                 content_repo_asset_dict[
@@ -418,19 +420,23 @@ class StoryBlokUtils:
                                                                                     compare_key],
                                                                                 expected_mime_type))
 
-            if is_asset_image is None:
-                if expected_mime_type == 'audio/mpeg':
-                    is_asset_image = False
-                else:
-                    is_asset_image = True
+            if expected_mime_type == 'audio/mpeg':
+                is_asset_image = False
+            else:
+                is_asset_image = True
 
             if is_asset_image:
-                image_size_end_index = sha1_start_index
-                image_size_start_index = expected_url.rfind('/', 0, image_size_end_index)
-                image_size = expected_url[image_size_start_index + 1:image_size_end_index]
-                split_index = image_size.rfind('x')
-                expected_width_value = image_size[:split_index]
-                expected_height_value = image_size[split_index + 1:]
+                # thumbnail have fixed width and height
+                if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
+                    expected_width_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_WIDTH
+                    expected_height_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HEIGHT
+                else:
+                    image_size_end_index = sha1_start_index
+                    image_size_start_index = expected_url.rfind('/', 0, image_size_end_index)
+                    image_size = expected_url[image_size_start_index + 1:image_size_end_index]
+                    split_index = image_size.rfind('x')
+                    expected_width_value = image_size[:split_index]
+                    expected_height_value = image_size[split_index + 1:]
 
                 compare_key = 'width'
                 error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
