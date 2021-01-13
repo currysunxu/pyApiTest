@@ -129,13 +129,33 @@ class LearningProfileEnvironment(object):
 class EVCContentEnvironment(object):
     QA = "https://qa.englishtown.cn"
     STAGING = "https://evc-content-staging.bj-englishtown.com"
-    LIVE = "https://evc-fe.bj-englishtown.com"
+    LIVE = "https://evc-content.bj-englishtown.com"
 
 
 class EVCCDNEnvironment(object):
     STAGING = "https://evc-fe-staging.bj-englishtown.com"
     LIVE = "https://evc-fe.bj-englishtown.com"
 
+
+class EVCDemoPageEnvironment(object):
+    STAGING = "https://evc-ts-staging.ef.com.cn"
+    LIVE = "https://evc-ts.ef.com.cn/"
+
+
+class EVCProxyEnvironment:
+    STAGING = {
+        "CN": "evc-ts-staging.ef.com.cn",
+        "US": "evc-tv-to-ts-staging.ef.com",
+        "UK": "evc-tf-to-ts-staging.ef.com",
+        "SG": "evc-tsg-to-ts-staging.ef.com"
+    }
+
+    LIVE = {
+        "CN": "evc-ts.ef.com.cn",
+        "US": "evc-tv-to-ts.ef.com",
+        "UK": "evc-tf-to-ts.ef.com",
+        "SG": "evc-tsg-to-ts.ef.com"
+    }
 
 try:
     print(os.environ['environment'])
@@ -206,6 +226,8 @@ elif os.environ['environment'] == 'STG':
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.STAGING
     EVC_CONTENT_ENVIRONMENT = EVCContentEnvironment.STAGING
     EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.STAGING
+    EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.STAGING
+    EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "10.163.24.124,1434",
@@ -262,6 +284,8 @@ elif os.environ['environment'] == 'LIVE':
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.LIVE
     EVC_CONTENT_ENVIRONMENT = EVCContentEnvironment.LIVE
     EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.LIVE
+    EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.LIVE
+    EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",

@@ -1,12 +1,18 @@
-from hamcrest import assert_that
+import string
+from random import Random
 
-from E1_API_Automation.Lib.Moutai import Moutai
+import requests
+from hamcrest import assert_that, equal_to, is_not
+from requests import request
+
+from E1_API_Automation.Settings import EVC_DEMO_PAGE_ENVIRONMENT, EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT, \
+    ENVIRONMENT, Environment
+from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCMeetingRole
 
 
 class EVCFrontendService(object):
     def __init__(self, host):
         self.host = host
-        self.mou_tai = Moutai(host=self.host)
 
     def generate_header(self, proxy_domain):
         headers = {
@@ -26,16 +32,70 @@ class EVCFrontendService(object):
         }
         return headers
 
-    def request_frontend_js(self, url):
-        response = self.mou_tai.get(url)
-
-        if response.status_code != 200:
-            raise Exception(
-                "Failed to get frontend version, status code: %s, response content: %s" % (
-                    response.status_code, response.content.decode("utf-8")))
+    def request_frontend_js(self, url, proxy_domain):
+        headers = self.generate_header(proxy_domain)
+        response = requests.get(self.host + url, headers=headers)
+        assert_that(response.status_code, equal_to(200))
 
         return response
 
-    def verify_header_info(self, header):
-        assert_that(header["vary"], "Origin")
-        assert_that(header["Access-Control-Allow-Origin"], "*")
+    def check_header_info(self, header):
+        assert_that(header["vary"], equal_to("Origin"))
+        assert_that(header["Access-Control-Allow-Origin"], equal_to("*"))
+
+    def generate_join_classroom_url(self, user_display_name="test_user", room_name=None, content_id="10223",
+                                    duration="30", role_code=EVCMeetingRole.STUDENT, center_code="S",
+                                    layout_code=EVCLayoutCode.Agora_Kids_PL, video_unmute=True,
+                                    video_display=True, use_agora=True):
+        if room_name is None:
+            r = Random()
+            room_name = "".join(r.sample(string.ascii_letters, 8))
+
+        request_url = EVC_DEMO_PAGE_ENVIRONMENT + "/evc15/meeting/tools/CreateOrJoinClassroom/?" + \
+                      "userDisplayName={0}&roomName={1}&contentId={2}&duration={3}&roleCode={4}&centerCode={5}&layoutCode={6}&videoUnMute={7}&videoDisplay={8}&&useAgora={9}".format(
+                          user_display_name, room_name, content_id, duration, role_code, center_code, layout_code,
+                          video_unmute, video_display, use_agora)
+        return request_url
+
+    def generate_user_access_token(self, url):
+        if ENVIRONMENT is Environment.STAGING:
+            access_key = '414d95a5-b338-4356-adac-eacce520b114'
+        elif ENVIRONMENT is Environment.LIVE:
+            access_key = "4f6d7f89-3779-42e0-a10d-8ad71aac4d80"
+        else:
+            raise Exception("Do not support to run this case on {0}".format(ENVIRONMENT))
+
+        headers = {
+            'Host': EVC_PROXY_ENVIRONMENT["CN"],
+            'Connection': 'keep-alive',
+            'Content-Length': '0',
+            'Accept': '*/*',
+            'X-Requested-With': 'XMLHttpRequest',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36',
+            'x-accesskey': access_key,
+            'Origin': EVC_DEMO_PAGE_ENVIRONMENT,
+            'Sec-Fetch-Site': 'same-origin',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Dest': 'empty',
+            'Referer': EVC_DEMO_PAGE_ENVIRONMENT.join("/evc15/meeting/tools/demo"),
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.9'
+        }
+
+        response = request("POST", url, headers=headers)
+        assert_that(response.status_code, equal_to(200))
+        assert_that(response.json()["attendanceToken"], is_not(None))
+        return response.json()["attendanceToken"]
+
+    def get_client_version_by_attendance_token(self, attendance_token, platform):
+        url = EVC_DEMO_PAGE_ENVIRONMENT + "/evc15/meeting/api/clientversion?platform={0}&attendanceToken={1}".format(
+            platform, attendance_token)
+        response = requests.get(url)
+        assert_that(response.status_code, equal_to(200))
+        return response.json()
+
+    def check_frontend_version(self, response, platform, expect_version):
+        expect_file_name = EVC_CDN_ENVIRONMENT + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
+                                                                                                        expect_version)
+        assert_that(response["Version"], equal_to(expect_version))
+        assert_that(response["FileName"], equal_to(expect_file_name))
