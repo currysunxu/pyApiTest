@@ -28,7 +28,7 @@ pipeline {
       agent {
         docker {
           label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/apipython3:latest'
+          image '10.128.42.139:5000/apipython3:latest'
         }
       }
       steps {
@@ -40,7 +40,7 @@ pipeline {
           } else if (case_tag == 'live_sg')
               case_tag = 'live'
            
-          sh "ptest3  -t E1_API_Automation.Test.HighFlyerV35.Hf35BffTest -i ${case_tag}"
+          sh "ptest3  -t E1_API_Automation.Test.HighFlyerV35.Hf35BffTest,E1_API_Automation.Test.HighFlyerV35.Hf35KafkaTest -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'

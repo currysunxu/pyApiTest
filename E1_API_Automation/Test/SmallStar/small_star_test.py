@@ -318,3 +318,9 @@ class SmallStarTestCases(SmallStarBase):
         lesson_key = '080BF3B5-24D0-E811-814A-02BC62143FC0'
         unlock= self.tpi_service.v3_product_unlock(self.user_id, lesson_key, product_code="SS")
         assert_that(unlock.status_code == 204)
+
+    @Test(tags='stg, live')
+    def test_lite_content_path_unlock(self):
+        content_path = 'smallstar/cn-3/book-1/unit-1/assignment-3'
+        unlock= self.tpi_service.lite_product_unlock(self.user_id, content_path, product_code="SS")
+        assert_that(unlock.status_code == 204)

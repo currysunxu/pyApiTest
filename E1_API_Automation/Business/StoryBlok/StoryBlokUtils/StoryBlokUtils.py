@@ -12,10 +12,13 @@ from hamcrest import assert_that
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
     ContentRepoGroupType
+from E1_API_Automation.Business.PipelinePublish.MediaService import MediaService
 from E1_API_Automation.Business.StoryBlok.StoryBlokImportService import StoryBlokImportService
+from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokConstants import StoryBlokConstants
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
-from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT
+from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, ENVIRONMENT, env_key
+from E1_API_Automation.Test_Data.PipelinePublishData import AEMData
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokVersion, StoryblokReleaseProgram
 
 
@@ -83,6 +86,21 @@ class StoryBlokUtils:
                 error_message.append(
                     'MockTest story\'s entityType in content-repo not equal to {0}'.format(expected_entity_type))
                 return error_message
+        elif release_type == StoryblokReleaseProgram.READERS:
+            #if it's reader release, there will be a cover_thumbnail field added if reader's cover_image have value
+            storyblok_content = storyblok_story['content']
+            if 'cover_image' in storyblok_content.keys():
+                cover_image_dict = storyblok_content['cover_image']
+                if 'filename' in cover_image_dict.keys() and len(cover_image_dict['filename']) != 0:
+                    cover_image_file_name = cover_image_dict['filename']
+                    indicator = cover_image_file_name.find('/f/')
+                    cover_thumbnail_file_name = '{0}/{1}/{2}'.format(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST,
+                                                                     StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION,
+                                                                     cover_image_file_name[indicator+1:])
+                    cover_thumbnail_dict = {}
+                    cover_thumbnail_dict['filename'] = cover_thumbnail_file_name
+                    cover_thumbnail_dict['fieldtype'] = 'asset'
+                    storyblok_content['cover_thumbnail'] = cover_thumbnail_dict
 
         content_repo_content_data = content_repo_content['data']
         # content repo source field should be storyblok
@@ -142,27 +160,25 @@ class StoryBlokUtils:
             if isinstance(storyblock_value, dict) and 'plugin' in storyblock_value.keys():
                 storyblock_value = storyblock_value[key]
 
-        if key.endswith('image'):
-            error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
-                                                                          content_repo_value, True))
-        elif key.endswith('audio'):
-            error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
-                                                                          content_repo_value, False))
-        else:
-            if isinstance(storyblock_value, list):
-                if len(storyblock_value) != len(content_repo_value):
-                    error_message.append(
-                        'length for key:{0} not consistent between storyblok and content_repo'.format(key))
-                else:
-                    for i in range(len(storyblock_value)):
-                        storyblok_list_item = storyblock_value[i]
-                        content_repo_list_item = content_repo_value[i]
-                        error_message.extend(StoryBlokUtils.
-                                             verify_storyblok_fields_with_contentrepo(key,
-                                                                                      storyblok_list_item,
-                                                                                      content_repo_list_item,
-                                                                                      release_type))
-            elif isinstance(storyblock_value, dict):
+        if isinstance(storyblock_value, list):
+            if len(storyblock_value) != len(content_repo_value):
+                error_message.append(
+                    'length for key:{0} not consistent between storyblok and content_repo'.format(key))
+            else:
+                for i in range(len(storyblock_value)):
+                    storyblok_list_item = storyblock_value[i]
+                    content_repo_list_item = content_repo_value[i]
+                    error_message.extend(StoryBlokUtils.
+                                         verify_storyblok_fields_with_contentrepo(key,
+                                                                                  storyblok_list_item,
+                                                                                  content_repo_list_item,
+                                                                                  release_type))
+        elif isinstance(storyblock_value, dict):
+            # if it's asset dict
+            if 'fieldtype' in storyblock_value.keys() and storyblock_value['fieldtype'] == 'asset':
+                error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
+                                                                              content_repo_value))
+            else:
                 for key in storyblock_value.keys():
                     if key not in (
                             '_uid', '_editable'):
@@ -176,11 +192,11 @@ class StoryBlokUtils:
                         # otherwise those key should not present in content_repo
                         if key in content_repo_value.keys():
                             error_message.append(' key:{0} should not exist in content-repo.')
-            else:
-                if str(storyblock_value) != str(content_repo_value):
-                    error_message.append(" key:" + key + "'s value in storyblok not equal to the value in content-repo." \
-                                                         "The storyblok value is:" + str(storyblock_value)
-                                         + ", but the value in content-repo is:" + str(content_repo_value))
+        else:
+            if str(storyblock_value) != str(content_repo_value):
+                error_message.append(" key:" + key + "'s value in storyblok not equal to the value in content-repo." \
+                                                     "The storyblok value is:" + str(storyblock_value)
+                                     + ", but the value in content-repo is:" + str(content_repo_value))
 
         return error_message
 
@@ -314,15 +330,14 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
-    def verify_content_repo_asset(storyblok_asset_dict, content_repo_asset_dict, is_asset_image=None):
+    def verify_content_repo_asset(storyblok_asset_dict, content_repo_asset_dict):
         error_message = []
 
         if isinstance(storyblok_asset_dict, str):
             if len(storyblok_asset_dict) == 0 and len(content_repo_asset_dict) == 0:
                 return []
             elif len(storyblok_asset_dict) == 0 and len(content_repo_asset_dict) != 0:
-                error_message.append("asset section in content repo should be empty, is the asset image?" + str(
-                    is_asset_image))
+                error_message.append("asset section in content repo should be empty")
                 return error_message
 
         storyblok_file_name = storyblok_asset_dict['filename']
@@ -349,12 +364,43 @@ class StoryBlokUtils:
             sha1_end_index = expected_url.rfind('/')
             sha1_start_index = expected_url.rfind('/', 0, sha1_end_index)
             expected_sha1 = expected_url[sha1_start_index + 1:sha1_end_index]
+            asset_name = storyblok_file_name[sha1_end_index+1:]
 
+            expected_mime_type = ''
+            if expected_url.lower().endswith('.png'):
+                expected_mime_type = 'image/png'
+            elif expected_url.lower().endswith('.mp3'):
+                expected_mime_type = 'audio/mpeg'
+            elif expected_url.lower().endswith('.jpg') or expected_url.lower().endswith('.jpeg'):
+                expected_mime_type = 'image/jpeg'
+
+            aws_s3_subfolder = expected_mime_type[:expected_mime_type.find('/')]
+
+            # if storyblok file name starts with https://storyblok-image.ef.com.cn/unsafe, the asset is for cover_thumbnail
+            if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
+                suffix_index = asset_name.rfind('.')
+                asset_name = asset_name[:suffix_index] + '_' + StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION \
+                             + asset_name[suffix_index:]
+
+            # url in content repo is different from storyblok, the asset will be uploaded to aws s3
+            expected_asset_name_in_content = '{0}_{1}'.format(expected_sha1, asset_name)
+            expected_url_value = 'org/com-ef-kt/{0}/{1}'.format(aws_s3_subfolder, expected_asset_name_in_content)
+            # check the content_repo url value
+            error_message.extend(StoryBlokUtils.verify_content_repo_asset_field('url_value',
+                                                                                content_repo_asset_dict[
+                                                                                    'url'],
+                                                                                expected_url_value))
+
+            # check the asset sha1 between storyblok and aws s3
             compare_key = 'url'
             error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
                                                                                 content_repo_asset_dict[
                                                                                     compare_key],
                                                                                 expected_url))
+
+            if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
+                expected_sha1 = '{0}_{1}'.format(expected_sha1, StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION)
+
             compare_key = 'sha1'
             error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
                                                                                 content_repo_asset_dict[
@@ -367,12 +413,6 @@ class StoryBlokUtils:
                                                                                 content_repo_asset_dict[
                                                                                     compare_key],
                                                                                 1024))
-            if expected_url.endswith('.png'):
-                expected_mime_type = 'image/png'
-            elif expected_url.endswith('.mp3'):
-                expected_mime_type = 'audio/mpeg'
-            elif expected_url.endswith('.jpg'):
-                expected_mime_type = 'image/jpeg'
 
             compare_key = 'mimeType'
             error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
@@ -380,19 +420,23 @@ class StoryBlokUtils:
                                                                                     compare_key],
                                                                                 expected_mime_type))
 
-            if is_asset_image is None:
-                if expected_mime_type == 'audio/mpeg':
-                    is_asset_image = False
-                else:
-                    is_asset_image = True
+            if expected_mime_type == 'audio/mpeg':
+                is_asset_image = False
+            else:
+                is_asset_image = True
 
             if is_asset_image:
-                image_size_end_index = sha1_start_index
-                image_size_start_index = expected_url.rfind('/', 0, image_size_end_index)
-                image_size = expected_url[image_size_start_index + 1:image_size_end_index]
-                split_index = image_size.find('x')
-                expected_width_value = image_size[:split_index]
-                expected_height_value = image_size[split_index + 1:]
+                # thumbnail have fixed width and height
+                if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
+                    expected_width_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_WIDTH
+                    expected_height_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HEIGHT
+                else:
+                    image_size_end_index = sha1_start_index
+                    image_size_start_index = expected_url.rfind('/', 0, image_size_end_index)
+                    image_size = expected_url[image_size_start_index + 1:image_size_end_index]
+                    split_index = image_size.rfind('x')
+                    expected_width_value = image_size[:split_index]
+                    expected_height_value = image_size[split_index + 1:]
 
                 compare_key = 'width'
                 error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
@@ -417,11 +461,35 @@ class StoryBlokUtils:
     @staticmethod
     def verify_content_repo_asset_field(field_name, content_repo_value, expected_value):
         error_message = []
-        if str(content_repo_value) != str(expected_value):
-            error_message.append("asset field:" + field_name + "'s value in content repo not as expected." \
-                                                               "The content_repo_value value is:" + str(
-                content_repo_value) \
-                                 + ", but expected value is:" + str(expected_value))
+        # storyblok resources were uploaded to AWS S3, need to compare storyblok resource sha1 with content repo resource sha1
+        if field_name == 'url' and len(expected_value) != 0:
+            storyblok_resource_response = StoryBlokImportService.get_storyblok_resource(expected_value)
+            assert_that(storyblok_resource_response.status_code == 200,
+                        'storyblok resource response status is {0}, not 200 for url: {1}'
+                        .format(storyblok_resource_response.status_code, expected_value))
+            storyblok_resource_sha1 = CommonUtils.get_asset_sha1(storyblok_resource_response.content)
+
+            media_host = AEMData.CSEMediaService[env_key]['host']
+            media_api_key = AEMData.CSEMediaService[env_key]['x-api-key']
+            cse_media_service = MediaService(media_host, media_api_key)
+            cse_media_service_response = cse_media_service.get_media(content_repo_value)
+            assert_that(cse_media_service_response.status_code == 200,
+                        'cse media service resource response status is {0} not 200 for url: {1}'
+                        .format(cse_media_service_response.status_code, content_repo_value))
+            media_resource_sha1 = CommonUtils.get_asset_sha1(cse_media_service_response.content)
+
+            # not compare resource sha1 for cover_thumbnail because of CP-237
+            if not expected_value.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
+                if storyblok_resource_sha1 != media_resource_sha1:
+                    error_message.append(
+                        "resource in content repo not consistent with Storyblok, content repo resource url is:{0}, storyblok resource url is:{1}, sha1 is:{2}".format(
+                            content_repo_value, expected_value, storyblok_resource_sha1))
+        else:
+            if str(content_repo_value) != str(expected_value):
+                error_message.append("asset field:" + field_name + "'s value in content repo not as expected." \
+                                                                   "The content_repo_value value is:" + str(
+                    content_repo_value) \
+                                     + ", but expected value is:" + str(expected_value))
         return error_message
 
     @staticmethod
@@ -513,7 +581,7 @@ class StoryBlokUtils:
             else:
                 expected_content_group_childref['type'] = "Reader"
                 expected_reader_metadata['title'] = latest_eca['data']['content']['title']
-                expected_reader_metadata['cover_image'] = latest_eca['data']['content']['cover_image']
+                expected_reader_metadata['cover_image'] = latest_eca['data']['content']['cover_thumbnail']
                 expected_reader_metadata['reader_provider'] = latest_eca['data']['content']['reader_provider']
             expected_content_group_childref['metadata'] = expected_reader_metadata
 
@@ -524,10 +592,12 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
-    def verify_reader_after_highflyers_release(book_in_content_map, storyblok_reader_config_list,
-                                               book_reader_content_group_list):
+    def verify_reader_after_course_release(book_in_content_map, storyblok_reader_config_list,
+                                           book_reader_content_group_list):
         error_message = []
         region_ach = book_in_content_map['regionAch']
+        book_content_path = book_in_content_map['contentPath']
+        course_source_name = book_content_path[:book_content_path.index('/')]
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
         if len(storyblok_reader_config_list) != len(book_reader_content_group_list):
@@ -544,7 +614,7 @@ class StoryBlokUtils:
 
             storyblok_correlation_path = storyblok_reader_config['content']['parent']['content']['correlation_path']
             storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
-                storyblok_correlation_path, region_ach)
+                storyblok_correlation_path, course_source_name, region_ach)
             unit_in_content_map = jmespath.search(
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
@@ -586,10 +656,12 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
-    def verify_vocab_after_highflyers_release(book_in_content_map, storyblok_vocab_config_list,
-                                              book_vocab_content_group_list):
+    def verify_vocab_after_course_release(book_in_content_map, storyblok_vocab_config_list,
+                                          book_vocab_content_group_list):
         error_message = []
         region_ach = book_in_content_map['regionAch']
+        book_content_path = book_in_content_map['contentPath']
+        course_source_name = book_content_path[:book_content_path.index('/')]
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
         vocab_eca_group_list = jmespath.search('[?groupType==\'ECA_GROUP\']', book_vocab_content_group_list)
@@ -609,7 +681,7 @@ class StoryBlokUtils:
 
             storyblok_correlation_path = storyblok_vocab_config['content']['parent']['content']['correlation_path']
             storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
-                storyblok_correlation_path, region_ach)
+                storyblok_correlation_path, course_source_name, region_ach)
             unit_in_content_map = jmespath.search(
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
@@ -681,10 +753,11 @@ class StoryBlokUtils:
         return None
 
     @staticmethod
-    def get_storyblok_correlation_path_wth_region(storyblok_correlation_path, region_ach):
+    def get_storyblok_correlation_path_wth_region(storyblok_correlation_path, course_source_name, region_ach):
         slash_index = storyblok_correlation_path.index('/')
         # correlation_path in storyblok is like "highflyers/book-7", need to add region into it to become: highflyers/cn-3/book-7
-        return storyblok_correlation_path[:slash_index] + '/' + region_ach + storyblok_correlation_path[slash_index:]
+        # return storyblok_correlation_path[:slash_index] + '/' + region_ach + storyblok_correlation_path[slash_index:]
+        return course_source_name + '/' + region_ach + storyblok_correlation_path[slash_index:]
 
     def convert_n_bytes(self, n, b):
         bits = b * 8
@@ -811,19 +884,3 @@ class StoryBlokUtils:
                     mt_resource_url, storyblok_resource_url, storyblok_resource_sha1))
         print("enf of verify url:" + mt_resource_url)
         return error_message
-
-    @staticmethod
-    def get_excel_file():
-        excel_name = askopenfilename()
-        excel_data = xlrd.open_workbook(excel_name)
-        return excel_data.sheets()[0]
-
-    @staticmethod
-    def convert_slug_name(slug_name):
-        slug_name = re.sub(r'\W', "-", slug_name).rstrip('-')
-        new_asset_name = [""]
-        for str in slug_name:
-            if str != new_asset_name[-1] or str != '-':
-                new_asset_name.append(str)
-        convert_name = ''.join(new_asset_name).lower()
-        return convert_name
