@@ -1,4 +1,6 @@
 import hashlib
+import random
+import string
 import urllib
 
 
@@ -20,3 +22,7 @@ class CommonUtils:
         encoded_cn = urllib.parse.quote('/' + cn_content_path + '/', safe="")
         encoded_content_path = cn_content_path_list[0] + encoded_cn + cn_content_path_list[2]
         return encoded_content_path
+
+    @staticmethod
+    def random_gen_str():
+        return ''.join(random.sample(string.ascii_letters + string.digits, 8))
