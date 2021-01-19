@@ -18,8 +18,9 @@ pipeline {
   }
 
   parameters {
-
         choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
+        text(name: 'agora_fe_version', defaultValue: '0.3.5-70e6029', description: '')
+        text(name: 'fm_fe_version', defaultValue: '0.1.39-bfed4c1', description: '')
     }
 
   stages {

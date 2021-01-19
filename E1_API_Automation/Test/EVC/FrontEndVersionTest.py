@@ -1,3 +1,4 @@
+from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test, BeforeClass
 
 from E1_API_Automation.Business.EVC.EVCFrontendService import EVCFrontendService
@@ -13,53 +14,47 @@ class FrontEndVersionTest:
         self.evc_frontend_service = EVCFrontendService(EVC_CDN_ENVIRONMENT)
 
     @Test(tags="stg, live", data_provider={"CN", "US", "UK", "SG"})
-    def test_kids_web_frontend(self, location):
-        url = "/_shared/evc15-fe_kids/{0}/main.js".format(EVC_AGORA_FRONTEND_VERSION)
-        response = self.evc_frontend_service.request_frontend_js(url, EVC_PROXY_ENVIRONMENT[location])
-        self.evc_frontend_service.check_header_info(response.headers)
+    def test_kids_frontend_deployed(self, location):
+        # get url list from test data
+        frontend_file_list = self.evc_frontend_service.get_frontend_file_url()
 
-    @Test(tags="stg, live", data_provider={"CN", "US", "UK", "SG"})
-    def test_kids_ios_frontend(self, location):
-        url = "/_shared/evc15-fe-ios-bundle_kids/{0}/ios.zip".format(EVC_AGORA_FRONTEND_VERSION)
-        response = self.evc_frontend_service.request_frontend_js(url, EVC_PROXY_ENVIRONMENT[location])
-        self.evc_frontend_service.check_header_info(response.headers)
+        # check each file is deployed with correct version
+        if len(frontend_file_list) > 0:
+            for url in frontend_file_list:
+                url = url.format(EVC_AGORA_FRONTEND_VERSION)
+                response = self.evc_frontend_service.request_frontend_js(url, EVC_PROXY_ENVIRONMENT[location])
 
-    @Test(tags="stg, live", data_provider={"CN", "US", "UK", "SG"})
-    def test_kids_android_frontend(self, location):
-        url = "/_shared/evc15-fe-android-bundle_kids/{0}/android.zip".format(EVC_AGORA_FRONTEND_VERSION)
-        response = self.evc_frontend_service.request_frontend_js(url, EVC_PROXY_ENVIRONMENT[location])
-        self.evc_frontend_service.check_header_info(response.headers)
+                assert_that(response.headers["vary"], equal_to("Origin"))
+                assert_that(response.headers["Access-Control-Allow-Origin"], equal_to("*"))
 
-    @Test(tags="stg, live")
-    def test_kids_agora_frontend_version(self):
+    @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
+    def test_kids_agora_frontend_version(self, platform):
+        # generate attendance token
         request_url = self.evc_frontend_service.generate_join_classroom_url()
         attendance_token = self.evc_frontend_service.generate_user_access_token(request_url)
 
-        # get iOS version and do verification
-        agora_ios_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token,
-                                                                                              EVCPlatform.IOS)
-        self.evc_frontend_service.check_frontend_version(agora_ios_response, EVCPlatform.IOS,
-                                                         EVC_AGORA_FRONTEND_VERSION)
+        # get version from api
+        agora_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token,
+                                                                                          platform)
+        expect_file_name = EVC_CDN_ENVIRONMENT + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
+                                                                                                        EVC_AGORA_FRONTEND_VERSION)
 
-        # get android version and do verification
-        agora_android_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token,
-                                                                                                  EVCPlatform.ANDROID)
-        self.evc_frontend_service.check_frontend_version(agora_android_response, EVCPlatform.ANDROID,
-                                                         EVC_AGORA_FRONTEND_VERSION)
+        # check version and url
+        assert_that(agora_response["Version"], equal_to(EVC_AGORA_FRONTEND_VERSION))
+        assert_that(agora_response["FileName"], equal_to(expect_file_name))
 
-    @Test(tags="stg, live")
-    def test_kids_fm_frontend_version(self):
+    @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
+    def test_kids_fm_frontend_version(self, platform):
+        # generate attendance token
         request_url = self.evc_frontend_service.generate_join_classroom_url(
             layout_code=EVCLayoutCode.FM_Kids_PL, use_agora=False)
         attendance_token = self.evc_frontend_service.generate_user_access_token(request_url)
 
-        # get iOS version and do verification
-        fm_ios_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token,
-                                                                                           EVCPlatform.IOS)
-        self.evc_frontend_service.check_frontend_version(fm_ios_response, EVCPlatform.IOS, EVC_FM_FRONTEND_VERSION)
-
-        # get android version and do verification
-        fm_android_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token,
-                                                                                               EVCPlatform.ANDROID)
-        self.evc_frontend_service.check_frontend_version(fm_android_response, EVCPlatform.ANDROID,
-                                                         EVC_FM_FRONTEND_VERSION)
+        # get version from api
+        fm_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token,
+                                                                                       platform)
+        expect_file_name = EVC_CDN_ENVIRONMENT + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
+                                                                                                        EVC_FM_FRONTEND_VERSION)
+        # check version and url
+        assert_that(fm_response["Version"], equal_to(EVC_FM_FRONTEND_VERSION))
+        assert_that(fm_response["FileName"], equal_to(expect_file_name))

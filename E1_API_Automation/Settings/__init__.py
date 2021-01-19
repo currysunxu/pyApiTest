@@ -127,7 +127,6 @@ class LearningProfileEnvironment(object):
 
 
 class EVCContentEnvironment(object):
-    QA = "https://qa.englishtown.cn"
     STAGING = "https://evc-content-staging.bj-englishtown.com"
     LIVE = "https://evc-content.bj-englishtown.com"
 
@@ -180,7 +179,6 @@ if os.environ['environment'] == 'QA':
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
     STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.QA
-    EVC_CONTENT_ENVIRONMENT = EVCContentEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",

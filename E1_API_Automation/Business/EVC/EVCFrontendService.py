@@ -5,7 +5,7 @@ import requests
 from hamcrest import assert_that, equal_to, is_not
 from requests import request
 
-from E1_API_Automation.Settings import EVC_DEMO_PAGE_ENVIRONMENT, EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT, \
+from E1_API_Automation.Settings import EVC_DEMO_PAGE_ENVIRONMENT, EVC_PROXY_ENVIRONMENT, \
     ENVIRONMENT, Environment
 from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCMeetingRole
 
@@ -39,9 +39,22 @@ class EVCFrontendService(object):
 
         return response
 
-    def check_header_info(self, header):
-        assert_that(header["vary"], equal_to("Origin"))
-        assert_that(header["Access-Control-Allow-Origin"], equal_to("*"))
+    def get_frontend_file_url(self):
+        file_location = "\E1_API_Automation\Test_Data\EVC_Frontend_File_List"
+        file_list = []
+
+        try:
+            files = open(file_location, "r")
+        except IOError:
+            print("Cannot find the specific file: {0}".format(file_location))
+        else:
+            lines = files.read().splitlines()
+
+            if lines is not None:
+                for line in lines:
+                    file_list.append(line)
+
+        return file_list
 
     def generate_join_classroom_url(self, user_display_name="test_user", room_name=None, content_id="10223",
                                     duration="30", role_code=EVCMeetingRole.STUDENT, center_code="S",
@@ -93,9 +106,3 @@ class EVCFrontendService(object):
         response = requests.get(url)
         assert_that(response.status_code, equal_to(200))
         return response.json()
-
-    def check_frontend_version(self, response, platform, expect_version):
-        expect_file_name = EVC_CDN_ENVIRONMENT + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
-                                                                                                        expect_version)
-        assert_that(response["Version"], equal_to(expect_version))
-        assert_that(response["FileName"], equal_to(expect_file_name))
