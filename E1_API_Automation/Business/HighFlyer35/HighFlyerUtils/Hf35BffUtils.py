@@ -124,7 +124,7 @@ class Hf35BffUtils:
         :param myvalue:
         :return: last index of myvalue
         """
-        return len(my_list) - my_list[::-1].index(my_value) - 1
+        return len(my_list) - my_list[::-1].index(my_value)
 
     @staticmethod
     def modify_dict_keys(previous_dict):
@@ -136,7 +136,7 @@ class Hf35BffUtils:
         """
         new_dict = previous_dict.copy()
         for item_key in previous_dict.keys():
-            field_name = item_key[Hf35BffUtils.last_index_of(item_key, "__") + 1:]
+            field_name = item_key[Hf35BffUtils.last_index_of(item_key, "__") :]
             field_name = Hf35BffUtils.underline_to_hump(field_name)
             new_dict.update({field_name: new_dict.pop(item_key)})
         return new_dict
@@ -315,7 +315,9 @@ class Hf35BffUtils:
     def construct_vocab_progress_list(book_content_id, item_num=1):
         random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
         word_attempt_entity = Hf35BffWordAttemptEntity()
-        word_attempt_entity.context_content_path = "contextContentPath%s" % (random.randint(1, 10))
+        context_content_paths = ["highflyers/cn-3/book-7/unit-","tb16/cn-3/book-1/unit-"]
+        random_path = random.choice(context_content_paths)
+        word_attempt_entity.context_content_path = random_path + str((random.randint(1, 3)))
         word_attempt_entity.context_lesson_content_id = str(uuid.uuid1())
         word_attempt_entity.context_tree_revision = "TreeRevision%s" % (random.randint(1, 10))
         word_attempt_entity.start_time = random_date_time
@@ -414,6 +416,13 @@ class Hf35BffUtils:
         return ms_sql_server.exec_query_return_dict_list(
             BffSQLString.get_study_plan_by_student_id_sql[env_key].format(student_id, product_module,
                                                                           ref_content_path))[0]
+
+    @staticmethod
+    def get_count_study_plan_by_student_id_from_db(student_id, product_module, ref_content_path):
+        ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
+        return ms_sql_server.exec_query_return_dict_list(
+            BffSQLString.get_count_study_plan_by_student_id_sql[env_key].format(student_id, product_module,
+                                                                          ref_content_path))[0]['count(*)']
 
     @staticmethod
     def get_count_completed_study_plan_by_student_id_from_db(student_id, ref_content_path):
