@@ -646,7 +646,11 @@ class Hf35BffTest(HfBffTestBase):
         learning_result_entity = LearningResultEntity(None, None, None)
         # 128 is for vocab product module
         learning_result_entity.product_module = LearningResultProductModule.VOCABULARY.value
-        learning_result_entity.product = LearningResultProduct.HIGHFLYER.value
+        if "highflyer" in word_attempt_list.context_content_path:
+            learning_result_entity.product = LearningResultProduct.HIGHFLYER.value
+        elif "tb16" in word_attempt_list.context_content_path:
+            learning_result_entity.product = LearningResultProduct.TRAILBLAZERS.value
+
         learning_result_entity.student_key = int(self.customer_id)
         learning_result_entity.business_key = word_attempt_list.context_lesson_content_id
         Hf35BffUtils.construct_expected_learning_result_by_word_attempt(learning_result_entity,word_attempt_list)
