@@ -14,7 +14,6 @@ class StoryBlokService:
 
     def get_storyblok_stories(self, starts_with, page_number=1, page_size=25, published_at_start='',
                               published_at_end=''):
-        # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         # api_version = StoryBlokUtils.get_storyblok_version_by_env()
         api_version = StoryBlokVersion.PUBLISHED.value
         api_url = "/v1/cdn/stories?token={0}&starts_with={1}&version={2}&sort_by=published_at&page={3}&per_page={4}&published_at_gt={5}&published_at_lt={6}".format(
@@ -26,7 +25,6 @@ class StoryBlokService:
                                           published_at_end)
 
     def get_storyblok_reader_levels(self):
-        # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
         api_version = StoryBlokVersion.PUBLISHED.value
         api_url = "/v1/cdn/stories?token={0}&starts_with=readers/course-config&version={1}&resolve_relations=parent&filter_query[component][in]=reader_level&sort_by=content.code&page=1&per_page=100".format(
             self.api_token, api_version)
@@ -38,25 +36,23 @@ class StoryBlokService:
     def get_storyblok_mocktest(self, page_number=1, page_size=25, published_at_start='', published_at_end=''):
         return self.get_storyblok_stories('mt', page_number, page_size, published_at_start, published_at_end)
 
-    def get_storyblok_book_by_scope(self, book_release_scope):
-        # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
+    def get_storyblok_book_by_scope(self, course_config_path, book_release_scope):
         api_version = StoryBlokVersion.PUBLISHED.value
-        api_url = "/v1/cdn/stories?token={0}&starts_with=highflyers/course-config/{1}&filter_query[component][in]=book&version={2}".format(
-            self.api_token, book_release_scope, api_version)
+        api_url = "/v1/cdn/stories?token={0}&starts_with={1}/{2}&filter_query[component][in]=book&version={3}".format(
+            self.api_token, course_config_path.lower(), book_release_scope, api_version)
         return self.mou_tai.get(api_url)
 
-    def get_storyblok_configs(self, book_release_scope, filter_component):
-        # api_token = StoryBlokData.StoryBlokAPIKey[env_key]
+    def get_storyblok_configs(self, course_config_path, book_release_scope, filter_component):
         api_version = StoryBlokVersion.PUBLISHED.value
-        api_url = "/v1/cdn/stories?token={0}&starts_with=highflyers/course-config/{1}&version={2}&resolve_relations=parent&filter_query[component][in]={3}".format(
-            self.api_token, book_release_scope, api_version, filter_component)
+        api_url = "/v1/cdn/stories?token={0}&starts_with={1}/{2}&version={3}&resolve_relations=parent&filter_query[component][in]={4}".format(
+            self.api_token, course_config_path.lower(), book_release_scope, api_version, filter_component)
         return self.mou_tai.get(api_url)
 
-    def get_storyblok_reader_configs(self, book_release_scope):
-        return self.get_storyblok_configs(book_release_scope, 'reader_config')
+    def get_storyblok_reader_configs(self, course_config_path, book_release_scope):
+        return self.get_storyblok_configs(course_config_path, book_release_scope, 'reader_config')
 
-    def get_storyblok_vocab_configs(self, book_release_scope):
-        return self.get_storyblok_configs(book_release_scope, 'vocab_config')
+    def get_storyblok_vocab_configs(self, course_config_path, book_release_scope):
+        return self.get_storyblok_configs(course_config_path, book_release_scope, 'vocab_config')
 
     def get_storyblok_question_by_full_slug(self, full_slug):
         api_version = StoryBlokVersion.DRAFT.value
@@ -72,8 +68,8 @@ class StoryBlokService:
         api_url = "/v1/spaces/{0}/asset_folders/".format(self.storyblok_space_id)
         return self.mou_tai.get(api_url)
 
-    def get_asset(self, asset_name):
-        api_url = "/v1/spaces/{0}/assets?search={1}".format(self.storyblok_space_id, asset_name)
+    def get_asset(self, asset_name, page_number, page_size):
+        api_url = "/v1/spaces/{0}/assets?search={1}&page={2}&per_page={3}".format(self.storyblok_space_id, asset_name, page_number, page_size)
         return self.mou_tai.get(api_url)
 
     def get_story_by_full_slug(self, full_slug):

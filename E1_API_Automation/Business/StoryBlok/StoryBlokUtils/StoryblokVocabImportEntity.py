@@ -8,6 +8,7 @@ class StoryblokVocabImportEntity:
         self.__translation = None
         self.__image_filename = None
         self.__audio_filename = None
+        self.__row = None
 
     @property
     def vocab_name(self):
@@ -65,3 +66,10 @@ class StoryblokVocabImportEntity:
     def audio_filename(self, audio_filename):
         self.__audio_filename = audio_filename
 
+    @property
+    def row(self):
+        return self.__row
+
+    @row.setter
+    def row(self, row):
+        self.__row = row
