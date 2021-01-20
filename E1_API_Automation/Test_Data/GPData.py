@@ -40,7 +40,7 @@ class MoscowGradeKey:
 
 
 class GP_user:
-    GPUsers = {'QA': {'username': 'hf3.cn.01', 'password': '12345', 'culture_code': 'zh-CN'},
+    GPUsers = {'QA': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
                'Staging': {'username': 'gp.cn.auto1', 'password': '12345', 'culture_code': 'zh-CN'},
                'Live': {'username': 'gp.cn.auto2', 'password': '12345', 'culture_code': 'zh-CN'},
                'Staging_SG': {'username': 'gp.id.auto1', 'password': '12345', 'culture_code': 'id-ID'},
