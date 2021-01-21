@@ -163,6 +163,10 @@ class StoryBlokTestCases:
     def test_smallstars_35_release(self):
         self.test_course_release_by_type(StoryblokReleaseProgram.SMALLSTARS_35)
 
+    @Test()
+    def test_trailblazers_30_release(self):
+        self.test_course_release_by_type(StoryblokReleaseProgram.TRAILBLAZERS_30)
+
     # test the course release by type
     def test_course_release_by_type(self, release_type):
         storyblok_release_service = StoryBlokReleaseService(STORYBLOK_RELEASE_ENVIRONMENT)
@@ -177,8 +181,8 @@ class StoryBlokTestCases:
         self.test_course_release_by_scope([release_scope], region_achs, release_program)
 
     # test course release by release scope
-    @Test(data_provider=(
-    ["book-c", "book-d", "book-e", "book-f", "book-g", "book-h", "book-i", "book-j"], ["cn-3", "cn-3-144"], 'Highflyers35'))
+    @Test(data_provider=[
+        (['book-1', 'book-2', 'book-3', 'book-4', "book-5", "book-6", "book-7", "book-8"], ['cn-3'], 'Trailblazers30')])
     def test_course_release_by_scope(self, release_scopes, region_achs, release_program):
         course_config_path = StoryBlokData.StoryBlokProgram[release_program]['course-config-path']
         course_source_name = StoryBlokData.StoryBlokProgram[release_program]['source-name']

@@ -5,7 +5,6 @@ import json_tools
 import re
 from tkinter.filedialog import askopenfilename
 import zipfile
-import xlrd
 
 from hamcrest import assert_that
 
@@ -518,7 +517,7 @@ class StoryBlokUtils:
             expected_reader_level['contentPath'] = storyblok_reader_level['full_slug'].replace('course-config/', '')
             expected_reader_level['course'] = 'READERS_10'
             expected_reader_level['originID'] = storyblok_reader_level['id']
-            expected_reader_level['code'] = storyblok_reader_level['content']['code']
+            expected_reader_level['code'] =int(storyblok_reader_level['content']['code'])
             expected_reader_level['source'] = 'storyblok'
             expected_reader_level['title'] = storyblok_reader_level['name']
             expected_reader_level['level_up_threshold'] = storyblok_reader_level['content']['level_up_threshold']
@@ -610,7 +609,7 @@ class StoryBlokUtils:
         # reader config list have been sorted by full_slug, the order should be consistent with content group searched by book
         for i in range(len(storyblok_reader_config_list)):
             storyblok_reader_config = storyblok_reader_config_list[i]
-            book_reader_content_group = book_reader_content_group_list[i]
+            # book_reader_content_group = book_reader_content_group_list[i]
 
             storyblok_correlation_path = storyblok_reader_config['content']['parent']['content']['correlation_path']
             storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
@@ -619,9 +618,14 @@ class StoryBlokUtils:
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
 
+            # for small star, it have unit 10, so the order can not guarantee the book_reader_content_group
+            unit_content_id = unit_in_content_map['contentId']
+            book_reader_content_group = jmespath.search(
+                '[?parentRef.contentId == \'{0}\'] | [0]'.format(unit_content_id), book_reader_content_group_list)
+
             expected_content_group_parent_ref = {}
             expected_content_group_parent_ref['type'] = 'UNIT'
-            expected_content_group_parent_ref['contentId'] = unit_in_content_map['contentId']
+            expected_content_group_parent_ref['contentId'] = unit_content_id
             expected_content_group_parent_ref['contentRevision'] = unit_in_content_map['contentRevision']
             expected_content_group_parent_ref['schemaVersion'] = unit_in_content_map['schemaVersion']
             expected_content_group_parent_ref['contentIndex'] = \

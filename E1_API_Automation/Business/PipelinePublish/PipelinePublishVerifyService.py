@@ -1,6 +1,7 @@
 import jmespath
 import json_tools
 import requests
+import json
 from hamcrest import assert_that
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
@@ -44,33 +45,43 @@ class PipelinePublishVerifyService:
         error_message.extend(self.verify_aem_fields_with_content_map(aem_book_tree,
                                                                      content_map_book_tree))
 
-        aem_unit_list = aem_book_tree['units']
+        aem_units_dict = aem_book_tree['units']
         content_map_unit_list = content_map_book_tree[PipelinePublishConstants.FIELD_CHILDREN]
 
-        if len(aem_unit_list) != len(content_map_unit_list):
+        if len(aem_units_dict) != len(content_map_unit_list):
             error_message.append('AEM unit list size not same as content map unit list size!')
             return error_message
 
-        for i in range(len(aem_unit_list)):
+        for i in range(len(content_map_unit_list)):
             print("--------------------start verify unit" + str(i + 1))
             # for each unit, init the service as the expire time is too short in QA
             self.__init__()
 
-            aem_unit_dict = aem_unit_list['unit-' + str(i + 1)]
+            # for small star, it have Unit 0, but the id is unit-11 for Unit 0
             content_map_unit_dict = content_map_unit_list[i]
+            aem_path = content_map_unit_dict['originID']
+            # aem_unit_dict = aem_unit_list['unit-' + str(i + 1)]
+            aem_unit_dict = PipelinePublishUtils.get_expected_aem_unit_by_path(aem_units_dict, aem_path)
 
             aem_unit_title = aem_unit_dict[PipelinePublishConstants.FIELD_TITLE]
 
             error_message.extend(self.verify_aem_fields_with_content_map(aem_unit_dict,
                                                                          content_map_unit_dict))
 
-            # unit title should not include unit character
-            if 'unit' in aem_unit_title.lower():
+            # unit title should not include unit character for highflyers
+            if 'unit' in aem_unit_title.lower() and content_map_book_tree['contentPath'].startswith('highflyers'):
                 error_message.append(" unit title should not include unit character!")
 
             # verify unit handouts
             error_message.extend(self.verify_unit_handouts(aem_unit_dict,
                                                            content_map_unit_dict))
+
+            # verify unit flashcards
+            error_message.extend(self.verify_unit_flashcard(aem_unit_dict,
+                                                            content_map_unit_dict))
+
+            # verify unit quiz
+            error_message.extend(self.verify_unit_quiz(aem_unit_dict, content_map_unit_dict))
 
             # verify lesson by unit structure
             aem_lesson_by_unit_list = aem_unit_dict[PipelinePublishConstants.FIELD_REGION_LESSONS][region_ach][
@@ -92,8 +103,10 @@ class PipelinePublishVerifyService:
                                                                              content_map_lesson_by_unit))
 
                 # verify lesson homework
-                error_message.extend(self.verify_lesson_homework(aem_lesson_by_unit,
-                                                                 content_map_lesson_by_unit))
+                # for small star, not verify homework for now, as lite not need these, and content-repo have issue: CP-254
+                if not content_map_book_tree['contentPath'].startswith('small'):
+                    error_message.extend(self.verify_lesson_homework(aem_lesson_by_unit,
+                                                                     content_map_lesson_by_unit))
                 print("--end of verify lesson" + str(j + 1))
         print("--------------------end of verify unit" + str(i + 1))
         return error_message
@@ -110,18 +123,31 @@ class PipelinePublishVerifyService:
         return error_message
 
     def verify_unit_handouts(self, aem_unit_dict, content_map_unit_dict):
+        return self.verify_unit_handouts_flashcard(aem_unit_dict, content_map_unit_dict, ContentRepoContentType.TypeHandout)
+
+    def verify_unit_flashcard(self, aem_unit_dict, content_map_unit_dict):
+        return self.verify_unit_handouts_flashcard(aem_unit_dict, content_map_unit_dict, ContentRepoContentType.TypeFlashcard)
+
+    def verify_unit_handouts_flashcard(self, aem_unit_dict, content_map_unit_dict, content_type):
         error_message = []
+
+        if not 'resources' in aem_unit_dict.keys():
+            return error_message
 
         aem_handouts_url = aem_unit_dict['resources']
         aem_handouts_response = requests.get(aem_handouts_url)
         assert_that(aem_handouts_response.status_code == 200)
 
-        aem_handouts_assets = jmespath.search('handouts.assets', aem_handouts_response.json())
+        expected_path = 'handouts.assets'
+        if content_type == ContentRepoContentType.TypeFlashcard:
+            expected_path = 'flashcards.assets'
+
+        aem_handouts_assets = jmespath.search(expected_path, aem_handouts_response.json())
 
         unit_content_id = content_map_unit_dict[PipelinePublishConstants.FIELD_CONTENT_ID]
 
         unit_handout_content_group = \
-            self.content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHandout.value,
+            self.content_repo_service.get_content_groups_by_param(content_type.value,
                                                                   None,
                                                                   unit_content_id,
                                                                   content_map_unit_dict[
@@ -157,6 +183,69 @@ class PipelinePublishVerifyService:
 
         return error_message
 
+    def verify_unit_quiz(self, aem_unit_dict, content_map_unit_dict):
+        error_message = []
+        aem_unit_quiz_list = []
+        if 'quiz' in aem_unit_dict.keys():
+            aem_unit_quiz_list = aem_unit_dict['quiz']
+
+        # there will be only one quiz if the list is not empty
+        if len(aem_unit_quiz_list) > 0:
+            aem_unit_quiz = aem_unit_quiz_list[0]
+
+        unit_content_id = content_map_unit_dict[PipelinePublishConstants.FIELD_CONTENT_ID]
+
+        unit_quiz_content_groups = \
+            self.content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeQuiz.value,
+                                                                  None,
+                                                                  unit_content_id,
+                                                                  content_map_unit_dict[
+                                                                      PipelinePublishConstants.FIELD_CONTENT_REVISION],
+                                                                  content_map_unit_dict[
+                                                                      PipelinePublishConstants.FIELD_SCHEMA_REVISION]).json()
+
+        if len(aem_unit_quiz_list) == 0:
+            if len(unit_quiz_content_groups) != 0:
+                error_message.append('There should be no QUIZ Content group created as AEM unit:{0} don\'t have any quiz!'.format(unit_content_id))
+                return error_message
+        else:
+            aem_unit_quiz_skillset_localization = aem_unit_quiz[PipelinePublishConstants.FIELD_SKILLSET_LOCALIZATION]
+            aem_unit_quiz_activities = aem_unit_quiz['activities']
+
+            unit_quiz_activity_group = jmespath.search('[?groupType==\'ACTIVITY_GROUP\']|[0]', unit_quiz_content_groups)
+            unit_quiz_asset_group_list = jmespath.search('[?groupType==\'ASSET_GROUP\']', unit_quiz_content_groups)
+
+            # check with the skillsetLocalization field
+            diff_list = json_tools.diff(aem_unit_quiz_skillset_localization,
+                                        unit_quiz_activity_group['metadata'][PipelinePublishConstants.FIELD_SKILLSET_LOCALIZATION])
+            if len(diff_list) != 0:
+                error_message.append('skillsetLocalization value in content group not consistent with the value in AEM, diff is:' \
+                                     + str(diff_list))
+
+            content_group_unit_quiz_activity_entity_list = unit_quiz_activity_group[PipelinePublishConstants.FIELD_CHILDREFS]
+            content_repo_unit_quiz_activity_list = self.content_repo_service.get_activities(content_group_unit_quiz_activity_entity_list).json()
+
+            if len(aem_unit_quiz_activities) != len(content_group_unit_quiz_activity_entity_list):
+                error_message.append(
+                    'AEM unit quiz activity list size not same as content repo unit quiz activity list size!')
+                return error_message
+
+            for i in range(len(aem_unit_quiz_activities)):
+                aem_unit_quiz_activity = aem_unit_quiz_activities[i]
+                content_group_unit_quiz_activity_entity = content_group_unit_quiz_activity_entity_list[i]
+                content_repo_unit_quiz_activity = jmespath.search(
+                    "[?contentId == '{0}'] | [0]".format(
+                        content_group_unit_quiz_activity_entity[PipelinePublishConstants.FIELD_CONTENT_ID]),
+                    content_repo_unit_quiz_activity_list)
+                error_message.extend(self.verify_aem_homework_with_content_repo_activity(
+                    aem_unit_quiz_activity, content_repo_unit_quiz_activity))
+
+            # verify the asset_group with the asset exit in the activity list
+            error_message.extend(self.verify_activity_assets_with_asset_group(
+                content_repo_unit_quiz_activity_list, unit_quiz_asset_group_list))
+
+        return error_message
+
     def verify_handout_eca_assets_with_asset_group(self, eca_list, asset_group):
         error_message = []
         # verify asset_group assets are same as it exits in the eca list
@@ -174,10 +263,16 @@ class PipelinePublishVerifyService:
     def verify_handout_homework_fields(self, aem_handout_homework, content_repo_eca_activity):
         error_message = []
         content_repo_eca_activity_data = content_repo_eca_activity[PipelinePublishConstants.FIELD_DATA]
+        print("aem_handout_homework:" + json.dumps(aem_handout_homework))
+        print("content_repo_eca_activity_data:" + json.dumps(content_repo_eca_activity_data))
         for key in aem_handout_homework.keys():
+            content_repo_key = key
+            # field name which in the same level with "questions", will be capitalized in content_repo
+            if 'questions' in aem_handout_homework.keys():
+                content_repo_key = content_repo_key.capitalize()
             error_message.extend(self
                                  .verify_aem_fields_with_content_repo(key, aem_handout_homework[key],
-                                                                      content_repo_eca_activity_data[key]))
+                                                                      content_repo_eca_activity_data[content_repo_key]))
         return error_message
 
     def verify_aem_fields_with_content_repo(self, key, aem_value, content_repo_value):
@@ -221,7 +316,14 @@ class PipelinePublishVerifyService:
         # assert_that(aem_asset_response.status_code == 200,
         #             'aem asset response status is not 200:' + aem_asset_url)
         # aem_asset_sha1 = PipelinePublishUtils.get_asset_sha1(aem_asset_response.content)
-        aem_asset_sha1 = aem_asset_url[aem_asset_url.rfind('=') + 1:]
+        sha1_start_index = aem_asset_url.rfind('v=') + 2
+        sha1_end_index = aem_asset_url.rfind('&')
+
+        # some TB asset url is like this: http://10.163.8.4:4503/apps/e1commons/image.view/content/adam/courses/tb16/book-1/unit-2/activities/homework/multipleselectimage-vocabulary-coloursanddescriptions-activity21-/vocabulary--colours-and-descriptions--activity-21--q4-/_jcr_content/stimulus?v=6fe66efc5af10aee9479b595b9fccfe90ce3dafa&compressToJpeg=true
+        if sha1_end_index != -1 and sha1_end_index > sha1_start_index:
+            aem_asset_sha1 = aem_asset_url[sha1_start_index:sha1_end_index]
+        else:
+            aem_asset_sha1 = aem_asset_url[sha1_start_index:]
 
         print("start get media for content asset:" + content_repo_asset_url)
         content_repo_asset_response = self.bff_service.get_media(content_repo_asset_url)
@@ -317,15 +419,25 @@ class PipelinePublishVerifyService:
 
     def verify_activity_assets_with_asset_group(self, activity_list, asset_group_list):
         error_message = []
-        # verify asset_group assets are same as it exits in the activity list
-        expected_asset_list = PipelinePublishUtils.get_expected_asset_list(activity_list)
 
-        expected_asset_list = sorted(expected_asset_list, key=lambda k: k[PipelinePublishConstants.FIELD_URL])
-        actual_asset_list = jmespath.search('[].childRefs[]', asset_group_list)
-        actual_asset_list = PipelinePublishUtils.remove_duplicate_asset(actual_asset_list)
-        actual_asset_list = sorted(actual_asset_list, key=lambda k: k[PipelinePublishConstants.FIELD_URL])
-        diff_list = json_tools.diff(actual_asset_list, expected_asset_list)
-        if len(diff_list) != 0:
-            error_message.append('asset list in asset_group not as expected for asset exist in activity list, diff is:' \
-                                 + str(diff_list))
+        if len(activity_list) != len(asset_group_list):
+            error_message.append('asset group list size not same with activity list size!')
+            return error_message
+
+        for asset_group in asset_group_list:
+            expected_activity_contentid = asset_group['parentRef']['contentId']
+            expected_activity = jmespath.search(
+                "[?contentId == '{0}'] | [0]".format(expected_activity_contentid), activity_list)
+
+            expected_asset_list = PipelinePublishUtils.get_expected_asset_list([expected_activity])
+
+            expected_asset_list = sorted(expected_asset_list, key=lambda k: k[PipelinePublishConstants.FIELD_URL])
+            actual_asset_list = jmespath.search('childRefs[]', asset_group)
+            actual_asset_list = PipelinePublishUtils.remove_duplicate_asset(actual_asset_list)
+            actual_asset_list = sorted(actual_asset_list, key=lambda k: k[PipelinePublishConstants.FIELD_URL])
+            diff_list = json_tools.diff(actual_asset_list, expected_asset_list)
+            if len(diff_list) != 0:
+                error_message.append(
+                    'asset list in asset_group for activity: {0} not as expected for asset exist in activity list, diff is: {1}'.format(
+                        expected_activity, str(diff_list)))
         return error_message
