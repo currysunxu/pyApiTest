@@ -1,20 +1,10 @@
 import copy
-from enum import Enum
 
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
     PipelinePublishConstants
 
 
-# class ContentMapCourse(Enum):
-#     highflyers = 'HIGH_FLYERS_35'
-
-
 class PipelinePublishUtils:
-    # @staticmethod
-    # def get_content_map_course(course_enum_name):
-    #     for content_map_course in ContentMapCourse:
-    #         if content_map_course.name == course_enum_name:
-    #             return content_map_course.value
 
     @staticmethod
     def remove_duplicate_asset(asset_list):

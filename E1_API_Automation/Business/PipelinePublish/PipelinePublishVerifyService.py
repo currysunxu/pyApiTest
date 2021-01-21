@@ -263,8 +263,6 @@ class PipelinePublishVerifyService:
     def verify_handout_homework_fields(self, aem_handout_homework, content_repo_eca_activity):
         error_message = []
         content_repo_eca_activity_data = content_repo_eca_activity[PipelinePublishConstants.FIELD_DATA]
-        print("aem_handout_homework:" + json.dumps(aem_handout_homework))
-        print("content_repo_eca_activity_data:" + json.dumps(content_repo_eca_activity_data))
         for key in aem_handout_homework.keys():
             content_repo_key = key
             # field name which in the same level with "questions", will be capitalized in content_repo

@@ -609,7 +609,6 @@ class StoryBlokUtils:
         # reader config list have been sorted by full_slug, the order should be consistent with content group searched by book
         for i in range(len(storyblok_reader_config_list)):
             storyblok_reader_config = storyblok_reader_config_list[i]
-            # book_reader_content_group = book_reader_content_group_list[i]
 
             storyblok_correlation_path = storyblok_reader_config['content']['parent']['content']['correlation_path']
             storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
