@@ -32,6 +32,8 @@ from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
 from E1_API_Automation.Lib.HamcrestExister import Exist
+from E1_API_Automation.Test_Data.BffData import SalesforceData
+
 
 
 
@@ -890,3 +892,41 @@ class Hf35BffTest(HfBffTestBase):
         # 2.current book will set the current unlock book from available book , which covered in mega-bff integration test
         assert_that(user_context_response.json()['currentBook'] , equal_to(content_path_for_book))
         assert_that(user_context_response.json()['availableBooks'][0]['contentId'] , equal_to(unlock_response.json()['bookContentId']))
+
+
+    @Test(tags="qa,stg,live",data_provider=["EVC","NOT_EVC","NULL_BODY"])
+    def test_class_online_enter(self, online_platform):
+        online_enter = self.bff_service.post_class_online_enter(online_platform)
+        assert_that(online_enter.status_code , equal_to(200))
+        if online_platform is "EVC":
+            assert_that(online_enter.json(), Exist("mediaToken"))
+            assert_that(online_enter.json(), Exist("errorCode"))
+            assert_that(online_enter.json(), Exist("attendanceToken"))
+            assert_that(online_enter.json(), Exist("accessKey"))
+        if EnvUtils.is_env_live() or online_platform is not "EVC":
+            assert_that(online_enter.json(), Exist("token"))
+            assert_that(online_enter.json(), Exist("domain"))
+            assert_that(online_enter.json(), Exist("studentId"))
+
+    @Test(tags="stg,live")
+    def test_get_online_class_id(self):
+        if not EnvUtils.is_env_qa():
+            self.user_name = BffUsers.BffUserPw[env_key][self.key][1]['username']
+            self.password = BffUsers.BffUserPw[env_key][self.key][1]['password']
+            self.bff_service.login(self.user_name, self.password)
+            reservation_id = SalesforceData.reservation_id[env_key]
+            online_id = self.bff_service.get_online_class_id(reservation_id)
+            assert_that(online_id.status_code, equal_to(200))
+            assert_that(online_id.json(), Exist("reservationId"))
+            assert_that(online_id.json(), Exist("sessionId"))
+            assert_that(online_id.json(), Exist("sessionPurpose"))
+            assert_that(online_id.json(), Exist("sessionType"))
+            assert_that(online_id.json(), Exist("onlinePlatform"))
+            assert_that(online_id.json(), Exist("onlineEntry"))
+            assert_that(online_id.json()['classroomStatus'], equal_to("CLOSED_FOR_ENDED"))
+
+
+
+
+
+
