@@ -2,7 +2,7 @@ import os
 
 
 class Environment(object):
-    QA = "https://e1svc-qa.ef.cn"
+    QA = "https://e1svc-qa.bj-englishtown.com"
     STAGING = "https://e1svc-staging.ef.cn"
     LIVE = "https://e1svc.ef.cn"
     STAGING_SG = "https://e1svc-staging.ef.com"
@@ -34,7 +34,7 @@ class TPIEnvironment(object):
 
 
 class AuthEnvironment(object):
-    QA = "https://auth-svc-qa.ef.cn"
+    QA = "https://auth-svc-qa.bj-englishtown.com"
     STAGING = "https://auth-svc-stg.ef.cn"
     STAGING_SG = "https://auth-svc-stg.ef.com"
     LIVE = "https://auth-svc.ef.cn"
@@ -92,7 +92,7 @@ class ContentBuilderEnvironment(object):
 
 
 class MockTestEnvironment(object):
-    QA = "https://ktsvc-qa.ef.cn/mseb"
+    QA = "https://ktsvc-qa.bj-englishtown.com/mseb"
     STAGING = "https://ktsvc-stg.ef.cn/mseb"
     LIVE = "https://ktsvc.ef.cn/mseb"
 
