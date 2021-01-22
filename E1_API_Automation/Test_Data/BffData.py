@@ -21,7 +21,7 @@ class BffUsers:
         },
         'Staging': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'}],
+            BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'},{'username': 'll.test', 'password': 'efef@123'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.SSV3.value: [{'username': 'ss3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
@@ -29,7 +29,7 @@ class BffUsers:
         },
         'Live': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'hf.test3', 'password': '12345', 'userid': 101548688}],
+            BffProduct.HFV35.value: [{'username': 'hf.test3', 'password': '12345', 'userid': 101548688},{'username': 'cc.test', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
             BffProduct.HFV2.value: [{'username': 'hf2.cn.01', 'password': '12345'}]
@@ -40,7 +40,7 @@ class BffUsers:
 class HF35DependService:
     provisioning_service = {
         'QA': {
-            'host': 'https://provisioning-qa.ef.cn',
+            'host': 'https://provisioning-qa.bj-englishtown.com',
             'ios-app-key': '6591032B-DF1F-405F-93B3-482371A99A13',
             'android-app-key': '43CF3DBD-FC07-4CE1-A319-F81D3BB17AAC'
         },
@@ -197,4 +197,11 @@ class BffSQLString:
         'QA': "SELECT count(*) FROM study_plan_qa.study_plan WHERE student_id = '{0}'and ref_content_path = '{1}' AND complete_at IS NOT NULL",
         'Staging': "SELECT count(*) FROM study_plan_stg.study_plan WHERE student_id = '{0}'and ref_content_path = '{1}' AND complete_at IS NOT NULL",
         'Live': ""
+    }
+
+class SalesforceData:
+    reservation_id = {
+        'QA': "",
+        'Staging': "a0G1s000001XDIEEA4",
+        'Live': "a0G2x000005ImLBEA0"
     }

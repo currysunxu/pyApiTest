@@ -15,3 +15,4 @@ class PipelinePublishConstants:
     FIELD_URL = 'url'
     FIELD_DATA = 'data'
     FIELD_MIME_TYPE = 'mimeType'
+    FIELD_SKILLSET_LOCALIZATION = 'skillsetLocalization'

@@ -12,3 +12,5 @@ class ContentRepoContentType(Enum):
     TypeHandout = 'HANDOUT'
     TypeVocab = 'VOCAB'
     TypeReader = 'READER'
+    TypeFlashcard = 'FLASHCARD'
+    TypeQuiz = 'QUIZ'

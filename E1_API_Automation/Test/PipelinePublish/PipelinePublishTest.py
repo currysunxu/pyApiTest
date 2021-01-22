@@ -32,19 +32,23 @@ class PipelinePublishTestCases:
     region_ach: indicate the region_ach you will verify in content service
     '''
 
-    @Test(data_provider=[("LIVE", "highflyers",
-                          ["book-1", "book-2", "book-3", "book-4", "book-5", "book-6", "book-7", "book-8"], "cn-3")])
-    def test_pp_release(self, source_aem_env, course, release_book_list, region_ach):
+    # @Test(data_provider=[("LIVE", "Highflyers35",
+    #                       ["book-1", "book-2", "book-3", "book-4", "book-5", "book-6", "book-7", "book-8"], "cn-3")])
+    @Test(data_provider=[("LIVE", "Smallstars35",
+                          ["book-3"], "cn-3")])
+    def test_pp_release(self, source_aem_env, release_program, release_book_list, region_ach):
         for release_book in release_book_list:
             print('-------------------------Start verify book: {0}'.format(release_book))
-            book_content_path = '{0}/{1}/{2}'.format(course, region_ach, release_book)
+            source_course = AEMData.CourseData[release_program]['source-name']
+            book_content_path = '{0}/{1}/{2}'.format(source_course, region_ach, release_book)
 
             aem_service = AEMService(AEMData.AEMHost[source_aem_env])
-            aem_book_response = aem_service.get_aem_book(course, release_book)
+            aem_book_response = aem_service.get_aem_book(source_course, release_book)
 
             content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
 
-            content_map_course = PipelinePublishUtils.get_content_map_course(course)
+            # content_map_course = PipelinePublishUtils.get_content_map_course(source_course)
+            content_map_course = AEMData.CourseData[release_program]['target-name']
             content_map_entity = ContentMapQueryEntity(content_map_course, region_ach=region_ach)
             content_map_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
             assert_that(content_map_tree_response.status_code == 200)
@@ -55,7 +59,7 @@ class PipelinePublishTestCases:
             content_builder_service = ContentBuilderService(CONTENT_BUILDER_ENVIRONMENT)
             content_builder_processed_status_response = content_builder_service.get_release_by_status()
             release_url_list = jmespath.search('[*].url', content_builder_processed_status_response.json())
-            latest_book_release_url = jmespath.search('[? contains(@, \'{0}\')]|[-1]'.format(book_content_id),
+            latest_book_release_url = jmespath.search('[? contains(@, \'{0}\')]|[0]'.format(book_content_id),
                                                       release_url_list)
             revision_start_index = latest_book_release_url.rfind('=')
             release_revision = latest_book_release_url[revision_start_index + 1:]
@@ -67,16 +71,16 @@ class PipelinePublishTestCases:
             assert_that(len(error_message) == 0, error_message)
             print('-------------------------End of verify book: {0}'.format(release_book))
 
-        # verify activities templates after release
-        self.test_book_activity_templates(course, region_ach, release_book_list)
+        # verify activities templates after release for highflyer
+        if release_program== 'Highflyers35':
+            self.test_book_activity_templates(release_program, region_ach, release_book_list)
 
     '''
     validate all the book's activities after release, to check if the structure align with the templates
     '''
-
     @Test(data_provider=[
-        ("highflyers", "cn-3", ["book-1", "book-2", "book-3", "book-4", "book-5", "book-6", "book-7", "book-8"])])
-    def test_book_activity_templates(self, course, region_ach, book_list):
+        ("Highflyers35", "cn-3", ["book-1", "book-2", "book-3", "book-4", "book-5", "book-6", "book-7", "book-8"])])
+    def test_book_activity_templates(self, release_program, region_ach, book_list):
         # get the pre-defined templates
         path = 'E1_API_Automation/Test_Data/ActivityTemplate/'
         dir_files = os.listdir(path)
@@ -93,9 +97,11 @@ class PipelinePublishTestCases:
         content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
         for book in book_list:
             print('-------------------------Start verify activities for book: {0}'.format(book))
-            book_content_path = '{0}/{1}/{2}'.format(course, region_ach, book)
+            source_course = AEMData.CourseData[release_program]['source-name']
+            book_content_path = '{0}/{1}/{2}'.format(source_course, region_ach, book)
 
-            content_map_course = PipelinePublishUtils.get_content_map_course(course)
+            # content_map_course = PipelinePublishUtils.get_content_map_course(course)
+            content_map_course = AEMData.CourseData[release_program]['target-name']
             content_map_entity = ContentMapQueryEntity(content_map_course, region_ach=region_ach)
             content_map_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
             assert_that(content_map_tree_response.status_code == 200)

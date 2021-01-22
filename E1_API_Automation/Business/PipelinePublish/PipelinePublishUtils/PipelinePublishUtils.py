@@ -1,27 +1,20 @@
 import copy
-from enum import Enum
 
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
     PipelinePublishConstants
 
 
-class ContentMapCourse(Enum):
-    highflyers = 'HIGH_FLYERS_35'
-
-
 class PipelinePublishUtils:
-    @staticmethod
-    def get_content_map_course(course_enum_name):
-        for content_map_course in ContentMapCourse:
-            if content_map_course.name == course_enum_name:
-                return content_map_course.value
 
     @staticmethod
     def remove_duplicate_asset(asset_list):
         # remove the duplicate assets
         asset_url_dict = {}
+
         for asset in asset_list:
-            asset_url_dict[asset[PipelinePublishConstants.FIELD_URL]] = asset
+            asset_url = asset[PipelinePublishConstants.FIELD_URL]
+            if not asset_url in asset_url_dict.keys():
+                asset_url_dict[asset_url] = asset
 
         return list(asset_url_dict.values())
 
@@ -58,3 +51,11 @@ class PipelinePublishUtils:
                     PipelinePublishUtils.get_expected_asset_list_by_indicator(content_value[key]))
 
         return expected_asset_list
+
+    @staticmethod
+    def get_expected_aem_unit_by_path(aem_units_dict, expected_aem_path):
+        for key in aem_units_dict.keys():
+            aem_unit_dict = aem_units_dict[key]
+            path = aem_unit_dict['path']
+            if path == expected_aem_path:
+                return aem_unit_dict
