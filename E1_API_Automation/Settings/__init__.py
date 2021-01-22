@@ -56,7 +56,7 @@ class LearningResultEnvironment(object):
 
 
 class BffEnvironment(object):
-    QA = "https://ktsvc-qa.ef.cn"
+    QA = "https://ktsvc-qa.bj-englishtown.com"
     STAGING = "https://ktsvc-stg.ef.cn"
     LIVE = "https://ktsvc.ef.cn"
 
@@ -92,7 +92,7 @@ class ContentBuilderEnvironment(object):
 
 
 class MockTestEnvironment(object):
-    QA = "https://ktsvc-qa.ef.cn/mseb"
+    QA = "https://ktsvc-qa.bj-englishtown.com/mseb"
     STAGING = "https://ktsvc-stg.ef.cn/mseb"
     LIVE = "https://ktsvc.ef.cn/mseb"
 
@@ -117,7 +117,7 @@ class E1TPIEnvironment(object):
 
 class StudyPlanEnvironment(object):
     QA = "https://internal-ktsvc-qa.english1.cn/study-plan"
-    STAGING = "https://internal-ktsvc-english1.cn/study-plan"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/study-plan"
     LIVE = "https://internal-ktsvc-english1.cn/study-plan"
 
 class LearningProfileEnvironment(object):
