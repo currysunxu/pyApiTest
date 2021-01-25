@@ -57,7 +57,7 @@ class LearningResultEnvironment(object):
 
 class BffEnvironment(object):
     QA = "https://ktsvc-qa.bj-englishtown.com"
-    STAGING = "https://ktsvc-stg.ef.cn"
+    STAGING = "https://ktsvc-stg.bj-englishtown.com"
     LIVE = "https://ktsvc.ef.cn"
 
 
@@ -93,7 +93,7 @@ class ContentBuilderEnvironment(object):
 
 class MockTestEnvironment(object):
     QA = "https://ktsvc-qa.bj-englishtown.com/mseb"
-    STAGING = "https://ktsvc-stg.ef.cn/mseb"
+    STAGING = "https://ktsvc-stg.bj-englishtown.com/mseb"
     LIVE = "https://ktsvc.ef.cn/mseb"
 
 
