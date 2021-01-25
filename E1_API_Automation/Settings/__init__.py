@@ -56,7 +56,7 @@ class LearningResultEnvironment(object):
 
 
 class BffEnvironment(object):
-    QA = "https://ktsvc-qa.ef.cn"
+    QA = "https://ktsvc-qa.bj-englishtown.com"
     STAGING = "https://ktsvc-stg.ef.cn"
     LIVE = "https://ktsvc.ef.cn"
 
@@ -92,7 +92,7 @@ class ContentBuilderEnvironment(object):
 
 
 class MockTestEnvironment(object):
-    QA = "https://ktsvc-qa.ef.cn/mseb"
+    QA = "https://ktsvc-qa.bj-englishtown.com/mseb"
     STAGING = "https://ktsvc-stg.ef.cn/mseb"
     LIVE = "https://ktsvc.ef.cn/mseb"
 
@@ -117,12 +117,44 @@ class E1TPIEnvironment(object):
 
 class StudyPlanEnvironment(object):
     QA = "https://internal-ktsvc-qa.english1.cn/study-plan"
-    STAGING = "https://internal-ktsvc-english1.cn/study-plan"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/study-plan"
     LIVE = "https://internal-ktsvc-english1.cn/study-plan"
+
 
 class LearningProfileEnvironment(object):
     STAGING = "https://e1-evc-booking-integration-stg.ef.com"
     LIVE = "https://e1-evc-booking-integration.ef.com"
+
+
+class EVCContentEnvironment(object):
+    STAGING = "https://evc-content-staging.bj-englishtown.com"
+    LIVE = "https://evc-content.bj-englishtown.com"
+
+
+class EVCCDNEnvironment(object):
+    STAGING = "https://evc-fe-staging.bj-englishtown.com"
+    LIVE = "https://evc-fe.bj-englishtown.com"
+
+
+class EVCDemoPageEnvironment(object):
+    STAGING = "https://evc-ts-staging.ef.com.cn"
+    LIVE = "https://evc-ts.ef.com.cn/"
+
+
+class EVCProxyEnvironment:
+    STAGING = {
+        "CN": "evc-ts-staging.ef.com.cn",
+        "US": "evc-tv-to-ts-staging.ef.com",
+        "UK": "evc-tf-to-ts-staging.ef.com",
+        "SG": "evc-tsg-to-ts-staging.ef.com"
+    }
+
+    LIVE = {
+        "CN": "evc-ts.ef.com.cn",
+        "US": "evc-tv-to-ts.ef.com",
+        "UK": "evc-tf-to-ts.ef.com",
+        "SG": "evc-tsg-to-ts.ef.com"
+    }
 
 try:
     print(os.environ['environment'])
@@ -190,6 +222,10 @@ elif os.environ['environment'] == 'STG':
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.STAGING
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.STAGING
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.STAGING
+    EVC_CONTENT_ENVIRONMENT = EVCContentEnvironment.STAGING
+    EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.STAGING
+    EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.STAGING
+    EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "10.163.24.124,1434",
@@ -244,6 +280,10 @@ elif os.environ['environment'] == 'LIVE':
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.LIVE
     STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.LIVE
     LEARNING_PROFILE_ENVIRONMENT = LearningProfileEnvironment.LIVE
+    EVC_CONTENT_ENVIRONMENT = EVCContentEnvironment.LIVE
+    EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.LIVE
+    EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.LIVE
+    EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",

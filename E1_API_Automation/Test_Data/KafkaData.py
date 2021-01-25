@@ -21,7 +21,7 @@ class KafkaData:
         return online_homework_unlock_message
 
     @staticmethod
-    def build_omni_sessions_message(group_type):
+    def build_omni_sessions_message(group_type,product):
         omni_sessions_message = {
             "payload": {
                 "Content__c": {
@@ -40,8 +40,8 @@ class KafkaData:
                     "season": None,
                     "roomId": None,
                     "reservationId": CommonUtils.random_gen_str(),
-                    "programLevel": "D",
-                    "program": "HFV3Plus",
+                    "programLevel": "2",
+                    "program": product,
                     "pdDesignation": None,
                     "offlineSessionId": None,
                     "lessons": [
