@@ -1,3 +1,4 @@
+import requests
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test, BeforeClass
 
@@ -58,3 +59,16 @@ class FrontEndVersionTest:
         # check version and url
         assert_that(fm_response["Version"], equal_to(EVC_FM_FRONTEND_VERSION))
         assert_that(fm_response["FileName"], equal_to(expect_file_name))
+
+    @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
+    def test_kids_efstudy_frontend_version(self, platform):
+        url = "{0}/_shared/evc15-fe-{1}-bundle_kids/version.json".format(EVC_CDN_ENVIRONMENT, platform)
+        response = requests.get(url)
+
+        # get parameters from response
+        version = response.json()["Version"]
+        file_name = response.json()["FileName"]
+
+        # check version and file_name
+        assert_that(version, equal_to(EVC_FM_FRONTEND_VERSION))
+        assert_that(file_name, equal_to(EVC_FM_FRONTEND_VERSION + "/" + platform + ".zip"))
