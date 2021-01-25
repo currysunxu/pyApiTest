@@ -1,4 +1,5 @@
 import string
+import os
 from random import Random
 
 import requests
@@ -40,7 +41,7 @@ class EVCFrontendService(object):
         return response
 
     def get_frontend_file_url(self):
-        file_location = "\E1_API_Automation\Test_Data\EVC_Frontend_File_List"
+        file_location = os.getcwd() + "\E1_API_Automation\Test_Data\EVC_Frontend_File_List"
         file_list = []
 
         try:
