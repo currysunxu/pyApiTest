@@ -8,7 +8,7 @@ from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCContentMateria
 
 
 def get_testcase_params(topic_type: EVCLayoutCode.FM_Kids_PL):
-    yield from list(EVCContentService.get_topic_ids(EVC_CONTENT_ENVIRONMENT, topic_type).json().keys())
+    yield from list(EVCContentService.get_topic_ids(EVC_CONTENT_ENVIRONMENT, topic_type).json().keys())[0:10]
 
 
 @TestClass(run_mode="parallel")
