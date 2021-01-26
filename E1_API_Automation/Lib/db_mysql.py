@@ -1,3 +1,5 @@
+import datetime
+
 import pymysql
 
 
@@ -18,8 +20,13 @@ class MYSQLHelper(object):
     # return the list of column field and value dictionary
     def exec_query_return_dict_list(self, sql):
         cur = self.__get_connect()
-        cur.execute(sql)
-        result_list = cur.fetchall()
+        startTick = datetime.datetime.now()
+        while 1:
+            cur.execute(sql)
+            result_list = cur.fetchall()
+            endTick = datetime.datetime.now()
+            if len(result_list) is not 0 or (endTick - startTick).seconds >= 15:
+                break
         cols = cur.description
 
         result_dict_list = []
