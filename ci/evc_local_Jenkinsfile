@@ -18,7 +18,7 @@ pipeline {
   }
 
   parameters {
-        choice(name:'environment',choices:['QA','STG','STG_SG','LIVE','LIVE_SG'],description:'')
+        choice(name:'environment',choices:['STG','LIVE'],description:'')
         text(name: 'agora_fe_version', defaultValue: '0.3.5-e8e94c3', description: '')
         text(name: 'fm_fe_version', defaultValue: '0.1.39-bfed4c1', description: '')
     }
@@ -29,25 +29,24 @@ pipeline {
       agent {
         docker {
           label 'CN_Kids_QA_CI'
-          image '10.128.42.216:5000/apipython3:latest'
+          image '10.128.42.139:5000/apipython3:latest'
         }
       }
       steps {
-
-          script {
+      script {
           case_tag = "${params.environment}".toLowerCase()
           if (case_tag == 'stg_sg') {
               case_tag = 'stg'
           } else if (case_tag == 'live_sg')
               case_tag = 'live'
 
-          sh "ptest3  -t E1_API_Automation.Test.EVC.EVCContentTest -i ${case_tag}"
+          sh "ptest3  -t E1_API_Automation.Test.EVC -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
 
-        }
-      }
+          }
+          }
     }
 
   }

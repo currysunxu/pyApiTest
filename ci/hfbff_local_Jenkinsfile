@@ -125,7 +125,7 @@ pipeline {
         </tr>
     </table>
 </body>
-</html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', from: 'qa.testauto@ef.com',to: 'E1PDQA@ef.cn'
+</html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', from: 'test.cn@ef.cn',to: 'E1PDQA@ef.cn'
             }
     }
   
