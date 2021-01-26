@@ -3,17 +3,17 @@ import os
 
 class Environment(object):
     QA = "https://e1svc-qa.bj-englishtown.com"
-    STAGING = "https://e1svc-staging.ef.cn"
+    STAGING = "https://e1svc-stg.bj-englishtown.com"
     LIVE = "https://e1svc.ef.cn"
-    STAGING_SG = "https://e1svc-staging.ef.com"
+    STAGING_SG = "https://e1svc-stg.english1.com"
     LIVE_SG = "https://e1svc.ef.com"
 
 
 class KSDEnvironment(object):
-    QA = "https://study-qa.ef.cn"
-    STAGING = "https://study-staging.ef.cn"
+    QA = "https://study-qa.bj-englishtown.com"
+    STAGING = "https://study-stg.bj-englishtown.com"
     LIVE = "https://study.ef.cn"
-    STAGING_SG = "https://study-staging.ef.com"
+    STAGING_SG = "https://study-stg.english1.com"
     LIVE_SG = "https://study.ef.com"
 
 
@@ -35,8 +35,8 @@ class TPIEnvironment(object):
 
 class AuthEnvironment(object):
     QA = "https://auth-svc-qa.bj-englishtown.com"
-    STAGING = "https://auth-svc-stg.ef.cn"
-    STAGING_SG = "https://auth-svc-stg.ef.com"
+    STAGING = "https://auth-svc-stg.bj-englishtown.com"
+    STAGING_SG = "https://auth-svc-stg.english1.com"
     LIVE = "https://auth-svc.ef.cn"
     LIVE_SG = "https://auth-svc.ef.com"
 
@@ -109,8 +109,8 @@ class StoryblokImportEnvironment(object):
 
 
 class E1TPIEnvironment(object):
-    STAGING = "https://e1tpi-staging.ef.cn"
-    STAGING_SG = "https://e1tpi-staging.ef.com"
+    STAGING = "https://e1tpi-stg.bj-englishtown.com"
+    STAGING_SG = "https://e1tpi-stg.english1.com"
     LIVE = "https://e1tpi.ef.cn"
     LIVE_SG = "https://e1tpi.ef.com"
 
