@@ -16,8 +16,6 @@ class Hf35KafkaTest():
         producer = Kafka_producer(host,'OnlineHomeworkUnlock')
         message = KafkaData.build_online_homework_unlock_message_by_content_path(content_path)
         producer.sendjsondata(message)
-        # Todo replace sleep by consumer is over
-        time.sleep(8)
         study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(message['StudentId'], 1, content_path)
         assert_that(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(message['UnlockAt'][:message['UnlockAt'].index('.')]))
         reader_study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(message['StudentId'], 512, content_path)
@@ -30,11 +28,8 @@ class Hf35KafkaTest():
         producer = Kafka_producer(host, 'OnlineHomeworkUnlock')
         message = KafkaData.build_online_homework_unlock_message_by_content_path(content_path)
         producer.sendjsondata(message)
-        time.sleep(2)
         message['UnlockAt'] = time.strftime("%Y-%m-%dT%H:%M:%S.%j", time.localtime())
         producer.sendjsondata(message)
-        # Todo replace sleep by consumer is over
-        time.sleep(8)
         study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(message['StudentId'], 1, content_path)
         assert_that(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(message['UnlockAt'][:message['UnlockAt'].index('.')]))
         reader_study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(message['StudentId'], 512, content_path)
@@ -61,10 +56,8 @@ class Hf35KafkaTest():
         # group type distinguish gl and pl
         message = KafkaData.build_omni_sessions_message(group_type,product)
         producer.sendjsondata(message)
-        time.sleep(5)
         message['payload']['Content__c']['startTime'] = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
         producer.sendjsondata(message)
-        time.sleep(5)
         payload_message = message['payload']['Content__c']
         study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(payload_message['customerId'], 256, content_path)
         assert_that(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(payload_message['startTime'][:payload_message['startTime'].index('.')]))
