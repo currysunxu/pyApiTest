@@ -10,14 +10,16 @@ import time
 @TestClass()
 class Hf35KafkaTest():
 
-    @Test(tags="qa, stg",data_provider = ["highflyers/cn-3-144/book-7/unit-1/assignment-2","highflyers/cn-3/book-7/unit-2/assignment-2"])
+    @Test(tags="qa, stg",data_provider = ["highflyers/cn-3-144/book-7/unit-1/assignment-2","highflyers/cn-3/book-7/unit-2/assignment-2",
+                                          "smallstar/cn-3/book-1/unit-1/assignment-1"])
     def test_insert_from_online_homework_unlock_to_student_unlock_study_plan(self,content_path):
         host = KafkaData.BOOTSTRAP_SERVERS[env_key]
         producer = Kafka_producer(host,'OnlineHomeworkUnlock')
         message = KafkaData.build_online_homework_unlock_message_by_content_path(content_path)
         producer.sendjsondata(message)
-        study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(message['StudentId'], 1, content_path)
-        assert_that(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(message['UnlockAt'][:message['UnlockAt'].index('.')]))
+        if "highflyers" in content_path :
+            study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(message['StudentId'], 1, content_path)
+            assert_that(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(message['UnlockAt'][:message['UnlockAt'].index('.')]))
         reader_study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(message['StudentId'], 512, content_path)
         assert_that(reader_study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(message['UnlockAt'][:message['UnlockAt'].index('.')]))
 
