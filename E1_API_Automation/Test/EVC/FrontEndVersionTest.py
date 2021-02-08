@@ -87,10 +87,10 @@ class FrontEndVersionTest:
         response = requests.post(url, headers=headers, data=json.dumps(payload))
 
         # get parameters from response
-        requiredTechCheck = response.json()["requireTechCheck"]
+        check_techcheck_required = response.json()["requireTechCheck"]
 
         # check tech check isn't required in FM PL
-        assert_that(requiredTechCheck, equal_to(False))
+        assert_that(check_techcheck_required, equal_to(False))
 
     @Test(tags="stg, live")
     def test_kids_agore_techcheck(self):
@@ -106,7 +106,7 @@ class FrontEndVersionTest:
         response = requests.post(url, headers=headers, data=json.dumps(payload))
 
         # get parameters from response
-        requiredTechCheck = response.json()["requireTechCheck"]
+        check_techcheck_required = response.json()["requireTechCheck"]
 
         # check tech check is required in Agora_PL
-        assert_that(requiredTechCheck, equal_to(True))
+        assert_that(check_techcheck_required, equal_to(True))
