@@ -159,7 +159,7 @@ class EVCProxyEnvironment:
 try:
     print(os.environ['environment'])
 except:
-    os.environ['environment'] = 'QA'
+    os.environ['environment'] = 'LIVE'
 
 if os.environ['environment'] == 'QA':
     ENVIRONMENT = Environment.QA
