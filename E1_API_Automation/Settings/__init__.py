@@ -118,7 +118,7 @@ class E1TPIEnvironment(object):
 class StudyPlanEnvironment(object):
     QA = "https://internal-ktsvc-qa.english1.cn/study-plan"
     STAGING = "https://internal-ktsvc-stg.english1.cn/study-plan"
-    LIVE = "https://internal-ktsvc-english1.cn/study-plan"
+    LIVE = "https://internal-ktsvc.english1.cn/study-plan"
 
 
 class LearningProfileEnvironment(object):
