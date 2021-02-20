@@ -9,7 +9,7 @@ from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode
 
 
 @TestClass()
-class APITest:
+class EVCPlatformTest:
     @BeforeClass()
     def before_method(self):
         self.evc_frontend_service = EVCFrontendService(EVC_CDN_ENVIRONMENT)
