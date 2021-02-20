@@ -1,9 +1,9 @@
-import requests,json
+import requests
 from hamcrest import assert_that, equal_to
 from ptest.decorator import TestClass, Test, BeforeClass
 
 from E1_API_Automation.Business.EVC.EVCFrontendService import EVCFrontendService
-from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT, EVC_DEMO_PAGE_ENVIRONMENT
+from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVC_AGORA_FRONTEND_VERSION, EVCPlatform, EVCLayoutCode, \
     EVC_FM_FRONTEND_VERSION
 
