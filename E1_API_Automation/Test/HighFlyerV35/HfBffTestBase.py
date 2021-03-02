@@ -2,6 +2,7 @@ import datetime
 import time
 import random
 import jmespath
+import jsonpath
 from hamcrest import assert_that, equal_to
 import uuid
 
@@ -18,6 +19,8 @@ from E1_API_Automation.Settings import *
 from ptest.decorator import BeforeMethod
 
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
+from E1_API_Automation.Business.AuthService import Auth2Service
+
 
 
 
@@ -35,6 +38,8 @@ class HfBffTestBase:
         self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
         self.bff_service.login(self.user_name, self.password)
         self.omni_service = OMNIService(OMNI_ENVIRONMENT)
+        self.auth2_service = Auth2Service(AUTH2_ENVIRONMENT, self.bff_service.mou_tai.headers['EF-Access-Token'])
+
         try:
             self.customer_id = BffUsers.BffUserPw[env_key][self.key][0]['userid']
         except:
@@ -299,3 +304,19 @@ class HfBffTestBase:
                 study_plan_entity.complete_at = None
             else:
                 study_plan_entity.complete_at = self.get_random_date(int(time.mktime(time.strptime(study_plan_entity.start_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))
+
+    def get_content_path_from_acl(self,acl_response):
+        levels = jsonpath.jsonpath(acl_response.json(), "$.[?(@.program == 'HFV3PLUS')].levels")
+        expect_levels = []
+        for level in levels[0]:
+            if not level['isSwapped'] and level['state'] == "INPROGRESS" and 'contentPath' in level:
+                expect_levels.append(level)
+        # if all completed status ,get content path by original levels
+        # else get the biggest level by inprogress status
+        if len(expect_levels) == 0:
+            content_path = levels[0][len(levels[0]) - 1]["contentPath"]
+        elif len(expect_levels) >= 0:
+            content_path = expect_levels[len(expect_levels)-1]["contentPath"]
+
+        return content_path
+
