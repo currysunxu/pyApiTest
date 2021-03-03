@@ -1,4 +1,5 @@
 import hashlib
+import json
 import random
 import string
 import urllib
@@ -26,3 +27,11 @@ class CommonUtils:
     @staticmethod
     def random_gen_str():
         return ''.join(random.sample(string.ascii_letters + string.digits, 8))
+
+    '''
+    print or log when debug
+    '''
+    @staticmethod
+    def beautify_json(obj):
+        formatted_json_str = json.dumps(obj,indent=4)
+        print(formatted_json_str)

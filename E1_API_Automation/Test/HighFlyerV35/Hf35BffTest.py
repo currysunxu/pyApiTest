@@ -717,11 +717,12 @@ class Hf35BffTest(HfBffTestBase):
                                                                                 relevant_content_revision)
             assert_that(content_group_response.status_code, equal_to(200))
 
-    @Test(tag="qa, stg, live")
-    def test_post_reader_progress(self):
+    @Test(tag="qa, stg, live",data_provider=["details_for_speech","no_details_old_app"],
+          data_name=lambda index, params: "%s" % params[:2])
+    def test_post_reader_progress(self,details):
         relevant_content_id = str(uuid.uuid1())
         reader_attempt_template = Hf35BffReaderAttemptEntity(relevant_content_id)
-        reader_attempt = Hf35BffUtils.construct_reader_attempt(reader_attempt_template)
+        reader_attempt = Hf35BffUtils.construct_reader_attempt(reader_attempt_template,details)
         reader_attempt_dict = Hf35BffUtils.construct_reader_attempt_dict(reader_attempt)
         # submit reader progress
         attempt_response = self.bff_service.post_reader_progress(reader_attempt_dict)
