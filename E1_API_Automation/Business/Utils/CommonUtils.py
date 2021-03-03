@@ -29,7 +29,7 @@ class CommonUtils:
         return ''.join(random.sample(string.ascii_letters + string.digits, 8))
 
     '''
-    print or log when debug
+    print or log formatted json string when debug
     '''
     @staticmethod
     def beautify_json(obj):
