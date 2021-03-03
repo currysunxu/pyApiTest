@@ -60,7 +60,6 @@ class BffEnvironment(object):
     STAGING = "https://ktsvc-stg.bj-englishtown.com"
     LIVE = "https://ktsvc.ef.cn"
 
-
 class HomeworkEnvironment(object):
     QA = "https://internal-ktsvc-qa.english1.cn/practice"
     STAGING = "https://internal-ktsvc-stg.english1.cn/practice"
@@ -140,6 +139,10 @@ class EVCDemoPageEnvironment(object):
     STAGING = "https://evc-ts-staging.ef.com.cn"
     LIVE = "https://evc-ts.ef.com.cn/"
 
+class Auth2Environment(object):
+    QA = "https://internal-ktsvc-qa.english1.cn"
+    STAGING = "https://internal-ktsvc-stg.english1.cn"
+    LIVE = "https://internal-ktsvc.english1.cn"
 
 class EVCProxyEnvironment:
     STAGING = {
@@ -179,6 +182,7 @@ if os.environ['environment'] == 'QA':
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
     STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.QA
+    AUTH2_ENVIRONMENT = Auth2Environment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -226,6 +230,7 @@ elif os.environ['environment'] == 'STG':
     EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.STAGING
     EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.STAGING
     EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.STAGING
+    AUTH2_ENVIRONMENT = Auth2Environment.STAGING
     env_key = 'Staging'
     DATABASE = {
         "Server": "10.163.24.124,1434",
@@ -284,6 +289,7 @@ elif os.environ['environment'] == 'LIVE':
     EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.LIVE
     EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.LIVE
     EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.LIVE
+    AUTH2_ENVIRONMENT = Auth2Environment.LIVE
     env_key = 'Live'
     DATABASE = {
         "Server": "",

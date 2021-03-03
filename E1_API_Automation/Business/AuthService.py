@@ -25,7 +25,7 @@ class AuthService:
         idToken = jmespath.search('idToken', athentication_result.json())
         self.mou_tai.headers['X-EF-TOKEN'] = idToken
         return athentication_result
-    
+
     def get_v3_token(self, id_token):
         project_dir = os.path.dirname(os.path.abspath(__file__))
         user_info = JWTHelper.decode_token(id_token, project_dir + "/rsa/public_key.pem")
@@ -72,3 +72,15 @@ class AuthDeviceType(Enum):
     Pad = 'PAD'
     PC = 'PC'
     Wearable = 'WEARABLE'
+
+
+class Auth2Service:
+
+    def __init__(self, host, access_token):
+        self.host = host
+        self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8",
+                                                       "EF-Access-Token": access_token})
+
+    def get_acl_response(self):
+        api_url = '/auth2/internal/api/v2/auth/acl'
+        return self.mou_tai.get(api_url)
