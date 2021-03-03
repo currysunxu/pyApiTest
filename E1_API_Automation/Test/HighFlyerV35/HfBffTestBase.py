@@ -306,7 +306,9 @@ class HfBffTestBase:
                 study_plan_entity.complete_at = self.get_random_date(int(time.mktime(time.strptime(study_plan_entity.start_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))
 
     def get_content_path_from_acl(self,acl_response):
-        levels = jsonpath.jsonpath(acl_response.json(), "$.[?(@.program == 'HFV3PLUS')].levels")
+        # get core and activated program
+        core_and_activated_program = jsonpath.jsonpath(acl_response.json(), "$.[?(@.type == 'CORE' && @.activated == True)].program")[0]
+        levels = jsonpath.jsonpath(acl_response.json(), "$.[?(@.program == '{}')].levels".format(core_and_activated_program))
         expect_levels = []
         for level in levels[0]:
             if not level['isSwapped'] and level['state'] == "INPROGRESS" and 'contentPath' in level:
