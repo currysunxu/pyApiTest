@@ -20,6 +20,7 @@ from E1_API_Automation.Business.HighFlyer35.Hf35BffAttemptEntity import Hf35BffA
 from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity, \
     Hf35BffWordAttemptDetailEntity, Hf35BffWordActivitiesEntity
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils import LearningCommonUtils
+from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.BffData import ExpectedData
@@ -136,7 +137,7 @@ class Hf35BffUtils:
         """
         new_dict = previous_dict.copy()
         for item_key in previous_dict.keys():
-            field_name = item_key[Hf35BffUtils.last_index_of(item_key, "__") :]
+            field_name = item_key[Hf35BffUtils.last_index_of(item_key, "__"):]
             field_name = Hf35BffUtils.underline_to_hump(field_name)
             new_dict.update({field_name: new_dict.pop(item_key)})
         return new_dict
@@ -255,13 +256,13 @@ class Hf35BffUtils:
             word_attempt_items = word_attempts.__dict__
             for item_key in word_attempt_items.keys():
                 word_attempt_field_name = item_key[
-                                              len('_' + word_attempts.__class__.__name__ + '__'):]
+                                          len('_' + word_attempts.__class__.__name__ + '__'):]
                 item_value = word_attempt_items[item_key]
 
                 if word_attempt_field_name != 'activities':
                     word_attempt_field_name = \
-                            LearningCommonUtils.convert_name_from_lower_case_to_camel_case(
-                                word_attempt_field_name)
+                        LearningCommonUtils.convert_name_from_lower_case_to_camel_case(
+                            word_attempt_field_name)
                     word_attempt_dict[word_attempt_field_name] = item_value
                 else:
                     activities_dict = Hf35BffUtils.construct_word_attempt_activities(item_value)
@@ -315,7 +316,7 @@ class Hf35BffUtils:
     def construct_vocab_progress_list(book_content_id, item_num=1):
         random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
         word_attempt_entity = Hf35BffWordAttemptEntity()
-        context_content_paths = ["highflyers/cn-3/book-7/unit-","tb16/cn-3/book-1/unit-"]
+        context_content_paths = ["highflyers/cn-3/book-7/unit-", "tb16/cn-3/book-1/unit-"]
         random_path = random.choice(context_content_paths)
         word_attempt_entity.context_content_path = random_path + str((random.randint(1, 3)))
         word_attempt_entity.context_lesson_content_id = str(uuid.uuid1())
@@ -346,7 +347,7 @@ class Hf35BffUtils:
 
     @staticmethod
     def construct_expected_learning_result_by_word_attempt(learning_result_entity, word_attempt):
-        if (hasattr(word_attempt , 'context_tree_revision')):
+        if (hasattr(word_attempt, 'context_tree_revision')):
             route = {}
             route['contextTreeRevision'] = word_attempt.context_tree_revision
             route['contextContentPath'] = word_attempt.context_content_path
@@ -354,7 +355,7 @@ class Hf35BffUtils:
 
         if (hasattr(word_attempt, 'parent_content_path')):
             extension = {
-                    "extension": {
+                "extension": {
                     "currentLevel": word_attempt.detail.current_level,
                     "parentContentPath": word_attempt.parent_content_path,
                     "unitContentId": word_attempt.unit_content_id,
@@ -374,7 +375,7 @@ class Hf35BffUtils:
         return expected_occontext
 
     @staticmethod
-    def construct_reader_attempt(reader_attempt_template, check_update='false', reader_type=3):
+    def construct_reader_attempt(reader_attempt_template, details, check_update='false', reader_type=3):
         reader_attempt_entity = Hf35BffReaderAttemptEntity(reader_attempt_template.relevant_content_id)
         random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
         reader_attempt_entity.end_time = random_date_time
@@ -391,6 +392,16 @@ class Hf35BffUtils:
             reader_attempt_entity.reader_progress = {"read": "true", "record": "true", "quiz": "false"}
         else:
             reader_attempt_entity.reader_progress = {"read": "true", "record": "true", "quiz": "true"}
+        if details is "details_for_speech":
+            reader_attempt_entity.details = [
+                {
+                    "questionId": random.randint(1, 5),
+                    "score": random.randint(1, 3),
+                    "answer": {
+                        "recordUrl": "https://www.{}".format(CommonUtils.random_gen_str())
+                    }
+                }]
+
         return reader_attempt_entity
 
     @staticmethod
@@ -422,11 +433,12 @@ class Hf35BffUtils:
         ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
         return ms_sql_server.exec_query_return_dict_list(
             BffSQLString.get_count_study_plan_by_student_id_sql[env_key].format(student_id, product_module,
-                                                                          ref_content_path))[0]['count(*)']
+                                                                                ref_content_path))[0]['count(*)']
 
     @staticmethod
     def get_count_completed_study_plan_by_student_id_from_db(student_id, ref_content_path):
         ms_sql_server = MYSQLHelper(MYSQL_MOCKTEST_DATABASE)
         return ms_sql_server.exec_query_return_dict_list(
             BffSQLString.get_count_completed_study_plan_by_student_id_content_path_sql[env_key].format(student_id,
-                                                                                                       ref_content_path))[0]['count(*)']
+                                                                                                       ref_content_path))[
+            0]['count(*)']
