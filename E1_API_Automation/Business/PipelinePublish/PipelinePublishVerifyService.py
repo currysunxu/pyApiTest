@@ -358,9 +358,9 @@ class PipelinePublishVerifyService:
         content_repo_eca_activity_data = content_repo_eca_activity[PipelinePublishConstants.FIELD_DATA]
         for key in aem_handout_homework.keys():
             content_repo_key = key
-            # for lesson homework activity, field name which in the same level with "questions", will be capitalized in content_repo
-            if activity_type == ContentRepoContentType.TypeHomework and 'questions' in aem_handout_homework.keys():
-                content_repo_key = content_repo_key.capitalize()
+            # # for lesson homework activity, field name which in the same level with "questions", will be capitalized in content_repo
+            # if activity_type == ContentRepoContentType.TypeHomework and 'questions' in aem_handout_homework.keys():
+            #     content_repo_key = content_repo_key.capitalize()
             error_message.extend(self
                                  .verify_aem_fields_with_content_repo(key, aem_handout_homework[key],
                                                                       content_repo_eca_activity_data[content_repo_key]))
