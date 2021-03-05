@@ -1,5 +1,6 @@
 import copy
 
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
     PipelinePublishConstants
 
@@ -59,3 +60,14 @@ class PipelinePublishUtils:
             path = aem_unit_dict['path']
             if path == expected_aem_path:
                 return aem_unit_dict
+
+    @staticmethod
+    def get_expected_content_metadata(course, content_type):
+        expected_metadata = {}
+        expected_metadata['program'] = course
+        expected_metadata['domainType'] = content_type.value
+        if content_type in (ContentRepoContentType.TypeHomework, ContentRepoContentType.TypeQuiz, ContentRepoContentType.TypeQuestionBank):
+            expected_metadata['entityType'] = 'ACTIVITY'
+        elif content_type in (ContentRepoContentType.TypeHandout, ContentRepoContentType.TypeFlashcard):
+            expected_metadata['entityType'] = 'ECA'
+        return expected_metadata

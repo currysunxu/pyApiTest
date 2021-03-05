@@ -16,3 +16,7 @@ class PipelinePublishConstants:
     FIELD_DATA = 'data'
     FIELD_MIME_TYPE = 'mimeType'
     FIELD_SKILLSET_LOCALIZATION = 'skillsetLocalization'
+    FIELD_QUIZ = 'quiz'
+    FIELD_QUESTION_BANK = 'questionBank'
+    FIELD_METADATA = 'metadata'
+    FIELD_COURSE = 'course'
