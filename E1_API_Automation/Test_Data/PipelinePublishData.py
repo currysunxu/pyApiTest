@@ -3,7 +3,7 @@ from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData
 
 class AEMData:
     AEMHost = {
-        'STG': 'https://internal-aem-publisher-staging.ef.cn',
+        'STG': 'https://internal-aem-publisher-stg.english1.cn',
         'LIVE': 'https://internal-aem-publisher.ef.cn'
     }
 

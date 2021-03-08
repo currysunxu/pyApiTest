@@ -14,3 +14,4 @@ class ContentRepoContentType(Enum):
     TypeReader = 'READER'
     TypeFlashcard = 'FLASHCARD'
     TypeQuiz = 'QUIZ'
+    TypeQuestionBank = 'QUESTION_BANK'
