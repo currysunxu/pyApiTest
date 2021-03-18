@@ -14,3 +14,7 @@ class CourseGroupService:
 	def get_current_unlock(self, student_id):
 		api_url = '/api/v1/unlocked-progress/current?studentId={0}'.format(student_id)
 		return self.mou_tai.get(api_url)
+
+	def get_core_current_group(self,student_id):
+		api_url = '/api/v2/students/{0}/groups/current-core-program-group'.format(student_id)
+		return self.mou_tai.get(api_url)
