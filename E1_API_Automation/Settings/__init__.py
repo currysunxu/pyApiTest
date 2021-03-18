@@ -126,13 +126,13 @@ class LearningProfileEnvironment(object):
 
 
 class EVCContentEnvironment(object):
-    STAGING = "https://evc-content-staging.english1.cn"
-    LIVE = "https://evc-content.english1.cn"
+    STAGING = "https://evc-content-staging.bj-englishtown.com"
+    LIVE = "https://evc-content.bj-englishtown.com"
 
 
 class EVCCDNEnvironment(object):
-    STAGING = "https://evc-fe-staging.english1.cn"
-    LIVE = "https://evc-fe.english1.cn"
+    STAGING = "https://evc-fe-staging.bj-englishtown.com"
+    LIVE = "https://evc-fe.bj-englishtown.com"
 
 
 class EVCDemoPageEnvironment(object):
