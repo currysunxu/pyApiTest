@@ -2,16 +2,16 @@ import os
 
 
 class Environment(object):
-    QA = "https://e1svc-qa.bj-englishtown.com"
-    STAGING = "https://e1svc-stg.bj-englishtown.com"
+    QA = "https://e1svc-qa.english1.cn"
+    STAGING = "https://e1svc-stg.english1.cn"
     LIVE = "https://e1svc.ef.cn"
     STAGING_SG = "https://e1svc-stg.english1.com"
     LIVE_SG = "https://e1svc.ef.com"
 
 
 class KSDEnvironment(object):
-    QA = "https://study-qa.bj-englishtown.com"
-    STAGING = "https://study-stg.bj-englishtown.com"
+    QA = "https://study-qa.english1.cn"
+    STAGING = "https://study-stg.english1.cn"
     LIVE = "https://study.ef.cn"
     STAGING_SG = "https://study-stg.english1.com"
     LIVE_SG = "https://study.ef.com"
@@ -34,8 +34,8 @@ class TPIEnvironment(object):
 
 
 class AuthEnvironment(object):
-    QA = "https://auth-svc-qa.bj-englishtown.com"
-    STAGING = "https://auth-svc-stg.bj-englishtown.com"
+    QA = "https://auth-svc-qa.english1.cn"
+    STAGING = "https://auth-svc-stg.english1.cn"
     STAGING_SG = "https://auth-svc-stg.english1.com"
     LIVE = "https://auth-svc.ef.cn"
     LIVE_SG = "https://auth-svc.ef.com"
@@ -56,8 +56,8 @@ class LearningResultEnvironment(object):
 
 
 class BffEnvironment(object):
-    QA = "https://ktsvc-qa.bj-englishtown.com"
-    STAGING = "https://ktsvc-stg.bj-englishtown.com"
+    QA = "https://ktsvc-qa.english1.cn"
+    STAGING = "https://ktsvc-stg.english1.cn"
     LIVE = "https://ktsvc.ef.cn"
 
 class HomeworkEnvironment(object):
@@ -91,8 +91,8 @@ class ContentBuilderEnvironment(object):
 
 
 class MockTestEnvironment(object):
-    QA = "https://ktsvc-qa.bj-englishtown.com/mseb"
-    STAGING = "https://ktsvc-stg.bj-englishtown.com/mseb"
+    QA = "https://ktsvc-qa.english1.cn/mseb"
+    STAGING = "https://ktsvc-stg.english1.cn/mseb"
     LIVE = "https://ktsvc.ef.cn/mseb"
 
 
@@ -108,7 +108,7 @@ class StoryblokImportEnvironment(object):
 
 
 class E1TPIEnvironment(object):
-    STAGING = "https://e1tpi-stg.bj-englishtown.com"
+    STAGING = "https://e1tpi-stg.english1.cn"
     STAGING_SG = "https://e1tpi-stg.english1.com"
     LIVE = "https://e1tpi.ef.cn"
     LIVE_SG = "https://e1tpi.ef.com"

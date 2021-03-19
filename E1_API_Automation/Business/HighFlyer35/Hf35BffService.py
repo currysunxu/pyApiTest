@@ -220,3 +220,16 @@ class Hf35BffService:
     def get_online_class_id(self , reservation_id):
         return self.mou_tai.get("/mega/api/v1/classes/online/{0}".format(reservation_id))
 
+    def post_pt_deep_link_enter(self,ptKey):
+        self.mou_tai.headers['x-ef-token'] = self.id_token
+        body = {
+                "testContentId": ptKey
+                }
+        api_url = "/mega/api/v1/progress-test/enter"
+        return self.mou_tai.post(api_url, body)
+
+    def post_mt_enter(self):
+        body = {}
+        api_url = "/mega/api/v1/mock-test/enter"
+        return self.mou_tai.post(api_url, body)
+
