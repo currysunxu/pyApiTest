@@ -60,7 +60,6 @@ class BffEnvironment(object):
     STAGING = "https://ktsvc-stg.english1.cn"
     LIVE = "https://ktsvc.ef.cn"
 
-
 class HomeworkEnvironment(object):
     QA = "https://internal-ktsvc-qa.english1.cn/practice"
     STAGING = "https://internal-ktsvc-stg.english1.cn/practice"
@@ -109,7 +108,7 @@ class StoryblokImportEnvironment(object):
 
 
 class E1TPIEnvironment(object):
-    STAGING = "https://e1tpi-stg.english1.cn.com"
+    STAGING = "https://e1tpi-stg.english1.cn"
     STAGING_SG = "https://e1tpi-stg.english1.com"
     LIVE = "https://e1tpi.ef.cn"
     LIVE_SG = "https://e1tpi.ef.com"

@@ -32,7 +32,7 @@ from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
 from E1_API_Automation.Lib.HamcrestExister import Exist
-from E1_API_Automation.Test_Data.BffData import SalesforceData
+from E1_API_Automation.Test_Data.BffData import SalesforceData,OspData
 
 
 @TestClass()
@@ -76,20 +76,12 @@ class Hf35BffTest(HfBffTestBase):
             response = self.bff_service.login(user_name, password)
             assert_that(response.status_code, equal_to(200))
 
-            # only HFV2, HFV3Plus users' contentscope is Standard, other products, return ONLINE_CLASS
-            response = self.bff_service.get_bootstrap_controller('ios')
-            if key in (BffProduct.HFV2.value, BffProduct.HFV3.value, BffProduct.HFV35.value):
+            response = self.bff_service.get_bootstrap_controller_v2('ios')
+            if key in (BffProduct.HFV2.value, BffProduct.HFV3.value, BffProduct.HFV35.value,BffProduct.SSV3.value, BffProduct.TBV3.value):
                 assert_that(response.status_code, equal_to(200))
                 assert_that(response.json(), match_to("provision"))
-                assert_that(response.json(), Exist("userContext.availableBooks"))
-                assert_that(response.json(), Exist("userContext.currentBook"))
-                assert_that(jmespath.search('userContext.contentScope', response.json()) == "STANDARD")
-            elif key in (BffProduct.SSV3.value, BffProduct.TBV3.value):
-                assert_that(response.status_code, equal_to(200))
-                assert_that(jmespath.search('userContext.contentScope', response.json()) == "LITE")
-            else:
-                assert_that(response.status_code, equal_to(200))
-                assert_that(jmespath.search('userContext.contentScope', response.json()) == "ONLINE_CLASS")
+                assert_that(response.json(), Exist("ocContext"))
+                assert_that(response.json(), Exist("appConfig"))
 
     @Test(tags="qa, stg, live", data_provider=["noToken"])
     def test_submit_new_attempt_without_auth_token(self, negative_para):
@@ -378,7 +370,7 @@ class Hf35BffTest(HfBffTestBase):
         else:
             platform_type = 2
 
-        assert_that(jmespath.search('provision.platformType', response.json()), equal_to(platform_type))
+        # assert_that(jmespath.search('provision.platformType', response.json()), equal_to(platform_type))
         provisioning_service = ProvisioningService(HF35DependService.provisioning_service[env_key]['host'])
         platform_key = HF35DependService.provisioning_service[env_key][platform + '-app-key']
         provisioning_response = provisioning_service.get_app_version_by_platform_key(platform_key)
@@ -399,19 +391,18 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_get_unlock_progress(self):
-        current_book = self.get_current_book_from_bootstrap()
+        current_book = self.get_current_book_content_id_from_bootstrap()
         bff_unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
         assert_that(bff_unlock_response.status_code == 200)
 
-        course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
-        course_group_unlock_response = course_group_service.get_unlock_progress(self.customer_id, current_book)
+        course_group_unlock_response = self.course_group_service.get_unlock_progress(self.customer_id, current_book)
         assert_that(course_group_unlock_response.status_code == 200)
 
         assert_that(bff_unlock_response.json(), equal_to(course_group_unlock_response.json()))
 
     @Test(tags="qa, stg, live")
     def test_get_homework_content_groups(self):
-        current_book = self.get_current_book_from_bootstrap()
+        current_book = self.get_current_book_content_id_from_bootstrap()
         tree_revision = self.get_tree_revision_from_course_structure()
         book_structure_response = self.bff_service.get_book_structure(current_book, tree_revision)
         unit_content_id = jmespath.search('children[0].contentId', book_structure_response.json())
@@ -444,7 +435,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_get_handout_content_groups(self):
-        book_content_id = self.get_current_book_from_bootstrap()
+        book_content_id = self.get_current_book_content_id_from_bootstrap()
         course_structure_response = self.bff_service.get_course_structure()
 
         book_content_revision = jmespath.search('children[?contentId==\'%s\'].contentRevision| [0]' % (book_content_id),
@@ -478,7 +469,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_get_homework_activities(self):
-        current_book = self.get_current_book_from_bootstrap()
+        current_book = self.get_current_book_content_id_from_bootstrap()
         tree_revision = self.get_tree_revision_from_course_structure()
         book_structure_response = self.bff_service.get_book_structure(current_book, tree_revision)
         unit_content_id = jmespath.search('children[0].contentId', book_structure_response.json())
@@ -504,7 +495,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_get_handout_eca(self):
-        book_content_id = self.get_current_book_from_bootstrap()
+        book_content_id = self.get_current_book_content_id_from_bootstrap()
         course_structure_response = self.bff_service.get_course_structure()
 
         book_content_revision = jmespath.search('children[?contentId==\'%s\'].contentRevision| [0]' % (book_content_id),
@@ -576,7 +567,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_get_vocab_content_groups(self):
-        current_book = self.get_current_book_from_bootstrap()
+        current_book = self.get_current_book_content_id_from_bootstrap()
         tree_revision = self.get_tree_revision_from_course_structure()
         book_structure_response = self.bff_service.get_book_structure(current_book, tree_revision)
         unit_content_id = jmespath.search('children[0].contentId', book_structure_response.json())
@@ -693,7 +684,7 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags="qa, stg, live")
     def test_get_reader_content_groups_by_book(self):
         # get current book id and relevant content id
-        current_book = self.get_current_book_from_bootstrap()
+        current_book = self.get_current_book_content_id_from_bootstrap()
         tree_revision = self.get_tree_revision_from_course_structure()
         book_structure_response = self.bff_service.get_book_structure(current_book, tree_revision)
         relevant_content_revision = jmespath.search('contentRevision', book_structure_response.json())
@@ -740,7 +731,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tag="qa, stg, live")
     def test_get_reader_progress_by_book(self):
-        current_book = self.get_current_book_from_bootstrap()
+        current_book = self.get_current_book_content_id_from_bootstrap()
         reader_progress_response = self.bff_service.get_reader_progress(self.customer_id, current_book)
         assert_that(reader_progress_response.status_code, equal_to(200))
 
@@ -759,7 +750,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_get_weekly_plan(self):
-        current_book = self.get_current_book_from_bootstrap()
+        current_book = self.get_current_book_content_id_from_bootstrap()
         unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
         assert_that(unlock_response.status_code, equal_to(200))
         unlock_at_str = jmespath.search('[*].unlockedAt', unlock_response.json())[:2]
@@ -884,21 +875,21 @@ class Hf35BffTest(HfBffTestBase):
     def test_student_context(self):
         user_context_response = self.bff_service.get_student_context()
         assert_that(user_context_response.status_code, equal_to(200))
-        acl_response = self.auth2_service.get_acl_response()
+        core_course_group_response = self.course_group_service.get_core_current_group(self.customer_id)
         if user_context_response.json()['isOnlineOnly'] is True:
             assert_that(user_context_response.json()['currentBook'], equal_to(None))
             assert_that(user_context_response.json()['availableBooks'], equal_to([]))
             assert_that(user_context_response.json()['isOnlineOnly'], equal_to(True))
         else:
             # get content path from acl
-            content_path_for_book = self.get_content_path_from_acl(acl_response)
+            content_path_for_book = core_course_group_response.json()['contentPath']
             # 1.current book will set the first available book without unlock , which covered in mega-bff integration test
             # 2.current book will set the current unlock book from available book , which covered in mega-bff integration test
             assert_that(user_context_response.json()['currentBook'], equal_to(content_path_for_book))
             assert_that(user_context_response.json()['availableBooks'], not_none())
 
     @Test(tags="qa,stg,live", data_provider=["EVC", "NOT_EVC", "NULL_BODY"])
-    def test_class_online_enter(self, online_platform):
+    def test_online_class_enter(self, online_platform):
         online_enter = self.bff_service.post_class_online_enter(online_platform)
         assert_that(online_enter.status_code, equal_to(200))
         if online_platform is "EVC":
@@ -927,3 +918,22 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(online_id.json(), Exist("onlinePlatform"))
             assert_that(online_id.json(), Exist("onlineEntry"))
             assert_that(online_id.json()['classroomStatus'], equal_to("CLOSED_FOR_ENDED"))
+
+    @Test(tags="qa,stg,live")
+    def test_pt_deep_link_enter(self):
+        ptKey = OspData.pt_key[env_key]
+        pt_enter = self.bff_service.post_pt_deep_link_enter(ptKey)
+        assert_that(pt_enter.status_code, equal_to(200))
+        assert_that(pt_enter.json(), match_to("course"))
+        assert_that(pt_enter.json(), match_to("jwtToken"))
+        assert_that(pt_enter.json(), match_to("v3Token"))
+        assert_that(pt_enter.json(), match_to("entrylink"))
+        assert_that(pt_enter.json(), match_to("deeplink"))
+
+    @Test(tags="qa,stg,live")
+    def test_mt_link_enter(self):
+        pt_enter = self.bff_service.post_mt_enter()
+        assert_that(pt_enter.status_code, equal_to(200))
+        assert_that(pt_enter.json(), match_to("entrylink"))
+
+

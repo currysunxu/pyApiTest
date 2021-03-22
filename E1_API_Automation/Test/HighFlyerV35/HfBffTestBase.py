@@ -14,6 +14,7 @@ from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentM
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningResultProduct, \
     LearningResultProductModule
+from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroupService
 from E1_API_Automation.Business.OMNIService import OMNIService
 from E1_API_Automation.Settings import *
 from ptest.decorator import BeforeMethod
@@ -39,6 +40,8 @@ class HfBffTestBase:
         self.bff_service.login(self.user_name, self.password)
         self.omni_service = OMNIService(OMNI_ENVIRONMENT)
         self.auth2_service = Auth2Service(AUTH2_ENVIRONMENT, self.bff_service.mou_tai.headers['EF-Access-Token'])
+        self.course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
+
 
         try:
             self.customer_id = BffUsers.BffUserPw[env_key][self.key][0]['userid']
@@ -212,10 +215,16 @@ class HfBffTestBase:
                 break
         return content_body
 
-    def get_current_book_from_bootstrap(self):
-        response = self.bff_service.get_bootstrap_controller(platform='ios')
-        current_book = jmespath.search('userContext.currentBook', response.json())
+    def get_current_book_content_path_from_bootstrap(self):
+        response = self.bff_service.get_student_context()
+        current_book = jmespath.search('currentBook', response.json())
         return current_book
+
+    def get_current_book_content_id_from_bootstrap(self):
+        response = self.bff_service.get_student_context()
+        current_book = jmespath.search('currentBook', response.json())
+        current_book_content_id = jmespath.search("availableBooks[?contentPath=='{0}'].contentId".format(current_book), response.json())[0]
+        return current_book_content_id
 
     def get_tree_revision_from_course_structure(self):
         response = self.bff_service.get_course_structure()
@@ -223,17 +232,14 @@ class HfBffTestBase:
         return tree_revision
 
     def get_reader_default_level_from_course_structure(self):
-        current_book = self.get_current_book_from_bootstrap()
-        course_structure = self.bff_service.get_course_structure()
+        current_book = self.get_current_book_content_path_from_bootstrap()
+        course_structure = self.bff_service.get_book_structure_v2(current_book)
         course_structure_json = course_structure.json()
         index = 0
         while 1:
-            content_id_path = 'children[%s].contentId' % index
-            default_level_path = 'children[%s].default_reader_level' % index
-
-            book_content_id = jmespath.search(content_id_path, course_structure_json)
-            if book_content_id == current_book:
-                default_level_id = jmespath.search(default_level_path, course_structure_json)
+            book_content_path = jmespath.search("contentPath", course_structure_json)
+            if book_content_path == current_book:
+                default_level_id = jmespath.search("default_reader_level", course_structure_json)
                 break
             index += 1
         return default_level_id

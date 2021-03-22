@@ -29,7 +29,7 @@ class BffUsers:
         },
         'Live': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'hf.test3', 'password': '12345', 'userid': 101548688},{'username': 'cc.test', 'password': '12345'}],
+            BffProduct.HFV35.value: [{'username': 'cs.test', 'password': '12345', 'userid': 101630985},{'username': 'cc.test', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
             BffProduct.HFV2.value: [{'username': 'hf2.cn.01', 'password': '12345'}]
@@ -40,7 +40,7 @@ class BffUsers:
 class HF35DependService:
     provisioning_service = {
         'QA': {
-            'host': 'https://provisioning-qa.bj-englishtown.com',
+            'host': 'https://provisioning-qa.english1.cn',
             'ios-app-key': '6591032B-DF1F-405F-93B3-482371A99A13',
             'android-app-key': '43CF3DBD-FC07-4CE1-A319-F81D3BB17AAC'
         },
@@ -204,4 +204,11 @@ class SalesforceData:
         'QA': "",
         'Staging': "a0G1s000001XDIEEA4",
         'Live': "a0G2x000005ImLBEA0"
+    }
+
+class OspData:
+    pt_key = {
+        'QA': "AC696E51-ABC7-4854-A700-331435B4DCAF",
+        'Staging': "66a0291e-b96f-453a-bd2c-14c56d808b5e",
+        'Live': "b14dc44b-cd31-41ff-a9f6-4269541d5503"
     }
