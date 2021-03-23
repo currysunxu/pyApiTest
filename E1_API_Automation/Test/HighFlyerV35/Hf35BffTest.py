@@ -38,7 +38,7 @@ from E1_API_Automation.Test_Data.BffData import SalesforceData,OspData
 @TestClass()
 class Hf35BffTest(HfBffTestBase):
 
-    @Test(tags="qa, stg, live")
+    @Test(tags="qa, stg, live, live_dr")
     def test_bff_auth_login_valid_username(self):
         product_keys = BffUsers.BffUserPw[env_key].keys()
         for key in product_keys:
@@ -66,7 +66,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(response.status_code, equal_to(401))
 
     # only HFV2, HFV3Plus user can call bff apis successfully, other users can't call bff apis, will return 401
-    @Test(tags="qa, stg, live")
+    @Test(tags="qa, stg, live, live_dr")
     def test_auth2_authorization(self):
         product_keys = BffUsers.BffUserPw[env_key].keys()
         for key in product_keys:
@@ -114,7 +114,7 @@ class Hf35BffTest(HfBffTestBase):
         self.setter_learning_result_details(learning_details_entity, bff_data_obj)
         self.check_bff_compare_learning_result(result_response, learning_result_entity, learning_details_entity)
 
-    @Test(tags="qa, stg, live", data_provider=[(1, 1), (4, 2)])
+    @Test(tags="qa, stg, live, live_dr", data_provider=[(1, 1), (4, 2)])
     def test_submit_best_attempt(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -146,7 +146,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(homework_best_score, equal_to(bff_best_score))
         assert_that(best_submit_response.json(), equal_to(homework_best_attempt_response.json()))
 
-    @Test(tags="qa, stg, live", data_provider=[("HIGH_FLYERS_35", "1")])
+    @Test(tags="qa, stg, live, live_dr", data_provider=[("HIGH_FLYERS_35", "1")])
     def test_get_course_structure(self, course, scheme_version):
         bff_course_response = self.bff_service.get_course_structure()
         assert_that(bff_course_response.status_code, equal_to(200))
@@ -381,15 +381,15 @@ class Hf35BffTest(HfBffTestBase):
         diff_list = json_tools.diff(response.json()['ocContext'], expected_oc_context)
         assert_that(len(diff_list), equal_to(0))
 
-    @Test(tags="qa, stg, live", data_provider=[1, 2])
+    @Test(tags="qa, stg, live, live_dr", data_provider=[1, 2])
     def test_bootstrap_controller_ios_platform(self, version):
         self.test_bootstrap_controller_by_platform('ios', version)
 
-    @Test(tags="qa, stg, live", data_provider=[1, 2])
+    @Test(tags="qa, stg, live, live_dr", data_provider=[1, 2])
     def test_bootstrap_controller_android_platform(self, version):
         self.test_bootstrap_controller_by_platform('android', version)
 
-    @Test(tags="qa, stg, live")
+    @Test(tags="qa, stg, live, live_dr")
     def test_get_unlock_progress(self):
         current_book = self.get_current_book_content_id_from_bootstrap()
         bff_unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
@@ -871,7 +871,7 @@ class Hf35BffTest(HfBffTestBase):
         total_rewards = self.bff_service.get_rewards_by_content_path("")
         assert_that(total_rewards.status_code, equal_to(400))
 
-    @Test(tags="qa,stg,live")
+    @Test(tags="qa,stg,live,live_dr")
     def test_student_context(self):
         user_context_response = self.bff_service.get_student_context()
         assert_that(user_context_response.status_code, equal_to(200))
@@ -919,7 +919,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(online_id.json(), Exist("onlineEntry"))
             assert_that(online_id.json()['classroomStatus'], equal_to("CLOSED_FOR_ENDED"))
 
-    @Test(tags="qa,stg,live")
+    @Test(tags="qa,stg,live,live_dr")
     def test_pt_deep_link_enter(self):
         ptKey = OspData.pt_key[env_key]
         pt_enter = self.bff_service.post_pt_deep_link_enter(ptKey)

@@ -265,7 +265,7 @@ elif os.environ['environment'] == 'STG_SG':
     }
 
 
-elif os.environ['environment'] == 'LIVE':
+elif os.environ['environment'] == 'LIVE' or os.environ['environment'] == 'LIVE_DR':
     ENVIRONMENT = Environment.LIVE
     KSD_ENVIRONMENT = KSDEnvironment.LIVE
     OSP_ENVIRONMENT = OSPEnvironment.LIVE
