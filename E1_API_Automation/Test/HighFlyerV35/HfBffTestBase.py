@@ -16,15 +16,14 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import L
     LearningResultProductModule
 from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroupService
 from E1_API_Automation.Business.OMNIService import OMNIService
+from E1_API_Automation.Business.RemediationService import RemediationService
+from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 from E1_API_Automation.Settings import *
 from ptest.decorator import BeforeMethod
 
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
 from E1_API_Automation.Business.AuthService import Auth2Service
-
-
-
-
+from E1_API_Automation.Test_Data.RemediationData import RemediationData
 
 
 class HfBffTestBase:
@@ -328,3 +327,15 @@ class HfBffTestBase:
 
         return content_path
 
+    def submit_remediation_best_attempts(self, test_id, test_instance_key,start,end):
+        actual_score = CommonUtils.randomFloatToString(start, end)
+        remediation_body = RemediationData.build_remediation_activities(test_instance_key, test_id, actual_score)
+        bff_remediation_response = self.bff_service.post_best_remediation_attempts(remediation_body)
+        return bff_remediation_response
+
+    def verify_bff_best_attempts(self, test_instance_key):
+        remediation = RemediationService(REMEDIATION_ENVIRONMENT)
+        best_attempts = remediation.get_best_remediation_attempts(self.customer_id, test_instance_key)
+        bff_best_attempts = self.bff_service.get_best_remediation_attempts(test_instance_key)
+        assert_that(bff_best_attempts.status_code, equal_to(200))
+        assert_that(bff_best_attempts.json()[0], equal_to(best_attempts.json()[0]))

@@ -233,3 +233,15 @@ class Hf35BffService:
         api_url = "/mega/api/v1/mock-test/enter"
         return self.mou_tai.post(api_url, body)
 
+    def get_remediation_by_pt_key_and_instance_key(self,pt_instance_key,pt_key):
+        api_url = "/mega/api/v1/remediation/content-groups?testInstanceId={0}&testId={1}".format(pt_instance_key,pt_key)
+        return self.mou_tai.get(api_url)
+
+    def post_best_remediation_attempts(self, attempts):
+        api_url = "/mega/api/v1/remediation/attempts"
+        return self.mou_tai.post(api_url,attempts)
+
+    def get_best_remediation_attempts(self, pt_instance_key):
+        api_url = "/mega/api/v1/remediation/attempts/best?testInstanceId={0}".format(pt_instance_key)
+        return self.mou_tai.get(api_url)
+

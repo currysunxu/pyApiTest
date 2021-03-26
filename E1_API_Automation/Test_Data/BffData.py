@@ -211,4 +211,13 @@ class OspData:
         'QA': "AC696E51-ABC7-4854-A700-331435B4DCAF",
         'Staging': "66a0291e-b96f-453a-bd2c-14c56d808b5e",
         'Live': "b14dc44b-cd31-41ff-a9f6-4269541d5503"
+    },
+    test_id = {
+        'QA': "CC9C905E-AE12-4E3A-B82D-921D27D3ED84",
+        'Staging': "CC9C905E-AE12-4E3A-B82D-921D27D3ED84",
+        'Live': "1E85C033-37C9-4061-AFCC-77366AAA20EE"
     }
+
+class BusinessData:
+    unit_content_path = "highflyers/cn-3/book-2/unit-3"
+    lesson_content_path = "highflyers/cn-3/book-2/unit-3/assignment-1"
