@@ -216,14 +216,20 @@ class HfBffTestBase:
 
     def get_current_book_content_path_from_bootstrap(self):
         response = self.bff_service.get_student_context()
-        current_book = jmespath.search('currentBook', response.json())
-        return current_book
+        finder_current_book = self.find_current_book(response)
+        return finder_current_book
 
     def get_current_book_content_id_from_bootstrap(self):
         response = self.bff_service.get_student_context()
-        current_book = jmespath.search('currentBook', response.json())
-        current_book_content_id = jmespath.search("availableBooks[?contentPath=='{0}'].contentId".format(current_book), response.json())[0]
+        finder_current_book = self.find_current_book(response)
+        current_book_content_id = jmespath.search("availableBooks[?contentPath=='{0}'].contentId".format(finder_current_book), response.json())[0]
         return current_book_content_id
+
+    def find_current_book(self, response):
+        current_book = jmespath.search('currentBook', response.json())
+        availableBooks = jmespath.search('availableBooks', response.json())
+        finder_current_book = current_book if current_book != 'unsupported/book' else availableBooks[-1]['contentPath']
+        return finder_current_book
 
     def get_tree_revision_from_course_structure(self):
         response = self.bff_service.get_course_structure()

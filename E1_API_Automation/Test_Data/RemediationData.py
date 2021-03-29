@@ -20,7 +20,7 @@ class RemediationData:
             "activityContentId": str(uuid.uuid1()),
             "testInstanceId": test_instance_id,
             "testId": test_id,
-            "contentPath": "highflyers/cn-3/book-1/unit-3",
+            "contentPath": CommonUtils.randomContentPath(),
             "activityResults": {
                 "Mid-HF-Book1": [
                     {
@@ -33,6 +33,7 @@ class RemediationData:
             },
             "score": score,
             "totalScore": "20.0",
-            "activityQuestionMd5":CommonUtils.random_gen_str(32)
+            "activityQuestionMd5":CommonUtils.random_gen_str(32),
+            "activityContentRevision":"fixed_revision_by_current_design"
         }
         return body

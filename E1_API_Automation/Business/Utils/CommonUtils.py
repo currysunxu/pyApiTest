@@ -56,6 +56,23 @@ class CommonUtils:
     def randomIntToString(range):
         return str(random.randint(1, range))
 
+    '''
+    randomly generate float by specific range and Keep two decimal places
+    '''
     @staticmethod
-    def randomFloatToString(startIndex,endIndex):
+    def randomFloatToString(startIndex, endIndex) -> str:
         return format(random.uniform(startIndex, endIndex), '.2f')
+
+    '''
+    randomly generate content path by programs and regions
+    default level is unit
+    for example: smallstar/cn-3-144/unit-2
+    '''
+    @staticmethod
+    def randomContentPath(level='unit') -> str:
+        programs = ["highflyers", "smallstar", "tb16"]
+        regions = ["cn-3", "cn-3-144"]
+        unit_content_path = "{0}/{1}/book-{2}/unit-{3}".format(random.choice(programs), random.choice(regions),
+                                                               random.randint(1,5),random.randint(1,4))
+        content_path = unit_content_path if level == 'unit' else unit_content_path + "/assignment-{0}".format(random.randint(4))
+        return content_path
