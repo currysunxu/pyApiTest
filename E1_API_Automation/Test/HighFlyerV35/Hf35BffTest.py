@@ -947,13 +947,15 @@ class Hf35BffTest(HfBffTestBase):
     def test_get_remediation_by_test_id(self):
         test_id = OspData.test_id[env_key]
         test_instance_key = uuid.uuid4()
-        bff_remediation_response = self.bff_service.get_remediation_by_pt_key_and_instance_key("b554306c-1383-45cc-96c6-cd25960b4f77", test_id)
+        bff_remediation_response = self.bff_service.get_remediation_by_pt_key_and_instance_key(test_instance_key, test_id)
         assert_that(bff_remediation_response.status_code, equal_to(200))
         if not EnvUtils.is_env_qa():
             remediation = RemediationService(REMEDIATION_ENVIRONMENT)
-            activity_obj = remediation.get_remediation_activity(self.customer_id,"b554306c-1383-45cc-96c6-cd25960b4f77",test_id)
+            activity_obj = remediation.get_remediation_activity(self.customer_id,test_instance_key,test_id)
             assert_that(bff_remediation_response.json()['activityGroups'][0], equal_to(activity_obj.json()))
-            # random instance_key
+            # assetGroups is empty array because of random instance_key
+            # remediation api get empty activity by random instance_key
+            # content repo asset group api will return [] by empty activity
             assert_that(bff_remediation_response.json()['assetGroups'], equal_to([]))
 
     @Test(tags="qa,stg,live")
