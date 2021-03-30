@@ -16,11 +16,6 @@ pipeline {
   triggers {
     cron('H 03 * * *')
   }
-  
-  parameters {
-        
-        choice(name:'environment',choices:['LIVE_Daily_Run'],description:'')
-    }
    
   stages {
     
