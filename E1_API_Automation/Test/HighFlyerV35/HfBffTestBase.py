@@ -199,6 +199,11 @@ class HfBffTestBase:
         self.__setter_content_map_entity(content_map_entity, json_body_dict)
         return content_map_service.post_content_map_query_tree(content_map_entity)
 
+    def get_data_from_content_map_course_node(self, content_path, check_field) -> object:
+        content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+        course_node_response = content_map_service.get_content_map_course_node(content_path)
+        return course_node_response.json()[check_field]
+
     def __setter_content_map_entity(self, content_map_entity, json_body_dict):
         content_map_entity.child_types = json_body_dict["childTypes"]
         content_map_entity.content_id = json_body_dict["contentId"]
@@ -224,6 +229,12 @@ class HfBffTestBase:
         finder_current_book = self.find_current_book(response)
         current_book_content_id = jmespath.search("availableBooks[?contentPath=='{0}'].contentId".format(finder_current_book), response.json())[0]
         return current_book_content_id
+
+    def get_check_field_from_content_obj_by_content_path(self, content_object, content_path, check_field) -> object:
+        # ..children match assignment level, .children match unit level
+        expression = '$..children[?(@.contentPath=="{0}")]' if "assignment" in content_path else '$.children[?(@.contentPath=="{0}")]'
+        dict_obj = jsonpath.jsonpath(content_object,expression.format(content_path))[0]
+        return dict_obj[check_field]
 
     def find_current_book(self, response):
         current_book = jmespath.search('currentBook', response.json())

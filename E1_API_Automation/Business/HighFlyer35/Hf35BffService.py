@@ -202,6 +202,10 @@ class Hf35BffService:
         encoded_content_path = CommonUtils.encode_url_content_path(content_path)
         return self.mou_tai.get("/mega/api/v2/books/{0}/structure".format(encoded_content_path))
 
+    def get_book_structure_v3(self, content_path):
+        encoded_content_path = CommonUtils.encode_url_content_path(content_path)
+        return self.mou_tai.get("/mega/api/v3/books/{0}/structure".format(encoded_content_path))
+
     def get_student_context(self):
         return self.mou_tai.get("/mega/api/v1/student/context")
 

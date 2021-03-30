@@ -66,13 +66,18 @@ class CommonUtils:
     '''
     randomly generate content path by programs and regions
     default level is unit
-    for example: smallstar/cn-3-144/unit-2
+    for example: smallstar/cn-3/unit-2, highflyers/cn-3-144/unit-1
     '''
     @staticmethod
     def randomContentPath(level='unit') -> str:
         programs = ["highflyers", "smallstar", "tb16"]
         regions = ["cn-3", "cn-3-144"]
-        unit_content_path = "{0}/{1}/book-{2}/unit-{3}".format(random.choice(programs), random.choice(regions),
-                                                               random.randint(1,5),random.randint(1,4))
-        content_path = unit_content_path if level == 'unit' else unit_content_path + "/assignment-{0}".format(random.randint(4))
+        if random.choice(regions) == "cn-3":
+            unit_content_path = "{0}/{1}/book-{2}/unit-{3}".format(random.choice(programs), regions[0],
+                                                                   random.randint(1, 4), random.randint(1, 5))
+        else:
+            unit_content_path = "{0}/{1}/book-{2}/unit-{3}".format(programs[0], regions[1],
+                                                                   random.randint(1, 4), random.randint(1, 5))
+        content_path = unit_content_path if level == 'unit' else unit_content_path + "/assignment-{0}".format(
+            random.randint(1, 4))
         return content_path

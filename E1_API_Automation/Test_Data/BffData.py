@@ -1,4 +1,5 @@
 from enum import Enum
+from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 
 class BffProduct(Enum):
     HFV35 = 'HFV35'
@@ -222,3 +223,16 @@ class OspData:
 class BusinessData:
     unit_content_path = "highflyers/cn-3/book-2/unit-3"
     lesson_content_path = "highflyers/cn-3/book-2/unit-3/assignment-1"
+
+    '''
+    build random content path by generator,default size is 4
+    '''
+    @staticmethod
+    def gen_all_programs_content_path(level, num = 4):
+        i= 0
+        while i < num:
+            content_path = CommonUtils.randomContentPath(level)
+            i = i + 1
+            yield content_path
+
+    expected_content_type = [1,64,128,512,1024]

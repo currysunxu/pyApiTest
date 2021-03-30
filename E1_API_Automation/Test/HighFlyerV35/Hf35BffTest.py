@@ -785,7 +785,7 @@ class Hf35BffTest(HfBffTestBase):
             path = content_path.json()[0]
             refProps = path['refProps']
             student_id, product_module = path['studentId'], path['productModule']
-            content_map = self.cm_service.get_content_map(study_plan_path).json()
+            content_map = self.cm_service.get_content_map_course_node(study_plan_path).json()
             study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id, product_module, study_plan_path)
             assert_that(path['refId'], equal_to(study_plan['ref_id']))
             assert_that(path['effectAt'], equal_to(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
@@ -971,7 +971,28 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(bff_remediation_response.status_code, equal_to(200))
             self.verify_bff_best_attempts(test_instance_key)
 
+    @Test(tags="qa, stg, live", data_provider=BusinessData.gen_all_programs_content_path("unit"))
+    def test_get_book_structure_v3_unit_level(self, content_path):
+        bff_book_response_v3 = self.bff_service.get_book_structure_v3(content_path)
+        content_type = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentType")
+        contentIndex = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentIndex")
+        childCount = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "childCount")
+        expected_contentIndex = self.get_data_from_content_map_course_node(content_path, "contentIndex")
+        expected_childCount = self.get_data_from_content_map_course_node(content_path, "childCount")
+        assert_that(bff_book_response_v3.status_code, equal_to(200))
+        assert_that(set(content_type) <= set(BusinessData.expected_content_type),"book structure content type {0} unexpected".format(content_type))
+        assert_that(contentIndex, equal_to(expected_contentIndex))
+        assert_that(childCount, equal_to(expected_childCount))
 
+    @Test(tags="qa, stg, live", data_provider=BusinessData.gen_all_programs_content_path("assignment"))
+    def test_get_book_structure_v3_assignment_level(self, content_path):
+        bff_book_response_v3 = self.bff_service.get_book_structure_v3(content_path)
+        content_type = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentType")
+        contentIndex = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentIndex")
+        expected_contentIndex = self.get_data_from_content_map_course_node(content_path, "contentIndex")
+        assert_that(bff_book_response_v3.status_code, equal_to(200))
+        assert_that(set(content_type) <= set(BusinessData.expected_content_type),"book structure content type {0} unexpected".format(content_type))
+        assert_that(contentIndex, equal_to(expected_contentIndex))
 
 
 
