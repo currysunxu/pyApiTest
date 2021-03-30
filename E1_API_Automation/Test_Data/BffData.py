@@ -1,6 +1,7 @@
 from enum import Enum
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 
+
 class BffProduct(Enum):
     HFV35 = 'HFV35'
     TBV3 = 'TBV3'
@@ -22,7 +23,8 @@ class BffUsers:
         },
         'Staging': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'},{'username': 'll.test', 'password': 'efef@123'}],
+            BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'},
+                                     {'username': 'll.test', 'password': 'efef@123'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.SSV3.value: [{'username': 'ss3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
@@ -30,7 +32,8 @@ class BffUsers:
         },
         'Live': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'cs.test', 'password': '12345', 'userid': 101630985},{'username': 'cc.test', 'password': '12345'}],
+            BffProduct.HFV35.value: [{'username': 'cs.test', 'password': '12345', 'userid': 101630985},
+                                     {'username': 'cc.test', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
             BffProduct.HFV2.value: [{'username': 'hf2.cn.01', 'password': '12345'}]
@@ -200,12 +203,14 @@ class BffSQLString:
         'Live': ""
     }
 
+
 class SalesforceData:
     reservation_id = {
         'QA': "",
         'Staging': "a0G1s000001XDIEEA4",
         'Live': "a0G2x000005ImLBEA0"
     }
+
 
 class OspData:
     pt_key = {
@@ -220,6 +225,7 @@ class OspData:
         'Live': "1E85C033-37C9-4061-AFCC-77366AAA20EE"
     }
 
+
 class BusinessData:
     unit_content_path = "highflyers/cn-3/book-2/unit-3"
     lesson_content_path = "highflyers/cn-3/book-2/unit-3/assignment-1"
@@ -227,12 +233,13 @@ class BusinessData:
     '''
     build random content path by generator,default size is 4
     '''
+
     @staticmethod
-    def gen_all_programs_content_path(level, num = 4):
-        i= 0
+    def gen_all_programs_content_path(level, num=4):
+        i = 0
         while i < num:
             content_path = CommonUtils.randomContentPath(level)
             i = i + 1
             yield content_path
 
-    expected_content_type = [1,64,128,512,1024]
+    expected_content_type = [1, 64, 128, 512, 1024]

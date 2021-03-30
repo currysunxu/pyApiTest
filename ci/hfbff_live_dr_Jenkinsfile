@@ -19,7 +19,7 @@ pipeline {
   
   parameters {
         
-        choice(name:'environment',choices:['LIVE'],description:'')
+        choice(name:'environment',choices:['LIVE_Daily_Run'],description:'')
     }
    
   stages {
@@ -34,12 +34,6 @@ pipeline {
       steps {
 
           script {
-          case_tag = "${params.environment}".toLowerCase()
-          if (case_tag == 'stg_sg') {
-              case_tag = 'stg'
-          } else if (case_tag == 'live_sg')
-              case_tag = 'live'
-           
           sh "ptest3  -t E1_API_Automation.Test.HighFlyerV35.Hf35BffTest -i live_dr"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
