@@ -53,3 +53,7 @@ class ContentRepoService:
 	def get_latest_activities(self, content_id_list):
 		api_url = "/api/v1/activities/latest"
 		return self.mou_tai.post(api_url, content_id_list)
+
+	def get_asset_group(self, remediation_response):
+		api_url = "/api/v1/asset-groups"
+		return self.mou_tai.post(api_url, remediation_response)

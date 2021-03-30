@@ -1,4 +1,6 @@
 from enum import Enum
+from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
+
 
 class BffProduct(Enum):
     HFV35 = 'HFV35'
@@ -21,7 +23,8 @@ class BffUsers:
         },
         'Staging': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'},{'username': 'll.test', 'password': 'efef@123'}],
+            BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'},
+                                     {'username': 'll.test', 'password': 'efef@123'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.SSV3.value: [{'username': 'ss3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
@@ -29,7 +32,8 @@ class BffUsers:
         },
         'Live': {
             # Todo need to do data refactor once Staging is ready
-            BffProduct.HFV35.value: [{'username': 'cs.test', 'password': '12345', 'userid': 101630985},{'username': 'cc.test', 'password': '12345'}],
+            BffProduct.HFV35.value: [{'username': 'cs.test', 'password': '12345', 'userid': 101630985},
+                                     {'username': 'cc.test', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
             BffProduct.HFV2.value: [{'username': 'hf2.cn.01', 'password': '12345'}]
@@ -194,10 +198,11 @@ class BffSQLString:
     }
 
     get_count_completed_study_plan_by_student_id_content_path_sql = {
-        'QA': "SELECT count(*) FROM study_plan_qa.study_plan WHERE student_id = '{0}'and ref_content_path = '{1}' AND complete_at IS NOT NULL",
-        'Staging': "SELECT count(*) FROM study_plan_stg.study_plan WHERE student_id = '{0}'and ref_content_path = '{1}' AND complete_at IS NOT NULL",
+        'QA': "SELECT count(*) FROM study_plan_qa.study_plan WHERE student_id = '{0}'and ref_content_path like '{1}%' AND complete_at IS NOT NULL",
+        'Staging': "SELECT count(*) FROM study_plan_stg.study_plan WHERE student_id = '{0}'and ref_content_path like '{1}%' AND complete_at IS NOT NULL",
         'Live': ""
     }
+
 
 class SalesforceData:
     reservation_id = {
@@ -206,9 +211,35 @@ class SalesforceData:
         'Live': "a0G2x000005ImLBEA0"
     }
 
+
 class OspData:
     pt_key = {
         'QA': "AC696E51-ABC7-4854-A700-331435B4DCAF",
         'Staging': "66a0291e-b96f-453a-bd2c-14c56d808b5e",
         'Live': "b14dc44b-cd31-41ff-a9f6-4269541d5503"
     }
+
+    test_id = {
+        'QA': "CC9C905E-AE12-4E3A-B82D-921D27D3ED84",
+        'Staging': "CC9C905E-AE12-4E3A-B82D-921D27D3ED84",
+        'Live': "1E85C033-37C9-4061-AFCC-77366AAA20EE"
+    }
+
+
+class BusinessData:
+    unit_content_path = "highflyers/cn-3/book-2/unit-3"
+    lesson_content_path = "highflyers/cn-3/book-2/unit-3/assignment-1"
+
+    '''
+    build random content path by generator,default size is 4
+    '''
+
+    @staticmethod
+    def gen_all_programs_content_path(level, num=4):
+        i = 0
+        while i < num:
+            content_path = CommonUtils.randomContentPath(level)
+            i = i + 1
+            yield content_path
+
+    expected_content_type = [1, 64, 128, 512, 1024]

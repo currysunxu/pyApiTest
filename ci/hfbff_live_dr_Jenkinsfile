@@ -16,15 +16,9 @@ pipeline {
   triggers {
     cron('H 03 * * *')
   }
-
-  parameters {
-        choice(name:'environment',choices:['STG','LIVE'],description:'')
-        text(name: 'agora_fe_version', defaultValue: '0.3.7-6f68f8c', description: '')
-        text(name: 'fm_fe_version', defaultValue: '0.1.39-bfed4c1', description: '')
-    }
-
+   
   stages {
-
+    
     stage('Verify') {
       agent {
         docker {
@@ -33,22 +27,19 @@ pipeline {
         }
       }
       steps {
-      script {
-          case_tag = "${params.environment}".toLowerCase()
-          if (case_tag == 'stg_sg') {
-              case_tag = 'stg'
-          } else if (case_tag == 'live_sg')
-              case_tag = 'live'
 
-          sh "ptest3  -t E1_API_Automation.Test.EVC -i ${case_tag}"
+          script {
+          sh "ptest3  -t E1_API_Automation.Test.HighFlyerV35.Hf35BffTest -i live_dr"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
 
-          }
-          }
+          
+        }
+      }
     }
 
+    
   }
     post {
         failure {
@@ -126,5 +117,5 @@ pipeline {
 </html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', from: 'svc.e1jenkins@ef.cn',to: 'E1PDQA@ef.cn'
             }
     }
-
+  
 }

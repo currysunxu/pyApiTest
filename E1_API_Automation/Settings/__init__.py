@@ -144,6 +144,11 @@ class Auth2Environment(object):
     STAGING = "https://internal-ktsvc-stg.english1.cn"
     LIVE = "https://internal-ktsvc.english1.cn"
 
+class RemediationEnvironment(object):
+    QA = "https://internal-ktsvc-qa.english1.cn/remediation"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/remediation"
+    LIVE = "https://internal-ktsvc.english1.cn/remediation"
+
 class EVCProxyEnvironment:
     STAGING = {
         "CN": "evc-ts-staging.ef.com.cn",
@@ -183,6 +188,7 @@ if os.environ['environment'] == 'QA':
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
     STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.QA
     AUTH2_ENVIRONMENT = Auth2Environment.QA
+    REMEDIATION_ENVIRONMENT = RemediationEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "cnsqlqa.english1.cn,1433",
@@ -231,6 +237,8 @@ elif os.environ['environment'] == 'STG':
     EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.STAGING
     EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.STAGING
     AUTH2_ENVIRONMENT = Auth2Environment.STAGING
+    REMEDIATION_ENVIRONMENT = RemediationEnvironment.STAGING
+
     env_key = 'Staging'
     DATABASE = {
         "Server": "cnsqlstg.english1.cn,1433",
@@ -265,7 +273,7 @@ elif os.environ['environment'] == 'STG_SG':
     }
 
 
-elif os.environ['environment'] == 'LIVE':
+elif os.environ['environment'] == 'LIVE' or os.environ['environment'] == 'LIVE_DR':
     ENVIRONMENT = Environment.LIVE
     KSD_ENVIRONMENT = KSDEnvironment.LIVE
     OSP_ENVIRONMENT = OSPEnvironment.LIVE
@@ -290,6 +298,8 @@ elif os.environ['environment'] == 'LIVE':
     EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.LIVE
     EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.LIVE
     AUTH2_ENVIRONMENT = Auth2Environment.LIVE
+    REMEDIATION_ENVIRONMENT = RemediationEnvironment.LIVE
+
     env_key = 'Live'
     DATABASE = {
         "Server": "",
