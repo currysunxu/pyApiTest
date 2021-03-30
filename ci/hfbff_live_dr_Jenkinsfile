@@ -119,7 +119,7 @@ pipeline {
         </tr>
     </table>
 </body>
-</html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', from: 'svc.e1jenkins@ef.cn',to: 'curry.sun@ef.cn','connie.liu.rr@ef.cn,'eileen.chen@ef.cn'
+</html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', from: 'svc.e1jenkins@ef.cn',to: 'E1PDQA@ef.cn'
             }
     }
   
