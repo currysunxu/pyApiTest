@@ -7,13 +7,11 @@ import json_tools
 from hamcrest import assert_that, equal_to, not_none
 from ptest.decorator import TestClass, Test
 
-from E1_API_Automation.Business.HighFlyer35.Hf35BffWordAttemptEntity import Hf35BffWordAttemptEntity
 from E1_API_Automation.Business.HighFlyer35.HF35BffReaderAttemptEntity import Hf35BffReaderAttemptEntity
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import OnlineScope
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
-from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroupService
 from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
@@ -24,6 +22,7 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum impor
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningResultProduct, \
     LearningResultProductModule
 from E1_API_Automation.Business.ProvisioningService import ProvisioningService
+from E1_API_Automation.Business.RemediationService import RemediationService
 from E1_API_Automation.Business.UpsPrivacyService import UpsPrivacyService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
@@ -32,13 +31,14 @@ from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
 from E1_API_Automation.Lib.HamcrestExister import Exist
-from E1_API_Automation.Test_Data.BffData import SalesforceData,OspData
+from E1_API_Automation.Test_Data.BffData import SalesforceData,OspData,BusinessData
+from E1_API_Automation.Test_Data.RemediationData import *
 
 
 @TestClass()
 class Hf35BffTest(HfBffTestBase):
 
-    @Test(tags="qa, stg, live")
+    @Test(tags="qa, stg, live, live_dr")
     def test_bff_auth_login_valid_username(self):
         product_keys = BffUsers.BffUserPw[env_key].keys()
         for key in product_keys:
@@ -66,7 +66,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(response.status_code, equal_to(401))
 
     # only HFV2, HFV3Plus user can call bff apis successfully, other users can't call bff apis, will return 401
-    @Test(tags="qa, stg, live")
+    @Test(tags="qa, stg, live, live_dr")
     def test_auth2_authorization(self):
         product_keys = BffUsers.BffUserPw[env_key].keys()
         for key in product_keys:
@@ -114,7 +114,7 @@ class Hf35BffTest(HfBffTestBase):
         self.setter_learning_result_details(learning_details_entity, bff_data_obj)
         self.check_bff_compare_learning_result(result_response, learning_result_entity, learning_details_entity)
 
-    @Test(tags="qa, stg, live", data_provider=[(1, 1), (4, 2)])
+    @Test(tags="qa, stg, live, live_dr", data_provider=[(1, 1), (4, 2)])
     def test_submit_best_attempt(self, activity_num, detail_num):
         bff_data_obj = Hf35BffCommonData(activity_num, detail_num)
         submit_response = self.bff_service.submit_new_attempt(bff_data_obj.get_attempt_body())
@@ -146,7 +146,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(homework_best_score, equal_to(bff_best_score))
         assert_that(best_submit_response.json(), equal_to(homework_best_attempt_response.json()))
 
-    @Test(tags="qa, stg, live", data_provider=[("HIGH_FLYERS_35", "1")])
+    @Test(tags="qa, stg, live, live_dr", data_provider=[("HIGH_FLYERS_35", "1")])
     def test_get_course_structure(self, course, scheme_version):
         bff_course_response = self.bff_service.get_course_structure()
         assert_that(bff_course_response.status_code, equal_to(200))
@@ -381,15 +381,15 @@ class Hf35BffTest(HfBffTestBase):
         diff_list = json_tools.diff(response.json()['ocContext'], expected_oc_context)
         assert_that(len(diff_list), equal_to(0))
 
-    @Test(tags="qa, stg, live", data_provider=[1, 2])
+    @Test(tags="qa, stg, live, live_dr", data_provider=[1, 2])
     def test_bootstrap_controller_ios_platform(self, version):
         self.test_bootstrap_controller_by_platform('ios', version)
 
-    @Test(tags="qa, stg, live", data_provider=[1, 2])
+    @Test(tags="qa, stg, live, live_dr", data_provider=[1, 2])
     def test_bootstrap_controller_android_platform(self, version):
         self.test_bootstrap_controller_by_platform('android', version)
 
-    @Test(tags="qa, stg, live")
+    @Test(tags="qa, stg, live, live_dr")
     def test_get_unlock_progress(self):
         current_book = self.get_current_book_content_id_from_bootstrap()
         bff_unlock_response = self.bff_service.get_unlock_progress_controller(current_book)
@@ -785,7 +785,7 @@ class Hf35BffTest(HfBffTestBase):
             path = content_path.json()[0]
             refProps = path['refProps']
             student_id, product_module = path['studentId'], path['productModule']
-            content_map = self.cm_service.get_content_map(study_plan_path).json()
+            content_map = self.cm_service.get_content_map_course_node(study_plan_path).json()
             study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(student_id, product_module, study_plan_path)
             assert_that(path['refId'], equal_to(study_plan['ref_id']))
             assert_that(path['effectAt'], equal_to(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S.000Z")))
@@ -805,7 +805,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_content_path_unit(self):
-        test_path = "highflyers/cn-3/book-2/unit-3"
+        test_path = BusinessData.unit_content_path
         study_plan_entity = StudyPlanEntity(None, None, None)
         self.setter_study_plan_entity(study_plan_entity, test_path, 1)
         study_plan_path = study_plan_entity.ref_content_path
@@ -833,7 +833,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_content_state(self):
-        test_path = "highflyers/cn-3/book-2/unit-1/assignment-1"
+        test_path = BusinessData.lesson_content_path
         study_plan_entity = StudyPlanEntity(None, None, None)
         self.setter_study_plan_entity(study_plan_entity, test_path, 0)
         self.sp_service.put_study_plan_test_entity(study_plan_entity)
@@ -855,9 +855,9 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags="qa, stg,live", data_provider=["unit", "lesson"])
     def test_content_path_rewards(self, level):
         if level == 'unit':
-            test_path = "highflyers/cn-3/book-2/unit-6"
+            test_path = BusinessData.unit_content_path
         else:
-            test_path = "highflyers/cn-3/book-2/unit-6/assignment-%s" % (random.randint(1, 10))
+            test_path = BusinessData.lesson_content_path
         total_rewards = self.bff_service.get_rewards_by_content_path(test_path)
         customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
         assert_that(total_rewards.status_code, equal_to(200))
@@ -871,22 +871,29 @@ class Hf35BffTest(HfBffTestBase):
         total_rewards = self.bff_service.get_rewards_by_content_path("")
         assert_that(total_rewards.status_code, equal_to(400))
 
-    @Test(tags="qa,stg,live")
-    def test_student_context(self):
+    @Test(tags="qa,stg,live,live_dr",data_provider=BffUsers.BffUserPw[env_key].keys())
+    def test_student_context(self,key):
+        self.user_name = BffUsers.BffUserPw[env_key][key][0]['username']
+        self.password = BffUsers.BffUserPw[env_key][key][0]['password']
+        self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+        # all type users can login successfully
+        response = self.bff_service.login(self.user_name, self.password)
+        assert_that(response.status_code, equal_to(200))
         user_context_response = self.bff_service.get_student_context()
         assert_that(user_context_response.status_code, equal_to(200))
         core_course_group_response = self.course_group_service.get_core_current_group(self.customer_id)
-        if user_context_response.json()['isOnlineOnly'] is True:
-            assert_that(user_context_response.json()['currentBook'], equal_to(None))
-            assert_that(user_context_response.json()['availableBooks'], equal_to([]))
-            assert_that(user_context_response.json()['isOnlineOnly'], equal_to(True))
-        else:
-            # get content path from acl
-            content_path_for_book = core_course_group_response.json()['contentPath']
-            # 1.current book will set the first available book without unlock , which covered in mega-bff integration test
-            # 2.current book will set the current unlock book from available book , which covered in mega-bff integration test
-            assert_that(user_context_response.json()['currentBook'], equal_to(content_path_for_book))
+        if core_course_group_response.text != '':
+            core_content_path = core_course_group_response.json()['contentPath']
+            expected_current_book = core_content_path if core_content_path is not None else 'unsupported/book'
+            assert_that(user_context_response.json()['currentBook'], equal_to(expected_current_book))
             assert_that(user_context_response.json()['availableBooks'], not_none())
+            if user_context_response.json()['availableBooks'] is None or user_context_response.json()['currentBook'] == 'unsupported/book':
+                assert_that(user_context_response.json()['isOnlineOnly'], equal_to(True))
+            else:
+                assert_that(user_context_response.json()['isOnlineOnly'], equal_to(False))
+        else:
+            assert_that(user_context_response.json()['currentBook'], equal_to(None))
+            assert_that(user_context_response.json()['isOnlineOnly'], equal_to(True))
 
     @Test(tags="qa,stg,live", data_provider=["EVC", "NOT_EVC", "NULL_BODY"])
     def test_online_class_enter(self, online_platform):
@@ -919,7 +926,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(online_id.json(), Exist("onlineEntry"))
             assert_that(online_id.json()['classroomStatus'], equal_to("CLOSED_FOR_ENDED"))
 
-    @Test(tags="qa,stg,live")
+    @Test(tags="qa,stg,live,live_dr")
     def test_pt_deep_link_enter(self):
         ptKey = OspData.pt_key[env_key]
         pt_enter = self.bff_service.post_pt_deep_link_enter(ptKey)
@@ -935,5 +942,58 @@ class Hf35BffTest(HfBffTestBase):
         pt_enter = self.bff_service.post_mt_enter()
         assert_that(pt_enter.status_code, equal_to(200))
         assert_that(pt_enter.json(), match_to("entrylink"))
+
+    @Test(tags="qa,stg,live")
+    def test_get_remediation_by_test_id(self):
+        test_id = OspData.test_id[env_key]
+        test_instance_key = uuid.uuid4()
+        bff_remediation_response = self.bff_service.get_remediation_by_pt_key_and_instance_key(test_instance_key, test_id)
+        assert_that(bff_remediation_response.status_code, equal_to(200))
+        if not EnvUtils.is_env_qa():
+            remediation = RemediationService(REMEDIATION_ENVIRONMENT)
+            activity_obj = remediation.get_remediation_activity(self.customer_id,test_instance_key,test_id)
+            assert_that(bff_remediation_response.json()['activityGroups'][0], equal_to(activity_obj.json()))
+            # assetGroups is empty array because of random instance_key
+            # remediation api get empty activity by random instance_key
+            # content repo asset group api will return [] by empty activity
+            assert_that(bff_remediation_response.json()['assetGroups'], equal_to([]))
+
+    @Test(tags="qa,stg,live")
+    def test_submit_best_remediation(self):
+        test_id = OspData.test_id[env_key]
+        test_instance_key = str(uuid.uuid1())
+        bff_remediation_response = self.submit_remediation_best_attempts(test_id, test_instance_key,0,3)
+        assert_that(bff_remediation_response.status_code, equal_to(200))
+        if not EnvUtils.is_env_qa():
+            self.verify_bff_best_attempts(test_instance_key)
+            #submit higher score
+            bff_remediation_response = self.submit_remediation_best_attempts(test_id, test_instance_key,3,10)
+            assert_that(bff_remediation_response.status_code, equal_to(200))
+            self.verify_bff_best_attempts(test_instance_key)
+
+    @Test(tags="qa, stg, live", data_provider=BusinessData.gen_all_programs_content_path("unit"))
+    def test_get_book_structure_v3_unit_level(self, content_path):
+        bff_book_response_v3 = self.bff_service.get_book_structure_v3(content_path)
+        content_type = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentType")
+        contentIndex = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentIndex")
+        childCount = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "childCount")
+        expected_contentIndex = self.get_data_from_content_map_course_node(content_path, "contentIndex")
+        expected_childCount = self.get_data_from_content_map_course_node(content_path, "childCount")
+        assert_that(bff_book_response_v3.status_code, equal_to(200))
+        assert_that(set(content_type) <= set(BusinessData.expected_content_type),"book structure content type {0} unexpected".format(content_type))
+        assert_that(contentIndex, equal_to(expected_contentIndex))
+        assert_that(childCount, equal_to(expected_childCount))
+
+    @Test(tags="qa, stg, live", data_provider=BusinessData.gen_all_programs_content_path("assignment"))
+    def test_get_book_structure_v3_assignment_level(self, content_path):
+        bff_book_response_v3 = self.bff_service.get_book_structure_v3(content_path)
+        content_type = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentType")
+        contentIndex = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentIndex")
+        expected_contentIndex = self.get_data_from_content_map_course_node(content_path, "contentIndex")
+        assert_that(bff_book_response_v3.status_code, equal_to(200))
+        assert_that(set(content_type) <= set(BusinessData.expected_content_type),"book structure content type {0} unexpected".format(content_type))
+        assert_that(contentIndex, equal_to(expected_contentIndex))
+
+
 
 
