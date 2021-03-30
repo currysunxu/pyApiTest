@@ -198,8 +198,8 @@ class BffSQLString:
     }
 
     get_count_completed_study_plan_by_student_id_content_path_sql = {
-        'QA': "SELECT count(*) FROM study_plan_qa.study_plan WHERE student_id = '{0}'and ref_content_path = '{1}' AND complete_at IS NOT NULL",
-        'Staging': "SELECT count(*) FROM study_plan_stg.study_plan WHERE student_id = '{0}'and ref_content_path = '{1}' AND complete_at IS NOT NULL",
+        'QA': "SELECT count(*) FROM study_plan_qa.study_plan WHERE student_id = '{0}'and ref_content_path like '{1}%' AND complete_at IS NOT NULL",
+        'Staging': "SELECT count(*) FROM study_plan_stg.study_plan WHERE student_id = '{0}'and ref_content_path like '{1}%' AND complete_at IS NOT NULL",
         'Live': ""
     }
 
