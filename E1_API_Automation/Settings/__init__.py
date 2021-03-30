@@ -185,7 +185,7 @@ if os.environ['environment'] == 'QA':
     AUTH2_ENVIRONMENT = Auth2Environment.QA
     env_key = 'QA'
     DATABASE = {
-        "Server": "10.163.24.105,1433",
+        "Server": "cnsqlqa.english1.cn,1433",
         "User": "SchoolUser",
         "Password": "#Bugsfor$!"
     }
@@ -233,7 +233,7 @@ elif os.environ['environment'] == 'STG':
     AUTH2_ENVIRONMENT = Auth2Environment.STAGING
     env_key = 'Staging'
     DATABASE = {
-        "Server": "10.163.24.124,1434",
+        "Server": "cnsqlstg.english1.cn,1433",
         "User": "TBV3",
         "Password": "#Bugsfor$"
     }
@@ -259,7 +259,7 @@ elif os.environ['environment'] == 'STG_SG':
     E1TPI_ENVIRONMENT = E1TPIEnvironment.STAGING_SG
     env_key = 'Staging_SG'
     DATABASE = {
-        "Server": "SGE1STGDB01.e1ef.com,1434",
+        "Server": "sgsqlstg.english1.com,1433",
         "User": "TBV3",
         "Password": "#Bugsfor$"
     }
