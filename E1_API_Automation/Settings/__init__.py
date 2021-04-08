@@ -149,6 +149,11 @@ class RemediationEnvironment(object):
     STAGING = "https://internal-ktsvc-stg.english1.cn/remediation"
     LIVE = "https://internal-ktsvc.english1.cn/remediation"
 
+class VocabEnvironment(object):
+    QA = "https://internal-vocab-qa.english1.cn"
+    STAGING = "https://internal-vocab-stg.english1.cn"
+    LIVE = "https://internal-vocab.english1.cn"
+
 class EVCProxyEnvironment:
     STAGING = {
         "CN": "evc-ts-staging.ef.com.cn",
@@ -189,6 +194,7 @@ if os.environ['environment'] == 'QA':
     STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.QA
     AUTH2_ENVIRONMENT = Auth2Environment.QA
     REMEDIATION_ENVIRONMENT = RemediationEnvironment.QA
+    VOCAB_ENVIRONMENT = VocabEnvironment.QA
     env_key = 'QA'
     DATABASE = {
         "Server": "10.163.24.105,1433",
@@ -238,6 +244,7 @@ elif os.environ['environment'] == 'STG':
     EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.STAGING
     AUTH2_ENVIRONMENT = Auth2Environment.STAGING
     REMEDIATION_ENVIRONMENT = RemediationEnvironment.STAGING
+    VOCAB_ENVIRONMENT = VocabEnvironment.STAGING
 
     env_key = 'Staging'
     DATABASE = {
@@ -299,6 +306,7 @@ elif os.environ['environment'] == 'LIVE' or os.environ['environment'] == 'LIVE_D
     EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.LIVE
     AUTH2_ENVIRONMENT = Auth2Environment.LIVE
     REMEDIATION_ENVIRONMENT = RemediationEnvironment.LIVE
+    VOCAB_ENVIRONMENT = VocabEnvironment.LIVE
 
     env_key = 'Live'
     DATABASE = {

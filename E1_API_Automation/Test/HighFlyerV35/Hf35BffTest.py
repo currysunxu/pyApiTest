@@ -12,7 +12,7 @@ from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.HF35BffEnum import On
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
-from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
+from E1_API_Automation.Business.NGPlatform.VocabService import VocabService
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.StudyPlanEntity import StudyPlanEntity
@@ -675,9 +675,9 @@ class Hf35BffTest(HfBffTestBase):
         vocab_progress_response = self.bff_service.get_vocab_progress(book_content_id)
         assert_that(vocab_progress_response.status_code, equal_to(200))
 
-        # check with homework service
-        homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
-        homework_vocab_progress_response = homework_service.get_vocab_progress(self.customer_id, book_content_id)
+        # check with vocab service
+        vocab_service = VocabService(VOCAB_ENVIRONMENT)
+        homework_vocab_progress_response = vocab_service.get_vocab_progress(self.customer_id, book_content_id)
         assert_that(homework_vocab_progress_response.status_code, equal_to(200))
         assert_that(vocab_progress_response.json(), equal_to(homework_vocab_progress_response.json()))
 
@@ -973,7 +973,8 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live", data_provider=BusinessData.gen_all_programs_content_path("unit"))
     def test_get_book_structure_v3_unit_level(self, content_path):
-        bff_book_response_v3 = self.bff_service.get_book_structure_v3(content_path)
+        book_content_path = content_path[:Hf35BffUtils.last_index_of(content_path,'/')-1]
+        bff_book_response_v3 = self.bff_service.get_book_structure_v3(book_content_path)
         content_type = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentType")
         contentIndex = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentIndex")
         childCount = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "childCount")
