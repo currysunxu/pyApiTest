@@ -360,3 +360,7 @@ class HfBffTestBase:
         bff_best_attempts = self.bff_service.get_best_remediation_attempts(test_instance_key)
         assert_that(bff_best_attempts.status_code, equal_to(200))
         assert_that(bff_best_attempts.json()[0], equal_to(best_attempts.json()[0]))
+
+    def get_specific_data_from_course_node(self, content_path, field):
+        content_map_course_node = self.cm_service.get_content_map_course_node(content_path)
+        return content_map_course_node.json()[field]

@@ -4,7 +4,7 @@ import uuid
 
 import jmespath
 import json_tools
-from hamcrest import assert_that, equal_to, not_none
+from hamcrest import assert_that, equal_to, not_none, contains_string
 from ptest.decorator import TestClass, Test
 
 from E1_API_Automation.Business.HighFlyer35.HF35BffReaderAttemptEntity import Hf35BffReaderAttemptEntity
@@ -13,6 +13,7 @@ from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData imp
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.VocabService import VocabService
+from E1_API_Automation.Business.NGPlatform.HomeworkService import HomeworkService
 from E1_API_Automation.Business.NGPlatform.LearningResultDetailEntity import LearningResultDetailEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.StudyPlanEntity import StudyPlanEntity
@@ -604,6 +605,8 @@ class Hf35BffTest(HfBffTestBase):
     def test_submit_vocab_progress(self, word_attempt_num):
         book_content_id = str(uuid.uuid1())
         word_attempt_list = Hf35BffUtils.construct_vocab_progress_list(book_content_id, word_attempt_num)
+        word_attempt_list.context_lesson_content_id = self.get_specific_data_from_course_node(word_attempt_list.context_content_path, 'contentId')
+        word_attempt_list.context_tree_revision = self.get_specific_data_from_course_node(word_attempt_list.context_content_path, 'treeRevision')
         # submit vocab progress
         submit_response = self.bff_service.post_vocab_progress(word_attempt_list)
         assert_that(submit_response.status_code, equal_to(200))
@@ -667,6 +670,9 @@ class Hf35BffTest(HfBffTestBase):
     def test_get_vocab_progress(self):
         book_content_id = str(uuid.uuid1())
         word_attempt_list = Hf35BffUtils.construct_vocab_progress_list(book_content_id, 3)
+        word_attempt_list.context_lesson_content_id = self.get_specific_data_from_course_node(word_attempt_list.context_content_path, 'contentId')
+        word_attempt_list.context_tree_revision = self.get_specific_data_from_course_node(word_attempt_list.context_content_path, 'treeRevision')
+
         # submit vocab progress
         vocab_submit_response = self.bff_service.post_vocab_progress(word_attempt_list)
         assert_that(vocab_submit_response.status_code, equal_to(200))
@@ -805,7 +811,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_content_path_unit(self):
-        test_path = BusinessData.unit_content_path
+        test_path = BusinessData.UNIT_CONTENT_PATH
         study_plan_entity = StudyPlanEntity(None, None, None)
         self.setter_study_plan_entity(study_plan_entity, test_path, 1)
         study_plan_path = study_plan_entity.ref_content_path
@@ -833,7 +839,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live")
     def test_content_state(self):
-        test_path = BusinessData.lesson_content_path
+        test_path = BusinessData.LESSON_CONTENT_PATH
         study_plan_entity = StudyPlanEntity(None, None, None)
         self.setter_study_plan_entity(study_plan_entity, test_path, 0)
         self.sp_service.put_study_plan_test_entity(study_plan_entity)
@@ -855,9 +861,9 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags="qa, stg,live", data_provider=["unit", "lesson"])
     def test_content_path_rewards(self, level):
         if level == 'unit':
-            test_path = BusinessData.unit_content_path
+            test_path = BusinessData.UNIT_CONTENT_PATH
         else:
-            test_path = BusinessData.lesson_content_path
+            test_path = BusinessData.LESSON_CONTENT_PATH
         total_rewards = self.bff_service.get_rewards_by_content_path(test_path)
         customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
         assert_that(total_rewards.status_code, equal_to(200))
@@ -948,8 +954,14 @@ class Hf35BffTest(HfBffTestBase):
         test_id = OspData.test_id[env_key]
         test_instance_key = uuid.uuid4()
         bff_remediation_response = self.bff_service.get_remediation_by_pt_key_and_instance_key(test_instance_key, test_id)
-        assert_that(bff_remediation_response.status_code, equal_to(200))
         if not EnvUtils.is_env_qa():
+            #TODO add live tesgt account for remediation
+            self.user_name = BffUsers.BffUserPw[env_key][self.key][2]['username']
+            self.password = BffUsers.BffUserPw[env_key][self.key][2]['password']
+            self.bff_service.login(self.user_name, self.password)
+            bff_remediation_response = self.bff_service.get_remediation_by_pt_key_and_instance_key(test_instance_key,
+                                                                                                   test_id)
+            assert_that(bff_remediation_response.status_code, equal_to(200))
             remediation = RemediationService(REMEDIATION_ENVIRONMENT)
             activity_obj = remediation.get_remediation_activity(self.customer_id,test_instance_key,test_id)
             assert_that(bff_remediation_response.json()['activityGroups'][0], equal_to(activity_obj.json()))
@@ -957,6 +969,9 @@ class Hf35BffTest(HfBffTestBase):
             # remediation api get empty activity by random instance_key
             # content repo asset group api will return [] by empty activity
             assert_that(bff_remediation_response.json()['assetGroups'], equal_to([]))
+        else:
+            assert_that(bff_remediation_response.status_code, equal_to(400), "QA env does not have mid final test key")
+            assert_that(bff_remediation_response.json()['message'], contains_string("400 Bad Request from"))
 
     @Test(tags="qa,stg,live")
     def test_submit_best_remediation(self):
@@ -973,7 +988,7 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa, stg, live", data_provider=BusinessData.gen_all_programs_content_path("unit"))
     def test_get_book_structure_v3_unit_level(self, content_path):
-        book_content_path = content_path[:Hf35BffUtils.last_index_of(content_path,'/')-1]
+        book_content_path = content_path[:CommonUtils.last_index_of(content_path,'/')-1]
         bff_book_response_v3 = self.bff_service.get_book_structure_v3(book_content_path)
         content_type = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentType")
         contentIndex = self.get_check_field_from_content_obj_by_content_path(bff_book_response_v3.json(), content_path, "contentIndex")
@@ -981,7 +996,8 @@ class Hf35BffTest(HfBffTestBase):
         expected_contentIndex = self.get_data_from_content_map_course_node(content_path, "contentIndex")
         expected_childCount = self.get_data_from_content_map_course_node(content_path, "childCount")
         assert_that(bff_book_response_v3.status_code, equal_to(200))
-        assert_that(set(content_type) <= set(BusinessData.expected_content_type),"book structure content type {0} unexpected".format(content_type))
+        assert_that(set(content_type) <= set(BusinessData.expected_content_type),
+                    "book structure content type {0} unexpected and content path is {1}".format(content_type,content_path))
         assert_that(contentIndex, equal_to(expected_contentIndex))
         assert_that(childCount, equal_to(expected_childCount))
 
@@ -995,6 +1011,17 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(set(content_type) <= set(BusinessData.expected_content_type),"book structure content type {0} unexpected".format(content_type))
         assert_that(contentIndex, equal_to(expected_contentIndex))
 
-
+    @Test(tags="qa, stg, live", data_provider=[BusinessData.BOOK_CONTENT_PATH_FLASHCARD])
+    def test_get_flashcard_content_group(self, content_path):
+        book_content_id = self.get_specific_data_from_course_node(content_path, 'contentId')
+        book_content_revision = self.get_specific_data_from_course_node(content_path, 'contentRevision')
+        book_schema_version = self.get_specific_data_from_course_node(content_path, 'schemaVersion')
+        bff_flashcard_response = self.bff_service.get_flashcard_content_group(book_content_id, book_content_revision, book_schema_version)
+        assert_that(bff_flashcard_response.status_code, equal_to(200))
+        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_eca_group_flashcard = content_repo_service.get_content_groups_by_param("FLASHCARD", "ECA_GROUP", book_content_id, book_content_revision, book_schema_version)
+        content_repo_asset_group_flashcard = content_repo_service.get_content_groups_by_param("FLASHCARD", "ASSET_GROUP", book_content_id, book_content_revision, book_schema_version)
+        assert_that(bff_flashcard_response.json()['ecaGroups'][0], equal_to(content_repo_eca_group_flashcard.json()[0]))
+        assert_that(bff_flashcard_response.json()['assetGroups'][0], equal_to(content_repo_asset_group_flashcard.json()[0]))
 
 

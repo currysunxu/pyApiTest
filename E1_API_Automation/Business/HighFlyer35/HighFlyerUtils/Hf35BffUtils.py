@@ -118,16 +118,6 @@ class Hf35BffUtils:
         return bff_dict_new
 
     @staticmethod
-    def last_index_of(my_list, my_value):
-        """
-        get last index of specific value
-        :param mylist:
-        :param myvalue:
-        :return: last index of myvalue
-        """
-        return len(my_list) - my_list[::-1].index(my_value)
-
-    @staticmethod
     def modify_dict_keys(previous_dict):
         """
         remove prefix of classname cause by python builtin __dict__
@@ -137,7 +127,7 @@ class Hf35BffUtils:
         """
         new_dict = previous_dict.copy()
         for item_key in previous_dict.keys():
-            field_name = item_key[Hf35BffUtils.last_index_of(item_key, "__"):]
+            field_name = item_key[CommonUtils.last_index_of(item_key, "__"):]
             field_name = Hf35BffUtils.underline_to_hump(field_name)
             new_dict.update({field_name: new_dict.pop(item_key)})
         return new_dict
@@ -316,9 +306,9 @@ class Hf35BffUtils:
     def construct_vocab_progress_list(book_content_id, item_num=1):
         random_date_time = time.strftime("%Y-%m-%dT%H:%M:%S.%jZ", time.localtime())
         word_attempt_entity = Hf35BffWordAttemptEntity()
-        context_content_paths = ["highflyers/cn-3/book-7/unit-", "tb16/cn-3/book-1/unit-"]
+        context_content_paths = ["highflyers/cn-3/book-7/unit-{0}/assignment-{1}", "tb16/cn-3/book-1/unit-{0}/assignment-{1}"]
         random_path = random.choice(context_content_paths)
-        word_attempt_entity.context_content_path = random_path + str((random.randint(1, 3)))
+        word_attempt_entity.context_content_path = random_path.format(str(random.randint(1, 3)), str(random.randint(1, 3)))
         word_attempt_entity.context_lesson_content_id = str(uuid.uuid1())
         word_attempt_entity.context_tree_revision = "TreeRevision%s" % (random.randint(1, 10))
         word_attempt_entity.start_time = random_date_time
