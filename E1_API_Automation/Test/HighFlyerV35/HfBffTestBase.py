@@ -232,8 +232,12 @@ class HfBffTestBase:
 
     def get_check_field_from_content_obj_by_content_path(self, content_object, content_path, check_field) -> object:
         # ..children match assignment level, .children match unit level
-        expression = '$..children[?(@.contentPath=="{0}")]' if "assignment" in content_path else '$.children[?(@.contentPath=="{0}")]'
-        dict_obj = jsonpath.jsonpath(content_object,expression.format(content_path))[0]
+        try:
+            expression = '$..children[?(@.contentPath=="{0}")]' if "assignment" in content_path else '$.children[?(@.contentPath=="{0}")]'
+            dict_obj = jsonpath.jsonpath(content_object,expression.format(content_path))[0]
+        except Exception as e:
+            print(str(e))
+            print(content_path)
         return dict_obj[check_field]
 
     def find_current_book(self, response):
@@ -356,3 +360,7 @@ class HfBffTestBase:
         bff_best_attempts = self.bff_service.get_best_remediation_attempts(test_instance_key)
         assert_that(bff_best_attempts.status_code, equal_to(200))
         assert_that(bff_best_attempts.json()[0], equal_to(best_attempts.json()[0]))
+
+    def get_specific_data_from_course_node(self, content_path, field):
+        content_map_course_node = self.cm_service.get_content_map_course_node(content_path)
+        return content_map_course_node.json()[field]

@@ -1,3 +1,4 @@
+import random
 from enum import Enum
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 
@@ -24,7 +25,8 @@ class BffUsers:
         'Staging': {
             # Todo need to do data refactor once Staging is ready
             BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'},
-                                     {'username': 'll.test', 'password': 'efef@123'}],
+                                     {'username': 'll.test', 'password': 'efef@123'},
+                                     {'username': 'hfcontent', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.SSV3.value: [{'username': 'ss3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
@@ -227,8 +229,9 @@ class OspData:
 
 
 class BusinessData:
-    unit_content_path = "highflyers/cn-3/book-2/unit-3"
-    lesson_content_path = "highflyers/cn-3/book-2/unit-3/assignment-1"
+    BOOK_CONTENT_PATH_FLASHCARD = "smallstar/cn-3/book-{0}".format(str(random.randint(1, 5)))
+    UNIT_CONTENT_PATH = "highflyers/cn-3/book-2/unit-3"
+    LESSON_CONTENT_PATH = "highflyers/cn-3/book-2/unit-3/assignment-1"
 
     '''
     build random content path by generator,default size is 4
@@ -242,4 +245,4 @@ class BusinessData:
             i = i + 1
             yield content_path
 
-    expected_content_type = [1, 64, 128, 512, 1024]
+    expected_content_type = [1, 16, 64, 128, 512, 1024]

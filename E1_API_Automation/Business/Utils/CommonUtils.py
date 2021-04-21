@@ -63,6 +63,16 @@ class CommonUtils:
     def randomFloatToString(startIndex, endIndex) -> str:
         return format(random.uniform(startIndex, endIndex), '.2f')
 
+    @staticmethod
+    def last_index_of(my_list, my_value):
+        """
+        get last index of specific value
+        :param mylist:
+        :param myvalue:
+        :return: last index of myvalue
+        """
+        return len(my_list) - my_list[::-1].index(my_value)
+
     '''
     randomly generate content path by programs and regions
     default level is unit
@@ -78,6 +88,7 @@ class CommonUtils:
         else:
             unit_content_path = "{0}/{1}/book-{2}/unit-{3}".format(programs[0], regions[1],
                                                                    random.randint(1, 4), random.randint(1, 5))
-        content_path = unit_content_path if level == 'unit' else unit_content_path + "/assignment-{0}".format(
+        book_content_path = unit_content_path[:CommonUtils.last_index_of(unit_content_path, '/')-1]
+        content_path = book_content_path if level == 'book' else unit_content_path if level == 'unit' else unit_content_path + "/assignment-{0}".format(
             random.randint(1, 4))
         return content_path
