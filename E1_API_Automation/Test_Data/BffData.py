@@ -245,4 +245,4 @@ class BusinessData:
             i = i + 1
             yield content_path
 
-    expected_content_type = [1, 16, 64, 128, 512, 1024]
+    expected_content_type = [1, 16, 64, 128, 512, 1024, 8192]
