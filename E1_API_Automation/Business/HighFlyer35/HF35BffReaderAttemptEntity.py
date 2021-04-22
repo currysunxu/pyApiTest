@@ -10,6 +10,7 @@ class Hf35BffReaderAttemptEntity:
         self.__need_check_upgrade = None
         self.__progress = None
         self.__practice = None
+        self.__details = None
 
     @property
     def relevant_content_id(self):
@@ -90,3 +91,11 @@ class Hf35BffReaderAttemptEntity:
     @need_check_upgrade.setter
     def need_check_upgrade(self, need_check_upgrade):
         self.__need_check_upgrade = need_check_upgrade
+
+    @property
+    def details(self):
+        return self.__details
+
+    @details.setter
+    def details(self, details):
+        self.__details = details

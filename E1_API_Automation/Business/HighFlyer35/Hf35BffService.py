@@ -9,10 +9,6 @@ from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 import jmespath
 
 
-
-
-
-
 class Hf35BffService:
     def __init__(self, host):
         self.host = host
@@ -202,11 +198,15 @@ class Hf35BffService:
         encoded_content_path = CommonUtils.encode_url_content_path(content_path)
         return self.mou_tai.get("/mega/api/v2/books/{0}/structure".format(encoded_content_path))
 
+    def get_book_structure_v3(self, content_path):
+        encoded_content_path = CommonUtils.encode_url_content_path(content_path)
+        return self.mou_tai.get("/mega/api/v3/books/{0}/structure".format(encoded_content_path))
+
     def get_student_context(self):
         return self.mou_tai.get("/mega/api/v1/student/context")
 
     # hardcode reservationId and sessionId from staging env
-    def post_class_online_enter(self,onlinePlatform):
+    def post_class_online_enter(self, onlinePlatform):
         body = {
             "onlinePlatform": onlinePlatform,
             "reservationId": "a0G1s000001W3OMEA0",
@@ -217,6 +217,36 @@ class Hf35BffService:
             body = {}
         return self.mou_tai.post(api_url, body)
 
-    def get_online_class_id(self , reservation_id):
+    def get_online_class_id(self, reservation_id):
         return self.mou_tai.get("/mega/api/v1/classes/online/{0}".format(reservation_id))
 
+    def post_pt_deep_link_enter(self, ptKey):
+        self.mou_tai.headers['x-ef-token'] = self.id_token
+        body = {
+            "testContentId": ptKey
+        }
+        api_url = "/mega/api/v1/progress-test/enter"
+        return self.mou_tai.post(api_url, body)
+
+    def post_mt_enter(self):
+        body = {}
+        api_url = "/mega/api/v1/mock-test/enter"
+        return self.mou_tai.post(api_url, body)
+
+    def get_remediation_by_pt_key_and_instance_key(self, pt_instance_key, pt_key):
+        api_url = "/mega/api/v1/remediation/content-groups?testInstanceId={0}&testId={1}".format(pt_instance_key,
+                                                                                                 pt_key)
+        return self.mou_tai.get(api_url)
+
+    def post_best_remediation_attempts(self, attempts):
+        api_url = "/mega/api/v1/remediation/attempts"
+        return self.mou_tai.post(api_url, attempts)
+
+    def get_best_remediation_attempts(self, pt_instance_key):
+        api_url = "/mega/api/v1/remediation/attempts/best?testInstanceId={0}".format(pt_instance_key)
+        return self.mou_tai.get(api_url)
+
+    def get_flashcard_content_group(self, book_content_id, book_content_revision, schema_version):
+        api_url = "/mega/api/v1/flashcard/content-groups?bookContentId={0}&bookContentRevision={1}&bookSchemaVersion={2}".format(
+            book_content_id, book_content_revision, schema_version)
+        return self.mou_tai.get(api_url)

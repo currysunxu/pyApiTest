@@ -59,47 +59,66 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
+    def get_reader_cover_thumbnail(cover_image_file_name, cover_thumbnail_resolution):
+        indicator = cover_image_file_name.find('/f/')
+        cover_thumbnail_file_name = '{0}/{1}/{2}'.format(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST,
+                                                         cover_thumbnail_resolution,
+                                                         cover_image_file_name[indicator + 1:])
+        cover_thumbnail_dict = {}
+        cover_thumbnail_dict['filename'] = cover_thumbnail_file_name
+        cover_thumbnail_dict['fieldtype'] = 'asset'
+        return cover_thumbnail_dict
+
+    @staticmethod
     def verify_storyblok_story_with_contentrepo(storyblok_story, content_repo_content, release_type=None):
         error_message = []
         print('start verify storyblok story:' + storyblok_story['name'])
 
         component = ''
         latest_activity_list = None
+        expected_metadata = {}
         if release_type == StoryblokReleaseProgram.MOCKTEST:
+            expected_metadata['domainType'] = 'MT'
             component = storyblok_story['content']['component']
-            if content_repo_content['domainType'] != 'MT':
-                error_message.append('MockTest question\'s domainType in content-repo not equal to MT')
-                return error_message
-
-            # if component is 'mt_activity', then expected value is question, otherwise, it's PAPER
-            expected_entity_type = 'question'
             if component == 'paper':
-                expected_entity_type = 'PAPER'
+                expected_metadata['entityType'] = 'PAPER'
                 # for paper, the activity will be converted to latest activity in content-repo
                 content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
                 paper_activity_id_list = jmespath.search("content.parts[].sections[].activities[].activity",
                                                          storyblok_story)
                 latest_activity_list = content_repo_service.get_latest_activities(paper_activity_id_list).json()
-
-            if content_repo_content['entityType'] != expected_entity_type:
-                error_message.append(
-                    'MockTest story\'s entityType in content-repo not equal to {0}'.format(expected_entity_type))
-                return error_message
+            else:
+                expected_metadata['entityType'] = 'ACTIVITY'
         elif release_type == StoryblokReleaseProgram.READERS:
+            expected_metadata['domainType'] = 'READER'
+            expected_metadata['entityType'] = 'ECA'
+
             #if it's reader release, there will be a cover_thumbnail field added if reader's cover_image have value
             storyblok_content = storyblok_story['content']
             if 'cover_image' in storyblok_content.keys():
                 cover_image_dict = storyblok_content['cover_image']
                 if 'filename' in cover_image_dict.keys() and len(cover_image_dict['filename']) != 0:
                     cover_image_file_name = cover_image_dict['filename']
-                    indicator = cover_image_file_name.find('/f/')
-                    cover_thumbnail_file_name = '{0}/{1}/{2}'.format(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST,
-                                                                     StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION,
-                                                                     cover_image_file_name[indicator+1:])
-                    cover_thumbnail_dict = {}
-                    cover_thumbnail_dict['filename'] = cover_thumbnail_file_name
-                    cover_thumbnail_dict['fieldtype'] = 'asset'
-                    storyblok_content['cover_thumbnail'] = cover_thumbnail_dict
+
+                    cover_thumbnail_dict_1 = StoryBlokUtils.get_reader_cover_thumbnail(cover_image_file_name, StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION_1)
+                    cover_thumbnail_dict_2 = StoryBlokUtils.get_reader_cover_thumbnail(cover_image_file_name,
+                                                                                       StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION_2)
+                    cover_thumbnail_dict_3 = StoryBlokUtils.get_reader_cover_thumbnail(cover_image_file_name,
+                                                                                       StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION_3)
+                    storyblok_content['cover_thumbnail'] = cover_thumbnail_dict_1
+                    storyblok_content['cover_thumbnail2'] = cover_thumbnail_dict_2
+                    storyblok_content['cover_thumbnail3'] = cover_thumbnail_dict_3
+        elif release_type == StoryblokReleaseProgram.VOCABULARIES:
+            expected_metadata['domainType'] = 'VOCAB'
+            expected_metadata['entityType'] = 'ECA'
+
+        diff_list = json_tools.diff(json.dumps(content_repo_content['metadata']), json.dumps(expected_metadata))
+        # if str(content_repo_content['metadata']) != str(expected_metadata):
+        if len(diff_list) != 0:
+            error_message.append(
+                '{0} story\'s metadata in content-repo not equal as expected {1}'.format(content_repo_content['contentId'],
+                                                                                         str(expected_metadata)))
+            return error_message
 
         content_repo_content_data = content_repo_content['data']
         # content repo source field should be storyblok
@@ -377,9 +396,11 @@ class StoryBlokUtils:
 
             # if storyblok file name starts with https://storyblok-image.ef.com.cn/unsafe, the asset is for cover_thumbnail
             if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
+                thumbnail_resolution_start_index = len(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST) + 1
+                thumbnail_resolution_end_index = storyblok_file_name.find('/', thumbnail_resolution_start_index)
+                thumbnail_resolution = storyblok_file_name[thumbnail_resolution_start_index:thumbnail_resolution_end_index]
                 suffix_index = asset_name.rfind('.')
-                asset_name = asset_name[:suffix_index] + '_' + StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION \
-                             + asset_name[suffix_index:]
+                asset_name = asset_name[:suffix_index] + '_' + thumbnail_resolution + asset_name[suffix_index:]
 
             # url in content repo is different from storyblok, the asset will be uploaded to aws s3
             expected_asset_name_in_content = '{0}_{1}'.format(expected_sha1, asset_name)
@@ -398,7 +419,7 @@ class StoryBlokUtils:
                                                                                 expected_url))
 
             if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
-                expected_sha1 = '{0}_{1}'.format(expected_sha1, StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION)
+                expected_sha1 = '{0}_{1}'.format(expected_sha1, thumbnail_resolution)
 
             compare_key = 'sha1'
             error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
@@ -427,8 +448,11 @@ class StoryBlokUtils:
             if is_asset_image:
                 # thumbnail have fixed width and height
                 if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
-                    expected_width_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_WIDTH
-                    expected_height_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HEIGHT
+                    # expected_width_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_WIDTH_221
+                    # expected_height_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HEIGHT
+                    indicator = thumbnail_resolution.find('x')
+                    expected_width_value = thumbnail_resolution[:indicator]
+                    expected_height_value = thumbnail_resolution[indicator+1:]
                 else:
                     image_size_end_index = sha1_start_index
                     image_size_start_index = expected_url.rfind('/', 0, image_size_end_index)
@@ -581,6 +605,16 @@ class StoryBlokUtils:
                 expected_content_group_childref['type'] = "Reader"
                 expected_reader_metadata['title'] = latest_eca['data']['content']['title']
                 expected_reader_metadata['cover_image'] = latest_eca['data']['content']['cover_thumbnail']
+                if 'cover_thumbnail2' in latest_eca['data']['content'].keys():
+                    expected_reader_metadata['cover_image2'] = latest_eca['data']['content']['cover_thumbnail2']
+                else:
+                    expected_reader_metadata['cover_image2'] = None
+
+                if 'cover_thumbnail3' in latest_eca['data']['content'].keys():
+                    expected_reader_metadata['cover_image3'] = latest_eca['data']['content']['cover_thumbnail3']
+                else:
+                    expected_reader_metadata['cover_image3'] = None
+
                 expected_reader_metadata['reader_provider'] = latest_eca['data']['content']['reader_provider']
             expected_content_group_childref['metadata'] = expected_reader_metadata
 

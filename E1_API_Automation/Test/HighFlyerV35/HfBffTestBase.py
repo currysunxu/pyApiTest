@@ -2,6 +2,7 @@ import datetime
 import time
 import random
 import jmespath
+import jsonpath
 from hamcrest import assert_that, equal_to
 import uuid
 
@@ -13,14 +14,16 @@ from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentM
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import LearningResultProduct, \
     LearningResultProductModule
+from E1_API_Automation.Business.NGPlatform.CourseGroupService import CourseGroupService
 from E1_API_Automation.Business.OMNIService import OMNIService
+from E1_API_Automation.Business.RemediationService import RemediationService
+from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 from E1_API_Automation.Settings import *
 from ptest.decorator import BeforeMethod
 
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
-
-
-
+from E1_API_Automation.Business.AuthService import Auth2Service
+from E1_API_Automation.Test_Data.RemediationData import RemediationData
 
 
 class HfBffTestBase:
@@ -35,6 +38,10 @@ class HfBffTestBase:
         self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
         self.bff_service.login(self.user_name, self.password)
         self.omni_service = OMNIService(OMNI_ENVIRONMENT)
+        self.auth2_service = Auth2Service(AUTH2_ENVIRONMENT, self.bff_service.mou_tai.headers['EF-Access-Token'])
+        self.course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
+
+
         try:
             self.customer_id = BffUsers.BffUserPw[env_key][self.key][0]['userid']
         except:
@@ -192,6 +199,11 @@ class HfBffTestBase:
         self.__setter_content_map_entity(content_map_entity, json_body_dict)
         return content_map_service.post_content_map_query_tree(content_map_entity)
 
+    def get_data_from_content_map_course_node(self, content_path, check_field) -> object:
+        content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+        course_node_response = content_map_service.get_content_map_course_node(content_path)
+        return course_node_response.json()[check_field]
+
     def __setter_content_map_entity(self, content_map_entity, json_body_dict):
         content_map_entity.child_types = json_body_dict["childTypes"]
         content_map_entity.content_id = json_body_dict["contentId"]
@@ -207,10 +219,32 @@ class HfBffTestBase:
                 break
         return content_body
 
-    def get_current_book_from_bootstrap(self):
-        response = self.bff_service.get_bootstrap_controller(platform='ios')
-        current_book = jmespath.search('userContext.currentBook', response.json())
-        return current_book
+    def get_current_book_content_path_from_bootstrap(self):
+        response = self.bff_service.get_student_context()
+        finder_current_book = self.find_current_book(response)
+        return finder_current_book
+
+    def get_current_book_content_id_from_bootstrap(self):
+        response = self.bff_service.get_student_context()
+        finder_current_book = self.find_current_book(response)
+        current_book_content_id = jmespath.search("availableBooks[?contentPath=='{0}'].contentId".format(finder_current_book), response.json())[0]
+        return current_book_content_id
+
+    def get_check_field_from_content_obj_by_content_path(self, content_object, content_path, check_field) -> object:
+        # ..children match assignment level, .children match unit level
+        try:
+            expression = '$..children[?(@.contentPath=="{0}")]' if "assignment" in content_path else '$.children[?(@.contentPath=="{0}")]'
+            dict_obj = jsonpath.jsonpath(content_object,expression.format(content_path))[0]
+        except Exception as e:
+            print(str(e))
+            print(content_path)
+        return dict_obj[check_field]
+
+    def find_current_book(self, response):
+        current_book = jmespath.search('currentBook', response.json())
+        availableBooks = jmespath.search('availableBooks', response.json())
+        finder_current_book = current_book if current_book != 'unsupported/book' else availableBooks[-1]['contentPath']
+        return finder_current_book
 
     def get_tree_revision_from_course_structure(self):
         response = self.bff_service.get_course_structure()
@@ -218,17 +252,14 @@ class HfBffTestBase:
         return tree_revision
 
     def get_reader_default_level_from_course_structure(self):
-        current_book = self.get_current_book_from_bootstrap()
-        course_structure = self.bff_service.get_course_structure()
+        current_book = self.get_current_book_content_path_from_bootstrap()
+        course_structure = self.bff_service.get_book_structure_v2(current_book)
         course_structure_json = course_structure.json()
         index = 0
         while 1:
-            content_id_path = 'children[%s].contentId' % index
-            default_level_path = 'children[%s].default_reader_level' % index
-
-            book_content_id = jmespath.search(content_id_path, course_structure_json)
-            if book_content_id == current_book:
-                default_level_id = jmespath.search(default_level_path, course_structure_json)
+            book_content_path = jmespath.search("contentPath", course_structure_json)
+            if book_content_path == current_book:
+                default_level_id = jmespath.search("default_reader_level", course_structure_json)
                 break
             index += 1
         return default_level_id
@@ -299,3 +330,37 @@ class HfBffTestBase:
                 study_plan_entity.complete_at = None
             else:
                 study_plan_entity.complete_at = self.get_random_date(int(time.mktime(time.strptime(study_plan_entity.start_at,"%Y-%m-%dT%H:%M:%S.%jZ"))))
+
+    def get_content_path_from_acl(self,acl_response):
+        # get core and activated program
+        core_and_activated_program = jsonpath.jsonpath(acl_response.json(), "$.[?(@.type == 'CORE' && @.activated == True)].program")[0]
+        levels = jsonpath.jsonpath(acl_response.json(), "$.[?(@.program == '{}')].levels".format(core_and_activated_program))
+        expect_levels = []
+        for level in levels[0]:
+            if not level['isSwapped'] and level['state'] == "INPROGRESS" and 'contentPath' in level:
+                expect_levels.append(level)
+        # if all completed status ,get content path by original levels
+        # else get the biggest level by inprogress status
+        if len(expect_levels) == 0:
+            content_path = levels[0][len(levels[0]) - 1]["contentPath"]
+        elif len(expect_levels) >= 0:
+            content_path = expect_levels[len(expect_levels)-1]["contentPath"]
+
+        return content_path
+
+    def submit_remediation_best_attempts(self, test_id, test_instance_key,start,end):
+        actual_score = CommonUtils.randomFloatToString(start, end)
+        remediation_body = RemediationData.build_remediation_activities(test_instance_key, test_id, actual_score)
+        bff_remediation_response = self.bff_service.post_best_remediation_attempts(remediation_body)
+        return bff_remediation_response
+
+    def verify_bff_best_attempts(self, test_instance_key):
+        remediation = RemediationService(REMEDIATION_ENVIRONMENT)
+        best_attempts = remediation.get_best_remediation_attempts(self.customer_id, test_instance_key)
+        bff_best_attempts = self.bff_service.get_best_remediation_attempts(test_instance_key)
+        assert_that(bff_best_attempts.status_code, equal_to(200))
+        assert_that(bff_best_attempts.json()[0], equal_to(best_attempts.json()[0]))
+
+    def get_specific_data_from_course_node(self, content_path, field):
+        content_map_course_node = self.cm_service.get_content_map_course_node(content_path)
+        return content_map_course_node.json()[field]

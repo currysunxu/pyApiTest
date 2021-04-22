@@ -2,16 +2,16 @@ import os
 
 
 class Environment(object):
-    QA = "https://e1svc-qa.bj-englishtown.com"
-    STAGING = "https://e1svc-stg.bj-englishtown.com"
+    QA = "https://e1svc-qa.english1.cn"
+    STAGING = "https://e1svc-stg.english1.cn"
     LIVE = "https://e1svc.ef.cn"
     STAGING_SG = "https://e1svc-stg.english1.com"
     LIVE_SG = "https://e1svc.ef.com"
 
 
 class KSDEnvironment(object):
-    QA = "https://study-qa.bj-englishtown.com"
-    STAGING = "https://study-stg.bj-englishtown.com"
+    QA = "https://study-qa.english1.cn"
+    STAGING = "https://study-stg.english1.cn"
     LIVE = "https://study.ef.cn"
     STAGING_SG = "https://study-stg.english1.com"
     LIVE_SG = "https://study.ef.com"
@@ -34,8 +34,8 @@ class TPIEnvironment(object):
 
 
 class AuthEnvironment(object):
-    QA = "https://auth-svc-qa.bj-englishtown.com"
-    STAGING = "https://auth-svc-stg.bj-englishtown.com"
+    QA = "https://auth-svc-qa.english1.cn"
+    STAGING = "https://auth-svc-stg.english1.cn"
     STAGING_SG = "https://auth-svc-stg.english1.com"
     LIVE = "https://auth-svc.ef.cn"
     LIVE_SG = "https://auth-svc.ef.com"
@@ -56,10 +56,9 @@ class LearningResultEnvironment(object):
 
 
 class BffEnvironment(object):
-    QA = "https://ktsvc-qa.bj-englishtown.com"
-    STAGING = "https://ktsvc-stg.bj-englishtown.com"
+    QA = "https://ktsvc-qa.english1.cn"
+    STAGING = "https://ktsvc-stg.english1.cn"
     LIVE = "https://ktsvc.ef.cn"
-
 
 class HomeworkEnvironment(object):
     QA = "https://internal-ktsvc-qa.english1.cn/practice"
@@ -92,8 +91,8 @@ class ContentBuilderEnvironment(object):
 
 
 class MockTestEnvironment(object):
-    QA = "https://ktsvc-qa.bj-englishtown.com/mseb"
-    STAGING = "https://ktsvc-stg.bj-englishtown.com/mseb"
+    QA = "https://ktsvc-qa.english1.cn/mseb"
+    STAGING = "https://ktsvc-stg.english1.cn/mseb"
     LIVE = "https://ktsvc.ef.cn/mseb"
 
 
@@ -109,7 +108,7 @@ class StoryblokImportEnvironment(object):
 
 
 class E1TPIEnvironment(object):
-    STAGING = "https://e1tpi-stg.bj-englishtown.com"
+    STAGING = "https://e1tpi-stg.english1.cn"
     STAGING_SG = "https://e1tpi-stg.english1.com"
     LIVE = "https://e1tpi.ef.cn"
     LIVE_SG = "https://e1tpi.ef.com"
@@ -140,6 +139,20 @@ class EVCDemoPageEnvironment(object):
     STAGING = "https://evc-ts-staging.ef.com.cn"
     LIVE = "https://evc-ts.ef.com.cn/"
 
+class Auth2Environment(object):
+    QA = "https://internal-ktsvc-qa.english1.cn"
+    STAGING = "https://internal-ktsvc-stg.english1.cn"
+    LIVE = "https://internal-ktsvc.english1.cn"
+
+class RemediationEnvironment(object):
+    QA = "https://internal-ktsvc-qa.english1.cn/remediation"
+    STAGING = "https://internal-ktsvc-stg.english1.cn/remediation"
+    LIVE = "https://internal-ktsvc.english1.cn/remediation"
+
+class VocabEnvironment(object):
+    QA = "https://internal-vocab-qa.english1.cn"
+    STAGING = "https://internal-vocab-stg.english1.cn"
+    LIVE = "https://internal-vocab.english1.cn"
 
 class EVCProxyEnvironment:
     STAGING = {
@@ -179,9 +192,12 @@ if os.environ['environment'] == 'QA':
     MOCK_TEST_ENVIRONMENT = MockTestEnvironment.QA
     STORYBLOK_RELEASE_ENVIRONMENT = StoryblokReleaseEnvironment.QA
     STORYBLOK_IMPORT_ENVIRONMENT = StoryblokImportEnvironment.QA
+    AUTH2_ENVIRONMENT = Auth2Environment.QA
+    REMEDIATION_ENVIRONMENT = RemediationEnvironment.QA
+    VOCAB_ENVIRONMENT = VocabEnvironment.QA
     env_key = 'QA'
     DATABASE = {
-        "Server": "10.163.24.105,1433",
+        "Server": "cnsqlqa.english1.cn,1433",
         "User": "SchoolUser",
         "Password": "#Bugsfor$!"
     }
@@ -226,9 +242,13 @@ elif os.environ['environment'] == 'STG':
     EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.STAGING
     EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.STAGING
     EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.STAGING
+    AUTH2_ENVIRONMENT = Auth2Environment.STAGING
+    REMEDIATION_ENVIRONMENT = RemediationEnvironment.STAGING
+    VOCAB_ENVIRONMENT = VocabEnvironment.STAGING
+
     env_key = 'Staging'
     DATABASE = {
-        "Server": "10.163.24.124,1434",
+        "Server": "cnsqlstg.english1.cn,1433",
         "User": "TBV3",
         "Password": "#Bugsfor$"
     }
@@ -254,13 +274,13 @@ elif os.environ['environment'] == 'STG_SG':
     E1TPI_ENVIRONMENT = E1TPIEnvironment.STAGING_SG
     env_key = 'Staging_SG'
     DATABASE = {
-        "Server": "SGE1STGDB01.e1ef.com,1434",
+        "Server": "sgsqlstg.english1.com,1433",
         "User": "TBV3",
         "Password": "#Bugsfor$"
     }
 
 
-elif os.environ['environment'] == 'LIVE':
+elif os.environ['environment'] == 'LIVE' or os.environ['environment'] == 'LIVE_DR':
     ENVIRONMENT = Environment.LIVE
     KSD_ENVIRONMENT = KSDEnvironment.LIVE
     OSP_ENVIRONMENT = OSPEnvironment.LIVE
@@ -284,6 +304,10 @@ elif os.environ['environment'] == 'LIVE':
     EVC_CDN_ENVIRONMENT = EVCCDNEnvironment.LIVE
     EVC_DEMO_PAGE_ENVIRONMENT = EVCDemoPageEnvironment.LIVE
     EVC_PROXY_ENVIRONMENT = EVCProxyEnvironment.LIVE
+    AUTH2_ENVIRONMENT = Auth2Environment.LIVE
+    REMEDIATION_ENVIRONMENT = RemediationEnvironment.LIVE
+    VOCAB_ENVIRONMENT = VocabEnvironment.LIVE
+
     env_key = 'Live'
     DATABASE = {
         "Server": "",
