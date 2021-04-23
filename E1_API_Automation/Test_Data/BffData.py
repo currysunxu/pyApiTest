@@ -25,8 +25,8 @@ class BffUsers:
         'Staging': {
             # Todo need to do data refactor once Staging is ready
             BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'},
-                                     {'username': 'll.test', 'password': 'efef@123'},
-                                     {'username': 'hfcontent', 'password': '12345'}],
+                                     {'username': 'hfcontent', 'password': '12345'},
+                                     {'username': 'll.test', 'password': 'efef@123'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.SSV3.value: [{'username': 'ss3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
@@ -35,7 +35,8 @@ class BffUsers:
         'Live': {
             # Todo need to do data refactor once Staging is ready
             BffProduct.HFV35.value: [{'username': 'cs.test', 'password': '12345', 'userid': 101630985},
-                                     {'username': 'cc.test', 'password': '12345'}],
+                                     {'username': 'cc.test', 'password': '12345'},
+                                     {'username': 'w.test', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
             BffProduct.HFV2.value: [{'username': 'hf2.cn.01', 'password': '12345'}]
@@ -203,14 +204,6 @@ class BffSQLString:
         'QA': "SELECT count(*) FROM study_plan_qa.study_plan WHERE student_id = '{0}'and ref_content_path like '{1}%' AND complete_at IS NOT NULL",
         'Staging': "SELECT count(*) FROM study_plan_stg.study_plan WHERE student_id = '{0}'and ref_content_path like '{1}%' AND complete_at IS NOT NULL",
         'Live': ""
-    }
-
-
-class SalesforceData:
-    reservation_id = {
-        'QA': "",
-        'Staging': "a0G1s000001XDIEEA4",
-        'Live': "a0G2x000005ImLBEA0"
     }
 
 

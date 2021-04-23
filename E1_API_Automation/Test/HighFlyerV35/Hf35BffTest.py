@@ -1,6 +1,4 @@
-import random
 import time
-import uuid
 
 import jmespath
 import json_tools
@@ -32,7 +30,7 @@ from E1_API_Automation.Settings import *
 from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
 from E1_API_Automation.Lib.HamcrestExister import Exist
-from E1_API_Automation.Test_Data.BffData import SalesforceData,OspData,BusinessData
+from E1_API_Automation.Test_Data.BffData import OspData,BusinessData
 from E1_API_Automation.Test_Data.RemediationData import *
 
 
@@ -745,7 +743,7 @@ class Hf35BffTest(HfBffTestBase):
     def test_get_reader_progress_by_level(self):
         default_level_id = self.get_reader_default_level_from_course_structure()
         level_focused_response = self.bff_service.get_reader_level_focused(self.customer_id, default_level_id)
-        assert_that(level_focused_response.status_code, equal_to(200))
+        assert_that(level_focused_response.status_code, equal_to(200), "{0} default level miss in content repo side".format(default_level_id))
         level_focused_json = level_focused_response.json()
 
         # go through all the levels in the response to get progress
@@ -903,7 +901,12 @@ class Hf35BffTest(HfBffTestBase):
 
     @Test(tags="qa,stg,live", data_provider=["EVC", "NOT_EVC", "NULL_BODY"])
     def test_online_class_enter(self, online_platform):
-        online_enter = self.bff_service.post_class_online_enter(online_platform)
+        self.user_name = BffUsers.BffUserPw[env_key][self.key][2]['username']
+        self.password = BffUsers.BffUserPw[env_key][self.key][2]['password']
+        self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+        omni_response = self.omni_service.get_pl_session(self.customer_id)
+        the_latest_session = omni_response.json()[len(omni_response.json())-1]
+        online_enter = self.bff_service.post_class_online_enter(online_platform, the_latest_session['reservationId'], the_latest_session['sessionId'])
         assert_that(online_enter.status_code, equal_to(200))
         if online_platform is "EVC":
             assert_that(online_enter.json(), Exist("mediaToken"))
@@ -918,10 +921,13 @@ class Hf35BffTest(HfBffTestBase):
     @Test(tags="stg,live")
     def test_get_online_class_id(self):
         if not EnvUtils.is_env_qa():
-            self.user_name = BffUsers.BffUserPw[env_key][self.key][1]['username']
-            self.password = BffUsers.BffUserPw[env_key][self.key][1]['password']
+            self.user_name = BffUsers.BffUserPw[env_key][self.key][2]['username']
+            self.password = BffUsers.BffUserPw[env_key][self.key][2]['password']
             self.bff_service.login(self.user_name, self.password)
-            reservation_id = SalesforceData.reservation_id[env_key]
+            self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
+            omni_response = self.omni_service.get_pl_session(self.customer_id)
+            the_latest_session = omni_response.json()[len(omni_response.json()) - 1]
+            reservation_id = the_latest_session['reservationId']
             online_id = self.bff_service.get_online_class_id(reservation_id)
             assert_that(online_id.status_code, equal_to(200))
             assert_that(online_id.json(), Exist("reservationId"))
@@ -956,19 +962,20 @@ class Hf35BffTest(HfBffTestBase):
         bff_remediation_response = self.bff_service.get_remediation_by_pt_key_and_instance_key(test_instance_key, test_id)
         if not EnvUtils.is_env_qa():
             #TODO add live tesgt account for remediation
-            self.user_name = BffUsers.BffUserPw[env_key][self.key][2]['username']
-            self.password = BffUsers.BffUserPw[env_key][self.key][2]['password']
+            self.user_name = BffUsers.BffUserPw[env_key][self.key][1]['username']
+            self.password = BffUsers.BffUserPw[env_key][self.key][1]['password']
+            self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
             self.bff_service.login(self.user_name, self.password)
             bff_remediation_response = self.bff_service.get_remediation_by_pt_key_and_instance_key(test_instance_key,
                                                                                                    test_id)
             assert_that(bff_remediation_response.status_code, equal_to(200))
             remediation = RemediationService(REMEDIATION_ENVIRONMENT)
-            activity_obj = remediation.get_remediation_activity(self.customer_id,test_instance_key,test_id)
+            activity_obj = remediation.get_remediation_activity(self.customer_id, test_instance_key, test_id)
             assert_that(bff_remediation_response.json()['activityGroups'][0], equal_to(activity_obj.json()))
             # assetGroups is empty array because of random instance_key
             # remediation api get empty activity by random instance_key
             # content repo asset group api will return [] by empty activity
-            assert_that(bff_remediation_response.json()['assetGroups'], equal_to([]))
+            assert_that(bff_remediation_response.json()['assetGroups'][0]['groupType'], equal_to("ASSET_GROUP"))
         else:
             assert_that(bff_remediation_response.status_code, equal_to(400), "QA env does not have mid final test key")
             assert_that(bff_remediation_response.json()['message'], contains_string("400 Bad Request from"))
