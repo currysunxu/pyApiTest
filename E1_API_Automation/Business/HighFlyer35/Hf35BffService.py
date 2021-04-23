@@ -206,11 +206,11 @@ class Hf35BffService:
         return self.mou_tai.get("/mega/api/v1/student/context")
 
     # hardcode reservationId and sessionId from staging env
-    def post_class_online_enter(self, onlinePlatform):
+    def post_class_online_enter(self, onlinePlatform, reservation_id, session_id):
         body = {
             "onlinePlatform": onlinePlatform,
-            "reservationId": "a0G1s000001W3OMEA0",
-            "sessionId": 120974039
+            "reservationId": reservation_id,
+            "sessionId": session_id
         }
         api_url = "/mega/api/v1/classes/online/enter"
         if onlinePlatform is "NULL_BODY":
