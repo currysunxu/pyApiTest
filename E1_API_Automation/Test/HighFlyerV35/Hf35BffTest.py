@@ -130,8 +130,8 @@ class Hf35BffTest(HfBffTestBase):
         bff_best_score = sum(
             Hf35BffCommonData.get_value_by_json_path(best_submit_response.json()[0], "$.activities..score"))
         expected_score = sum(Hf35BffCommonData.get_value_by_json_path(bff_data_obj.attempt_json, "$..score"))
-        assert_that(bff_best_total_score, equal_to(expected_total_score))
-        assert_that(bff_best_score, equal_to(expected_score))
+        assert_that(format(bff_best_total_score, '.2f'), equal_to(format(expected_total_score, '.2f')))
+        assert_that(format(bff_best_score, '.2f'), equal_to(format(expected_score, '.2f')))
 
         # check homework service best attempt
         homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
