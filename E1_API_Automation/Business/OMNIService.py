@@ -26,6 +26,16 @@ class OMNIService:
     def get_customer_groups(self, customer_id):
         return self.mou_tai.get("/api/v1/customer/{0}/groups".format(customer_id))
 
+    def get_pl_session(self, customer_id):
+        payload = {
+            "url": "/services/apexrest/osd/v1/group/sessions",
+            "http_method": "POST",
+            "body": {
+                "studentId": customer_id
+            }
+        }
+        return self.mou_tai.post("/api/v1/sf/restapi", payload)
+
 
 class CourseGroupInfo:
     def __init__(self, course_type_code, group_status, is_current_group, is_default=False):
