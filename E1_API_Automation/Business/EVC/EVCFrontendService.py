@@ -6,8 +6,9 @@ import requests
 from hamcrest import assert_that, equal_to, is_not
 from requests import request
 
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import EVC_DEMO_PAGE_ENVIRONMENT, EVC_PROXY_ENVIRONMENT, \
-    ENVIRONMENT, Environment
+    ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCMeetingRole
 
 
@@ -72,9 +73,9 @@ class EVCFrontendService(object):
         return request_url
 
     def generate_user_access_token(self, url):
-        if ENVIRONMENT is Environment.STAGING:
+        if EnvUtils.is_env_stg():
             access_key = '414d95a5-b338-4356-adac-eacce520b114'
-        elif ENVIRONMENT is Environment.LIVE:
+        elif EnvUtils.is_env_live():
             access_key = "4f6d7f89-3779-42e0-a10d-8ad71aac4d80"
         else:
             raise Exception("Do not support to run this case on {0}".format(ENVIRONMENT))

@@ -143,8 +143,8 @@ class Hf35BffTest(HfBffTestBase):
                                                      "$.activities..totalScore"))
         homework_best_score = sum(
             Hf35BffCommonData.get_value_by_json_path(homework_best_attempt_response.json()[0], "$.activities..score"))
-        assert_that(homework_best_total_score, equal_to(bff_best_total_score))
-        assert_that(homework_best_score, equal_to(bff_best_score))
+        assert_that(format(homework_best_total_score, '.2f'), equal_to(format(bff_best_total_score, '.2f')))
+        assert_that(format(homework_best_score, '.2f'), equal_to(format(bff_best_score, '.2f')))
         assert_that(best_submit_response.json(), equal_to(homework_best_attempt_response.json()))
 
     @Test(tags="qa, stg, live, live_dr", data_provider=[("HIGH_FLYERS_35", "1")])
