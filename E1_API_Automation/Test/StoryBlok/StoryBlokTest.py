@@ -13,7 +13,6 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum impor
 from E1_API_Automation.Business.StoryBlok.StoryBlokReleaseService import StoryBlokReleaseService
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
-from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, CONTENT_MAP_ENVIRONMENT, STORYBLOK_RELEASE_ENVIRONMENT
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData, StoryblokReleaseProgram
 
@@ -81,7 +80,11 @@ class StoryBlokTestCases:
         else:
             published_at_start_date = ''
             published_at_end_date = ''
-        storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
+
+        if release_type == StoryblokReleaseProgram.MOCKTEST:
+            storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'], 'MT')
+        else:
+            storyblok_service = StoryBlokService(StoryBlokData.StoryBlokService['host'])
         page_number = 1
         page_size = 100
         total_count = 0
@@ -147,11 +150,7 @@ class StoryBlokTestCases:
 
     @Test()
     def test_highflyers_release(self):
-        if EnvUtils.is_env_qa():
-            release_type = StoryblokReleaseProgram.HIGHFLYERS_35
-        else:
-            # for staging and live, the storyblok release program haven't been changed, so, still using the old name
-            release_type = StoryblokReleaseProgram.HIGHFLYERS
+        release_type = StoryblokReleaseProgram.HIGHFLYERS_35
 
         self.test_course_release_by_type(release_type)
 
@@ -181,8 +180,12 @@ class StoryBlokTestCases:
         self.test_course_release_by_scope([release_scope], region_achs, release_program)
 
     # test course release by release scope
+    # @Test(data_provider=[
+    #     (['book-1', 'book-2', 'book-3', 'book-4', "book-5", "book-6", "book-7", "book-8"], ['cn-3'], 'Trailblazers30')])
     @Test(data_provider=[
-        (['book-1', 'book-2', 'book-3', 'book-4', "book-5", "book-6", "book-7", "book-8"], ['cn-3'], 'Trailblazers30')])
+        (['book-c', 'book-d', 'book-e', 'book-f', "book-g", "book-h", "book-i", "book-j"], ['cn-3', 'cn-3-144'], 'Highflyers35')])
+    # @Test(data_provider=[
+    #     (['book-1', 'book-2', 'book-3', 'book-4'], ['cn-3'], 'Smallstars30')])
     def test_course_release_by_scope(self, release_scopes, region_achs, release_program):
         course_config_path = StoryBlokData.StoryBlokProgram[release_program]['course-config-path']
         course_source_name = StoryBlokData.StoryBlokProgram[release_program]['source-name']

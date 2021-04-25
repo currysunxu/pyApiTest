@@ -39,7 +39,8 @@ class Hf35KafkaTest():
 
 
     @Test(tags="qa, stg",data_provider = [("highflyers/cn-3/book-2/unit-6/assignment-1","City-Wide Classroom","HFV3Plus"),("highflyers/cn-3/book-2/unit-6/assignment-1","Online Classroom","HFV3Plus"),
-                                          ("smallstar/cn-3/book-2/unit-6/assignment-1","Online Classroom","SSV3"),("tb16/cn-3/book-2/unit-6/assignment-1","Online Classroom","TBV3Plus")])
+                                          ("smallstar/cn-3/book-2/unit-6/assignment-1","Online Classroom","SSV3"),("tb16/cn-3/book-2/unit-6/assignment-1","Online Classroom","TBV3Plus"),
+                                          ("","City-Wide Classroom","KETV1")])
     def test_insert_from_omni_student_sessions_to_student_sessions_study_plan(self,content_path,group_type,product):
         host = KafkaData.BOOTSTRAP_SERVERS[env_key]
         producer = Kafka_producer(host,'OMNI-StudentSession')

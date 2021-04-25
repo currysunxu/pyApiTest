@@ -10,6 +10,9 @@ import uuid
 
 
 class ContentRepoCommonData:
+	DOMAIN_TYPE = "HOMEWORK_TEST"
+	ENTITY_TYPE = "ACTIVITY"
+
 	def __init__(self,number = 3,activity_or_asset = "activity"):
 		self.content_body = self.create_activity_content_body(number)
 		self.ancestor_refs = self.create_ancestor_obj()
@@ -24,6 +27,11 @@ class ContentRepoCommonData:
 		for index in range(number):
 			activity_obj = {
 				"schemaVersion": 1,
+				"metadata": {
+					"domainType": self.DOMAIN_TYPE,
+					"entityType": self.ENTITY_TYPE,
+					"program": None
+				},
 				"contentId": uuid.uuid4().__str__(),
 				"contentRevision": ''.join(random.sample(string.ascii_letters + string.digits, 10)),
 				"url": ''.join(random.sample(string.ascii_letters + string.digits, 10)),
