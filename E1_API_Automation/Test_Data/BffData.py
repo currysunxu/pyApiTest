@@ -222,7 +222,7 @@ class OspData:
 
 
 class BusinessData:
-    BOOK_CONTENT_PATH_FLASHCARD = "smallstar/cn-3/book-{0}".format(str(random.randint(1, 5)))
+    BOOK_CONTENT_PATH_FLASHCARD = "smallstar/cn-3/book-{0}".format(str(random.randint(1, 4)))
     UNIT_CONTENT_PATH = "highflyers/cn-3/book-2/unit-3"
     LESSON_CONTENT_PATH = "highflyers/cn-3/book-2/unit-3/assignment-1"
 
