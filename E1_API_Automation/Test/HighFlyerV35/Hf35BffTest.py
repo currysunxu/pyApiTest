@@ -899,7 +899,7 @@ class Hf35BffTest(HfBffTestBase):
             assert_that(user_context_response.json()['currentBook'], equal_to(None))
             assert_that(user_context_response.json()['isOnlineOnly'], equal_to(True))
 
-    @Test(tags="qa,stg,live", data_provider=["EVC", "NOT_EVC", "NULL_BODY"])
+    @Test(tags="stg,live", data_provider=["EVC", "NOT_EVC", "NULL_BODY"])
     def test_online_class_enter(self, online_platform):
         self.user_name = BffUsers.BffUserPw[env_key][self.key][2]['username']
         self.password = BffUsers.BffUserPw[env_key][self.key][2]['password']
