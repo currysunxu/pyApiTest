@@ -1,9 +1,10 @@
 import string
 import os
-from random import Random
-
 import requests
+
 from hamcrest import assert_that, equal_to, is_not
+from ptest.plogger import preporter
+from random import Random
 from requests import request
 
 from E1_API_Automation.Settings import EVC_DEMO_PAGE_ENVIRONMENT, EVC_PROXY_ENVIRONMENT, \
@@ -36,6 +37,7 @@ class EVCFrontendService(object):
     def request_frontend_js(self, url, proxy_domain):
         headers = self.generate_header(proxy_domain)
         response = requests.get(self.host + url, headers=headers)
+        preporter.info("check front end file: {0}".format(self.host + url))
         assert_that(response.status_code, equal_to(200))
 
         return response
