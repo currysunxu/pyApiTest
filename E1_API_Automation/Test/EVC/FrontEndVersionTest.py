@@ -5,7 +5,7 @@ from ptest.decorator import TestClass, Test, BeforeClass
 from E1_API_Automation.Business.EVC.EVCFrontendService import EVCFrontendService
 from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVC_AGORA_FRONTEND_VERSION, EVCPlatform, EVCLayoutCode, \
-    EVC_FM_FRONTEND_VERSION
+    EVC_FM_FRONTEND_VERSION, EVC_TECH_CHECK_VERSION, EVC_INDO_DEMO_VERSION
 
 
 @TestClass()
@@ -22,7 +22,14 @@ class FrontEndVersionTest:
         # check each file is deployed with correct version
         if len(frontend_file_list) > 0:
             for url in frontend_file_list:
-                url = url.format(EVC_AGORA_FRONTEND_VERSION)
+                if url.find("techcheck") != -1:
+                    version = EVC_TECH_CHECK_VERSION
+                elif url.find("indodemo") != -1:
+                    version = EVC_INDO_DEMO_VERSION
+                else:
+                    version = EVC_AGORA_FRONTEND_VERSION
+
+                url = url.format(version)
                 response = self.evc_frontend_service.request_frontend_js(url, EVC_PROXY_ENVIRONMENT[location])
 
                 assert_that(response.headers["vary"], equal_to("Origin"))
