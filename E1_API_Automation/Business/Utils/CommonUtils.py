@@ -90,5 +90,5 @@ class CommonUtils:
                                                                    random.randint(1, 4), random.randint(1, 5))
         book_content_path = unit_content_path[:CommonUtils.last_index_of(unit_content_path, '/')-1]
         content_path = book_content_path if level == 'book' else unit_content_path if level == 'unit' else unit_content_path + "/assignment-{0}".format(
-            random.randint(1, 4))
+            random.randint(1, 3))
         return content_path

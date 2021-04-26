@@ -35,7 +35,7 @@ class BffUsers:
         'Live': {
             # Todo need to do data refactor once Staging is ready
             BffProduct.HFV35.value: [{'username': 'cs.test', 'password': '12345', 'userid': 101630985},
-                                     {'username': 'cc.test', 'password': '12345'},
+                                     {'username': 'hf2.cn.06', 'password': '12345'},
                                      {'username': 'w.test', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
@@ -83,7 +83,7 @@ class HF35DependService:
             'host': 'https://internal-e1-ups-privacy-stg.ef.cn'
         },
         'Live': {
-            'host': 'https://internal-e1-ups-privacy.ef.cn'
+            'host': 'https://internal-e1-ups-privacy.english1.cn'
         }
     }
 
@@ -217,7 +217,7 @@ class OspData:
     test_id = {
         'QA': "CC9C905E-AE12-4E3A-B82D-921D27D3ED84",
         'Staging': "CC9C905E-AE12-4E3A-B82D-921D27D3ED84",
-        'Live': "1E85C033-37C9-4061-AFCC-77366AAA20EE"
+        'Live': "51E9078E-08A0-489E-869E-4FB4939A14F0"
     }
 
 
