@@ -35,7 +35,7 @@ class EVCPlatformMeetingService:
         else:
             raise Exception()
 
-    def meeting_create(self, start_time, end_time, real_start_time, layout_code=EVCLayoutCode.Kids_PL)
+    def meeting_create(self, start_time, end_time, real_start_time, layout_code=EVCLayoutCode.Kids_PL):
         external_key = "".join(Random().sample(string.ascii_letters, 26))
 
         url = "/evc15/meeting/api/create"
