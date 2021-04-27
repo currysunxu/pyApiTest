@@ -24,7 +24,7 @@ class MockTestCases:
         self.no_mt_student = MockTestStudentType.HasNoMockTest.value
         self.mt_student_id = MockTestUsers.MTUserPw[env_key][self.has_mt_student][0]['custom_id']
         # If not Live environment, then will do the DB verification
-        if not EnvUtils.is_env_live_cn():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             self.valid_test_id = self.mt_service.get_valid_test_id_by_test_id_from_db(self.mt_student_id)["id"]
         else:
             self.valid_test_id = self.finished_test_id
