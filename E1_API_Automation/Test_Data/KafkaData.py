@@ -6,8 +6,8 @@ from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 
 class KafkaData:
     BOOTSTRAP_SERVERS = {
-        'QA': "10.179.243.71:9092",
-        'Staging': "10.179.243.78:9092"
+        'QA': "10.179.247.75:9092",
+        'Staging': "10.179.247.77:9092"
     }
 
     @staticmethod
