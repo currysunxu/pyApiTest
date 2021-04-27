@@ -19,6 +19,13 @@ class EVCContentMaterialType:
 class EVCLayoutCode:
     Kids_PL = "kids_pl"
     Agora_Kids_PL = "kids_pl_v2"
+    Indo_FR_GL = "indo_fr_gl"
+    Indo_HF_GL = "indo_hf_gl"
+    Indo_SS_GL = "indo_ss_gl"
+    Indo_TB_GL = "indo_tb_gl"
+    Indo_Phonics_GL = "indo_phonics_gl"
+    Indo_Story_Teller_GL = "indo_storytellers_gl"
+    Indo_Speak_Up_GL = "indo_speakup_gl"
 
 
 class EVCMeetingRole:

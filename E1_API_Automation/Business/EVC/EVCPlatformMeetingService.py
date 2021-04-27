@@ -35,7 +35,7 @@ class EVCPlatformMeetingService:
         else:
             raise Exception()
 
-    def meeting_create(self, start_time, end_time, real_start_time):
+    def meeting_create(self, start_time, end_time, real_start_time, layout_code=EVCLayoutCode.Kids_PL):
         external_key = "".join(Random().sample(string.ascii_letters, 26))
 
         url = "/evc15/meeting/api/create"
@@ -49,8 +49,7 @@ class EVCPlatformMeetingService:
         }
 
         param = {
-            # "layoutCode": "kids_PL",
-            "layoutCode": "indo_fr_gl",
+            "layoutCode": layout_code,
             "startTime": start_time,
             "endTime": end_time,
             "externalSysCode": "EVC-TEST",
@@ -59,7 +58,6 @@ class EVCPlatformMeetingService:
         }
 
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
-        print(response.json())
         assert_that(response.status_code, equal_to(200))
         return response.json()
 
@@ -110,7 +108,6 @@ class EVCPlatformMeetingService:
         content_service = EVCContentService(EVC_CONTENT_ENVIRONMENT)
 
         material_payload = content_service.get_lesson_by_id(topic_id).json()[0]
-        print(material_payload)
         action_arguments = {"materialPayload": material_payload, "materialCode": topic_id}
         update_actions = [{"actionName": "materialset", "actionArguments": action_arguments}]
 
@@ -121,7 +118,6 @@ class EVCPlatformMeetingService:
             "componentUpdateInfo": component_update_info
         }
 
-        print(param)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response
