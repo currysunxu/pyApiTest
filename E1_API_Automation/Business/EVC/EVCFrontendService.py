@@ -73,9 +73,9 @@ class EVCFrontendService(object):
         return request_url
 
     def generate_user_access_token(self, url):
-        if EnvUtils.is_env_stg():
+        if EnvUtils.is_env_stg_cn():
             access_key = '414d95a5-b338-4356-adac-eacce520b114'
-        elif EnvUtils.is_env_live():
+        elif EnvUtils.is_env_live_cn():
             access_key = "4f6d7f89-3779-42e0-a10d-8ad71aac4d80"
         else:
             raise Exception("Do not support to run this case on {0}".format(ENVIRONMENT))

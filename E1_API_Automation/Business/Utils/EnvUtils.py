@@ -3,7 +3,7 @@ from E1_API_Automation.Settings import env_key
 
 class EnvUtils:
     @staticmethod
-    def is_env_live() -> bool:
+    def is_env_live_cn() -> bool:
         return env_key == 'Live'
 
     @staticmethod
@@ -15,7 +15,7 @@ class EnvUtils:
         return env_key == 'QA'
 
     @staticmethod
-    def is_env_stg() -> bool:
+    def is_env_stg_cn() -> bool:
         return env_key == 'Staging'
 
     @staticmethod

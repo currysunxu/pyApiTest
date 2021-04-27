@@ -15,7 +15,7 @@ class SmallStarBase():
     product_code = None
     course_plan_key = None
     un_lock_lesson_keys = None
-    if EnvUtils.is_env_stg():
+    if EnvUtils.is_env_stg_cn():
         user_name = "ss3.cn.01"
         password = '12345'
         culture_code = 'zh-CN'
@@ -27,7 +27,7 @@ class SmallStarBase():
         user_name = "ss3.cn.01"
         password = '12345'
         culture_code = 'zh-CN'
-    if EnvUtils.is_env_live():
+    if EnvUtils.is_env_live_cn():
         user_name = "ss3.cn.01"
         password = '12345'
         culture_code = 'zh-CN'
