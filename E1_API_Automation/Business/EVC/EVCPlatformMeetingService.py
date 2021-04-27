@@ -230,6 +230,14 @@ class EVCPlatformMeetingService:
         assert_that(response.status_code, equal_to(200))
         return response.json()
 
+    # init_flag = 0: when student entering the classroom;
+    # class_end_flag = 1: when received the class end Kafka event;
+    # merger_done_flag = 2: when video merger completed
+    def update_record_flag(self, meeting_token, merger_done_flag='2'):
+        url = self.host + "/evc15/meeting/api/updaterecordflag?flag={0}&meetingToken={1}&setFlag=true".format(merger_done_flag, meeting_token)
 
+        response = request("POST", url, headers=self.header)
+        assert_that(response.status_code, equal_to(200))
+        return response
 
 
