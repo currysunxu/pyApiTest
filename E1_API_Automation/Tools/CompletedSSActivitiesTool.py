@@ -3,7 +3,7 @@ import arrow
 import jmespath
 
 from E1_API_Automation.Lib.Moutai import Moutai, Token
-from E1_API_Automation.Settings import Environment
+from E1_API_Automation.Settings import ENVIRONMENT
 
 
 class SmallStarService():
@@ -224,7 +224,7 @@ if __name__ == '__main__':
     password = '12345'  # login password
     book_name = 'Book 1'  # The book that needs to be executed
     unit_name = 'Unit 2'  # The unit that needs to be executed
-    small_star_service = SmallStarService(Environment.STAGING)
+    small_star_service = SmallStarService(ENVIRONMENT)
     # Environment: QA / STAGING / STAGING_SG / LIVE / LIVE_SG
 
     small_star_service.login(username, password)
