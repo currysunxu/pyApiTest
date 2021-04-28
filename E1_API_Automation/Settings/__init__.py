@@ -2,7 +2,8 @@ import os
 import yaml
 from E1_API_Automation.Settings.parseyaml import read_yaml_file
 
-yaml_cfg = yaml.full_load(read_yaml_file("E1_API_Automation/Settings/config.yaml"))
+current_path = os.path.dirname(__file__)
+yaml_cfg = yaml.full_load(read_yaml_file(current_path))
 
 
 def key_to_env(key):
