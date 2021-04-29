@@ -168,6 +168,11 @@ EVCProxyEnvironment:
     "SG": "evc-tsg-to-ts.ef.com"
   }
 
+MediaEnvironment:
+  QA: "https://kt-asset-qa.english1.cn"
+  STAGING: "https://kt-asset-stg.english1.cn"
+  LIVE: "https://kt-asset.english1.cn"
+
 DATABASE:
   QA: {
     "Server": "cnsqlqa.english1.cn,1433",

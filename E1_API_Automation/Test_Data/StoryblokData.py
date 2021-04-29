@@ -38,18 +38,18 @@ class StoryBlokData:
             }
         },
         'MT': {
-            # 'space': '222',
-            # 'token': {
-            #     'QA': '9wmr7bICxBjVnB5PZ8i38wtt',
-            #     'Staging': 'M0TdPuAXkTkSzelnaU8wJwtt',
-            #     'Live': 'HdhWXGOS4YriIqAN49KtEQtt'
-            # }
-            'space': '215',
+            'space': '222',
             'token': {
-                'QA': 'KjpKJ2NRB6DRPFaMAzrXxAtt',
+                'QA': '9wmr7bICxBjVnB5PZ8i38wtt',
                 'Staging': 'M0TdPuAXkTkSzelnaU8wJwtt',
                 'Live': 'HdhWXGOS4YriIqAN49KtEQtt'
             }
+            # 'space': '215',
+            # 'token': {
+            #     'QA': 'KjpKJ2NRB6DRPFaMAzrXxAtt',
+            #     'Staging': 'M0TdPuAXkTkSzelnaU8wJwtt',
+            #     'Live': 'HdhWXGOS4YriIqAN49KtEQtt'
+            # }
         },
         'TestingOfOneapp': {
             'space': '225',
@@ -72,9 +72,11 @@ class StoryBlokData:
             'course-config-path': 'Smallstars/course-config'
         },
         'Smallstars35': {
-            'source-name': 'small-stars-3-5',
+            'source-name': 'smallstars-35',
             'target-name': 'SMALL_STARS_35',
-            'course-config-path': 'Smallstars/course-config'
+            'course-config-path': 'Smallstars/course-config',
+            #content builder can release one course to another
+            'release-as': 'Smallstars30'
         },
         'Trailblazers30': {
             'source-name': 'tb16',

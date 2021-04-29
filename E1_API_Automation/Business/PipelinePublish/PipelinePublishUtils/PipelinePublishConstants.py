@@ -20,3 +20,4 @@ class PipelinePublishConstants:
     FIELD_QUESTION_BANK = 'questionBank'
     FIELD_METADATA = 'metadata'
     FIELD_COURSE = 'course'
+    FIELD_REGION_ACH = 'regionAch'
