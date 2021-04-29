@@ -6,13 +6,14 @@ import requests
 from hamcrest import assert_that
 
 from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
+from E1_API_Automation.Business.HighFlyer35.Hf35MediaService import Hf35MediaService
 from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepoService
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
     PipelinePublishConstants
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishUtils import PipelinePublishUtils
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
-from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, BFF_ENVIRONMENT, env_key
+from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, BFF_ENVIRONMENT, env_key, MEDIA_ENVIRONMENT
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
 
 
@@ -23,6 +24,7 @@ class PipelinePublishVerifyService:
         user_name = BffUsers.BffUserPw[env_key][key][0]['username']
         password = BffUsers.BffUserPw[env_key][key][0]['password']
         self.bff_service.login(user_name, password)
+        self.media_service = Hf35MediaService(MEDIA_ENVIRONMENT, self.bff_service.access_token)
         self.content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
 
     def verify_content_after_release(self, aem_book_tree, content_map_book_tree, expected_release_revision):
@@ -107,10 +109,12 @@ class PipelinePublishVerifyService:
                                                                              content_map_lesson_by_unit))
 
                 # verify lesson homework
-                # for small star, not verify homework for now, as lite not need these, and content-repo have issue: CP-254
-                if not content_map_book_tree['contentPath'].startswith('small'):
-                    error_message.extend(self.verify_lesson_homework(aem_lesson_by_unit,
-                                                                     content_map_lesson_by_unit))
+                # # for small star, not verify homework for now, as lite not need these, and content-repo have issue: CP-254
+                # if not content_map_book_tree['contentPath'].startswith('small'):
+                #     error_message.extend(self.verify_lesson_homework(aem_lesson_by_unit,
+                #                                                      content_map_lesson_by_unit))
+                error_message.extend(self.verify_lesson_homework(aem_lesson_by_unit,
+                                                                 content_map_lesson_by_unit))
                 print("--end of verify lesson" + str(j + 1))
         print("--------------------end of verify unit" + str(i + 1))
         return error_message
@@ -152,6 +156,7 @@ class PipelinePublishVerifyService:
 
         unit_content_id = content_map_unit_dict[PipelinePublishConstants.FIELD_CONTENT_ID]
         course = content_map_unit_dict[PipelinePublishConstants.FIELD_COURSE]
+        region_ach = content_map_unit_dict[PipelinePublishConstants.FIELD_REGION_ACH]
 
         unit_handout_content_group = \
             self.content_repo_service.get_content_groups_by_param(content_type.value,
@@ -190,7 +195,8 @@ class PipelinePublishVerifyService:
                 error_message.extend(self.verify_handout_homework_fields(aem_handout_asset,
                                                                          unit_handout_eca,
                                                                          content_type,
-                                                                         course))
+                                                                         course,
+                                                                         region_ach))
 
             # verify handout eca asset list with asset group
             error_message.extend(self.verify_handout_eca_assets_with_asset_group(unit_handout_ecas,
@@ -211,6 +217,7 @@ class PipelinePublishVerifyService:
 
         unit_content_id = content_map_unit_dict[PipelinePublishConstants.FIELD_CONTENT_ID]
         course = content_map_unit_dict[PipelinePublishConstants.FIELD_COURSE]
+        region_ach = content_map_unit_dict[PipelinePublishConstants.FIELD_REGION_ACH]
 
         unit_quiz_content_groups = \
             self.content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeQuiz.value,
@@ -228,25 +235,30 @@ class PipelinePublishVerifyService:
                         unit_content_id))
                 return error_message
         else:
-            aem_unit_quiz_skillset_localization = aem_unit_quiz[PipelinePublishConstants.FIELD_SKILLSET_LOCALIZATION]
+            aem_unit_quiz_skillset_localizations = aem_unit_quiz[PipelinePublishConstants.FIELD_SKILLSET_LOCALIZATION]
             aem_unit_quiz_activities = aem_unit_quiz['activities']
 
             unit_quiz_activity_group = jmespath.search('[?groupType==\'ACTIVITY_GROUP\']|[0]', unit_quiz_content_groups)
             unit_quiz_asset_group_list = jmespath.search('[?groupType==\'ASSET_GROUP\']', unit_quiz_content_groups)
 
-            # check with the skillsetLocalization field
-            diff_list = json_tools.diff(aem_unit_quiz_skillset_localization,
-                                        unit_quiz_activity_group['metadata'][
-                                            PipelinePublishConstants.FIELD_SKILLSET_LOCALIZATION])
-            if len(diff_list) != 0:
-                error_message.append(
-                    'skillsetLocalization value in content group not consistent with the value in AEM, diff is:' \
-                    + str(diff_list))
-
             content_group_unit_quiz_activity_entity_list = unit_quiz_activity_group[
                 PipelinePublishConstants.FIELD_CHILDREFS]
             content_repo_unit_quiz_activity_list = self.content_repo_service.get_activities(
                 content_group_unit_quiz_activity_entity_list).json()
+
+            # verify the localization for this unit quiz
+            expected_skill_set_localizations = PipelinePublishUtils.get_expected_unit_quiz_localizations(
+                content_group_unit_quiz_activity_entity_list,
+                content_repo_unit_quiz_activity_list,
+                aem_unit_quiz_skillset_localizations)
+
+            # check with the skillsetLocalization field
+            diff_list = json_tools.diff(expected_skill_set_localizations,
+                                        unit_quiz_activity_group['metadata']['parts'])
+            if len(diff_list) != 0:
+                error_message.append(
+                    'skillsetLocalization value in content group not consistent with the value in AEM, diff is:' \
+                    + str(diff_list))
 
             if len(aem_unit_quiz_activities) != len(content_group_unit_quiz_activity_entity_list):
                 error_message.append(
@@ -261,7 +273,7 @@ class PipelinePublishVerifyService:
                         content_group_unit_quiz_activity_entity[PipelinePublishConstants.FIELD_CONTENT_ID]),
                     content_repo_unit_quiz_activity_list)
                 error_message.extend(self.verify_aem_homework_with_content_repo_activity(
-                    aem_unit_quiz_activity, content_repo_unit_quiz_activity, ContentRepoContentType.TypeQuiz, course))
+                    aem_unit_quiz_activity, content_repo_unit_quiz_activity, ContentRepoContentType.TypeQuiz, course, region_ach))
 
             # verify the asset_group with the asset exit in the activity list
             error_message.extend(self.verify_activity_assets_with_asset_group(
@@ -278,6 +290,7 @@ class PipelinePublishVerifyService:
 
         unit_content_id = content_map_unit_dict[PipelinePublishConstants.FIELD_CONTENT_ID]
         course = content_map_unit_dict[PipelinePublishConstants.FIELD_COURSE]
+        region_ach = content_map_unit_dict[PipelinePublishConstants.FIELD_REGION_ACH]
 
         unit_question_bank_content_groups = \
             self.content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeQuestionBank.value,
@@ -320,7 +333,7 @@ class PipelinePublishVerifyService:
                     content_repo_unit_question_bank_activity_list)
                 error_message.extend(self.verify_aem_homework_with_content_repo_activity(
                     aem_unit_question_bank_activity, content_repo_unit_question_bank_activity,
-                    ContentRepoContentType.TypeQuestionBank, course))
+                    ContentRepoContentType.TypeQuestionBank, course, region_ach))
 
             # verify the asset_group with the asset exit in the activity list
             error_message.extend(self.verify_activity_assets_with_asset_group(
@@ -342,13 +355,12 @@ class PipelinePublishVerifyService:
                 asset_group['parentRef'][PipelinePublishConstants.FIELD_CONTENT_ID], str(diff_list)))
         return error_message
 
-    def verify_handout_homework_fields(self, aem_handout_homework, content_repo_eca_activity, activity_type, course):
+    def verify_handout_homework_fields(self, aem_handout_homework, content_repo_eca_activity, activity_type, course, region_ach):
         error_message = []
 
-        expected_metadata = PipelinePublishUtils.get_expected_content_metadata(course, activity_type)
+        expected_metadata = PipelinePublishUtils.get_expected_content_metadata(course, activity_type, region_ach)
         actual_metadata = content_repo_eca_activity[PipelinePublishConstants.FIELD_METADATA]
-        # if str(expected_metadata) != str(actual_metadata):
-        diff_list = json_tools.diff(json.dumps(actual_metadata), json.dumps(expected_metadata))
+        diff_list = json_tools.diff(actual_metadata, expected_metadata)
         if len(diff_list) != 0:
             error_message.append("metadata {0} not as expect"
                                  "ed for activity/eca:{1}, expected metadata is:{2}".format(actual_metadata,
@@ -389,9 +401,11 @@ class PipelinePublishVerifyService:
                 for key in aem_value.keys():
                     aem_field_value = aem_value[key]
                     # print("verify key:" + key)
-                    content_repo_field_value = content_repo_value[key]
-                    error_message.extend(self.verify_aem_fields_with_content_repo(key, aem_field_value,
-                                                                                  content_repo_field_value))
+                    # need to check with leon, there's theme in the activity body
+                    if key != 'theme' and key != 'tags':
+                        content_repo_field_value = content_repo_value[key]
+                        error_message.extend(self.verify_aem_fields_with_content_repo(key, aem_field_value,
+                                                                                      content_repo_field_value))
             else:
                 if str(aem_value) != str(content_repo_value):
                     error_message.append(" key:" + key + "'s value in aem not equal to the value in content-repo." \
@@ -417,7 +431,7 @@ class PipelinePublishVerifyService:
             aem_asset_sha1 = aem_asset_url[sha1_start_index:]
 
         print("start get media for content asset:" + content_repo_asset_url)
-        content_repo_asset_response = self.bff_service.get_media(content_repo_asset_url)
+        content_repo_asset_response = self.media_service.get_media(content_repo_asset_url)
         assert_that(content_repo_asset_response.status_code == 200,
                     'content asset response status is {0}, not 200 for url: {1}'
                     .format(content_repo_asset_response.status_code, content_repo_asset_url))
@@ -437,6 +451,7 @@ class PipelinePublishVerifyService:
 
         lesson_content_id = content_map_lesson_by_unit_dict[PipelinePublishConstants.FIELD_CONTENT_ID]
         course = content_map_lesson_by_unit_dict[PipelinePublishConstants.FIELD_COURSE]
+        region_ach = content_map_lesson_by_unit_dict[PipelinePublishConstants.FIELD_REGION_ACH]
 
         lesson_homework_content_group = \
             self.content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHomework.value,
@@ -474,7 +489,7 @@ class PipelinePublishVerifyService:
                         lesson_activity_metadata[PipelinePublishConstants.FIELD_CONTENT_ID]),
                     lesson_activity_list)
                 error_message.extend(self.verify_aem_homework_with_content_repo_activity(
-                    aem_homework, lesson_activity, ContentRepoContentType.TypeHomework, course))
+                    aem_homework, lesson_activity, ContentRepoContentType.TypeHomework, course, region_ach))
 
             # verify the asset_group with the asset exit in the activity list
             error_message.extend(self.verify_activity_assets_with_asset_group(
@@ -482,7 +497,7 @@ class PipelinePublishVerifyService:
 
         return error_message
 
-    def verify_aem_homework_with_content_repo_activity(self, aem_homework, lesson_activity, activity_type, course):
+    def verify_aem_homework_with_content_repo_activity(self, aem_homework, lesson_activity, activity_type, course, region_ach):
         error_message = []
         aem_homework_detail_url = aem_homework[PipelinePublishConstants.FIELD_URL]
         aem_homework_detail_response = requests.get(aem_homework_detail_url)
@@ -507,7 +522,8 @@ class PipelinePublishVerifyService:
                 aem_homework_detail['Key']))
 
         error_message.extend(self.verify_handout_homework_fields(aem_homework_detail,
-                                                                 lesson_activity, activity_type, course))
+                                                                 lesson_activity, activity_type, course,
+                                                                 region_ach))
         return error_message
 
     def verify_activity_assets_with_asset_group(self, activity_list, asset_group_list):

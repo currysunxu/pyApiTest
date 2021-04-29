@@ -14,6 +14,7 @@ class Hf35BffService:
         self.host = host
         self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8"})
         self.id_token = None
+        self.access_token = None
 
     def login(self, user_name, password):
         user_info = {
@@ -23,6 +24,7 @@ class Hf35BffService:
 
         athentication_result = self.mou_tai.post("/auth2/api/v1/login", user_info)
         accessToken = jmespath.search('accessToken', athentication_result.json())
+        self.access_token = accessToken
         self.mou_tai.headers['EF-Access-Token'] = accessToken
         self.id_token = jmespath.search('idToken', athentication_result.json())
         return athentication_result
