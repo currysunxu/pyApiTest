@@ -544,7 +544,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_privacy_policy_document_response.json()['url'] == ups_pp_document_response.json()['url'])
         # currently, this value will be same for all the environment
         assert_that(bff_privacy_policy_document_response.json()[
-                        'termsConditionUrl'] == 'https://study.ef.cn/content/terms-and-conditions.htm')
+                        'termsConditionUrl'] == 'https://study.ef.cn/portal/websiteUserAgreement.pdf')
 
     @Test(tags="qa, stg, live")
     def test_post_privacy_policy_agreement(self):
