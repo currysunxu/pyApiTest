@@ -1,6 +1,6 @@
 from ..Lib.Moutai import Moutai, Token
 from E1_API_Automation.Business.AuthService import AuthService
-from E1_API_Automation.Settings import AuthEnvironment, env_key
+from E1_API_Automation.Settings import AUTH_ENVIRONMENT, env_key
 from E1_API_Automation.Test_Data.PTReviewData import BffUsers
 
 
@@ -10,7 +10,7 @@ class PTReviewBFFService:
         self.mou_tai = Moutai(host=self.host, token=Token("x-ef-token", "Token"))
 
     def login(self):
-        auth = AuthService(getattr(AuthEnvironment, str.upper(env_key)))
+        auth = AuthService(AUTH_ENVIRONMENT)
         self.user_name = BffUsers.BffUserPw[env_key]['username']
         self.password = BffUsers.BffUserPw[env_key]['password']
         x_ef_token = auth.login(self.user_name, self.password).json()['idToken']

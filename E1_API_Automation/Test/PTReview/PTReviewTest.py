@@ -43,7 +43,7 @@ class PTReviewTestCases:
                 assert_that(code_list == expected_code_list, "TB code returned is not as expected.")
 
             # if it's not Live environment, then do the rest verification with DB
-            if not EnvUtils.is_env_live():
+            if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
                 # get the result from DB
                 db_query_result = PTReviewService.get_all_books_by_course_from_db(course_code)
 
@@ -137,7 +137,7 @@ class PTReviewTestCases:
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
 
         osp_service = OSPService(OSP_ENVIRONMENT)
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             # make sure all the score have value at first
             PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
             hf_pt_assess = PTReviewService.get_hf_pt_assessment_from_db(student_id, book_key, unit_key)
@@ -204,7 +204,7 @@ class PTReviewTestCases:
 
         osp_service = OSPService(OSP_ENVIRONMENT)
 
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             # make sure all the score have value at first
             PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
             hf_pt_assess = PTReviewService.get_hf_pt_assessment_by_book_from_db(student_id, book_key)
@@ -502,7 +502,7 @@ class PTReviewTestCases:
         assert_that(actual_result.json()["GroupId"], equal_to(expected_entity_dict["GroupId"]))
         assert_that(actual_result.json()["SchoolCode"], equal_to(expected_entity_dict["SchoolCode"]))
         assert_that(actual_result.json()["Name"], equal_to("Progress Test"))
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
             pt_instance_key = str(pt_instance_key)[str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
             assert_that(actual_result.json()["ProgressTestInstanceKey"], equal_to(pt_instance_key))

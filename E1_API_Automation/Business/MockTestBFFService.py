@@ -1,7 +1,7 @@
 from ..Lib.Moutai import Moutai, Token
 from E1_API_Automation.Business.AuthService import AuthService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
-from E1_API_Automation.Settings import AuthEnvironment, env_key
+from E1_API_Automation.Settings import AUTH_ENVIRONMENT, env_key
 from E1_API_Automation.Test_Data.MockTestData import MockTestUsers, TestTableSQLString
 from E1_API_Automation.Lib.HamcrestExister import exist
 from E1_API_Automation.Settings import MYSQL_MOCKTEST_DATABASE
@@ -19,7 +19,7 @@ class MockTestBFFService:
         self.mou_tai = Moutai(host=self.host, token=Token("X-EF-ID", "Token"))
 
     def login(self, student_type):
-        auth = AuthService(getattr(AuthEnvironment, env_key.upper()))
+        auth = AuthService(AUTH_ENVIRONMENT)
         user_name = MockTestUsers.MTUserPw[env_key][student_type][0]['username']
         password = MockTestUsers.MTUserPw[env_key][student_type][0]['password']
         id_token = auth.login(user_name, password).json()['idToken']
@@ -153,7 +153,7 @@ class MockTestBFFService:
         custom_id = MockTestUsers.MTUserPw[env_key][student_type][0]['custom_id']
         assert_that(jmespath.search("data.currentUser.id", mt_response.json()), equal_to(custom_id))
         # If not Live environment, then will do the DB verification
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             # Check student can only see tests configured for his city
             for i in range(len(jmespath.search("data.currentUser.tests", mt_response.json()))):
                 test_id = jmespath.search("data.currentUser.tests[%d].id" % i, mt_response.json())
@@ -164,7 +164,7 @@ class MockTestBFFService:
         assert_that(mt_response.status_code == 200)
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
         # If not Live environment, then will do the DB verification
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             assert_that(jmespath.search("data.test.paper.id", mt_response.json()),
                         equal_to(self.get_test_details_by_test_id_from_db(test_id, student_id)["paperId"]))
         assert_that(jmespath.search("data.test.paper.parts[*].type", mt_response.json()),
@@ -172,7 +172,7 @@ class MockTestBFFService:
 
     def check_bff_get_test_intro_structure(self, mt_response, test_id, student_id):
         # If not Live environment, then will do the DB verification
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             expect_details = self.get_test_details_by_test_id_from_db(test_id, student_id)
             self.check_test_basic_info(expect_details, mt_response)
         assert_that(mt_response.status_code == 200)
@@ -204,7 +204,7 @@ class MockTestBFFService:
     def check_insert_valid_test(self, mt_response, test_id, student_id):
         assert_that(jmespath.search("data.startTest.test.id", mt_response.json()), equal_to(test_id))
         # If not Live environment, then will do the DB verification
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             self.compare_response_date_and_db_date(
                 jmespath.search("data.startTest.test.startedDate", mt_response.json()),
                 self.get_result_details_by_test_id_from_db(test_id, student_id)[
@@ -264,7 +264,7 @@ class MockTestBFFService:
         assert_that(len(jmespath.search("data.test.remediations", mt_response.json())) > 0)
         assert_that(jmespath.search("data.test.id", mt_response.json()), equal_to(test_id))
         # If not Live environment, then will do the DB verification
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             # Check test data
             expect_test_data = self.get_test_details_by_test_id_from_db(test_id, student_id)
             self.check_test_basic_info(expect_test_data, mt_response)
@@ -281,7 +281,7 @@ class MockTestBFFService:
         assert_that(jmespath.search("data.test.testState", mt_response.json()),
                     equal_to("COMPLETED_WITH_REMEDIATION_AVAILABLE"))
         # If not Live environment, then will do the DB verification
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             # Assert test data
             test_details = self.get_test_details_by_test_id_from_db(test_id, student_id)
             self.check_test_basic_info(test_details, mt_response)
@@ -312,7 +312,7 @@ class MockTestBFFService:
         assert_that(mt_response.status_code == 200)
         assert_that(len(jmespath.search("data.test.paper.parts", mt_response.json())) > 0)
         # If not Live environment, then will do the DB verification
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             expect_paper_data = self.get_paper_details_by_paper_id_from_db(paper_id)[0]
             assert_that(jmespath.search("data.test.paper.title", mt_response.json()),
                         equal_to(expect_paper_data["title"]))

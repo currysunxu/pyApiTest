@@ -71,7 +71,7 @@ class PlanResultTestCases:
         learning_result_get_api_response = learning_result_service.get_specific_result(learning_result)
         assert_that(learning_result_get_api_response.status_code == 200)
 
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             learning_result_list_from_db = LearningDBUtils.get_specific_result(learning_result)
 
             error_message = \
@@ -322,7 +322,7 @@ class PlanResultTestCases:
                     'batch insert api response status is:' + str(learning_result_batch_insert_api_response.status_code))
 
         # get data from DB
-        if not EnvUtils.is_env_live():
+        if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             if learning_result_query_type == LearningResultQueryType.TypeGetUser:
                 learning_result_list_from_db = LearningDBUtils.get_user_result(learning_result_template)
             elif learning_result_query_type == LearningResultQueryType.TypeGetPartition:
@@ -344,7 +344,7 @@ class PlanResultTestCases:
 
             assert_that(learning_result_get_api_response.status_code == 200)
 
-            if not EnvUtils.is_env_live():
+            if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
                 # if there's more than 50 records fit the condition, the get API will by default get 50 records
                 if record_number > 50:
                     learning_result_list_from_db = learning_result_list_from_db[:50]
@@ -366,7 +366,7 @@ class PlanResultTestCases:
 
                 assert_that(learning_result_get_api_response.status_code == 200)
 
-                if not EnvUtils.is_env_live():
+                if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
                     expected_learning_result_list_from_db = \
                         LearningCommonUtils.get_expected_learning_data_from_db_by_limit_page(
                             learning_result_list_from_db,
