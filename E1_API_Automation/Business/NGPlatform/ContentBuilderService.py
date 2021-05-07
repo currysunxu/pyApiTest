@@ -1,10 +1,7 @@
-from E1_API_Automation.Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 
 
-class ContentBuilderService:
-	def __init__(self, host):
-		self.host = host
-		self.mou_tai = Moutai(host=self.host)
+class ContentBuilderService(BaseService):
 
 	def get_release_by_status(self, status='PROCESSED'):
 		api_url = "/admin/api/v1/releases?status={0}".format(status)

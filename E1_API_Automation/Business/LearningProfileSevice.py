@@ -1,11 +1,10 @@
+from E1_API_Automation.Business.BaseService import BaseService
 from ..Lib.Moutai import Moutai, Token
 
 
-class LearningProfileService:
+class LearningProfileService(BaseService):
     def __init__(self, host):
-        self.host = host
-        print(host)
-        self.mou_tai = Moutai(host=self.host, token=Token("X-EF-ID", "Token"))
+        super().__init__(host, {"X-EF-ID": "Token"})
 
     def get_learning_profile(self, access_token, student_id, class_id):
         self.mou_tai.headers["X-EF-Access"] = access_token

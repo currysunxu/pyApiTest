@@ -2,19 +2,14 @@ import time
 
 import requests
 
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
-from E1_API_Automation.Lib.Moutai import Moutai
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 
 import jmespath
 
 
-class Hf35BffService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8"})
-        self.id_token = None
-        self.access_token = None
+class Hf35BffService(BaseService):
 
     def login(self, user_name, password):
         user_info = {

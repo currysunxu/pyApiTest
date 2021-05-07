@@ -1,10 +1,8 @@
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Lib.Moutai import Moutai
 
 
-class ContentMapService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host)
+class ContentMapService(BaseService):
 
     # query content map, call by other methods
     def post_content_map_query(self, content_map_query_entity, is_by_tree):

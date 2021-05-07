@@ -1,3 +1,4 @@
+from E1_API_Automation.Business.BaseService import BaseService
 from ..Lib.Moutai import Moutai, Token
 from E1_API_Automation.Business.AuthService import AuthService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
@@ -13,10 +14,9 @@ import arrow
 import json
 
 
-class MockTestBFFService:
+class MockTestBFFService(BaseService):
     def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, token=Token("X-EF-ID", "Token"))
+        super().__init__(host, {"X-EF-ID": "Token"})
 
     def login(self, student_type):
         auth = AuthService(AUTH_ENVIRONMENT)
