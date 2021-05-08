@@ -219,7 +219,10 @@ class EVCPlatformMeetingService:
 
         print(url, self.header)
         response = request("POST", url, headers=self.header)
-        print(response.json())
+        print('status_code')
+        print(response.status_code)
+        print('body')
+        print(response.text)
         assert_that(response.status_code, equal_to(204))
         return response
 
