@@ -224,6 +224,9 @@ class EVCPlatformMeetingService:
         print('body')
         print(response.text)
         assert_that(response.status_code, equal_to(204))
+        import os
+        for k in os.environ.keys():
+            print('{k}:{v}'.format(k=k, v=os.environ[k]))
         return response
 
     def load_batch_attendance(self, meeting_token_list):
