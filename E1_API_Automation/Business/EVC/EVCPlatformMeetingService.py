@@ -1,6 +1,7 @@
 import json
 import string
 import urllib
+from time import sleep
 from random import Random
 
 import requests
@@ -217,6 +218,7 @@ class EVCPlatformMeetingService:
         return room_info
 
     def trigger_record_class(self, meeting_token):
+        sleep(5) # not sure the reason, but it would fail without sleep
         url = self.host + '/evc15/meeting/api/recording'
         params = {
             'meetingToken': meeting_token
@@ -234,9 +236,6 @@ class EVCPlatformMeetingService:
         print(response.request.url)
         print(response.request.headers)
         print(response.request.body)
-        import os
-        for k in os.environ.keys():
-            print('{k}:{v}'.format(k=k, v=os.environ[k]))
 
         if response.status_code != 204:
             response = requests.post(url, data='{}', params=params, headers=self.header)
