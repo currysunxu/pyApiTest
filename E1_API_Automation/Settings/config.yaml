@@ -1,5 +1,5 @@
 Local:
-  LOCAL_ENV: "QA"
+  LOCAL_ENV: "STG"
 
 Environment:
   QA: "https://e1svc-qa.english1.cn"
@@ -130,13 +130,15 @@ EVCContentEnvironment:
 
 
 EVCCDNEnvironment:
+  QA: "https://evc-ts-qa.bj-englishtown.com"
   STAGING: "https://evc-fe-staging.bj-englishtown.com"
   LIVE: "https://evc-fe.bj-englishtown.com"
 
 
-EVCDemoPageEnvironment:
-  STAGING: "https://evc-ts-staging.ef.com.cn"
-  LIVE: "https://evc-ts.ef.com.cn/"
+#EVCBackendEnvironment:
+#  QA: "https://evc-ts-qa.bj-englishtown.com"
+#  STAGING: "https://evc-ts-staging.ef.com.cn"
+#  LIVE: "https://evc-ts.ef.com.cn/"
 
 Auth2Environment:
   QA: "https://internal-ktsvc-qa.english1.cn"
@@ -155,17 +157,17 @@ VocabEnvironment:
 
 EVCProxyEnvironment:
   STAGING: {
-    "CN": "evc-ts-staging.ef.com.cn",
-    "US": "evc-tv-to-ts-staging.ef.com",
-    "UK": "evc-tf-to-ts-staging.ef.com",
-    "SG": "evc-tsg-to-ts-staging.ef.com"
+    "CN": "https://evc-ts-staging.ef.com.cn",
+    "US": "https://evc-tv-to-ts-staging.ef.com",
+    "UK": "https://evc-tf-to-ts-staging.ef.com",
+    "SG": "https://evc-tsg-to-ts-staging.ef.com"
   }
 
   LIVE: {
-    "CN": "evc-ts.ef.com.cn",
-    "US": "evc-tv-to-ts.ef.com",
-    "UK": "evc-tf-to-ts.ef.com",
-    "SG": "evc-tsg-to-ts.ef.com"
+    "CN": "https://evc-ts.ef.com.cn",
+    "US": "https://evc-tv-to-ts.ef.com",
+    "UK": "https://evc-tf-to-ts.ef.com",
+    "SG": "https://evc-tsg-to-ts.ef.com"
   }
 
 MediaEnvironment:

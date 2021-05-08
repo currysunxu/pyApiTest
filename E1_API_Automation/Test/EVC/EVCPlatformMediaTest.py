@@ -3,15 +3,16 @@ from ptest.decorator import TestClass, Test, BeforeClass
 
 from E1_API_Automation.Business.EVC.EVCPlatformMediaService import EVCPlatformMediaService
 from E1_API_Automation.Business.EVC.EVCPlatformMeetingService import EVCPlatformMeetingService
-from E1_API_Automation.Settings import EVC_DEMO_PAGE_ENVIRONMENT
+# from E1_API_Automation.Settings import EVC_BACKEND_ENVIRONMENT
+from E1_API_Automation.Settings import EVC_PROXY_ENVIRONMENT
 
 
 @TestClass()
 class EVCPlatformMediaTest:
     @BeforeClass()
     def before_method(self):
-        self.evc_meeting_service = EVCPlatformMeetingService(EVC_DEMO_PAGE_ENVIRONMENT)
-        self.evc_media_service = EVCPlatformMediaService(EVC_DEMO_PAGE_ENVIRONMENT)
+        self.evc_meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT["CN"])
+        self.evc_media_service = EVCPlatformMediaService(EVC_PROXY_ENVIRONMENT["CN"])
 
     @Test(tags="stg, live")
     def test_kids_fm_techcheck(self):

@@ -9,12 +9,25 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from E1_API_Automation.Business.EVC.EVCPlatformMeetingService import EVCPlatformMeetingService
-from E1_API_Automation.Settings import EVC_DEMO_PAGE_ENVIRONMENT
+from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode
 
 class_duration = 5
 
-platform_service = EVCPlatformMeetingService(EVC_DEMO_PAGE_ENVIRONMENT)
+platform_service = EVCPlatformMeetingService("https://evc-tsg-to-ts-staging.ef.com")
+# STAGING: {
+#     "CN": "https://evc-ts-staging.ef.com.cn",
+#     "US": "https://evc-tv-to-ts-staging.ef.com",
+#     "UK": "https://evc-tf-to-ts-staging.ef.com",
+#     "SG": "https://evc-tsg-to-ts-staging.ef.com"
+# }
+#
+# LIVE: {
+#     "CN": "https://evc-ts.ef.com.cn",
+#     "US": "https://evc-tv-to-ts.ef.com",
+#     "UK": "https://evc-tf-to-ts.ef.com",
+#     "SG": "https://evc-tsg-to-ts.ef.com"
+# }
 
 
 def generate_chrome_option():
@@ -51,6 +64,8 @@ def register_user(meeting_token, amount):
 
 
 def mock_omni_class_booking(layout_code, student_amount):
+    # start_time = datetime(2021, 5, 6, 10, 20)
+    real_start_time = start_time + timedelta(minutes=1)
     start_time = datetime.now()
     real_start_time = start_time + timedelta(minutes=1)
     end_time = real_start_time + timedelta(minutes=class_duration)
@@ -103,9 +118,10 @@ def mock_omni_class_booking(layout_code, student_amount):
     preporter.info("----Trigger recording with token----: {0}".format(meeting_token))
     platform_service.trigger_record_class(meeting_token)
 
-    time.sleep(class_duration * 60 - 160)
+    # time.sleep(class_duration * 60 - 160)
 
 
 if __name__ == "__main__":
     mock_omni_class_booking(EVCLayoutCode.Indo_FR_GL, 5)
-    # mock_omni_class_booking(EVCLayoutCode.Kids_PL, 1)
+    # for i in range(10):
+        # mock_omni_class_booking(EVCLayoutCode.Kids_PL, 1)

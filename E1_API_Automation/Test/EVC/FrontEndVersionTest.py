@@ -4,7 +4,7 @@ from ptest.decorator import TestClass, Test, BeforeClass
 
 from E1_API_Automation.Business.EVC.EVCFrontendService import EVCFrontendService
 from E1_API_Automation.Business.EVC.EVCPlatformMeetingService import EVCPlatformMeetingService
-from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT, EVC_DEMO_PAGE_ENVIRONMENT
+from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVC_AGORA_FRONTEND_VERSION, EVCPlatform, EVC_FM_FRONTEND_VERSION, \
     EVC_TECH_CHECK_VERSION, EVC_INDO_DEMO_VERSION
 
@@ -39,7 +39,7 @@ class FrontEndVersionTest:
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_agora_frontend_version(self, platform):
         # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_DEMO_PAGE_ENVIRONMENT)
+        meeting_service = EVCPlatformMeetingService(EVC_BACKEND_ENVIRONMENT)
         attendance_token = meeting_service.create_or_join_classroom()["attendanceToken"]
 
         # get version from api
@@ -54,7 +54,7 @@ class FrontEndVersionTest:
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_fm_frontend_version(self, platform):
         # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_DEMO_PAGE_ENVIRONMENT)
+        meeting_service = EVCPlatformMeetingService(EVC_BACKEND_ENVIRONMENT)
         attendance_token = meeting_service.create_or_join_classroom(use_agora="False")["attendanceToken"]
 
         # get version from api

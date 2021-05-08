@@ -1,15 +1,15 @@
 import os
 
-EVC_AGORA_FRONTEND_VERSION = os.environ['agora_fe_version']
-EVC_FM_FRONTEND_VERSION = os.environ['fm_fe_version']
-EVC_TECH_CHECK_VERSION = os.environ['techcheck_version']
-EVC_INDO_DEMO_VERSION = os.environ['indo_demo_version']
+# EVC_AGORA_FRONTEND_VERSION = os.environ['agora_fe_version']
+# EVC_FM_FRONTEND_VERSION = os.environ['fm_fe_version']
+# EVC_TECH_CHECK_VERSION = os.environ['techcheck_version']
+# EVC_INDO_DEMO_VERSION = os.environ['indo_demo_version']
 
 
-# EVC_AGORA_FRONTEND_VERSION = "0.3.8-a983e52"
-# EVC_FM_FRONTEND_VERSION = "0.1.39-bfed4c1"
-# EVC_TECH_CHECK_VERSION = "0.2.3-f1e6b90"
-# EVC_INDO_DEMO_VERSION = "0.1.0-05a01fa"
+EVC_AGORA_FRONTEND_VERSION = "0.3.8-bc8b01c"
+EVC_FM_FRONTEND_VERSION = "0.1.39-bfed4c1"
+EVC_TECH_CHECK_VERSION = "0.2.3-f1e6b90"
+EVC_INDO_DEMO_VERSION = "0.1.0-05a01fa"
 
 class EVCContentMaterialType:
     FM_Kids_PL = "kids_pl"
