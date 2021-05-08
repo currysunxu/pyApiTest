@@ -229,6 +229,8 @@ class EVCPlatformMeetingService:
         print('body')
         print(response.text)
         print(response.request.url)
+        print(response.request.headers)
+        print(response.request.body)
         import os
         for k in os.environ.keys():
             print('{k}:{v}'.format(k=k, v=os.environ[k]))
