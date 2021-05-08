@@ -217,22 +217,24 @@ class EVCPlatformMeetingService:
         return room_info
 
     def trigger_record_class(self, meeting_token):
-        url = self.host + "/evc15/meeting/api/recording?meetingToken={0}".format(meeting_token)
-        response = requests.post(url, data='{}', headers=self.header)
-        print('url')
-        print(url)
+        url = self.host + '/evc15/meeting/api/recording'
+        params = {
+            'meetingToken': meeting_token
+        }
         print('header')
         print(self.header)
+        response = requests.post(url, data='{}', params=params, headers=self.header)
         print('status_code')
         print(response.status_code)
         print('body')
         print(response.text)
+        print(response.request.url)
         import os
         for k in os.environ.keys():
             print('{k}:{v}'.format(k=k, v=os.environ[k]))
 
         if response.status_code != 204:
-            response = requests.post(url, data='{}', headers=self.header)
+            response = requests.post(url, data='{}', params=params, headers=self.header)
             assert_that(response.status_code, equal_to(204))
 
         return response
