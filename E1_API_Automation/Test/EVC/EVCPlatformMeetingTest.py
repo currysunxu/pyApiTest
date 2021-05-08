@@ -7,6 +7,7 @@ from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode
 
 
 
+
 @TestClass()
 class EVCPlatformMediaTest:
     @BeforeClass()
@@ -26,6 +27,7 @@ class EVCPlatformMediaTest:
                                                                    int(real_start_time.timestamp() * 1000),
                                                                    layout_code=EVCLayoutCode.Agora_Kids_PL)
         meeting_token = (meeting_response["componentToken"])
+
         preporter.info("----Meeting token----: {0}".format(meeting_token))
 
         self.evc_meeting_service.trigger_record_class(meeting_token)

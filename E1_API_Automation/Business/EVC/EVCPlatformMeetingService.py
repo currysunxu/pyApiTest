@@ -216,8 +216,6 @@ class EVCPlatformMeetingService:
 
     def trigger_record_class(self, meeting_token):
         url = self.host + "/evc15/meeting/api/recording?meetingToken={0}".format(meeting_token)
-
-        print(url, self.header)
         response = request("POST", url, headers=self.header)
         print('status_code')
         print(response.status_code)
@@ -226,7 +224,11 @@ class EVCPlatformMeetingService:
         import os
         for k in os.environ.keys():
             print('{k}:{v}'.format(k=k, v=os.environ[k]))
-        assert_that(response.status_code, equal_to(204))
+
+        if response.status_code != 204:
+            response = request("POST", url, headers=self.header)
+            assert_that(response.status_code, equal_to(204))
+
         return response
 
     def load_batch_attendance(self, meeting_token_list):
