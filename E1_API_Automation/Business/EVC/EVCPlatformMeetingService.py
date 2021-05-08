@@ -217,9 +217,9 @@ class EVCPlatformMeetingService:
     def trigger_record_class(self, meeting_token):
         url = self.host + "/evc15/meeting/api/recording?meetingToken={0}".format(meeting_token)
 
-        print(url)
+        print(url, self.header)
         response = request("POST", url, headers=self.header)
-        print(response)
+        print(response.json())
         assert_that(response.status_code, equal_to(204))
         return response
 
