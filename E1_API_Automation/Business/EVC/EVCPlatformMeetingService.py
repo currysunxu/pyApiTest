@@ -57,6 +57,8 @@ class EVCPlatformMeetingService:
             "meetingMeta": json.dumps(meeting_meta)
         }
 
+        print(json.dumps(param))
+        print(self.header)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
@@ -216,7 +218,11 @@ class EVCPlatformMeetingService:
 
     def trigger_record_class(self, meeting_token):
         url = self.host + "/evc15/meeting/api/recording?meetingToken={0}".format(meeting_token)
-        response = request("POST", url, headers=self.header)
+        response = requests.post(url, data='{}', headers=self.header)
+        print('url')
+        print(url)
+        print('header')
+        print(self.header)
         print('status_code')
         print(response.status_code)
         print('body')
@@ -226,7 +232,7 @@ class EVCPlatformMeetingService:
             print('{k}:{v}'.format(k=k, v=os.environ[k]))
 
         if response.status_code != 204:
-            response = request("POST", url, headers=self.header)
+            response = requests.post(url, data='{}', headers=self.header)
             assert_that(response.status_code, equal_to(204))
 
         return response
