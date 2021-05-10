@@ -1,6 +1,7 @@
 import json
 import string
 import urllib
+from time import sleep
 from random import Random
 
 import requests
@@ -57,6 +58,8 @@ class EVCPlatformMeetingService:
             "meetingMeta": json.dumps(meeting_meta)
         }
 
+        print(json.dumps(param))
+        print(self.header)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
@@ -215,10 +218,29 @@ class EVCPlatformMeetingService:
         return room_info
 
     def trigger_record_class(self, meeting_token):
-        url = self.host + "/evc15/meeting/api/recording?meetingToken={0}".format(meeting_token)
+        sleep(5) # not sure the reason, but it would fail without sleep
+        url = self.host + '/evc15/meeting/api/recording'
+        params = {
+            'meetingToken': meeting_token
+        }
+        print('header')
+        print(self.header)
+        response = requests.post(url, data='{}', params=params, headers=self.header)
+        print('status_code')
+        print(response.status_code)
+        print('body')
+        print(response.text)
+        print(response.url)
+        print(response.content)
+        print(response.headers)
+        print(response.request.url)
+        print(response.request.headers)
+        print(response.request.body)
 
-        response = request("POST", url, headers=self.header)
-        assert_that(response.status_code, equal_to(204))
+        if response.status_code != 204:
+            response = requests.post(url, data='{}', params=params, headers=self.header)
+            assert_that(response.status_code, equal_to(204))
+
         return response
 
     def load_batch_attendance(self, meeting_token_list):
