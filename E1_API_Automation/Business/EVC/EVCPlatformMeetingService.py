@@ -40,22 +40,13 @@ class EVCPlatformMeetingService:
 
         url = "/evc15/meeting/api/create"
 
-        if layout_code == EVCLayoutCode.Kids_PL:
-            meeting_meta = {
-                "realStartTime": real_start_time,
-                "program": "HFV3Plus",
-                "pdDesignation": "HF 3.5",
-                "contentMap": "HF-v3-bookC-cn-own-3ach-cx-2",
-                "useNewRecord": True
-            }
-        else:
-            meeting_meta = {
-                "realStartTime": real_start_time,
-                "program": layout_code,
-                "pdDesignation": "",
-                "contentMap": "null",
-                "useNewRecord": True
-            }
+        meeting_meta = {
+            "realStartTime": real_start_time,
+            "program": "indo_fr_gl",
+            "pdDesignation": "",
+            "contentMap": "null",
+            "useNewRecord": True
+        }
 
         param = {
             "layoutCode": layout_code,
@@ -91,7 +82,7 @@ class EVCPlatformMeetingService:
             "componentToken": component_token,
             "displayName": display_name,
             "roleCode": role_code,
-            "externalSysCode": "EVC-TEST",
+            "externalSysCode": "System",
             "userMeta": json.dumps(user_meta),
             "externalUserId": ""
         }
@@ -227,7 +218,6 @@ class EVCPlatformMeetingService:
         url = self.host + "/evc15/meeting/api/recording?meetingToken={0}".format(meeting_token)
 
         response = request("POST", url, headers=self.header)
-        print(response.text)
         assert_that(response.status_code, equal_to(204))
         return response
 
@@ -244,9 +234,10 @@ class EVCPlatformMeetingService:
     # class_end_flag = 1: when received the class end Kafka event;
     # merger_done_flag = 2: when video merger completed
     def update_record_flag(self, meeting_token, merger_done_flag='2'):
-        url = self.host + "/evc15/meeting/api/updaterecordflag?flag={0}&meetingToken={1}&setFlag=true".format(
-            merger_done_flag, meeting_token)
+        url = self.host + "/evc15/meeting/api/updaterecordflag?flag={0}&meetingToken={1}&setFlag=true".format(merger_done_flag, meeting_token)
 
         response = request("POST", url, headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response
+
+
