@@ -1,0 +1,229 @@
+Local:
+  LOCAL_ENV: "QA"
+
+Environment:
+  QA: "https://e1svc-qa.english1.cn"
+  STAGING: "https://e1svc-stg.english1.cn"
+  LIVE: "https://e1svc.ef.cn"
+  STAGING_SG: "https://e1svc-stg.english1.com"
+  LIVE_SG: "https://e1svc.ef.com"
+
+KSDEnvironment:
+  QA: "https://study-qa.english1.cn"
+  STAGING: "https://study-stg.english1.cn"
+  LIVE: "https://study.ef.cn"
+  STAGING_SG: "https://study-stg.english1.com"
+  LIVE_SG: "https://study.ef.com"
+
+
+OSPEnvironment:
+  QA: "https://internal-osp-qa.english1.cn"
+  STAGING: "https://internal-osp-stg.english1.cn"
+  LIVE: "https://internal-osp.english1.cn"
+  STAGING_SG: "https://internal-osp-stg.english1.com"
+  LIVE_SG: "http://internal-osp.english1.com"
+
+
+TPIEnvironment:
+  QA: "https://internal-tpi-qa.english1.cn"
+  STAGING: "https://internal-tpi-stg.english1.cn"
+  STAGING_SG: "https://internal-tpi-stg.english1.com"
+  LIVE: "https://internal-tpi.english1.cn"
+  LIVE_SG: "https://internal-tpi.english1.com"
+
+
+AuthEnvironment:
+  QA: "https://auth-svc-qa.english1.cn"
+  STAGING: "https://auth-svc-stg.english1.cn"
+  STAGING_SG: "https://auth-svc-stg.english1.com"
+  LIVE: "https://auth-svc.ef.cn"
+  LIVE_SG: "https://auth-svc.ef.com"
+
+
+OMNIEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/omni/apigateway"
+  STAGING: "https://omni-apigateway-tc-staging.ef.cn"
+  STAGING_SG: "http://omni-apigateway-staging-tcjp.ef.com"
+  LIVE: "https://omni-apigateway-tc.ef.cn"
+  LIVE_SG: "http://omni-apigateway-tcjp.ef.com"
+
+
+LearningResultEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/learning-result"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/learning-result"
+  LIVE: "https://internal-ktsvc.english1.cn/learning-result"
+
+
+BffEnvironment:
+  QA: "https://ktsvc-qa.english1.cn"
+  STAGING: "https://ktsvc-stg.english1.cn"
+  LIVE: "https://ktsvc.ef.cn"
+
+HomeworkEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/practice"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/practice"
+  LIVE: "https://internal-ktsvc.english1.cn/practice"
+
+
+CourseGroupEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/course-group"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/course-group"
+  LIVE: "https://internal-ktsvc.english1.cn/course-group"
+
+
+ContentMapEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/content-map"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/content-map"
+  LIVE: "https://internal-ktsvc.english1.cn/content-map"
+
+
+ContentRepoEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/content-repo"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/content-repo"
+  LIVE: "https://internal-ktsvc.english1.cn/content-repo"
+
+
+ContentBuilderEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/content-builder"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/content-builder"
+  LIVE: "https://internal-ktsvc.english1.cn/content-builder"
+
+
+MockTestEnvironment:
+  QA: "https://ktsvc-qa.english1.cn/mseb"
+  STAGING: "https://ktsvc-stg.english1.cn/mseb"
+  LIVE: "https://ktsvc.ef.cn/mseb"
+
+
+StoryblokReleaseEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/storyblok-release"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/storyblok-release"
+  LIVE: "https://internal-ktsvc.english1.cn/storyblok-release"
+
+
+StoryblokImportEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/storyblok-import"
+  LIVE: "https://internal-ktsvc.english1.cn/storyblok-import"
+
+
+E1TPIEnvironment:
+  STAGING: "https://e1tpi-stg.english1.cn"
+  STAGING_SG: "https://e1tpi-stg.english1.com"
+  LIVE: "https://e1tpi.ef.cn"
+  LIVE_SG: "https://e1tpi.ef.com"
+
+
+StudyPlanEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/study-plan"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/study-plan"
+  LIVE: "https://internal-ktsvc.english1.cn/study-plan"
+
+
+LearningProfileEnvironment:
+  STAGING: "https://e1-evc-booking-integration-stg.ef.com"
+  LIVE: "https://e1-evc-booking-integration.ef.com"
+
+
+EVCContentEnvironment:
+  STAGING: "https://evc-content-staging.bj-englishtown.com"
+  LIVE: "https://evc-content.bj-englishtown.com"
+
+
+EVCCDNEnvironment:
+  STAGING: "https://evc-fe-staging.bj-englishtown.com"
+  LIVE: "https://evc-fe.bj-englishtown.com"
+
+
+EVCDemoPageEnvironment:
+  STAGING: "https://evc-ts-staging.ef.com.cn"
+  LIVE: "https://evc-ts.ef.com.cn/"
+
+Auth2Environment:
+  QA: "https://internal-ktsvc-qa.english1.cn"
+  STAGING: "https://internal-ktsvc-stg.english1.cn"
+  LIVE: "https://internal-ktsvc.english1.cn"
+
+RemediationEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/remediation"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/remediation"
+  LIVE: "https://internal-ktsvc.english1.cn/remediation"
+
+VocabEnvironment:
+  QA: "https://internal-vocab-qa.english1.cn"
+  STAGING: "https://internal-vocab-stg.english1.cn"
+  LIVE: "https://internal-vocab.english1.cn"
+
+EVCProxyEnvironment:
+  STAGING: {
+    "CN": "evc-ts-staging.ef.com.cn",
+    "US": "evc-tv-to-ts-staging.ef.com",
+    "UK": "evc-tf-to-ts-staging.ef.com",
+    "SG": "evc-tsg-to-ts-staging.ef.com"
+  }
+
+  LIVE: {
+    "CN": "evc-ts.ef.com.cn",
+    "US": "evc-tv-to-ts.ef.com",
+    "UK": "evc-tf-to-ts.ef.com",
+    "SG": "evc-tsg-to-ts.ef.com"
+  }
+
+MediaEnvironment:
+  QA: "https://kt-asset-qa.english1.cn"
+  STAGING: "https://kt-asset-stg.english1.cn"
+  LIVE: "https://kt-asset.english1.cn"
+
+DATABASE:
+  QA: {
+    "Server": "cnsqlqa.english1.cn,1433",
+    "User": "SchoolUser",
+    "Password": "#Bugsfor$!"
+  }
+
+  STAGING: {
+    "Server": "cnsqlstg.english1.cn,1433",
+    "User": "TBV3",
+    "Password": "#Bugsfor$"
+  }
+
+  STAGING_SG: {
+    "Server": "sgsqlstg.english1.com,1433",
+    "User": "TBV3",
+    "Password": "#Bugsfor$"
+  }
+
+CASSANDRA_DATABASE:
+  QA: {
+    "Server": "CNEDTECHSTG-CASSANDRA-2471745a408b9ef8.elb.cn-north-1.amazonaws.com.cn",
+    "KeySpace": "kids_qa",
+    "User": "result_app",
+    "Password": "GE^&%*!yrP@$^|cLmFH"
+  }
+
+  STAGING: {
+    "Server": "CNEDTECHSTG-CASSANDRA-2471745a408b9ef8.elb.cn-north-1.amazonaws.com.cn",
+    "KeySpace": "kids_stg",
+    "User": "result_app",
+    "Password": "GE^&%*!yrP@$^|cLmFH"
+  }
+
+MONGO_DATABASE:
+  QA: {
+    "Server": "10.179.243.73:27017,10.179.243.72:27017,10.179.243.66:27017",
+    "User": "svcuser",
+    "Password": "Efef@123!"
+  }
+
+MYSQL_MOCKTEST_DATABASE:
+  QA: {
+    "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
+    "User": "edtechmysqluser",
+    "Password": "edtechdbuserstg123"
+  }
+
+  STAGING: {
+    "Server": "cnedtechpdmysqlstg.c4qxob5ca5uq.rds.cn-north-1.amazonaws.com.cn:3306",
+    "User": "edtechmysqluser",
+    "Password": "edtechdbuserstg123"
+  }
+

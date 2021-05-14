@@ -1,5 +1,8 @@
 import copy
 
+import jmespath
+
+from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
     PipelinePublishConstants
 
@@ -59,3 +62,59 @@ class PipelinePublishUtils:
             path = aem_unit_dict['path']
             if path == expected_aem_path:
                 return aem_unit_dict
+
+    @staticmethod
+    def get_expected_content_metadata(course, content_type, region_ach):
+        expected_metadata = {}
+        expected_metadata['program'] = course
+        expected_metadata['domainType'] = content_type.value
+        if content_type in (ContentRepoContentType.TypeHomework, ContentRepoContentType.TypeQuiz, ContentRepoContentType.TypeQuestionBank):
+            expected_metadata['entityType'] = 'ACTIVITY'
+        elif content_type in (ContentRepoContentType.TypeHandout, ContentRepoContentType.TypeFlashcard):
+            expected_metadata['entityType'] = 'ECA'
+
+        if region_ach:
+            expected_metadata['regionAch'] = region_ach.upper()
+        return expected_metadata
+
+    @staticmethod
+    def get_expected_unit_quiz_localizations(content_group_unit_quiz_activity_entity_list,
+                                             content_repo_unit_quiz_activity_list,
+                                             aem_unit_quiz_skillset_localizations):
+        activity_skill_set_map = {}
+        for content_group_unit_quiz_activity_entity in content_group_unit_quiz_activity_entity_list:
+            content_repo_unit_quiz_activity = jmespath.search(
+                "[?contentId == '{0}'] | [0]".format(
+                    content_group_unit_quiz_activity_entity[PipelinePublishConstants.FIELD_CONTENT_ID]),
+                content_repo_unit_quiz_activity_list)
+            activity_skill_set = content_repo_unit_quiz_activity['data']['Body']['tags']['skillType']
+            activity_dict = {}
+            activity_dict[PipelinePublishConstants.FIELD_CONTENT_ID] = content_group_unit_quiz_activity_entity[
+                PipelinePublishConstants.FIELD_CONTENT_ID]
+            activity_dict[PipelinePublishConstants.FIELD_CONTENT_REVISION] = content_group_unit_quiz_activity_entity[
+                PipelinePublishConstants.FIELD_CONTENT_REVISION]
+            activity_dict[PipelinePublishConstants.FIELD_SCHEMA_REVISION] = content_group_unit_quiz_activity_entity[
+                PipelinePublishConstants.FIELD_SCHEMA_REVISION]
+            if activity_skill_set in activity_skill_set_map.keys():
+                categorized_activity_list = activity_skill_set_map[activity_skill_set]
+                activity_dict = len(categorized_activity_list) + 1
+                categorized_activity_list.append(activity_dict)
+            else:
+                activity_dict['sequence'] = 1
+                activity_skill_set_map[activity_skill_set] = [activity_dict]
+
+        expected_skill_set_localizations = []
+        for aem_skill_set_localization in aem_unit_quiz_skillset_localizations:
+            expected_skill_set_localization = {}
+            aem_skill_set = aem_skill_set_localization['skillset']
+            expected_skill_set_localization['code'] = aem_skill_set
+            expected_localization_desc_list = []
+            for aem_localization_desc in aem_skill_set_localization['localizations']:
+                expected_localization_desc = {}
+                expected_localization_desc['text'] = aem_localization_desc['description']
+                expected_localization_desc['language'] = aem_localization_desc['language']
+                expected_localization_desc_list.append(expected_localization_desc)
+            expected_skill_set_localization['title'] = expected_localization_desc_list
+            expected_skill_set_localization['activityRefs'] = activity_skill_set_map[aem_skill_set]
+            expected_skill_set_localizations.append(expected_skill_set_localization)
+        return expected_skill_set_localizations

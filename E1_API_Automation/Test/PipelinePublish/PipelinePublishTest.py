@@ -2,6 +2,7 @@ import json
 import os
 
 import jmespath
+import requests
 from hamcrest import assert_that
 from jsonschema import validate
 from ptest.decorator import TestClass, Test
@@ -13,7 +14,8 @@ from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepo
 from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum import ContentRepoContentType, \
     ContentRepoGroupType
 from E1_API_Automation.Business.PipelinePublish.AEMService import AEMService
-from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishUtils import PipelinePublishUtils
+from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
+    PipelinePublishConstants
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishVerifyService import PipelinePublishVerifyService
 from E1_API_Automation.Settings import CONTENT_MAP_ENVIRONMENT, CONTENT_BUILDER_ENVIRONMENT, CONTENT_REPO_ENVIRONMENT
 from E1_API_Automation.Test_Data.PipelinePublishData import AEMData
@@ -33,22 +35,33 @@ class PipelinePublishTestCases:
     '''
 
     # @Test(data_provider=[("LIVE", "Highflyers35",
-    #                       ["book-1", "book-2", "book-3", "book-4", "book-5", "book-6", "book-7", "book-8"], "cn-3")])
+    #                       ["book-2", "book-3", "book-4", "book-5", "book-6", "book-7", "book-8"], "cn-3")])
     @Test(data_provider=[("LIVE", "Smallstars35",
-                          ["book-3"], "cn-3")])
+                          ["book-4"], "cn-3")])
     def test_pp_release(self, source_aem_env, release_program, release_book_list, region_ach):
         for release_book in release_book_list:
             print('-------------------------Start verify book: {0}'.format(release_book))
-            source_course = AEMData.CourseData[release_program]['source-name']
-            book_content_path = '{0}/{1}/{2}'.format(source_course, region_ach, release_book)
+            release_as_program = None
+            if 'release-as' in AEMData.CourseData[release_program].keys():
+                release_as_program = AEMData.CourseData[release_program]['release-as']
+
+            if release_as_program is not None:
+                release_course = AEMData.CourseData[release_as_program]['source-name']
+            else:
+                release_course = AEMData.CourseData[release_program]['source-name']
+
+            book_content_path = '{0}/{1}/{2}'.format(release_course, region_ach, release_book)
 
             aem_service = AEMService(AEMData.AEMHost[source_aem_env])
+            source_course = AEMData.CourseData[release_program]['source-name']
             aem_book_response = aem_service.get_aem_book(source_course, release_book)
 
             content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
 
-            # content_map_course = PipelinePublishUtils.get_content_map_course(source_course)
-            content_map_course = AEMData.CourseData[release_program]['target-name']
+            if release_as_program is not None:
+                content_map_course = AEMData.CourseData[release_as_program]['target-name']
+            else:
+                content_map_course = AEMData.CourseData[release_program]['target-name']
             content_map_entity = ContentMapQueryEntity(content_map_course, region_ach=region_ach)
             content_map_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
             assert_that(content_map_tree_response.status_code == 200)
@@ -72,7 +85,7 @@ class PipelinePublishTestCases:
             print('-------------------------End of verify book: {0}'.format(release_book))
 
         # verify activities templates after release for highflyer
-        if release_program== 'Highflyers35':
+        if release_program == 'Highflyers35':
             self.test_book_activity_templates(release_program, region_ach, release_book_list)
 
     '''
@@ -100,7 +113,6 @@ class PipelinePublishTestCases:
             source_course = AEMData.CourseData[release_program]['source-name']
             book_content_path = '{0}/{1}/{2}'.format(source_course, region_ach, book)
 
-            # content_map_course = PipelinePublishUtils.get_content_map_course(course)
             content_map_course = AEMData.CourseData[release_program]['target-name']
             content_map_entity = ContentMapQueryEntity(content_map_course, region_ach=region_ach)
             content_map_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)

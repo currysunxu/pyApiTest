@@ -19,8 +19,10 @@ pipeline {
 
   parameters {
         choice(name:'environment',choices:['STG','LIVE'],description:'')
-        text(name: 'agora_fe_version', defaultValue: '0.3.7-2a4d772', description: '')
+        text(name: 'agora_fe_version', defaultValue: '0.3.8-b76b2e8', description: '')
         text(name: 'fm_fe_version', defaultValue: '0.1.39-bfed4c1', description: '')
+        text(name: 'techcheck_version', defaultValue: '0.2.3-f1e6b90', description: '')
+        text(name: 'indo_demo_version', defaultValue: '0.1.0-05a01fa', description: '')
     }
 
   stages {
@@ -123,7 +125,7 @@ pipeline {
         </tr>
     </table>
 </body>
-</html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', from: 'qa.testauto@ef.com',to: 'e1pdqa@ef.com'
+</html>''', subject: '[Jenkins Notification] ${PROJECT_NAME} - Run # ${BUILD_NUMBER} Results(${TEST_COUNTS,var="pass"}/${TEST_COUNTS, var="total"}) - ${BUILD_STATUS} ', from: 'svc.e1jenkins@ef.cn',to: 'E1PDQA@ef.cn'
             }
     }
 

@@ -7,7 +7,7 @@ from E1_API_Automation.Settings import EVC_CONTENT_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCContentMaterialType
 
 
-def get_testcase_params(topic_type: EVCLayoutCode.FM_Kids_PL):
+def get_testcase_params(topic_type: EVCLayoutCode.Kids_PL):
     yield from list(EVCContentService.get_topic_ids(EVC_CONTENT_ENVIRONMENT, topic_type).json().keys())[0:10]
 
 
@@ -32,7 +32,7 @@ class EVCContentTest:
             assert_that(item, not_none())
             assert_that(topic_list[item], not_none())
 
-    @Test(tags="stg, live", data_provider=get_testcase_params(EVCLayoutCode.FM_Kids_PL))
+    @Test(tags="stg, live", data_provider=get_testcase_params(EVCLayoutCode.Kids_PL))
     def test_kids_pl_material(self, topic_id):
         response = self.evc_content_service.get_lesson_by_id(topic_id)
 

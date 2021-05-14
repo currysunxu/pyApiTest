@@ -59,47 +59,67 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
+    def get_reader_cover_thumbnail(cover_image_file_name, cover_thumbnail_resolution):
+        indicator = cover_image_file_name.find('/f/')
+        cover_thumbnail_file_name = '{0}/{1}/{2}'.format(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST,
+                                                         cover_thumbnail_resolution,
+                                                         cover_image_file_name[indicator + 1:])
+        cover_thumbnail_dict = {}
+        cover_thumbnail_dict['filename'] = cover_thumbnail_file_name
+        cover_thumbnail_dict['fieldtype'] = 'asset'
+        return cover_thumbnail_dict
+
+    @staticmethod
     def verify_storyblok_story_with_contentrepo(storyblok_story, content_repo_content, release_type=None):
         error_message = []
         print('start verify storyblok story:' + storyblok_story['name'])
 
         component = ''
         latest_activity_list = None
+        expected_metadata = {}
         if release_type == StoryblokReleaseProgram.MOCKTEST:
+            expected_metadata['domainType'] = 'MT'
             component = storyblok_story['content']['component']
-            if content_repo_content['domainType'] != 'MT':
-                error_message.append('MockTest question\'s domainType in content-repo not equal to MT')
-                return error_message
-
-            # if component is 'mt_activity', then expected value is question, otherwise, it's PAPER
-            expected_entity_type = 'question'
             if component == 'paper':
-                expected_entity_type = 'PAPER'
+                expected_metadata['entityType'] = 'PAPER'
                 # for paper, the activity will be converted to latest activity in content-repo
                 content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
                 paper_activity_id_list = jmespath.search("content.parts[].sections[].activities[].activity",
                                                          storyblok_story)
                 latest_activity_list = content_repo_service.get_latest_activities(paper_activity_id_list).json()
-
-            if content_repo_content['entityType'] != expected_entity_type:
-                error_message.append(
-                    'MockTest story\'s entityType in content-repo not equal to {0}'.format(expected_entity_type))
-                return error_message
+                expected_paper_question_count = len(jmespath.search("content.parts[].sections[].activities[]", storyblok_story))
+            else:
+                expected_metadata['entityType'] = 'ACTIVITY'
         elif release_type == StoryblokReleaseProgram.READERS:
+            expected_metadata['domainType'] = 'READER'
+            expected_metadata['entityType'] = 'ECA'
+
             #if it's reader release, there will be a cover_thumbnail field added if reader's cover_image have value
             storyblok_content = storyblok_story['content']
             if 'cover_image' in storyblok_content.keys():
                 cover_image_dict = storyblok_content['cover_image']
                 if 'filename' in cover_image_dict.keys() and len(cover_image_dict['filename']) != 0:
                     cover_image_file_name = cover_image_dict['filename']
-                    indicator = cover_image_file_name.find('/f/')
-                    cover_thumbnail_file_name = '{0}/{1}/{2}'.format(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST,
-                                                                     StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION,
-                                                                     cover_image_file_name[indicator+1:])
-                    cover_thumbnail_dict = {}
-                    cover_thumbnail_dict['filename'] = cover_thumbnail_file_name
-                    cover_thumbnail_dict['fieldtype'] = 'asset'
-                    storyblok_content['cover_thumbnail'] = cover_thumbnail_dict
+
+                    cover_thumbnail_dict_1 = StoryBlokUtils.get_reader_cover_thumbnail(cover_image_file_name, StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION_1)
+                    cover_thumbnail_dict_2 = StoryBlokUtils.get_reader_cover_thumbnail(cover_image_file_name,
+                                                                                       StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION_2)
+                    cover_thumbnail_dict_3 = StoryBlokUtils.get_reader_cover_thumbnail(cover_image_file_name,
+                                                                                       StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION_3)
+                    storyblok_content['cover_thumbnail'] = cover_thumbnail_dict_1
+                    storyblok_content['cover_thumbnail2'] = cover_thumbnail_dict_2
+                    storyblok_content['cover_thumbnail3'] = cover_thumbnail_dict_3
+        elif release_type == StoryblokReleaseProgram.VOCABULARIES:
+            expected_metadata['domainType'] = 'VOCAB'
+            expected_metadata['entityType'] = 'ECA'
+
+        diff_list = json_tools.diff(json.dumps(content_repo_content['metadata']), json.dumps(expected_metadata))
+        # if str(content_repo_content['metadata']) != str(expected_metadata):
+        if len(diff_list) != 0:
+            error_message.append(
+                '{0} story\'s metadata in content-repo not equal as expected {1}'.format(content_repo_content['contentId'],
+                                                                                         str(expected_metadata)))
+            return error_message
 
         content_repo_content_data = content_repo_content['data']
         # content repo source field should be storyblok
@@ -107,6 +127,14 @@ class StoryBlokUtils:
             error_message.append(
                 'reader/vocab eca or mocktest activity field \'source\' in content-repo not equal to storyblok')
             return error_message
+
+        # for paper, it will generate questionCount in content repo
+        if component == 'paper':
+            key = 'questionCount'
+            content_repo_question_count = content_repo_content_data[key]
+            error_message.extend(StoryBlokUtils.
+                                 verify_paper_fields_with_contentrepo(key, expected_paper_question_count,
+                                                                      content_repo_question_count))
 
         for key in storyblok_story.keys():
             if key not in (
@@ -141,7 +169,31 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
-    def verify_storyblok_fields_with_contentrepo(key, storyblock_value, content_repo_value, release_type=None):
+    def verify_mt_question_resources(storyblock_value, content_repo_value):
+        error_message = []
+        # for mt question resources filed, only url will be changed(upload to AWS), other fields will not be converted
+        for key in storyblock_value.keys():
+            if key not in ('id', 'url'):
+                storyblock_field_value = storyblock_value[key]
+                content_repo_field_value = content_repo_value[key]
+
+                if str(storyblock_field_value) != str(content_repo_field_value):
+                    error_message.append(" key:" + key + "'s value in storyblok mt question resource not equal to the value in content-repo." \
+                                                         "The storyblok value is:" + str(storyblock_field_value)
+                                         + ", but the value in content-repo is:" + str(content_repo_field_value))
+            elif key == 'url':
+                # check the asset sha1 between storyblok and aws s3
+                error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(key,
+                                                                                    content_repo_value[key],
+                                                                                    storyblock_value[key]))
+            else:
+                # otherwise those key should not present in content_repo
+                if key in content_repo_value.keys():
+                    error_message.append(' mt question resources\' key:{0} should not exist in content-repo.')
+        return error_message
+
+    @staticmethod
+    def verify_storyblok_fields_with_contentrepo(key, storyblock_value, content_repo_value, release_type=None, is_mt_question_resource=False):
         error_message = []
 
         ''' 
@@ -158,6 +210,8 @@ class StoryBlokUtils:
                 'body', 'tags', 'stimulus', 'questions', 'resources', 'explanation'):
             if isinstance(storyblock_value, dict) and 'plugin' in storyblock_value.keys():
                 storyblock_value = storyblock_value[key]
+                if key == 'resources':
+                    is_mt_question_resource = True
 
         if isinstance(storyblock_value, list):
             if len(storyblock_value) != len(content_repo_value):
@@ -171,26 +225,33 @@ class StoryBlokUtils:
                                          verify_storyblok_fields_with_contentrepo(key,
                                                                                   storyblok_list_item,
                                                                                   content_repo_list_item,
-                                                                                  release_type))
+                                                                                  release_type,
+                                                                                  is_mt_question_resource))
         elif isinstance(storyblock_value, dict):
-            # if it's asset dict
-            if 'fieldtype' in storyblock_value.keys() and storyblock_value['fieldtype'] == 'asset':
-                error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
-                                                                              content_repo_value))
+            # for mt question resource, valdiate differently
+            if is_mt_question_resource:
+                error_message.extend(StoryBlokUtils.verify_mt_question_resources(storyblock_value,
+                                                                                 content_repo_value))
             else:
-                for key in storyblock_value.keys():
-                    if key not in (
-                            '_uid', '_editable'):
-                        storyblock_field_value = storyblock_value[key]
-                        content_repo_field_value = content_repo_value[key]
-                        error_message.extend(StoryBlokUtils.
-                                             verify_storyblok_fields_with_contentrepo(key, storyblock_field_value,
-                                                                                      content_repo_field_value,
-                                                                                      release_type))
-                    else:
-                        # otherwise those key should not present in content_repo
-                        if key in content_repo_value.keys():
-                            error_message.append(' key:{0} should not exist in content-repo.')
+                # if it's asset dict
+                if 'fieldtype' in storyblock_value.keys() and storyblock_value['fieldtype'] == 'asset':
+                    error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
+                                                                                  content_repo_value))
+                else:
+                    for key in storyblock_value.keys():
+                        if key not in (
+                                '_uid', '_editable'):
+                            storyblock_field_value = storyblock_value[key]
+                            content_repo_field_value = content_repo_value[key]
+
+                            error_message.extend(StoryBlokUtils.
+                                                 verify_storyblok_fields_with_contentrepo(key, storyblock_field_value,
+                                                                                          content_repo_field_value,
+                                                                                          release_type))
+                        else:
+                            # otherwise those key should not present in content_repo
+                            if key in content_repo_value.keys():
+                                error_message.append(' key:{0} should not exist in content-repo.')
         else:
             if str(storyblock_value) != str(content_repo_value):
                 error_message.append(" key:" + key + "'s value in storyblok not equal to the value in content-repo." \
@@ -261,6 +322,9 @@ class StoryBlokUtils:
                     error_message.append(' sectionSequence not as expected as {0}'.format(str(i + 1)))
 
                 for key in storyblok_section.keys():
+                    #storyblok section's id will not be released to content repo, content repo's id value will be released with storyblok's _uid value
+                    if key == 'id':
+                        continue
                     storyblok_section_value = storyblok_section[key]
                     if key == 'activities':
                         expected_content_repo_value = content_repo_section[key]
@@ -377,9 +441,11 @@ class StoryBlokUtils:
 
             # if storyblok file name starts with https://storyblok-image.ef.com.cn/unsafe, the asset is for cover_thumbnail
             if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
+                thumbnail_resolution_start_index = len(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST) + 1
+                thumbnail_resolution_end_index = storyblok_file_name.find('/', thumbnail_resolution_start_index)
+                thumbnail_resolution = storyblok_file_name[thumbnail_resolution_start_index:thumbnail_resolution_end_index]
                 suffix_index = asset_name.rfind('.')
-                asset_name = asset_name[:suffix_index] + '_' + StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION \
-                             + asset_name[suffix_index:]
+                asset_name = asset_name[:suffix_index] + '_' + thumbnail_resolution + asset_name[suffix_index:]
 
             # url in content repo is different from storyblok, the asset will be uploaded to aws s3
             expected_asset_name_in_content = '{0}_{1}'.format(expected_sha1, asset_name)
@@ -398,7 +464,7 @@ class StoryBlokUtils:
                                                                                 expected_url))
 
             if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
-                expected_sha1 = '{0}_{1}'.format(expected_sha1, StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_RESOLUTION)
+                expected_sha1 = '{0}_{1}'.format(expected_sha1, thumbnail_resolution)
 
             compare_key = 'sha1'
             error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(compare_key,
@@ -427,8 +493,11 @@ class StoryBlokUtils:
             if is_asset_image:
                 # thumbnail have fixed width and height
                 if storyblok_file_name.startswith(StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HOST):
-                    expected_width_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_WIDTH
-                    expected_height_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HEIGHT
+                    # expected_width_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_WIDTH_221
+                    # expected_height_value = StoryBlokConstants.STORYBLOK_COVER_THUMBNAIL_HEIGHT
+                    indicator = thumbnail_resolution.find('x')
+                    expected_width_value = thumbnail_resolution[:indicator]
+                    expected_height_value = thumbnail_resolution[indicator+1:]
                 else:
                     image_size_end_index = sha1_start_index
                     image_size_start_index = expected_url.rfind('/', 0, image_size_end_index)
@@ -581,6 +650,16 @@ class StoryBlokUtils:
                 expected_content_group_childref['type'] = "Reader"
                 expected_reader_metadata['title'] = latest_eca['data']['content']['title']
                 expected_reader_metadata['cover_image'] = latest_eca['data']['content']['cover_thumbnail']
+                if 'cover_thumbnail2' in latest_eca['data']['content'].keys():
+                    expected_reader_metadata['cover_image2'] = latest_eca['data']['content']['cover_thumbnail2']
+                else:
+                    expected_reader_metadata['cover_image2'] = None
+
+                if 'cover_thumbnail3' in latest_eca['data']['content'].keys():
+                    expected_reader_metadata['cover_image3'] = latest_eca['data']['content']['cover_thumbnail3']
+                else:
+                    expected_reader_metadata['cover_image3'] = None
+
                 expected_reader_metadata['reader_provider'] = latest_eca['data']['content']['reader_provider']
             expected_content_group_childref['metadata'] = expected_reader_metadata
 
@@ -679,8 +758,8 @@ class StoryBlokUtils:
         # vocab config list have been sorted by full_slug, the order should be consistent with content group searched by book
         for i in range(len(storyblok_vocab_config_list)):
             storyblok_vocab_config = storyblok_vocab_config_list[i]
-            vocab_eca_group = vocab_eca_group_list[i]
-            vocab_asset_group = vocab_asset_group_list[i]
+            # vocab_eca_group = vocab_eca_group_list[i]
+            # vocab_asset_group = vocab_asset_group_list[i]
 
             storyblok_correlation_path = storyblok_vocab_config['content']['parent']['content']['correlation_path']
             storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
@@ -688,14 +767,19 @@ class StoryBlokUtils:
             unit_in_content_map = jmespath.search(
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
+            unit_content_index = unit_content_path_list_in_content_map.index(storyblok_correlation_path) + 1
+
+            vocab_eca_group = jmespath.search(
+                '[? parentRef.contentIndex == `{0}`]| [0]'.format(unit_content_index), vocab_eca_group_list)
+            vocab_asset_group = jmespath.search(
+                '[? parentRef.contentIndex == `{0}`]| [0]'.format(unit_content_index), vocab_asset_group_list)
 
             expected_content_group_parent_ref = {}
             expected_content_group_parent_ref['type'] = 'UNIT'
             expected_content_group_parent_ref['contentId'] = unit_in_content_map['contentId']
             expected_content_group_parent_ref['contentRevision'] = unit_in_content_map['contentRevision']
             expected_content_group_parent_ref['schemaVersion'] = unit_in_content_map['schemaVersion']
-            expected_content_group_parent_ref['contentIndex'] = \
-                unit_content_path_list_in_content_map.index(storyblok_correlation_path) + 1
+            expected_content_group_parent_ref['contentIndex'] = unit_content_index
 
             actual_eca_group_parent_ref = vocab_eca_group['parentRef']
 

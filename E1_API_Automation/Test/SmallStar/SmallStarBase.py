@@ -4,7 +4,8 @@ from ptest.decorator import TestClass, BeforeClass, AfterMethod, BeforeMethod
 from E1_API_Automation.Business.Athena import Student
 from E1_API_Automation.Business.SmallStarV3 import SmallStarService
 from E1_API_Automation.Business.TPIService import TPIService
-from E1_API_Automation.Settings import ENVIRONMENT, Environment, TPI_ENVIRONMENT
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
+from E1_API_Automation.Settings import ENVIRONMENT, TPI_ENVIRONMENT
 
 
 @TestClass()
@@ -14,23 +15,23 @@ class SmallStarBase():
     product_code = None
     course_plan_key = None
     un_lock_lesson_keys = None
-    if ENVIRONMENT == Environment.STAGING:
+    if EnvUtils.is_env_stg_cn():
         user_name = "ss3.cn.01"
         password = '12345'
         culture_code = 'zh-CN'
-    if ENVIRONMENT == Environment.STAGING_SG:
+    if EnvUtils.is_env_stg_sg():
         user_name = "ss3.id.01"
         password = '12345'
         culture_code = 'id-ID'
-    if ENVIRONMENT == Environment.QA:
+    if EnvUtils.is_env_qa():
         user_name = "ss3.cn.01"
         password = '12345'
         culture_code = 'zh-CN'
-    if ENVIRONMENT == Environment.LIVE:
+    if EnvUtils.is_env_live_cn():
         user_name = "ss3.cn.01"
         password = '12345'
         culture_code = 'zh-CN'
-    if ENVIRONMENT == Environment.LIVE_SG:
+    if EnvUtils.is_env_live_sg():
         user_name = "ss3.ru.01"
         password = '12345'
         culture_code = 'ru-RU'

@@ -83,7 +83,7 @@ class AuthTestCases:
                     assert_that(product_content['value'] == expected_value)
                     assert_that(product_content['level'] == 'PRODUCT')
                     # if it's not Live environment, then do the rest verification with DB
-                    if not EnvUtils.is_env_live():
+                    if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg() :
                         customer_id = auth_service.get_custom_id()
                         student_profile = auth_service.get_student_profile_from_db(customer_id)
                         expected_gp_purchase_type = AuthUtils.get_expected_gp_purchase_type(student_profile[0][0])
