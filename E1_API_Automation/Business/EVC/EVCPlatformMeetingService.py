@@ -2,14 +2,17 @@ import json
 import string
 import urllib
 from random import Random
+from time import sleep
 
 import requests
 from hamcrest import assert_that, equal_to
+from ptest.plogger import preporter
 from requests import request
 
+from E1_API_Automation.Business.EVC.EVCComponentEntity import EVCComponent, MeetingComponent
 from E1_API_Automation.Business.EVC.EVCContentService import EVCContentService
 from E1_API_Automation.Settings import EVC_CONTENT_ENVIRONMENT
-from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode
+from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode, EVCComponentType
 
 
 class EVCPlatformMeetingService:
@@ -56,7 +59,7 @@ class EVCPlatformMeetingService:
             "externalSysKey": external_key,
             "meetingMeta": json.dumps(meeting_meta)
         }
-
+        preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
@@ -86,7 +89,7 @@ class EVCPlatformMeetingService:
             "userMeta": json.dumps(user_meta),
             "externalUserId": ""
         }
-
+        preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
@@ -97,7 +100,7 @@ class EVCPlatformMeetingService:
         param = {
             "attendanceToken": attendance_token
         }
-
+        preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
@@ -117,7 +120,7 @@ class EVCPlatformMeetingService:
             "componentToken": component_token,
             "componentUpdateInfo": component_update_info
         }
-
+        preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response
@@ -144,7 +147,7 @@ class EVCPlatformMeetingService:
             "componentUpdateInfo": component_update_info
         }
 
-        print(param)
+        preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response
@@ -159,7 +162,7 @@ class EVCPlatformMeetingService:
         param = {
             "attendanceToken": attendance_token
         }
-
+        preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         return response.json()
 
@@ -168,31 +171,25 @@ class EVCPlatformMeetingService:
         param = {
             "componentToken": component_token
         }
-
+        preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         return response.json()
 
     def create_or_join_classroom(self, user_name="test", room_name=None, content_id="10223", duration=5,
-                                 role_code=EVCMeetingRole.STUDENT, layout_code=EVCLayoutCode.Kids_PL, use_agora="True"):
+                                 role_code=EVCMeetingRole.STUDENT, layout_code=EVCLayoutCode.Kids_PL, use_agora=True,
+                                 media_type="agora"):
+
         if room_name is None:
             r = Random()
             room_name = "".join(r.sample(string.ascii_letters, 8))
 
-        header = {'x-accesskey': self.access_key}
-        url = '/evc15/meeting/tools/CreateOrJoinClassroom'
-        param = {
-            'userDisplayName': user_name,
-            'roomName': room_name,
-            'contentId': content_id,
-            'duration': duration,
-            'roleCode': role_code,
-            'videoUnMute': True,
-            'videoDisplay': True,
-            'layoutCode': layout_code,
-            'centerCode': 'S',
-            'useAgora': use_agora
-        }
-        response = requests.post(self.host + url, params=param, headers=header)
+        url = "/evc15/meeting/tools/CreateOrJoinClassroom/?userDisplayName={0}&roomName={1}&contentId={2}&duration={3}&roleCode={4}&centerCode=S&layoutCode={5}&videoUnMute=true&videoDisplay=true&externalUserId=&useAgora={6}&mediaType={7}".format(
+            user_name, room_name, content_id, duration, role_code, layout_code, use_agora, media_type)
+
+        payload = ""
+
+        response = requests.request("POST", self.host + url, headers=self.header, data=payload)
+
         assert_that(response.status_code, equal_to(200))
         return response.json()
 
@@ -202,7 +199,7 @@ class EVCPlatformMeetingService:
         class_info = self.create_or_join_classroom(user_name, room_name, content_id, duration, role_code, layout_code,
                                                    use_agora)
         bootstrap_url = urllib.parse.unquote(class_info['bootstrapApi'], encoding='utf-8', errors='replace')
-        bootstrap_response = self.meeting_bootstrap(class_info['attendanceToken'], bootstrap_url)
+        bootstrap_response = self.meeting_bootstrap(class_info['attendanceToken'])
         components = bootstrap_response['components']
         room_info = {
             'user_name': user_name,
@@ -215,10 +212,18 @@ class EVCPlatformMeetingService:
         return room_info
 
     def trigger_record_class(self, meeting_token):
-        url = self.host + "/evc15/meeting/api/recording?meetingToken={0}".format(meeting_token)
+        sleep(5)  # not sure the reason, but it would fail without sleep
+        url = self.host + '/evc15/meeting/api/recording'
+        params = {
+            'meetingToken': meeting_token
+        }
 
-        response = request("POST", url, headers=self.header)
-        assert_that(response.status_code, equal_to(204))
+        response = requests.post(url, data='{}', params=params, headers=self.header)
+
+        if response.status_code != 204:
+            response = requests.post(url, data='{}', params=params, headers=self.header)
+            assert_that(response.status_code, equal_to(204))
+
         return response
 
     def load_batch_attendance(self, meeting_token_list):
@@ -226,6 +231,7 @@ class EVCPlatformMeetingService:
         param = {
             "componentTokens": meeting_token_list
         }
+        preporter.info(self.host + url)
         response = requests.post(self.host + url, params=param, headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
@@ -234,10 +240,51 @@ class EVCPlatformMeetingService:
     # class_end_flag = 1: when received the class end Kafka event;
     # merger_done_flag = 2: when video merger completed
     def update_record_flag(self, meeting_token, merger_done_flag='2'):
-        url = self.host + "/evc15/meeting/api/updaterecordflag?flag={0}&meetingToken={1}&setFlag=true".format(merger_done_flag, meeting_token)
-
+        url = self.host + "/evc15/meeting/api/updaterecordflag?flag={0}&meetingToken={1}&setFlag=true".format(
+            merger_done_flag, meeting_token)
+        preporter.info(url)
         response = request("POST", url, headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response
 
+    def load_meeting_home(self, room_info):
+        url = self.host + '/evc15/meeting/home?room={0}&token={1}&accesskey={2}&fmdebug=true'.format(
+            room_info['room_name'], room_info['attendance_token'], self.access_key)
+        preporter.info("load {0}".format(url))
+        response = requests.get(url)
+        assert_that(response.status_code, equal_to(200))
 
+    def websync_teacher(self, room_info):
+        meeting_component = MeetingComponent(EVCComponentType.MEETING, room_info)
+
+        print("call home?room url")
+        url = self.host + '/evc15/meeting/home?room={0}&token={1}&accesskey={2}&fmdebug=true'.format(
+            room_info['room_name'], room_info['attendance_token'], self.access_key)
+        requests.get(url)
+
+        print("handshake meeting component")
+        shake = meeting_component.handshake()
+        print(shake)
+
+        connect = meeting_component.connect(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], False)
+        print(connect)
+        binding = meeting_component.binding(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'],
+                                            room_info['attendance_token'], self.access_key)
+
+        print(binding)
+        meeting_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
+        media_component = EVCComponent(EVCComponentType.MEDIA, room_info)
+        media_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
+        note_component = EVCComponent(EVCComponentType.NOTE, room_info)
+        note_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
+        chat_component = EVCComponent(EVCComponentType.CHAT, room_info)
+        chat_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
+        whiteboard_component = EVCComponent(EVCComponentType.WHITEBOARD, room_info)
+        whiteboard_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
+        connect = meeting_component.connect(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], True)
+
+        chat_body = {
+            "data": {"message": "abcddd-", "displayName": room_info['user_name'],
+                     "attendanceRefCode": room_info['attendance_token'],
+                     "roleCode": room_info['role']}, "params": {"topic": "MESSAGE.NEW"}}
+        return chat_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], chat_body).json()

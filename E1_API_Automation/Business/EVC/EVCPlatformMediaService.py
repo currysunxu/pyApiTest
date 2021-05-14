@@ -23,4 +23,4 @@ class EVCPlatformMediaService:
         response = requests.post(url, headers=self.header, data=json.dumps(payload))
         assert_that(response.status_code, equal_to(200))
 
-        return response
+        return response.json()

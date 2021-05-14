@@ -39,7 +39,7 @@ class FrontEndVersionTest:
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_agora_frontend_version(self, platform):
         # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_BACKEND_ENVIRONMENT)
+        meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT["CN"])
         attendance_token = meeting_service.create_or_join_classroom()["attendanceToken"]
 
         # get version from api
@@ -54,7 +54,7 @@ class FrontEndVersionTest:
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_fm_frontend_version(self, platform):
         # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_BACKEND_ENVIRONMENT)
+        meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT["CN"])
         attendance_token = meeting_service.create_or_join_classroom(use_agora="False")["attendanceToken"]
 
         # get version from api

@@ -4,6 +4,8 @@ import requests
 from hamcrest import assert_that, equal_to, is_not
 from ptest.plogger import preporter
 
+from E1_API_Automation.Settings import EVC_PROXY_ENVIRONMENT
+
 
 class EVCFrontendService(object):
     def __init__(self, host):
@@ -53,7 +55,7 @@ class EVCFrontendService(object):
         return file_list
 
     def get_client_version_by_attendance_token(self, attendance_token, platform):
-        url = EVC_BACKEND_ENVIRONMENT + "/evc15/meeting/api/clientversion?platform={0}&attendanceToken={1}".format(
+        url = EVC_PROXY_ENVIRONMENT["CN"] + "/evc15/meeting/api/clientversion?platform={0}&attendanceToken={1}".format(
             platform, attendance_token)
         response = requests.get(url)
         assert_that(response.status_code, equal_to(200))

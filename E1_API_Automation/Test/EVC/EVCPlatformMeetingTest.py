@@ -17,7 +17,7 @@ class EVCPlatformMediaTest:
         self.teacher_name = "test teacher"
         self.student_name = "test student"
 
-    @Test(tags="stg", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG", "CN_NEW", "SG_NEW", "US_NEW", "SG_NEW"])
     def test_agora_pl_recorded(self, location):
         evc_meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT[location])
 
@@ -38,7 +38,7 @@ class EVCPlatformMediaTest:
         evc_meeting_service.trigger_record_class(meeting_token)
         evc_meeting_service.update_record_flag(meeting_token)
 
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG", "CN_NEW", "SG_NEW", "US_NEW", "SG_NEW"])
     def test_teacher_bootstrap(self, location):
         evc_meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT[location])
 
@@ -71,13 +71,13 @@ class EVCPlatformMediaTest:
         assert_that(material_info["roleCode"], equal_to(EVCMeetingRole.TEACHER))
         assert_that(material_info["rtcProvider"], equal_to("agora"))
 
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG", "CN_NEW", "SG_NEW", "US_NEW", "SG_NEW"])
     def test_student_bootstrap(self, location):
         evc_meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT[location])
 
         start_time = datetime.now()
         real_start_time = start_time + timedelta(minutes=1)
-        end_time = real_start_time + timedelta(minutes=5)
+        end_time = real_start_time + timedelta(minutes=30)
 
         # create meeting
         preporter.info("----Create meeting under {0}----: {1}".format(location, EVC_PROXY_ENVIRONMENT[location]))
@@ -104,13 +104,13 @@ class EVCPlatformMediaTest:
         assert_that(material_info["roleCode"], equal_to(EVCMeetingRole.STUDENT))
         assert_that(material_info["rtcProvider"], equal_to("agora"))
 
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG", "CN_NEW", "SG_NEW", "US_NEW", "SG_NEW"])
     def test_teacher_loadstate(self, location):
         evc_meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT[location])
 
         start_time = datetime.now()
         real_start_time = start_time + timedelta(minutes=1)
-        end_time = real_start_time + timedelta(minutes=5)
+        end_time = real_start_time + timedelta(minutes=30)
 
         # create meeting
         preporter.info("----Create meeting under {0}----: {1}".format(location, EVC_PROXY_ENVIRONMENT[location]))
@@ -132,7 +132,7 @@ class EVCPlatformMediaTest:
         assert_that(loadstate["roleCode"], equal_to(EVCMeetingRole.TEACHER))
         assert_that(loadstate["state"], equal_to(2270))
 
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG", "CN_NEW", "SG_NEW", "US_NEW", "SG_NEW"])
     def test_student_loadstate(self, location):
         evc_meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT[location])
 

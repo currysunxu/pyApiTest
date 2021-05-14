@@ -12,26 +12,13 @@ from E1_API_Automation.Business.EVC.EVCPlatformMeetingService import EVCPlatform
 from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode
 
-class_duration = 5
+class_duration = 30
 
-platform_service = EVCPlatformMeetingService("https://evc-tsg-to-ts-staging.ef.com")
-# STAGING: {
-#     "CN": "https://evc-ts-staging.ef.com.cn",
-#     "US": "https://evc-tv-to-ts-staging.ef.com",
-#     "UK": "https://evc-tf-to-ts-staging.ef.com",
-#     "SG": "https://evc-tsg-to-ts-staging.ef.com"
-# }
-#
-# LIVE: {
-#     "CN": "https://evc-ts.ef.com.cn",
-#     "US": "https://evc-tv-to-ts.ef.com",
-#     "UK": "https://evc-tf-to-ts.ef.com",
-#     "SG": "https://evc-tsg-to-ts.ef.com"
-# }
-
+platform_service = EVCPlatformMeetingService("https://evc-tsg-to-ts-staging.ef.com/")
 
 def generate_chrome_option():
     options = ChromeOptions()
+    options.add_argument('--headless')
     options.add_argument("use-fake-ui-for-media-stream")  # grant the permissions of micro and camera
     options.add_argument("use-fake-device-for-media-stream")  # use fake video & audio
     options.add_argument("ignore-certificate-errors")  # ignore certificate errors
@@ -40,7 +27,7 @@ def generate_chrome_option():
 
 
 def click_auto_play(web_driver):
-    wait = WebDriverWait(web_driver, 15)
+    wait = WebDriverWait(web_driver, 5)
     try:
         auto_play_button = wait.until(
             EC.element_to_be_clickable((By.XPATH, "//*[@id='classroom-splash']/div[2]/div[1]")))
@@ -65,7 +52,7 @@ def register_user(meeting_token, amount):
 
 def mock_omni_class_booking(layout_code, student_amount):
     # start_time = datetime(2021, 5, 6, 10, 20)
-    real_start_time = start_time + timedelta(minutes=1)
+    # real_start_time = start_time + timedelta(minutes=1)
     start_time = datetime.now()
     real_start_time = start_time + timedelta(minutes=1)
     end_time = real_start_time + timedelta(minutes=class_duration)
@@ -122,6 +109,7 @@ def mock_omni_class_booking(layout_code, student_amount):
 
 
 if __name__ == "__main__":
-    mock_omni_class_booking(EVCLayoutCode.Indo_FR_GL, 5)
+    mock_omni_class_booking(EVCLayoutCode.Indo_FR_GL, 9)
+    time.sleep(class_duration * 60 - 160)
     # for i in range(10):
-        # mock_omni_class_booking(EVCLayoutCode.Kids_PL, 1)
+    # mock_omni_class_booking(EVCLayoutCode.Kids_PL, 1)
