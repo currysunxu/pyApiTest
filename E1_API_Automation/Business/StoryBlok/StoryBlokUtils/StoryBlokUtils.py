@@ -87,6 +87,7 @@ class StoryBlokUtils:
                 paper_activity_id_list = jmespath.search("content.parts[].sections[].activities[].activity",
                                                          storyblok_story)
                 latest_activity_list = content_repo_service.get_latest_activities(paper_activity_id_list).json()
+                expected_paper_question_count = len(jmespath.search("content.parts[].sections[].activities[]", storyblok_story))
             else:
                 expected_metadata['entityType'] = 'ACTIVITY'
         elif release_type == StoryblokReleaseProgram.READERS:
@@ -127,6 +128,14 @@ class StoryBlokUtils:
                 'reader/vocab eca or mocktest activity field \'source\' in content-repo not equal to storyblok')
             return error_message
 
+        # for paper, it will generate questionCount in content repo
+        if component == 'paper':
+            key = 'questionCount'
+            content_repo_question_count = content_repo_content_data[key]
+            error_message.extend(StoryBlokUtils.
+                                 verify_paper_fields_with_contentrepo(key, expected_paper_question_count,
+                                                                      content_repo_question_count))
+
         for key in storyblok_story.keys():
             if key not in (
                     '_uid', '_editable', 'alternates', 'default_full_slug', 'sort_by_date', 'position', 'tag_list',
@@ -160,7 +169,31 @@ class StoryBlokUtils:
         return error_message
 
     @staticmethod
-    def verify_storyblok_fields_with_contentrepo(key, storyblock_value, content_repo_value, release_type=None):
+    def verify_mt_question_resources(storyblock_value, content_repo_value):
+        error_message = []
+        # for mt question resources filed, only url will be changed(upload to AWS), other fields will not be converted
+        for key in storyblock_value.keys():
+            if key not in ('id', 'url'):
+                storyblock_field_value = storyblock_value[key]
+                content_repo_field_value = content_repo_value[key]
+
+                if str(storyblock_field_value) != str(content_repo_field_value):
+                    error_message.append(" key:" + key + "'s value in storyblok mt question resource not equal to the value in content-repo." \
+                                                         "The storyblok value is:" + str(storyblock_field_value)
+                                         + ", but the value in content-repo is:" + str(content_repo_field_value))
+            elif key == 'url':
+                # check the asset sha1 between storyblok and aws s3
+                error_message.extend(StoryBlokUtils.verify_content_repo_asset_field(key,
+                                                                                    content_repo_value[key],
+                                                                                    storyblock_value[key]))
+            else:
+                # otherwise those key should not present in content_repo
+                if key in content_repo_value.keys():
+                    error_message.append(' mt question resources\' key:{0} should not exist in content-repo.')
+        return error_message
+
+    @staticmethod
+    def verify_storyblok_fields_with_contentrepo(key, storyblock_value, content_repo_value, release_type=None, is_mt_question_resource=False):
         error_message = []
 
         ''' 
@@ -177,6 +210,8 @@ class StoryBlokUtils:
                 'body', 'tags', 'stimulus', 'questions', 'resources', 'explanation'):
             if isinstance(storyblock_value, dict) and 'plugin' in storyblock_value.keys():
                 storyblock_value = storyblock_value[key]
+                if key == 'resources':
+                    is_mt_question_resource = True
 
         if isinstance(storyblock_value, list):
             if len(storyblock_value) != len(content_repo_value):
@@ -190,26 +225,33 @@ class StoryBlokUtils:
                                          verify_storyblok_fields_with_contentrepo(key,
                                                                                   storyblok_list_item,
                                                                                   content_repo_list_item,
-                                                                                  release_type))
+                                                                                  release_type,
+                                                                                  is_mt_question_resource))
         elif isinstance(storyblock_value, dict):
-            # if it's asset dict
-            if 'fieldtype' in storyblock_value.keys() and storyblock_value['fieldtype'] == 'asset':
-                error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
-                                                                              content_repo_value))
+            # for mt question resource, valdiate differently
+            if is_mt_question_resource:
+                error_message.extend(StoryBlokUtils.verify_mt_question_resources(storyblock_value,
+                                                                                 content_repo_value))
             else:
-                for key in storyblock_value.keys():
-                    if key not in (
-                            '_uid', '_editable'):
-                        storyblock_field_value = storyblock_value[key]
-                        content_repo_field_value = content_repo_value[key]
-                        error_message.extend(StoryBlokUtils.
-                                             verify_storyblok_fields_with_contentrepo(key, storyblock_field_value,
-                                                                                      content_repo_field_value,
-                                                                                      release_type))
-                    else:
-                        # otherwise those key should not present in content_repo
-                        if key in content_repo_value.keys():
-                            error_message.append(' key:{0} should not exist in content-repo.')
+                # if it's asset dict
+                if 'fieldtype' in storyblock_value.keys() and storyblock_value['fieldtype'] == 'asset':
+                    error_message.extend(StoryBlokUtils.verify_content_repo_asset(storyblock_value,
+                                                                                  content_repo_value))
+                else:
+                    for key in storyblock_value.keys():
+                        if key not in (
+                                '_uid', '_editable'):
+                            storyblock_field_value = storyblock_value[key]
+                            content_repo_field_value = content_repo_value[key]
+
+                            error_message.extend(StoryBlokUtils.
+                                                 verify_storyblok_fields_with_contentrepo(key, storyblock_field_value,
+                                                                                          content_repo_field_value,
+                                                                                          release_type))
+                        else:
+                            # otherwise those key should not present in content_repo
+                            if key in content_repo_value.keys():
+                                error_message.append(' key:{0} should not exist in content-repo.')
         else:
             if str(storyblock_value) != str(content_repo_value):
                 error_message.append(" key:" + key + "'s value in storyblok not equal to the value in content-repo." \
@@ -280,6 +322,9 @@ class StoryBlokUtils:
                     error_message.append(' sectionSequence not as expected as {0}'.format(str(i + 1)))
 
                 for key in storyblok_section.keys():
+                    #storyblok section's id will not be released to content repo, content repo's id value will be released with storyblok's _uid value
+                    if key == 'id':
+                        continue
                     storyblok_section_value = storyblok_section[key]
                     if key == 'activities':
                         expected_content_repo_value = content_repo_section[key]
@@ -713,8 +758,8 @@ class StoryBlokUtils:
         # vocab config list have been sorted by full_slug, the order should be consistent with content group searched by book
         for i in range(len(storyblok_vocab_config_list)):
             storyblok_vocab_config = storyblok_vocab_config_list[i]
-            vocab_eca_group = vocab_eca_group_list[i]
-            vocab_asset_group = vocab_asset_group_list[i]
+            # vocab_eca_group = vocab_eca_group_list[i]
+            # vocab_asset_group = vocab_asset_group_list[i]
 
             storyblok_correlation_path = storyblok_vocab_config['content']['parent']['content']['correlation_path']
             storyblok_correlation_path = StoryBlokUtils.get_storyblok_correlation_path_wth_region(
@@ -722,14 +767,19 @@ class StoryBlokUtils:
             unit_in_content_map = jmespath.search(
                 'children[?contentPath == \'{0}\'] | [0]'.format(storyblok_correlation_path),
                 book_in_content_map)
+            unit_content_index = unit_content_path_list_in_content_map.index(storyblok_correlation_path) + 1
+
+            vocab_eca_group = jmespath.search(
+                '[? parentRef.contentIndex == `{0}`]| [0]'.format(unit_content_index), vocab_eca_group_list)
+            vocab_asset_group = jmespath.search(
+                '[? parentRef.contentIndex == `{0}`]| [0]'.format(unit_content_index), vocab_asset_group_list)
 
             expected_content_group_parent_ref = {}
             expected_content_group_parent_ref['type'] = 'UNIT'
             expected_content_group_parent_ref['contentId'] = unit_in_content_map['contentId']
             expected_content_group_parent_ref['contentRevision'] = unit_in_content_map['contentRevision']
             expected_content_group_parent_ref['schemaVersion'] = unit_in_content_map['schemaVersion']
-            expected_content_group_parent_ref['contentIndex'] = \
-                unit_content_path_list_in_content_map.index(storyblok_correlation_path) + 1
+            expected_content_group_parent_ref['contentIndex'] = unit_content_index
 
             actual_eca_group_parent_ref = vocab_eca_group['parentRef']
 
