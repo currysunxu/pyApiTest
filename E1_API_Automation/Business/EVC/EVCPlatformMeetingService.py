@@ -7,6 +7,7 @@ from random import Random
 import requests
 from hamcrest import assert_that, equal_to
 from requests import request
+from E1_API_Automation.Business.EVC import *
 
 from E1_API_Automation.Business.EVC.EVCContentService import EVCContentService
 from E1_API_Automation.Settings import EVC_CONTENT_ENVIRONMENT
@@ -164,6 +165,14 @@ class EVCPlatformMeetingService:
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         return response.json()
 
+    def load_by_attendance(self, attendance_token):
+        url = '/evc15/meeting/api/loadbyattendance'
+        param = {
+            "attendanceToken": attendance_token
+        }
+        response = requests.post(self.host + url, json=param, headers=self.headers)
+        return response.json()
+
     def meeting_load(self, component_token):
         url = "/evc15/meeting/api/load"
         param = {
@@ -245,9 +254,10 @@ class EVCPlatformMeetingService:
     # merger_done_flag = 2: when video merger completed
     def update_record_flag(self, meeting_token, merger_done_flag='2'):
         url = self.host + "/evc15/meeting/api/updaterecordflag?flag={0}&meetingToken={1}&setFlag=true".format(merger_done_flag, meeting_token)
-
         response = request("POST", url, headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response
+
+
 
 

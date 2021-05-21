@@ -77,7 +77,6 @@ class EVCComponent:
         response = requests.post(self.websync_endpoint, params=self.param, json=json)
         return response
 
-
 class MeetingComponent(EVCComponent):
     @need_count(True)
     def handshake(self):
@@ -108,109 +107,15 @@ class MeetingComponent(EVCComponent):
         requests.post(self.websync_endpoint, params=self.param, json=binding_data).json()
 
 
-class EVCPlatformService:
+class EVCPlatformWebsync:
     def __init__(self, host):
         self.host = host
-        self.access_key = self.__create_api_access_Key()
         self.headers = {'x-accesskey': self.access_key}
 
-    def __create_api_access_Key(self):
-        param = {
-            'username': 'abc',
-            'password': '123'
-        }
-        response = requests.post(self.host + '/evc15/meeting/api/create_accesskey', json=param)
-        if response.status_code == 200:
-            return response.json()['accessKey']
-        else:
-            raise Exception;
-
-    def create(self, layout_code, start_time, end_time, meeting_meta):
-
-        param = {
-            "layoutCode": layout_code,
-            "startTime": start_time,
-            "endTime": end_time,
-            "externalSysCode": "System",
-            "externalSysKey": "external_key",
-            "meetingMeta": meeting_meta
-        }
-        url = '/evc15/meeting/api/create'
-        response = requests.post(self.host + url, json=param, headers=self.headers)
-        return response.json()
-
-    def register(self, component_token,name, role_code, user_meta):
-        url = '/evc15/meeting/api/register'
-        param = {
-            "componentToken": component_token,
-            "displayName": name,
-            "roleCode": role_code,
-            "externalSysCode": "System",
-            "userMeta": user_meta,
-            "externalUserId": ""
-        }
-        response = requests.post(self.host + url, json=param, headers=self.headers)
-        return response.json()
-
-    def load_by_attendance(self, attendance_token):
-        url = '/evc15/meeting/api/loadbyattendance'
-        param = {
-            "attendanceToken": attendance_token
-        }
-        response = requests.post(self.host + url, json=param, headers=self.headers)
-        return response.json()
-
-
-    def join_classroom(self, user_name, room_name, content_id, duration, role_code, layout_code, use_agora):
-        header = {'x-accesskey': self.access_key}
-        url = '/evc15/meeting/tools/CreateOrJoinClassroom'
-        param = {
-            'userDisplayName': user_name,
-            'roomName': room_name,
-            'contentId': content_id,
-            'duration': duration,
-            'roleCode': role_code,
-            'videoUnMute': True,
-            'videoDisplay': True,
-            'layoutCode': layout_code,
-            'centerCode': 'S',
-            'useAgora': use_agora
-        }
-        response = requests.post(self.host + url, json=param, headers=header)
-        return response.json()
-
-    def meeting_bootstrap(self, attendance_token, url):
-        headers = {
-            'x-accesskey': self.access_key,
-            'X-AttendanceToken': attendance_token
-        }
-        payload = {
-            "attendanceToken": attendance_token
-        }
-        response = requests.post(url, json=payload, headers=headers).json()
-        return response
-
-    def get_meeting_room_info(self, user_name, room_name, content_id, duration, role_code, layout_code,
-                              use_agora):
-        class_info = self.join_classroom(user_name, room_name, content_id, duration, role_code, layout_code, use_agora)
-        bootstrap_url = urllib.parse.unquote(class_info['bootstrapApi'], encoding='utf-8', errors='replace')
-        bootstrap_response = self.meeting_bootstrap(class_info['attendanceToken'], bootstrap_url)
-        components = bootstrap_response['components']
-        room_info = {
-            'user_name': user_name,
-            'room_name': room_name,
-            'role': role_code,
-            'request_token': Random().randint(10000000, 99999999),
-            'component_detail': components,
-            'attendance_token': class_info['attendanceToken']
-        }
-        return room_info
 
     def websync(self, room_info):
         meeting_component = MeetingComponent(ComponentType.meeting, room_info)
-        url = self.host + '/evc15/meeting/home?room={0}&token={1}&accesskey={2}&fmdebug=true'.format(
-            room_info['room_name'], room_info['attendance_token'], self.access_key)
-        requests.get(url)
+
         shake = meeting_component.handshake()
         connect = meeting_component.connect(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], False)
         binding = meeting_component.binding(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'],
@@ -230,31 +135,3 @@ class EVCPlatformService:
                      "attendanceRefCode": room_info['attendance_token'],
                      "roleCode": room_info['role']}, "params": {"topic": "MESSAGE.NEW"}}
         return chat_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], chat_body).json()
-
-    def websync_2(self, room_info):
-        meeting_component = MeetingComponent(ComponentType.meeting, room_info)
-        url = self.host + '/evc15/meeting/home?room={0}&token={1}&accesskey={2}&fmdebug=true'.format(
-            room_info['room_name'], room_info['attendance_token'], self.access_key)
-        requests.get(url)
-        shake = meeting_component.handshake()
-        connect = meeting_component.connect(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], False)
-        binding = meeting_component.binding(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'],
-                                            room_info['attendance_token'], self.access_key)
-        meeting_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        media_component = EVCComponent(ComponentType.media, room_info)
-        media_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        note_component = EVCComponent(ComponentType.note, room_info)
-        note_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        chat_component = EVCComponent(ComponentType.chat, room_info)
-        chat_response = chat_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-
-        whiteboard_component = EVCComponent(ComponentType.whiteboard, room_info)
-        whiteboard_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        return chat_response.json()
-
-
-if __name__ == '__main__':
-    evc = EVCPlatformService('https://evc-ts.ef.com.cn')
-    resonse = evc.load_by_attendance('1d77e0a1-0e68-4e6c-9430-37fd1796c2d3')
-    print(resonse)
-
