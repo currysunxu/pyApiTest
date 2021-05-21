@@ -45,7 +45,7 @@ class EVCPlatformMeetingService:
             "realStartTime": real_start_time,
             "program": "indo_fr_gl",
             "pdDesignation": "",
-            "contentMap": "null",
+            "contentMap": "25989d4c-ea94-4e28-862a-7",
             "useNewRecord": True
         }
 
@@ -67,19 +67,17 @@ class EVCPlatformMeetingService:
     def meeting_register(self, location, component_token, role_code=EVCMeetingRole.TEACHER, display_name="test user"):
         url = "/evc15/meeting/api/register"
 
-        if role_code == EVCMeetingRole.TEACHER:
+        if location == "CN":
+            user_meta = {
+                "initState": 1502
+            }
+        else:
             user_meta = {
                 "initState": 2270,
                 "turnFlag": location,
                 "forceTurn": True,
                 "useProxy": True
             }
-        elif role_code == EVCMeetingRole.STUDENT:
-            user_meta = {
-                "initState": 1502
-            }
-        else:
-            raise Exception("Do not support to register meeting with {0}:".format(role_code))
 
         param = {
             "componentToken": component_token,
@@ -226,16 +224,6 @@ class EVCPlatformMeetingService:
         print('header')
         print(self.header)
         response = requests.post(url, data='{}', params=params, headers=self.header)
-        print('status_code')
-        print(response.status_code)
-        print('body')
-        print(response.text)
-        print(response.url)
-        print(response.content)
-        print(response.headers)
-        print(response.request.url)
-        print(response.request.headers)
-        print(response.request.body)
 
         if response.status_code != 204:
             response = requests.post(url, data='{}', params=params, headers=self.header)
