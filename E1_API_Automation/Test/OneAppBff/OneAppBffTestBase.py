@@ -6,9 +6,10 @@ import jsonpath
 from hamcrest import assert_that, equal_to
 import uuid
 
-from E1_API_Automation.Business.HighFlyer35.Hf35BffService import Hf35BffService
+from E1_API_Automation.Business.HighFlyer35.OneAppBffService import OneAppBffService
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffCommonData import Hf35BffCommonData
 from E1_API_Automation.Business.NGPlatform.ContentMapService import ContentMapService
+from E1_API_Automation.Business.NGPlatform.GeneralTestService import GeneralTestService
 from E1_API_Automation.Business.NGPlatform.StudyPlanService import StudyPlanService
 from E1_API_Automation.Business.NGPlatform.ContentMapQueryEntity import ContentMapQueryEntity
 from E1_API_Automation.Business.NGPlatform.LearningResultService import LearningResultService
@@ -19,44 +20,47 @@ from E1_API_Automation.Business.OMNIService import OMNIService
 from E1_API_Automation.Business.RemediationService import RemediationService
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 from E1_API_Automation.Settings import *
-from ptest.decorator import BeforeMethod
+from ptest.decorator import BeforeMethod,BeforeClass
+from E1_API_Automation.Test_Data.SSUnitQuizData import SSUnitQuizData
 
-from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
+
+from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers, BusinessData
 from E1_API_Automation.Business.AuthService import Auth2Service
 from E1_API_Automation.Test_Data.RemediationData import RemediationData
 
 
-class HfBffTestBase:
+def check_bff_compare_learning_plan(plan_response, leanring_plan_entity):
+    assert_that(plan_response.json()[0]["planBusinessKey"], equal_to(leanring_plan_entity.business_key))
+    assert_that(int(plan_response.json()[0]["studentKey"]), equal_to(int(leanring_plan_entity.student_key)))
+    assert_that(plan_response.json()[0]["bucketId"], equal_to(leanring_plan_entity.bucket_id))
+    assert_that(plan_response.json()[0]["productId"], equal_to(leanring_plan_entity.product))
+    assert_that(plan_response.json()[0]["state"], equal_to(leanring_plan_entity.state))
+    assert_that(plan_response.json()[0]["learningUnit"], equal_to(leanring_plan_entity.learning_unit))
+    assert_that(plan_response.json()[0]["route"], equal_to(leanring_plan_entity.route))
+    assert_that(plan_response.json()[0]["startTime"], equal_to(leanring_plan_entity.start_time))
+    assert_that(plan_response.json()[0]["endTime"], equal_to(leanring_plan_entity.end_time))
 
-    @BeforeMethod()
+
+class OneAppBffTestBase:
+
+    @BeforeClass()
     def setup(self):
-        self.bff_service = Hf35BffService(BFF_ENVIRONMENT)
+        self.bff_service = OneAppBffService(BFF_ENVIRONMENT)
         self.cm_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
         self.sp_service = StudyPlanService(STUDY_TIME_ENVIRONMENT)
-        self.key = BffProduct.HFV35.value
+        current_test_program = self.__class__.__name__
+        self.key = BffProduct.HFV35.value if current_test_program.startswith('Hf') else BffProduct.SSV3.value
         self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
         self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
-        self.bff_service.login(self.user_name, self.password)
         self.omni_service = OMNIService(OMNI_ENVIRONMENT)
-        self.auth2_service = Auth2Service(AUTH2_ENVIRONMENT, self.bff_service.mou_tai.headers['EF-Access-Token'])
         self.course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
+        self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
 
+    @BeforeMethod()
+    def sign_in(self):
+        self.bff_service.login(self.user_name, self.password)
+        self.auth2_service = Auth2Service(AUTH2_ENVIRONMENT, self.bff_service.mou_tai.headers['EF-Access-Token'])
 
-        try:
-            self.customer_id = BffUsers.BffUserPw[env_key][self.key][0]['userid']
-        except:
-            self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
-
-    def check_bff_compare_learning_plan(self, plan_response, leanring_plan_entity):
-        assert_that(plan_response.json()[0]["planBusinessKey"], equal_to(leanring_plan_entity.business_key))
-        assert_that(int(plan_response.json()[0]["studentKey"]), equal_to(int(leanring_plan_entity.student_key)))
-        assert_that(plan_response.json()[0]["bucketId"], equal_to(leanring_plan_entity.bucket_id))
-        assert_that(plan_response.json()[0]["productId"], equal_to(leanring_plan_entity.product))
-        assert_that(plan_response.json()[0]["state"], equal_to(leanring_plan_entity.state))
-        assert_that(plan_response.json()[0]["learningUnit"], equal_to(leanring_plan_entity.learning_unit))
-        assert_that(plan_response.json()[0]["route"], equal_to(leanring_plan_entity.route))
-        assert_that(plan_response.json()[0]["startTime"], equal_to(leanring_plan_entity.start_time))
-        assert_that(plan_response.json()[0]["endTime"], equal_to(leanring_plan_entity.end_time))
 
     def check_bff_compare_learning_result(self, result_response, learning_result_entity, learning_details_entity):
         assert_that(result_response.json()[0]["product"], equal_to(learning_result_entity.product))
@@ -364,3 +368,19 @@ class HfBffTestBase:
     def get_specific_data_from_course_node(self, content_path, field):
         content_map_course_node = self.cm_service.get_content_map_course_node(content_path)
         return content_map_course_node.json()[field]
+
+    def unlock_ss_unit_quiz(self):
+        global unlock_response
+        course_node_response = self.cm_service.get_content_map_course_node(BusinessData.SS_UNIT_CONTENT_PATH,
+                                                                           "WITH_DESCENDANTS").json()
+        last_assignment_content_path = course_node_response['children'][course_node_response['childCount'] - 1][
+            'contentPath']
+        general_test_svc = GeneralTestService(GENERAL_TEST_ENVIRONMENT)
+        general_test = general_test_svc.get_test_by_student_and_content_path(self.customer_id,
+                                                                             BusinessData.SS_UNIT_CONTENT_PATH)
+        if general_test.status_code == 204:
+            # 204 mean no unlock for current test
+            unlock_response = general_test_svc.put_unlock_unit_quiz(self.customer_id, last_assignment_content_path)
+            assert_that(unlock_response.status_code, equal_to(200))
+            return general_test, general_test_svc, unlock_response
+        return general_test, general_test_svc, None

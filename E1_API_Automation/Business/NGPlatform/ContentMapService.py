@@ -46,6 +46,6 @@ class ContentMapService(BaseService):
         }
         return self.mou_tai.post("/admin/api/v1/trees/", insert_body)
 
-    def get_content_map_course_node(self, content_path):
-        api_url = '/api/v2/course-nodes?contentPath={0}&traverse=WITH_ANCESTORS'.format(content_path)
+    def get_content_map_course_node(self, content_path, traverse= "WITH_ANCESTORS"):
+        api_url = '/api/v2/course-nodes?traverse={0}&contentPath={1}'.format(traverse, content_path)
         return self.mou_tai.get(api_url)
