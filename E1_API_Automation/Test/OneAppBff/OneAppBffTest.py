@@ -37,7 +37,7 @@ from E1_API_Automation.Test_Data.RemediationData import *
 
 
 @TestClass()
-class Hf35BffTest(OneAppBffTestBase):
+class OneAppBffTest(OneAppBffTestBase):
 
     @Test(tags="qa, stg, live, live_dr")
     def test_bff_auth_login_valid_username(self):
