@@ -1,4 +1,4 @@
-from ..Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 import os
 from enum import Enum
 from E1_API_Automation.Settings import DATABASE
@@ -8,10 +8,7 @@ from ..Lib.jwt_helper import JWTHelper
 import jmespath
 
 
-class AuthService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8"})
+class AuthService(BaseService):
 
     def login(self, user_name, password, platform='UNDEFINED', device_type='NONE'):
         user_info = {
@@ -74,12 +71,10 @@ class AuthDeviceType(Enum):
     Wearable = 'WEARABLE'
 
 
-class Auth2Service:
+class Auth2Service(BaseService):
 
     def __init__(self, host, access_token):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8",
-                                                       "EF-Access-Token": access_token})
+        super().__init__(host, {"EF-Access-Token": access_token})
 
     def get_acl_response(self):
         api_url = '/auth2/internal/api/v2/auth/acl'

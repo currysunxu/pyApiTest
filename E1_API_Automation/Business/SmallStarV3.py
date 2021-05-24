@@ -1,15 +1,14 @@
 import uuid
 import arrow
 
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Business.SchoolCourse import CourseBook
 from ..Lib.Moutai import Moutai, Token
 
 
-class SmallStarService():
+class SmallStarService(BaseService):
     def __init__(self, host):
-        self.host = host
-        print(self.host)
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+        super().__init__(host, {"X-BA-TOKEN": "Token"})
 
     def login(self, user_name, password):
         user_info = {

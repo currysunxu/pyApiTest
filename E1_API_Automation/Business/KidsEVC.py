@@ -2,7 +2,7 @@ import random
 
 from ..Lib.Moutai import Moutai, Token
 from .AuthService import AuthService
-from E1_API_Automation.Settings import AuthEnvironment,env_key
+from E1_API_Automation.Settings import AUTH_ENVIRONMENT,env_key
 import jmespath
 import requests
 
@@ -17,14 +17,14 @@ class KidsEVCService():
         self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
 
     def login(self, user_name, password):
-        auth = AuthService(getattr(AuthEnvironment,env_key.upper()))
+        auth = AuthService(getattr(AUTH_ENVIRONMENT,env_key.upper()))
         id_token = auth.login(user_name, password).json()['idToken']
         headers = {"X-EF-TOKEN": id_token, "Content-Type": "application/json"}
         self.mou_tai.set_header(headers)
         return id_token
 
     def login_get_v3_token(self, user_name, password):
-        auth = AuthService(getattr(AuthEnvironment, env_key.upper()))
+        auth = AuthService(getattr(AUTH_ENVIRONMENT, env_key.upper()))
         id_token = auth.login(user_name, password).json()['idToken']
         ba_token = auth.get_v3_token(id_token)
         headers = {"X-BA-TOKEN": ba_token, "Content-Type": "application/json"}
@@ -74,7 +74,7 @@ class KidsEVCService():
         return self.mou_tai.put("/ksdsvc/api/v2/classes/lesson", json=body)
 
     def sign_out(self):
-        auth = AuthService(getattr(AuthEnvironment, env_key.upper()))
+        auth = AuthService(getattr(AUTH_ENVIRONMENT, env_key.upper()))
         auth.sign_out()
         return self.mou_tai.delete(url="/api/v1/Token/")
 

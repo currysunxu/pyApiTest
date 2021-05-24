@@ -1,10 +1,7 @@
-from ..Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 
 
-class UpsPrivacyService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host)
+class UpsPrivacyService(BaseService):
 
     def get_privacy_policy_document(self, product_id, region_code):
         return self.mou_tai.get('/api/v1/privacy-policy-documents?productId={0}&regionCode={1}'.format(product_id,

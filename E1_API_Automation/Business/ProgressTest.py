@@ -1,12 +1,12 @@
 import jmespath
 
+from E1_API_Automation.Business.BaseService import BaseService
 from ..Lib.Moutai import Moutai, Token
 
 
-class PTService():
+class PTService(BaseService):
     def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+        super().__init__(host, {"X-BA-TOKEN": "Token"})
 
     def stuff_login(self, username, password):
         user_info = {
@@ -53,7 +53,7 @@ class PTService():
             "Month": date[0]["month"]
         }
         return self.mou_tai.post('/api/v2/CourseSchedule/', data)
-    
+
     def get_sspt_course_schedule(self, teacher_id, school_code, date):
         data = {
             "Day": date[0]["day"],

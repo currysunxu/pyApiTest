@@ -23,19 +23,21 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningEnum import L
 from E1_API_Automation.Business.ProvisioningService import ProvisioningService
 from E1_API_Automation.Business.RemediationService import RemediationService
 from E1_API_Automation.Business.UpsPrivacyService import UpsPrivacyService
+from E1_API_Automation.Business.NGPlatform.GeneralTestService import GeneralTestService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
 from E1_API_Automation.Lib.HamcrestExister import Exist
 from E1_API_Automation.Settings import *
-from E1_API_Automation.Test.HighFlyerV35.HfBffTestBase import HfBffTestBase
+from E1_API_Automation.Test.OneAppBff.OneAppBffTestBase import OneAppBffTestBase
 from E1_API_Automation.Test_Data.BffData import BffUsers, HF35DependService, BffProduct
 from E1_API_Automation.Lib.HamcrestExister import Exist
 from E1_API_Automation.Test_Data.BffData import OspData,BusinessData
+from E1_API_Automation.Test_Data.SSUnitQuizData import SSUnitQuizData
 from E1_API_Automation.Test_Data.RemediationData import *
 
 
 @TestClass()
-class Hf35BffTest(HfBffTestBase):
+class OneAppBffTest(OneAppBffTestBase):
 
     @Test(tags="qa, stg, live, live_dr")
     def test_bff_auth_login_valid_username(self):
@@ -544,7 +546,7 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_privacy_policy_document_response.json()['url'] == ups_pp_document_response.json()['url'])
         # currently, this value will be same for all the environment
         assert_that(bff_privacy_policy_document_response.json()[
-                        'termsConditionUrl'] == 'https://study.ef.cn/portal/websiteUserAgreement.pdf')
+                        'termsConditionUrl'], equal_to('https://kt-widget.kids.ef.cn/tc/'))
 
     @Test(tags="qa, stg, live")
     def test_post_privacy_policy_agreement(self):
@@ -1032,4 +1034,43 @@ class Hf35BffTest(HfBffTestBase):
         assert_that(bff_flashcard_response.json()['ecaGroups'][0], equal_to(content_repo_eca_group_flashcard.json()[0]))
         assert_that(bff_flashcard_response.json()['assetGroups'][0], equal_to(content_repo_asset_group_flashcard.json()[0]))
 
+    @Test(tags="qa, stg, live")
+    def test_get_ss_unit_quiz_content_group(self):
+        general_test, general_test_svc, unlock_response = self.unlock_ss_unit_quiz()
+        if general_test.status_code == 200 or unlock_response.status_code == 200:
+            # 200 test has been unlock yet
+            general_test = general_test_svc.get_test_by_student_and_content_path(self.customer_id,
+                                                                                 BusinessData.SS_UNIT_CONTENT_PATH)
+            bff_content_group_response = self.bff_service.get_ss_unit_quiz_content_group(general_test.json()['id'])
+            general_test_content_response = general_test_svc.get_content_group_for_unit_quiz(general_test.json()['id'])
+            general_test_asset_response = general_test_svc.get_asset_group_for_unit_quiz(general_test.json()['id'])
+            assert_that(bff_content_group_response.json()['contentPath'],
+                        equal_to(general_test_content_response.json()['contentPath']))
+            assert_that(bff_content_group_response.json()['duration'],
+                        equal_to(general_test_content_response.json()['duration']))
+            assert_that(bff_content_group_response.json()['parts'],
+                        equal_to(general_test_content_response.json()['parts']))
+            assert_that(bff_content_group_response.json()['assetGroups'], equal_to(general_test_asset_response.json()))
 
+    @Test(tags="qa, stg, live")
+    def test_ss_unit_quiz_attempts(self):
+        try:
+            SSUnitQuizData.clean_unit_quiz_by_test_id_from_db(self.customer_id)
+        except:
+            print("skip live database, current environment is {0}".format(env_key))
+        general_test, general_test_svc, unlock_response = self.unlock_ss_unit_quiz()
+        if general_test.status_code == 200 or unlock_response.status_code == 200:
+            # 200 test has been unlock yet
+            general_test = general_test_svc.get_test_by_student_and_content_path(self.customer_id,
+                                                                                 BusinessData.SS_UNIT_CONTENT_PATH)
+            test_result_response = self.bff_service.get_ss_unit_quiz_attempts_details(general_test.json()['id'])
+            assert_that(test_result_response.status_code, equal_to(200))
+            attempt_payload = SSUnitQuizData.build_ss_unit_quiz_attempts(general_test.json()['id'])
+            if test_result_response.text == '':
+                # first submission
+                unit_quiz_attempt = self.bff_service.post_ss_submit_unit_quiz_attempts(attempt_payload)
+                assert_that(unit_quiz_attempt.status_code, equal_to(200))
+            else:
+                # submit before return conflict code
+                unit_quiz_attempt = self.bff_service.post_ss_submit_unit_quiz_attempts(attempt_payload)
+                assert_that(unit_quiz_attempt.status_code, equal_to(409))

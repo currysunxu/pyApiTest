@@ -4,9 +4,9 @@ Local:
 Environment:
   QA: "https://e1svc-qa.english1.cn"
   STAGING: "https://e1svc-stg.english1.cn"
-  LIVE: "https://e1svc.ef.cn"
+  LIVE: "https://e1svc.kids.ef.cn"
   STAGING_SG: "https://e1svc-stg.english1.com"
-  LIVE_SG: "https://e1svc.ef.com"
+  LIVE_SG: "https://e1svc.kids.ef.com"
 
 KSDEnvironment:
   QA: "https://study-qa.english1.cn"
@@ -36,14 +36,14 @@ AuthEnvironment:
   QA: "https://auth-svc-qa.english1.cn"
   STAGING: "https://auth-svc-stg.english1.cn"
   STAGING_SG: "https://auth-svc-stg.english1.com"
-  LIVE: "https://auth-svc.ef.cn"
+  LIVE: "https://auth-svc.kids.ef.cn"
   LIVE_SG: "https://auth-svc.ef.com"
 
 
 OMNIEnvironment:
   QA: "https://internal-ktsvc-qa.english1.cn/omni/apigateway"
-  STAGING: "https://omni-apigateway-tc-staging.ef.cn"
-  STAGING_SG: "http://omni-apigateway-staging-tcjp.ef.com"
+  STAGING: "https://omni-apigw-cn-stg.english1.cn"
+  STAGING_SG: "https://omni-apigw-cn-stg.english1.com"
   LIVE: "https://omni-apigateway-tc.ef.cn"
   LIVE_SG: "http://omni-apigateway-tcjp.ef.com"
 
@@ -57,7 +57,7 @@ LearningResultEnvironment:
 BffEnvironment:
   QA: "https://ktsvc-qa.english1.cn"
   STAGING: "https://ktsvc-stg.english1.cn"
-  LIVE: "https://ktsvc.ef.cn"
+  LIVE: "https://ktsvc.kids.ef.cn"
 
 HomeworkEnvironment:
   QA: "https://internal-ktsvc-qa.english1.cn/practice"
@@ -92,7 +92,7 @@ ContentBuilderEnvironment:
 MockTestEnvironment:
   QA: "https://ktsvc-qa.english1.cn/mseb"
   STAGING: "https://ktsvc-stg.english1.cn/mseb"
-  LIVE: "https://ktsvc.ef.cn/mseb"
+  LIVE: "https://ktsvc.kids.ef.cn/mseb"
 
 
 StoryblokReleaseEnvironment:
@@ -109,7 +109,7 @@ StoryblokImportEnvironment:
 E1TPIEnvironment:
   STAGING: "https://e1tpi-stg.english1.cn"
   STAGING_SG: "https://e1tpi-stg.english1.com"
-  LIVE: "https://e1tpi.ef.cn"
+  LIVE: "https://tpi.kids.ef.cn"
   LIVE_SG: "https://e1tpi.ef.com"
 
 
@@ -152,6 +152,11 @@ VocabEnvironment:
   QA: "https://internal-vocab-qa.english1.cn"
   STAGING: "https://internal-vocab-stg.english1.cn"
   LIVE: "https://internal-vocab.english1.cn"
+
+GeneralTestEnvironment:
+  QA: "https://internal-ktsvc-qa.english1.cn/kgt"
+  STAGING: "https://internal-ktsvc-stg.english1.cn/kgt"
+  LIVE: "https://internal-ktsvc.english1.cn/kgt"
 
 EVCProxyEnvironment:
   STAGING: {
@@ -226,4 +231,3 @@ MYSQL_MOCKTEST_DATABASE:
     "User": "edtechmysqluser",
     "Password": "edtechdbuserstg123"
   }
-

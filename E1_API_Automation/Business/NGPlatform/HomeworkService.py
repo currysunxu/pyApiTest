@@ -3,13 +3,10 @@
 
 #author:Curry
 #date:2019/10/29
-from E1_API_Automation.Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 
 
-class HomeworkService:
-	def __init__(self, host):
-		self.host = host
-		self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8"})
+class HomeworkService(BaseService):
 
 	def get_the_best_attempt(self, student_id, book_content_id):
 		api_url = '/api/v1/attempts/best?studentId={0}&bookContentId={1}'.format(student_id, book_content_id)
@@ -18,9 +15,3 @@ class HomeworkService:
 	def submit_new_attempt(self, attempt_json):
 		attempt_result = self.mou_tai.post("/api/v1/attempts", attempt_json)
 		return attempt_result
-
-	def get_vocab_progress(self, student_id, book_content_id):
-		api_url = '/api/v1/students/{0}/progress?bookContentId={1}'.format(student_id, book_content_id)
-		host = str(self.host).replace('practice','vocab')
-		self.mou_tai = Moutai(host=host, headers={"Content-Type": "application/json;charset=UTF-8"})
-		return self.mou_tai.get(api_url)
