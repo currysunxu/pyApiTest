@@ -134,12 +134,6 @@ EVCCDNEnvironment:
   STAGING: "https://evc-fe-staging.bj-englishtown.com"
   LIVE: "https://evc-fe.bj-englishtown.com"
 
-
-#EVCBackendEnvironment:
-#  QA: "https://evc-ts-qa.bj-englishtown.com"
-#  STAGING: "https://evc-ts-staging.ef.com.cn"
-#  LIVE: "https://evc-ts.ef.com.cn/"
-
 Auth2Environment:
   QA: "https://internal-ktsvc-qa.english1.cn"
   STAGING: "https://internal-ktsvc-stg.english1.cn"
@@ -155,29 +149,21 @@ VocabEnvironment:
   STAGING: "https://internal-vocab-stg.english1.cn"
   LIVE: "https://internal-vocab.english1.cn"
 
-EVCProxyEnvironment:
+EVCEnvironment:
   QA: "https://evc-ts-qa2.bj-englishtown.com"
 
   STAGING: {
-    "CN": "https://evc-ts-staging.ef.com.cn",
-    "US": "https://evc-tv-to-ts-staging.ef.com",
-    "UK": "https://evc-tf-to-ts-staging.ef.com",
-    "SG": "https://evc-tsg-to-ts-staging.ef.com",
-    "CN_NEW": "https://evc-ts-staging.kids.ef.cn",
-    "US_NEW": "https://evc-tv-to-ts-staging.kids.ef.com",
-    "UK_NEW": "https://evc-tf-to-ts-staging.kids.ef.com",
-    "SG_NEW": "https://evc-tsg-to-ts-staging.kids.ef.com"
+    "CN": "https://evc-ts-staging.kids.ef.cn",
+    "US": "https://evc-tv-to-ts-staging.kids.ef.com",
+    "UK": "https://evc-tf-to-ts-staging.kids.ef.com",
+    "SG": "https://evc-tsg-to-ts-staging.kids.ef.com"
   }
 
   LIVE: {
-    "CN": "https://evc-ts.ef.com.cn",
-    "US": "https://evc-tv-to-ts.ef.com",
-    "UK": "https://evc-tf-to-ts.ef.com",
-    "SG": "https://evc-tsg-to-ts.ef.com",
-    "CN_NEW": "https://evc-ts.kids.ef.cn",
-    "US_NEW": "https://evc-tv-to-ts.kids.ef.com",
-    "UK_NEW": "https://evc-tf-to-ts.kids.ef.com",
-    "SG_NEW": "https://evc-tsg-to-ts.kids.ef.com"
+    "CN": "https://evc-ts.kids.ef.cn",
+    "US": "https://evc-tv-to-ts.kids.ef.com",
+    "UK": "https://evc-tf-to-ts.kids.ef.com",
+    "SG": "https://evc-tsg-to-ts.kids.ef.com"
   }
 
 EVCMeetingWebsyncEnvironment:

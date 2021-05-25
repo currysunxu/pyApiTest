@@ -1,6 +1,6 @@
 import json
 import string
-import urllib
+from datetime import datetime, timedelta
 from random import Random
 from time import sleep
 
@@ -9,10 +9,9 @@ from hamcrest import assert_that, equal_to
 from ptest.plogger import preporter
 from requests import request
 
-from E1_API_Automation.Business.EVC.EVCComponentEntity import EVCComponent, MeetingComponent
 from E1_API_Automation.Business.EVC.EVCContentService import EVCContentService
 from E1_API_Automation.Settings import EVC_CONTENT_ENVIRONMENT
-from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode, EVCComponentType
+from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode, EVCProxyLocation, EVCMediaType
 
 
 class EVCPlatformMeetingService:
@@ -45,7 +44,7 @@ class EVCPlatformMeetingService:
 
         meeting_meta = {
             "realStartTime": real_start_time,
-            "program": "indo_fr_gl",
+            "program": layout_code,
             "pdDesignation": "",
             "contentMap": "null",
             "useNewRecord": True
@@ -68,16 +67,29 @@ class EVCPlatformMeetingService:
         url = "/evc15/meeting/api/register"
 
         if role_code == EVCMeetingRole.TEACHER:
-            user_meta = {
-                "initState": 2270,
-                "turnFlag": location,
-                "forceTurn": True,
-                "useProxy": True
-            }
+            if location != EVCProxyLocation.CN:
+                user_meta = {
+                    "turnFlag": location,
+                    "forceTurn": False,
+                    "useProxy": True,
+                    "initState": 2270
+                }
+            else:
+                user_meta = {
+                    "initState": 2270
+                }
         elif role_code == EVCMeetingRole.STUDENT:
-            user_meta = {
-                "initState": 1502
-            }
+            if location != EVCProxyLocation.CN:
+                user_meta = {
+                    "turnFlag": location,
+                    "forceTurn": False,
+                    "useProxy": True,
+                    "initState": 1502
+                }
+            else:
+                user_meta = {
+                    "initState": 1502
+                }
         else:
             raise Exception("Do not support to register meeting with {0}:".format(role_code))
 
@@ -85,12 +97,13 @@ class EVCPlatformMeetingService:
             "componentToken": component_token,
             "displayName": display_name,
             "roleCode": role_code,
-            "externalSysCode": "System",
+            "externalSysCode": "EVC-TEST",
             "userMeta": json.dumps(user_meta),
             "externalUserId": ""
         }
         preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
+        preporter.info(response.json())
         assert_that(response.status_code, equal_to(200))
         return response.json()
 
@@ -164,6 +177,7 @@ class EVCPlatformMeetingService:
         }
         preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
+        assert_that(response.status_code, equal_to(200))
         return response.json()
 
     def meeting_load(self, component_token):
@@ -173,41 +187,63 @@ class EVCPlatformMeetingService:
         }
         preporter.info(self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
+        assert_that(response.status_code, equal_to(200))
         return response.json()
 
     def create_or_join_classroom(self, user_name="test", room_name=None, content_id="10223", duration=5,
                                  role_code=EVCMeetingRole.STUDENT, layout_code=EVCLayoutCode.Kids_PL, use_agora=True,
-                                 media_type="agora"):
+                                 media_type=EVCMediaType.AGORA, center_code="S"):
 
         if room_name is None:
             r = Random()
             room_name = "".join(r.sample(string.ascii_letters, 8))
 
-        url = "/evc15/meeting/tools/CreateOrJoinClassroom/?userDisplayName={0}&roomName={1}&contentId={2}&duration={3}&roleCode={4}&centerCode=S&layoutCode={5}&videoUnMute=true&videoDisplay=true&externalUserId=&useAgora={6}&mediaType={7}".format(
-            user_name, room_name, content_id, duration, role_code, layout_code, use_agora, media_type)
+        url = "/evc15/meeting/tools/CreateOrJoinClassroom/?userDisplayName={0}&roomName={1}&contentId={2}&duration={3}&roleCode={4}&centerCode={5}&layoutCode={6}&videoUnMute=true&videoDisplay=true&externalUserId=&useAgora={7}&mediaType={8}".format(
+            user_name, room_name, content_id, duration, role_code, center_code, layout_code, use_agora, media_type)
 
         payload = ""
-
+        print(url)
         response = requests.request("POST", self.host + url, headers=self.header, data=payload)
 
         assert_that(response.status_code, equal_to(200))
         return response.json()
 
-    def get_meeting_room_info(self, user_name="default user", room_name=None, content_id="10223", duration=30,
-                              role_code=EVCMeetingRole.STUDENT, layout_code=EVCLayoutCode.Kids_PL,
-                              use_agora=True):
-        class_info = self.create_or_join_classroom(user_name, room_name, content_id, duration, role_code, layout_code,
-                                                   use_agora)
-        bootstrap_url = urllib.parse.unquote(class_info['bootstrapApi'], encoding='utf-8', errors='replace')
-        bootstrap_response = self.meeting_bootstrap(class_info['attendanceToken'])
+    def create_end_to_end_class(self, start_time=None, end_time=None, real_start_time=None, class_duration=5,
+                                layout_code=EVCLayoutCode.Kids_PL):
+        if start_time is None:
+            start_time = datetime.now()
+        if real_start_time is None:
+            real_start_time = start_time
+        if end_time is None:
+            end_time = real_start_time + timedelta(minutes=class_duration)
+
+        meeting_response = self.meeting_create(int(start_time.timestamp() * 1000),
+                                               int(end_time.timestamp() * 1000),
+                                               int(real_start_time.timestamp() * 1000),
+                                               layout_code)
+        return meeting_response
+
+    def get_meeting_room_info(self, start_time=None, end_time=None, real_start_time=None, class_duration=5,
+                              layout_code=EVCLayoutCode.Kids_PL, role_code=EVCMeetingRole.STUDENT,
+                              user_name="default user", location=EVCProxyLocation.CN):
+
+        meeting_response = self.create_end_to_end_class(start_time=start_time, end_time=end_time,
+                                                        real_start_time=real_start_time, class_duration=class_duration,
+                                                        layout_code=layout_code)
+        meeting_token = (meeting_response["componentToken"])
+        preporter.info("----Meeting token----: {0}".format(meeting_token))
+
+        # register meeting & bootstrap
+        user_info = self.meeting_register(location, meeting_token, role_code, user_name)
+        sleep(5)
+        bootstrap_response = self.meeting_bootstrap(user_info["attendanceToken"])
         components = bootstrap_response['components']
         room_info = {
             'user_name': user_name,
-            'room_name': room_name,
             'role': role_code,
             'request_token': Random().randint(10000000, 99999999),
             'component_detail': components,
-            'attendance_token': class_info['attendanceToken']
+            'attendance_token': user_info['attendanceToken']
         }
         return room_info
 
@@ -219,6 +255,7 @@ class EVCPlatformMeetingService:
         }
 
         response = requests.post(url, data='{}', params=params, headers=self.header)
+        print(url)
 
         if response.status_code != 204:
             response = requests.post(url, data='{}', params=params, headers=self.header)
@@ -254,37 +291,12 @@ class EVCPlatformMeetingService:
         response = requests.get(url)
         assert_that(response.status_code, equal_to(200))
 
-    def websync_teacher(self, room_info):
-        meeting_component = MeetingComponent(EVCComponentType.MEETING, room_info)
-
-        print("call home?room url")
-        url = self.host + '/evc15/meeting/home?room={0}&token={1}&accesskey={2}&fmdebug=true'.format(
-            room_info['room_name'], room_info['attendance_token'], self.access_key)
-        requests.get(url)
-
-        print("handshake meeting component")
-        shake = meeting_component.handshake()
-        print(shake)
-
-        connect = meeting_component.connect(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], False)
-        print(connect)
-        binding = meeting_component.binding(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'],
-                                            room_info['attendance_token'], self.access_key)
-
-        print(binding)
-        meeting_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        media_component = EVCComponent(EVCComponentType.MEDIA, room_info)
-        media_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        note_component = EVCComponent(EVCComponentType.NOTE, room_info)
-        note_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        chat_component = EVCComponent(EVCComponentType.CHAT, room_info)
-        chat_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        whiteboard_component = EVCComponent(EVCComponentType.WHITEBOARD, room_info)
-        whiteboard_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'])
-        connect = meeting_component.connect(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], True)
-
-        chat_body = {
-            "data": {"message": "abcddd-", "displayName": room_info['user_name'],
-                     "attendanceRefCode": room_info['attendance_token'],
-                     "roleCode": room_info['role']}, "params": {"topic": "MESSAGE.NEW"}}
-        return chat_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], chat_body).json()
+    def meeting_agora_uid_data_fix(self, meeting_token):
+        url = self.host + "/evc15/meeting/api/agorauiddatafix?meetingToken={0}".format(meeting_token)
+        payload = {}
+        headers = {
+            'Accept': 'application/json',
+            'x-accesskey': self.access_key
+        }
+        response = requests.request("POST", url, headers=headers, data=payload)
+        assert_that(response.status_code, equal_to(200))

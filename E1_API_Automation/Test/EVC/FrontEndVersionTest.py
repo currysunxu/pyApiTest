@@ -4,9 +4,9 @@ from ptest.decorator import TestClass, Test, BeforeClass
 
 from E1_API_Automation.Business.EVC.EVCFrontendService import EVCFrontendService
 from E1_API_Automation.Business.EVC.EVCPlatformMeetingService import EVCPlatformMeetingService
-from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT
+from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT, EVC_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVC_AGORA_FRONTEND_VERSION, EVCPlatform, EVC_FM_FRONTEND_VERSION, \
-    EVC_TECH_CHECK_VERSION, EVC_INDO_DEMO_VERSION
+    EVC_TECH_CHECK_VERSION, EVC_INDO_DEMO_VERSION, EVCMediaType
 
 
 @TestClass()
@@ -31,7 +31,7 @@ class FrontEndVersionTest:
                     version = EVC_AGORA_FRONTEND_VERSION
 
                 url = url.format(version)
-                response = self.evc_frontend_service.request_frontend_js(url, EVC_PROXY_ENVIRONMENT[location])
+                response = self.evc_frontend_service.request_frontend_js(url, EVC_ENVIRONMENT[location])
 
                 assert_that(response.headers["vary"], equal_to("Origin"))
                 assert_that(response.headers["Access-Control-Allow-Origin"], equal_to("*"))
@@ -39,7 +39,7 @@ class FrontEndVersionTest:
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_agora_frontend_version(self, platform):
         # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT["CN"])
+        meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         attendance_token = meeting_service.create_or_join_classroom()["attendanceToken"]
 
         # get version from api
@@ -54,8 +54,9 @@ class FrontEndVersionTest:
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_fm_frontend_version(self, platform):
         # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT["CN"])
-        attendance_token = meeting_service.create_or_join_classroom(use_agora="False")["attendanceToken"]
+        meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
+        attendance_token = meeting_service.create_or_join_classroom(use_agora="False", media_type=EVCMediaType.FM)[
+            "attendanceToken"]
 
         # get version from api
         fm_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token, platform)
