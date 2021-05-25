@@ -8,7 +8,7 @@ import time
 
 
 @TestClass()
-class Hf35KafkaTest():
+class OneAppKafkaTest():
 
     @Test(tags="qa, stg",data_provider = ["highflyers/cn-3-144/book-7/unit-1/assignment-2","highflyers/cn-3/book-7/unit-2/assignment-2",
                                           "smallstar/cn-3/book-1/unit-1/assignment-1"])

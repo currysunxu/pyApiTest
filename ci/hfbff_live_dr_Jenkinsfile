@@ -36,7 +36,7 @@ pipeline {
           script {
           case_tag = "${params.environment}".toLowerCase()
 
-          sh "ptest3  -t E1_API_Automation.Test.OneAppBff.Hf35BffTest -i ${case_tag}"
+          sh "ptest3  -t E1_API_Automation.Test.OneAppBff.OneAppBffTest -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
