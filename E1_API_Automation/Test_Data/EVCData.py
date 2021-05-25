@@ -18,7 +18,7 @@ class EVCContentMaterialType:
 
 class EVCLayoutCode:
     Kids_PL = "kids_pl"
-    Agora_Kids_PL = "kids_pl_v2"
+    Agora_Kids_PL = "kids_pl"
     Indo_FR_GL = "indo_fr_gl"
     Indo_HF_GL = "indo_hf_gl"
     Indo_SS_GL = "indo_ss_gl"
@@ -37,3 +37,13 @@ class EVCPlatform:
     WEB = "web"
     IOS = "ios"
     ANDROID = "android"
+
+
+class EVCComponent:
+     PL  = ['meeting', 'media', 'whiteboard', 'chat', 'note']
+     GL = ['meeting', 'media', 'whiteboard', 'chat', 'note']
+
+class RTCProvider:
+    AGROA = 'agora'
+    TRTC = 'trtc'
+

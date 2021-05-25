@@ -7,6 +7,7 @@ from random import Random
 import requests
 from hamcrest import assert_that, equal_to
 from requests import request
+from E1_API_Automation.Business.EVC import *
 
 from E1_API_Automation.Business.EVC.EVCContentService import EVCContentService
 from E1_API_Automation.Settings import EVC_CONTENT_ENVIRONMENT
@@ -45,7 +46,7 @@ class EVCPlatformMeetingService:
             "realStartTime": real_start_time,
             "program": "indo_fr_gl",
             "pdDesignation": "",
-            "contentMap": "null",
+            "contentMap": "25989d4c-ea94-4e28-862a-7",
             "useNewRecord": True
         }
 
@@ -67,19 +68,17 @@ class EVCPlatformMeetingService:
     def meeting_register(self, location, component_token, role_code=EVCMeetingRole.TEACHER, display_name="test user"):
         url = "/evc15/meeting/api/register"
 
-        if role_code == EVCMeetingRole.TEACHER:
+        if location == "CN":
+            user_meta = {
+                "initState": 1502
+            }
+        else:
             user_meta = {
                 "initState": 2270,
                 "turnFlag": location,
                 "forceTurn": True,
                 "useProxy": True
             }
-        elif role_code == EVCMeetingRole.STUDENT:
-            user_meta = {
-                "initState": 1502
-            }
-        else:
-            raise Exception("Do not support to register meeting with {0}:".format(role_code))
 
         param = {
             "componentToken": component_token,
@@ -166,6 +165,14 @@ class EVCPlatformMeetingService:
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         return response.json()
 
+    def load_by_attendance(self, attendance_token):
+        url = '/evc15/meeting/api/loadbyattendance'
+        param = {
+            "attendanceToken": attendance_token
+        }
+        response = requests.post(self.host + url, json=param, headers=self.headers)
+        return response.json()
+
     def meeting_load(self, component_token):
         url = "/evc15/meeting/api/load"
         param = {
@@ -226,16 +233,6 @@ class EVCPlatformMeetingService:
         print('header')
         print(self.header)
         response = requests.post(url, data='{}', params=params, headers=self.header)
-        print('status_code')
-        print(response.status_code)
-        print('body')
-        print(response.text)
-        print(response.url)
-        print(response.content)
-        print(response.headers)
-        print(response.request.url)
-        print(response.request.headers)
-        print(response.request.body)
 
         if response.status_code != 204:
             response = requests.post(url, data='{}', params=params, headers=self.header)
@@ -257,9 +254,10 @@ class EVCPlatformMeetingService:
     # merger_done_flag = 2: when video merger completed
     def update_record_flag(self, meeting_token, merger_done_flag='2'):
         url = self.host + "/evc15/meeting/api/updaterecordflag?flag={0}&meetingToken={1}&setFlag=true".format(merger_done_flag, meeting_token)
-
         response = request("POST", url, headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response
+
+
 
 
