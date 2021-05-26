@@ -16,11 +16,11 @@ class CourseGroupService(BaseService):
         api_url = '/api/v2/students/{0}/groups/current-core-program-group'.format(student_id)
         return self.mou_tai.get(api_url)
 
-    def put_unlock_practice(self, student_id, content_path, unlock_at=CommonUtils.datetime_format(), product=2):
+    def put_unlock_practice(self, student_id, content_path, unlock_at=CommonUtils.datetime_format(), group_id='test'):
         api_url = '/admin/api/v1/unlocked-progress'
         unlock_body = {
             "studentId": student_id,
-            "product": product,
+            "groupId": group_id,
             "contentPath": content_path,
             "unlockedAt": unlock_at
         }
