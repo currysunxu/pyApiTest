@@ -25,7 +25,7 @@ class EVCPlatformMeetingTest:
         cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
         class_duration = 10
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = cn_pl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -61,7 +61,7 @@ class EVCPlatformMeetingTest:
         cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
         class_duration = 10
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = cn_pl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -96,7 +96,7 @@ class EVCPlatformMeetingTest:
         cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
         class_duration = self.meeting_duration
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = cn_pl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -133,7 +133,7 @@ class EVCPlatformMeetingTest:
         start_time = datetime.now()
         class_duration = self.meeting_duration
         class_num = 10
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -183,7 +183,7 @@ class EVCPlatformMeetingTest:
         start_time = datetime.now()
         class_duration = 15
         class_num = 10
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -233,7 +233,7 @@ class EVCPlatformMeetingTest:
         start_time = datetime.now()
         class_duration = 5
         class_num = 3
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -283,7 +283,7 @@ class EVCPlatformMeetingTest:
         start_time = datetime.now()
         class_duration = 5
         class_num = 3
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -333,7 +333,7 @@ class EVCPlatformMeetingTest:
         start_time = datetime.now()
         class_duration = 5
         class_num = 2
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -383,7 +383,7 @@ class EVCPlatformMeetingTest:
         start_time = datetime.now()
         class_duration = self.meeting_duration
         class_num = 2
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -433,7 +433,7 @@ class EVCPlatformMeetingTest:
         start_time = datetime.now()
         class_duration = self.meeting_duration
         class_num = 2
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -482,7 +482,7 @@ class EVCPlatformMeetingTest:
         evc_meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
         class_duration = 5
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
 
         # create meeting
