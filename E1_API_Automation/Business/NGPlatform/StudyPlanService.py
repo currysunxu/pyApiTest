@@ -1,12 +1,8 @@
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Lib.Moutai import Moutai
 
 
-class StudyPlanService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host)
-        headers = {"Content-Type": "application/json"}
-        self.mou_tai.set_header(headers)
+class StudyPlanService(BaseService):
 
     def put_study_plan_test_entity(self, study_plan_entity):
         body_json = {

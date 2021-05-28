@@ -1,13 +1,10 @@
-from ..Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 from ..Settings import DATABASE
 from ..Test_Data.PTReviewData import PTReviewSQLString
 from ..Lib.db_mssql import MSSQLHelper
 
 
-class PTReviewService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host)
+class PTReviewService(BaseService):
 
     def post_resource_batch(self, resource_list):
         return self.mou_tai.post("/Resource/Batch", resource_list)

@@ -114,5 +114,5 @@ def mock_omni_class_booking(layout_code, student_amount):
 
 if __name__ == "__main__":
     platform_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[proxy_location])
-    # mock_omni_class_booking(EVCLayoutCode.CN_TB_PL, 1)
-    mock_omni_class_booking(EVCLayoutCode.Indo_FR_GL, 2)
+    mock_omni_class_booking(EVCLayoutCode.CN_TB_PL, 1)
+    # mock_omni_class_booking(EVCLayoutCode.Indo_FR_GL, 2)

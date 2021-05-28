@@ -5,6 +5,8 @@ from kafka import KafkaConsumer
 from kafka.errors import KafkaError
 import json
 
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
+
 
 class Kafka_producer():
     '''
@@ -14,7 +16,12 @@ class Kafka_producer():
     def __init__(self, kafkahost, kafkatopic):
         self.kafkaHost = kafkahost
         self.kafkatopic = kafkatopic
-        self.producer = KafkaProducer(bootstrap_servers = self.kafkaHost , api_version=(0, 10, 0))
+        if EnvUtils.is_env_stg_cn():
+            self.producer = KafkaProducer(sasl_mechanism="PLAIN", security_protocol='SASL_PLAINTEXT',
+                                          sasl_plain_username="ckafka-epk0cfr4#ksd", sasl_plain_password="ksd",
+                                          bootstrap_servers=self.kafkaHost, api_version=(0, 10, 0))
+        else:
+            self.producer = KafkaProducer(bootstrap_servers=self.kafkaHost, api_version=(0, 10, 0))
 
     def sendjsondata(self, params):
         try:
@@ -42,5 +49,3 @@ class Kafka_consumer():
                 yield message
         except KeyboardInterrupt as e:
             print(e)
-
-

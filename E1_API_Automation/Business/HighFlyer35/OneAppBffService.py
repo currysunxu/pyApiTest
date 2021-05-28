@@ -2,19 +2,14 @@ import time
 
 import requests
 
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
-from E1_API_Automation.Lib.Moutai import Moutai
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 
 import jmespath
 
 
-class Hf35BffService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8"})
-        self.id_token = None
-        self.access_token = None
+class OneAppBffService(BaseService):
 
     def login(self, user_name, password):
         user_info = {
@@ -251,4 +246,16 @@ class Hf35BffService:
     def get_flashcard_content_group(self, book_content_id, book_content_revision, schema_version):
         api_url = "/mega/api/v1/flashcard/content-groups?bookContentId={0}&bookContentRevision={1}&bookSchemaVersion={2}".format(
             book_content_id, book_content_revision, schema_version)
+        return self.mou_tai.get(api_url)
+
+    def get_ss_unit_quiz_content_group(self, test_id):
+        api_url = "/mega/api/v1/unit-quiz/content-groups/{0}".format(test_id)
+        return self.mou_tai.get(api_url)
+
+    def post_ss_submit_unit_quiz_attempts(self, attempts):
+        api_url = "/mega/api/v1/unit-quiz/attempts"
+        return self.mou_tai.post(api_url, attempts)
+
+    def get_ss_unit_quiz_attempts_details(self, test_id):
+        api_url = "/mega/api/v1/unit-quiz/attempts/{0}".format(test_id)
         return self.mou_tai.get(api_url)

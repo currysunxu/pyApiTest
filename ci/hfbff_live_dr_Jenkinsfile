@@ -17,8 +17,13 @@ pipeline {
     cron('H 03 * * *')
   }
    
+  parameters {
+
+        choice(name:'environment',choices:['LIVE_DR'],description:'')
+    }
+
   stages {
-    
+
     stage('Verify') {
       agent {
         docker {
@@ -29,17 +34,19 @@ pipeline {
       steps {
 
           script {
-          sh "ptest3  -t E1_API_Automation.Test.HighFlyerV35.Hf35BffTest -i live_dr"
+          case_tag = "${params.environment}".toLowerCase()
+
+          sh "ptest3  -t E1_API_Automation.Test.OneAppBff.OneAppBffTest -i ${case_tag}"
           junit 'test-output/xunit-results.xml'
           if (currentBuild.result =='UNSTABLE')
               currentBuild.result = 'FAILURE'
 
-          
+
         }
       }
     }
 
-    
+
   }
     post {
         failure {

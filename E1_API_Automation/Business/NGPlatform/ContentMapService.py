@@ -1,10 +1,8 @@
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Lib.Moutai import Moutai
 
 
-class ContentMapService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host)
+class ContentMapService(BaseService):
 
     # query content map, call by other methods
     def post_content_map_query(self, content_map_query_entity, is_by_tree):
@@ -48,6 +46,6 @@ class ContentMapService:
         }
         return self.mou_tai.post("/admin/api/v1/trees/", insert_body)
 
-    def get_content_map_course_node(self, content_path):
-        api_url = '/api/v2/course-nodes?contentPath={0}&traverse=WITH_ANCESTORS'.format(content_path)
+    def get_content_map_course_node(self, content_path, traverse= "WITH_ANCESTORS"):
+        api_url = '/api/v2/course-nodes?traverse={0}&contentPath={1}'.format(traverse, content_path)
         return self.mou_tai.get(api_url)

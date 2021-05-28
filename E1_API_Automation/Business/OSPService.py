@@ -1,15 +1,12 @@
 import random
 import uuid
 
-from ..Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 
 
-class OSPService:
+class OSPService(BaseService):
     def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host)
-        headers = {"x-ba-token": "3C40AB54-798C-4517-A82A-26017EE98285", "Content-Type": "application/json"}
-        self.mou_tai.set_header(headers)
+        super().__init__(host, {"x-ba-token": "3C40AB54-798C-4517-A82A-26017EE98285"})
 
     def get_all_books_by_course(self, course_code):
         return self.mou_tai.get('/api/v2/AllBooksByCourse/{0}'.format(course_code))

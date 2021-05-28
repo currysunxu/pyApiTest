@@ -1,5 +1,5 @@
 from E1_API_Automation.Test_Data.KafkaData import KafkaData
-from E1_API_Automation.Business.HighFlyer35.Hf35KafkaService import Kafka_producer,Kafka_consumer
+from E1_API_Automation.Business.HighFlyer35.Hf35KafkaService import Kafka_producer
 from ptest.decorator import TestClass, Test
 from E1_API_Automation.Settings import *
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
@@ -8,7 +8,7 @@ import time
 
 
 @TestClass()
-class Hf35KafkaTest():
+class OneAppKafkaTest():
 
     @Test(tags="qa, stg",data_provider = ["highflyers/cn-3-144/book-7/unit-1/assignment-2","highflyers/cn-3/book-7/unit-2/assignment-2",
                                           "smallstar/cn-3/book-1/unit-1/assignment-1"])
@@ -38,7 +38,7 @@ class Hf35KafkaTest():
         assert_that(reader_study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(message['UnlockAt'][:message['UnlockAt'].index('.')]))
 
 
-    @Test(tags="qa, stg",data_provider = [("highflyers/cn-3/book-2/unit-6/assignment-1","City-Wide Classroom","HFV3Plus"),("highflyers/cn-3/book-2/unit-6/assignment-1","Online Classroom","HFV3Plus"),
+    @Test(tags="qa",data_provider = [("highflyers/cn-3/book-2/unit-6/assignment-1","City-Wide Classroom","HFV3Plus"),("highflyers/cn-3/book-2/unit-6/assignment-1","Online Classroom","HFV3Plus"),
                                           ("smallstar/cn-3/book-2/unit-6/assignment-1","Online Classroom","SSV3"),("tb16/cn-3/book-2/unit-6/assignment-1","Online Classroom","TBV3Plus"),
                                           ("","City-Wide Classroom","KETV1")])
     def test_insert_from_omni_student_sessions_to_student_sessions_study_plan(self,content_path,group_type,product):
@@ -52,7 +52,7 @@ class Hf35KafkaTest():
         study_plan = Hf35BffUtils.get_study_plan_by_student_id_from_db(payload_message['customerId'], 256, content_path)
         assert_that(study_plan['effect_at'].strftime("%Y-%m-%dT%H:%M:%S"), equal_to(payload_message['startTime'][:payload_message['startTime'].index('.')]))
 
-    @Test(tags="qa, stg",data_provider = [("highflyers/cn-3/book-2/unit-6/assignment-1","City-Wide Classroom","HFV3Plus"),("smallstar/cn-3/book-2/unit-6/assignment-1","Online Classroom","SSV3")])
+    @Test(tags="qa",data_provider = [("highflyers/cn-3/book-2/unit-6/assignment-1","City-Wide Classroom","HFV3Plus"),("smallstar/cn-3/book-2/unit-6/assignment-1","Online Classroom","SSV3")])
     def test_update_remove_from_omni_student_sessions_to_student_sessions_study_plan(self,content_path,group_type,product):
         host = KafkaData.BOOTSTRAP_SERVERS[env_key]
         producer = Kafka_producer(host,'OMNI-StudentSession')

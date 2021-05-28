@@ -17,7 +17,7 @@ class BffUsers:
         'QA': {
             BffProduct.HFV35.value: [{'username': 'hf3.cn.02', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
-            BffProduct.SSV3.value: [{'username': 'ss3.cn.01', 'password': '12345'}],
+            BffProduct.SSV3.value: [{'username': 'ss3.cn.02', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.02', 'password': '12345'}],
             BffProduct.HFV2.value: [{'username': 'hf2.cn.02', 'password': '12345'}],
             BffProduct.HFV3.value: [{'username': 'hf3.cn.01', 'password': '12345'}]
@@ -28,7 +28,7 @@ class BffUsers:
                                      {'username': 'hfcontent', 'password': '12345'},
                                      {'username': 'll.test', 'password': 'efef@123'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
-            BffProduct.SSV3.value: [{'username': 'ss3.cn.01', 'password': '12345'}],
+            BffProduct.SSV3.value: [{'username': 'ss3.cn.02', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
             BffProduct.HFV2.value: [{'username': 'hf2.cn.01', 'password': '12345'}]
         },
@@ -38,6 +38,7 @@ class BffUsers:
                                      {'username': 'hf2.cn.06', 'password': '12345'},
                                      {'username': 'w.test', 'password': '12345'}],
             BffProduct.TBV3.value: [{'username': 'tb3.cn.01', 'password': '12345'}],
+            BffProduct.SSV3.value: [{'username': 'ss3.cn.02', 'password': '12345'}],
             BffProduct.FRV1.value: [{'username': 'fr.cn.01', 'password': '12345'}],
             BffProduct.HFV2.value: [{'username': 'hf2.cn.01', 'password': '12345'}]
         }
@@ -57,7 +58,7 @@ class HF35DependService:
             'android-app-key': 'f6925fb9-0101-4fc9-8b6d-839f7045451b'
         },
         'Live': {
-            'host': 'https://provisioning.ef.cn',
+            'host': 'https://app-release.kids.ef.cn',
             'ios-app-key': 'd978ecfa-07c3-435f-9a88-ad5cdcc9c0f5',
             'android-app-key': 'b792a26f-e8a4-461d-9ae7-f82a2a5a6d51'
         }
@@ -225,6 +226,8 @@ class BusinessData:
     BOOK_CONTENT_PATH_FLASHCARD = "smallstar/cn-3/book-{0}".format(str(random.randint(1, 4)))
     UNIT_CONTENT_PATH = "highflyers/cn-3/book-2/unit-3"
     LESSON_CONTENT_PATH = "highflyers/cn-3/book-2/unit-3/assignment-1"
+    SS_UNIT_CONTENT_PATH = random.choice(["smallstar/cn-3/book-4/unit-{0}", "smallstar/cn-3/book-3/unit-{0}"]).format(
+        str(random.randint(1, 4)))
 
     '''
     build random content path by generator,default size is 4

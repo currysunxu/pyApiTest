@@ -1,9 +1,9 @@
 class PTUsers:
     pt_user = {'QA': {'username': 'pdcc.cn@ef.com', 'password': '12345', 'school': "DCNBJS21",
                       'ss_scheduledDate': [{"day": 19, "month": 5, "year": 2019}],'hf_scheduledDate': [{"day": 16, "month": 5, "year": 2019}]},
-               'Staging': {'username': 'edtech.testcn@ef.cn', 'password': 'efef@111', 'school': "DCNTES01",
-                           'ss_scheduledDate': [{"day": 5, "month": 6, "year": 2019}],'hf_scheduledDate': [{"day": 12, "month": 11, "year": 2020}]},
-               'Live': {'username': 'pdcc.cn@ef.com', 'password': 'Pass@246', 'school': "DCNTES01",
+               'Staging': {'username': 'edtech.testcn@ef.cn', 'password': 'efef@222', 'school': "DCNTES01",
+                           'ss_scheduledDate': [{"day": 5, "month": 6, "year": 2019}],'hf_scheduledDate': [{"day": 31, "month": 12, "year": 2020}]},
+               'Live': {'username': 'edtech.testcn@ef.cn', 'password': 'efef@222', 'school': "DCNTES01",
                         'scheduledDate': [{"day": 12, "month": 6, "year": 2019}]},
                'Live_SG': {'username': 'edtech.test1@ef.id', 'password': 'efef@111', 'school': "DIDTES01",
                         'ss_scheduledDate': [{"day": 2, "month": 12, "year": 2020}]}
