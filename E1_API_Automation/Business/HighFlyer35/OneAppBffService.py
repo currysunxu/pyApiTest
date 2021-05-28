@@ -107,18 +107,6 @@ class OneAppBffService(BaseService):
             self.mou_tai.headers[
                 'EF-Access-Token'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJqdGkiOiI2Y2QzMjEwMy05MDg4LTRiM2EtYmY1Ni1mZjE0ZjJhZjQ3MTUiLCJzdWIiOiIxMDAyIiwiaWF0IjoxNTgyNjE0NTYwLCJleHAiOjE1ODI2MjUzNjAsImNvcnJlbGF0aW9uX2lkIjoiY2Q5YWQ0ZjgtMjBmMy00YWUzLWE0YzEtMWZiOTBiMjEwOWY2IiwicmVmX2lkIjoiYWQ2MWRlMTQtMzUxMC00YjMxLTk1OTUtMzIyZWJmZjE1ZDMwIn0.sfl4sm7ON58rpUkxZ4g_PPMTb8bp1Vi4CIfYke8DxAfL0nNuQUR6fTfVCeHp71hf7GRPpnGIkgyhCX16aQMIMBZtVQWtYy_35EaCuKHCXoWUeAc6M7TJTp3qAW8UyvxX9Vh1aNvVPWWmWWI2OtvCKs1CLDRCOnVp9pDz2mm-3vUZ2IWeq1Di53tq1L2hp_DLQIK5LveLqHbGb9zesniHfVKVsPae-rOx2154Ffw6-YLxA_HJXlsgci5EQX4eYzlfcyH4jBj_u68IgZA8UflJ3ok_HkBXl2vWCOptEgq74O1o6N1qNBkHjLZZPIyI2CS79KENHYAoNln2lcEVkqjrtA"
 
-    def get_online_pl_class(self, scope, course_type_level_code=''):
-        # get online pl class api need both X-EF-TOKEN and EF-Access-Token
-        self.mou_tai.headers['X-EF-TOKEN'] = self.id_token
-        api_url = "/mega/api/v1/classes/online-pl?scope={0}&courseTypeLevelCode={1}".format(scope,
-                                                                                            course_type_level_code)
-        return self.mou_tai.get(api_url)
-
-    def get_online_gl_class(self):
-        # get online gl class api need both X-EF-TOKEN and EF-Access-Token
-        self.mou_tai.headers['X-EF-TOKEN'] = self.id_token
-        api_url = "/mega/api/v1/classes/online-gl"
-        return self.mou_tai.get(api_url)
 
     def get_privacy_policy_document(self):
         # don't need any token

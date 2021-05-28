@@ -48,12 +48,12 @@ class OneAppBffTestBase:
         self.bff_service = OneAppBffService(BFF_ENVIRONMENT)
         self.cm_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
         self.sp_service = StudyPlanService(STUDY_TIME_ENVIRONMENT)
-        current_test_program = self.__class__.__name__
-        self.key = BffProduct.HFV35.value if current_test_program.startswith('Hf') else BffProduct.SSV3.value
-        self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
-        self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
         self.omni_service = OMNIService(OMNI_ENVIRONMENT)
         self.course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
+        current_test_program = self.__class__.__name__
+        self.key = BffProduct.HFV35.value if current_test_program.startswith('HighFlyer') else BffProduct.SSV3.value
+        self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
+        self.password = BffUsers.BffUserPw[env_key][self.key][0]['password']
         self.customer_id = self.omni_service.get_customer_id(self.user_name, self.password)
 
     @BeforeMethod()
