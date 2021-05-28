@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from time import sleep
 
 import jmespath
 from hamcrest import assert_that
@@ -20,7 +21,7 @@ class EVCPlatformMeetingTest:
     def before_method(self):
         self.meeting_duration = 5
 
-    @Test(tags="stg", data_provider={"SG", "UK", "US"})
+    # @Test(tags="stg", data_provider={"SG", "UK", "US"})
     def test_china_tb_pl(self, teacher_location):
         cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
@@ -56,7 +57,7 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg", data_provider={"SG", "UK", "US"})
+    # @Test(tags="stg", data_provider={"SG", "UK", "US"})
     def test_china_ss_pl(self, teacher_location):
         cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
@@ -91,7 +92,7 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg", data_provider={"SG", "UK", "US"})
+    # @Test(tags="stg", data_provider={"SG", "UK", "US"})
     def test_china_hf_pl(self, teacher_location):
         cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
@@ -127,7 +128,7 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg", data_provider={"SG"})
+    # @Test(tags="stg", data_provider={"SG"})
     def test_id_hf_gl(self, teacher_location):
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
         start_time = datetime.now()
@@ -177,7 +178,7 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg", data_provider={"SG"})
+    # @Test(tags="stg", data_provider={"SG"})
     def test_id_fr_gl(self, teacher_location):
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
         start_time = datetime.now()
@@ -227,7 +228,7 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg", data_provider={"SG"})
+    # @Test(tags="stg", data_provider={"SG"})
     def test_id_tb_gl(self, teacher_location):
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
         start_time = datetime.now()
@@ -297,6 +298,7 @@ class EVCPlatformMeetingTest:
                                                       "teacheret er irueiiuwouei uorueiiuwoue")
         student_list = []
         for i in range(0, class_num):
+            sleep(1)
             student = sg_gl_meeting.meeting_register("SG", meeting_token,
                                                      EVCMeetingRole.STUDENT,
                                                      "student ier eoeuwiu nt ier eoeuwiu ooiowruorowruoowr_" + str(i))
@@ -310,6 +312,7 @@ class EVCPlatformMeetingTest:
 
         for stu in student_list:
             stu_classurl = cn_student_service.get_class_entry_url(stu["attendanceToken"])
+            sleep(1)
             stu_bootstrap = cn_student_service.meeting_bootstrap(stu["attendanceToken"])
             assert_that(jmespath.search('layout.template', stu_bootstrap) == 'kids',
                         'The layout template should be kids')
@@ -327,7 +330,7 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg, live", data_provider=["SG"])
+    # @Test(tags="stg, live", data_provider=["SG"])
     def test_indo_phonics_gl_meeting_create(self, teacher_location):
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
         start_time = datetime.now()
@@ -377,7 +380,7 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg", data_provider=["SG"])
+    # @Test(tags="stg", data_provider=["SG"])
     def test_indo_speak_up_gl_meeting_create(self, teacher_location):
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
         start_time = datetime.now()
@@ -427,7 +430,7 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg", data_provider=["SG"])
+    # @Test(tags="stg", data_provider=["SG"])
     def test_indo_story_teller_gl_meeting_create(self, teacher_location):
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
         start_time = datetime.now()
