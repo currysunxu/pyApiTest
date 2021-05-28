@@ -8,7 +8,7 @@ from E1_API_Automation.Test_Data.EVCData import EVCComponentType, EVCMeetingRole
 
 @TestClass()
 class EVCWebSyncTest:
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg", data_provider=["CN"])
     def test_agora_teacher_meeting_websync(self, location):
         meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[location])
         room_info = meeting_service.get_meeting_room_info(role_code=EVCMeetingRole.TEACHER, location=location)
@@ -38,7 +38,7 @@ class EVCWebSyncTest:
                      "roleCode": room_info['role']}, "params": {"topic": "MESSAGE.NEW"}}
         return chat_component.subscribe(shake[0]['clientId'], shake[0]['ext']['fm.sessionId'], chat_body).json()
 
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    # @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
     def test_agora_student_meeting_websync(self, location):
         meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[location])
         room_info = meeting_service.get_meeting_room_info(role_code=EVCMeetingRole.STUDENT, location=location)

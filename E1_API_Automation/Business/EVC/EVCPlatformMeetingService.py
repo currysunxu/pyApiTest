@@ -113,7 +113,8 @@ class EVCPlatformMeetingService:
         param = {
             "attendanceToken": attendance_token
         }
-        preporter.info(self.host + url)
+        print(datetime.now())
+        preporter.info("bootstrap: " + self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
