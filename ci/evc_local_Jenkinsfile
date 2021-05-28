@@ -19,7 +19,7 @@ pipeline {
 
   parameters {
         choice(name:'environment',choices:['STG','LIVE'],description:'')
-        text(name: 'agora_fe_version', defaultValue: '0.3.9-cdac249', description: '')
+        text(name: 'agora_fe_version', defaultValue: '0.4.0-a11fb4b', description: '')
         text(name: 'fm_fe_version', defaultValue: '0.1.39-bfed4c1', description: '')
         text(name: 'techcheck_version', defaultValue: '0.2.3-f14927a', description: '')
         text(name: 'indo_demo_version', defaultValue: '0.1.0-05a01fa', description: '')

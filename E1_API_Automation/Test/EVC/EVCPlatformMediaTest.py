@@ -9,7 +9,7 @@ from E1_API_Automation.Settings import EVC_ENVIRONMENT
 
 @TestClass()
 class EVCPlatformMediaTest:
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg, live", data_provider=["CN"])
     def test_kids_fm_techcheck(self, location):
         self.evc_meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[location])
         self.evc_media_service = EVCPlatformMediaService(EVC_ENVIRONMENT[location])
@@ -26,7 +26,7 @@ class EVCPlatformMediaTest:
         assert_that(response["audioThreshold"], equal_to(-20.0))
         assert_that(response["requireTechCheck"], equal_to(False))
 
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg, live", data_provider=["CN"])
     def test_kids_agore_techcheck(self, location):
         self.evc_meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[location])
         self.evc_media_service = EVCPlatformMediaService(EVC_ENVIRONMENT[location])
@@ -41,7 +41,7 @@ class EVCPlatformMediaTest:
         assert_that(response["audioThreshold"], equal_to(-20.0))
         assert_that(response["requireTechCheck"], equal_to(True))
 
-    @Test(tags="stg, live", data_provider=["CN", "SG", "US", "SG"])
+    @Test(tags="stg, live", data_provider=["CN"])
     def test_kids_trtc_techcheck(self, location):
         self.evc_meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[location])
         self.evc_media_service = EVCPlatformMediaService(EVC_ENVIRONMENT[location])

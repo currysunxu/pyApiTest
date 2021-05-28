@@ -15,7 +15,7 @@ class FrontEndVersionTest:
     def before_method(self):
         self.evc_frontend_service = EVCFrontendService(EVC_CDN_ENVIRONMENT)
 
-    @Test(tags="stg, live", data_provider={"CN", "US", "UK", "SG"})
+    @Test(tags="stg, live", data_provider={"CN"})
     def test_kids_frontend_deployed(self, location):
         # get url list from test data
         frontend_file_list = self.evc_frontend_service.get_frontend_file_url()
