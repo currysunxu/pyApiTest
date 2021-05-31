@@ -30,7 +30,6 @@ class EVCPlatformMeetingTest:
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = cn_pl_meeting.meeting_create(int(start_time.timestamp() * 1000),
-
                                                         int(end_time.timestamp() * 1000),
                                                         int(real_start_time.timestamp() * 1000),
                                                         EVCLayoutCode.CN_TB_PL)
@@ -280,7 +279,10 @@ class EVCPlatformMeetingTest:
 
     @Test(tags="stg", data_provider={"SG"})
     def test_id_ss_gl(self, teacher_location):
+        print("---init class time---")
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
+        cn_student_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
+
         start_time = datetime.now()
         class_duration = 5
         class_num = 3
@@ -288,12 +290,13 @@ class EVCPlatformMeetingTest:
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
-
                                                         int(end_time.timestamp() * 1000),
                                                         int(real_start_time.timestamp() * 1000),
                                                         EVCLayoutCode.Indo_SS_GL)
 
         meeting_token = (meeting_response["componentToken"])
+
+        # meeting register
         teacher_info = sg_gl_meeting.meeting_register("SG", meeting_token, EVCMeetingRole.TEACHER,
                                                       "teacheret er irueiiuwouei uorueiiuwoue")
         student_list = []
@@ -304,15 +307,17 @@ class EVCPlatformMeetingTest:
                                                      "student ier eoeuwiu nt ier eoeuwiu ooiowruorowruoowr_" + str(i))
             student_list.append(student)
 
+        # update meeting material
         sg_gl_meeting.meeting_update_by_material(meeting_token)
-        cn_student_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
-        teacher_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[teacher_location])
+        # teacher_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[teacher_location])
 
-        teacher_url = teacher_service.get_class_entry_url(teacher_info["attendanceToken"])
+        teacher_url = sg_gl_meeting.get_class_entry_url(teacher_info["attendanceToken"])
+        print(teacher_url)
 
         for stu in student_list:
             stu_classurl = cn_student_service.get_class_entry_url(stu["attendanceToken"])
-            sleep(1)
+            print(stu_classurl)
+            sleep(5)
             stu_bootstrap = cn_student_service.meeting_bootstrap(stu["attendanceToken"])
             assert_that(jmespath.search('layout.template', stu_bootstrap) == 'kids',
                         'The layout template should be kids')
@@ -325,7 +330,7 @@ class EVCPlatformMeetingTest:
 
         sg_gl_meeting.trigger_record_class(meeting_token)
 
-        teacher_bootstrap = teacher_service.meeting_bootstrap(teacher_info["attendanceToken"])
+        teacher_bootstrap = sg_gl_meeting.meeting_bootstrap(teacher_info["attendanceToken"])
         assert_that(jmespath.search('roleCode', teacher_bootstrap) == EVCMeetingRole.TEACHER, 'shold be teacher role')
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
@@ -484,11 +489,14 @@ class EVCPlatformMeetingTest:
     def test_agora_pl_recorded(self):
         evc_meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
+        print(start_time)
         class_duration = 5
         real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
+        print(end_time)
 
         # create meeting
+        sleep(5)
         meeting_response = evc_meeting_service.meeting_create(int(start_time.timestamp() * 1000),
                                                               int(end_time.timestamp() * 1000),
                                                               int(real_start_time.timestamp() * 1000),

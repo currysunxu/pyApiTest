@@ -59,6 +59,7 @@ class EVCPlatformMeetingService:
             "meetingMeta": json.dumps(meeting_meta)
         }
         preporter.info(self.host + url)
+        print(datetime.now())
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
@@ -113,8 +114,9 @@ class EVCPlatformMeetingService:
         param = {
             "attendanceToken": attendance_token
         }
+        print(param)
         print(datetime.now())
-        preporter.info("bootstrap: " + self.host + url)
+        print("bootstrap: " + self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200))
         return response.json()
@@ -186,7 +188,7 @@ class EVCPlatformMeetingService:
         param = {
             "attendanceToken": attendance_token
         }
-        response = requests.post(self.host + url, json=param, headers=self.headers)
+        response = requests.post(self.host + url, json=param, headers=self.header)
         return response.json()
 
     def meeting_load(self, component_token):
