@@ -2,7 +2,7 @@ from E1_API_Automation.Business.AuthService import AuthService, AuthPlatform, Au
 from E1_API_Automation.Test_Data.AuthData import AuthUsers, AuthProduct
 from hamcrest import assert_that
 from ptest.decorator import TestClass, Test
-from E1_API_Automation.Settings import AUTH_ENVIRONMENT, env_key
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Business.Utils.AuthUtils import AuthUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from ...Lib.HamcrestMatcher import match_to
@@ -14,7 +14,7 @@ class AuthTestCases:
 
     @Test(tags="qa, stg, live")
     def test_login_logout(self):
-        auth_service = AuthService(AUTH_ENVIRONMENT)
+        auth_service = AuthService()
         product_keys = AuthUsers.AuthUsers[env_key].keys()
 
         # verify login for all the product user with all the supported platform and device type
@@ -38,7 +38,7 @@ class AuthTestCases:
 
     @Test(tags="qa, stg, live")
     def test_legacy_logout(self):
-        auth_service = AuthService(AUTH_ENVIRONMENT)
+        auth_service = AuthService()
         product_keys = AuthUsers.AuthUsers[env_key].keys()
 
         # test the legacy logout for all the products
@@ -52,7 +52,7 @@ class AuthTestCases:
 
     @Test(tags="qa, stg, live")
     def test_products(self):
-        auth_service = AuthService(AUTH_ENVIRONMENT)
+        auth_service = AuthService()
         product_keys = AuthUsers.AuthUsers[env_key].keys()
 
         # test the product API for all the products

@@ -1,16 +1,14 @@
 from typing import List
 import requests
 
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Test_Data.EVCData import EVCContentMaterialType
 
 
-class EVCContentService:
-    def __init__(self, host):
-        self.host = host
+class EVCContentService(BaseService):
 
-    @staticmethod
-    def get_topic_ids(host_url, topic_type) -> List[str]:
-        request_url = host_url + "/services/api/evccontent/topiclist?topictype={0}".format(topic_type)
+    def get_topic_ids(self, topic_type) -> List[str]:
+        request_url = self.host + "/services/api/evccontent/topiclist?topictype={0}".format(topic_type)
         response = requests.get(request_url)
         return response
 

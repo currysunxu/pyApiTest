@@ -1,7 +1,7 @@
 from ptest.decorator import TestClass, BeforeMethod, Test
 from E1_API_Automation.Business.MockTestBFFService import MockTestBFFService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
-from E1_API_Automation.Settings import MOCK_TEST_ENVIRONMENT, env_key
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.MockTestData import *
 
 import random
@@ -13,7 +13,7 @@ import jmespath
 class MockTestCases:
     @BeforeMethod()
     def before_method(self):
-        self.mt_service = MockTestBFFService(MOCK_TEST_ENVIRONMENT)
+        self.mt_service = MockTestBFFService()
         self.finished_test_id = TestDataList.TestId[env_key]['finished_test_id']
         self.part = random.randint(0, 2)
         self.activities = TestDataList.RemediationActivities[env_key]

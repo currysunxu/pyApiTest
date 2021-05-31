@@ -16,7 +16,7 @@ from E1_API_Automation.Business.StoryBlok.StoryBlokImportService import StoryBlo
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokConstants import StoryBlokConstants
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
-from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, ENVIRONMENT, env_key
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.PipelinePublishData import AEMData
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokVersion, StoryblokReleaseProgram
 
@@ -83,7 +83,7 @@ class StoryBlokUtils:
             if component == 'paper':
                 expected_metadata['entityType'] = 'PAPER'
                 # for paper, the activity will be converted to latest activity in content-repo
-                content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+                content_repo_service = ContentRepoService()
                 paper_activity_id_list = jmespath.search("content.parts[].sections[].activities[].activity",
                                                          storyblok_story)
                 latest_activity_list = content_repo_service.get_latest_activities(paper_activity_id_list).json()
@@ -565,7 +565,7 @@ class StoryBlokUtils:
         content_revision_list = jmespath.search('[].contentRevision', content_map_reader_level_list)
         content_revision_list = list(set(content_revision_list))
 
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
 
         error_message = []
         if len(content_revision_list) != 1:
@@ -676,7 +676,7 @@ class StoryBlokUtils:
         region_ach = book_in_content_map['regionAch']
         book_content_path = book_in_content_map['contentPath']
         course_source_name = book_content_path[:book_content_path.index('/')]
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
 
         if len(storyblok_reader_config_list) != len(book_reader_content_group_list):
             error_message.append(
@@ -744,7 +744,7 @@ class StoryBlokUtils:
         region_ach = book_in_content_map['regionAch']
         book_content_path = book_in_content_map['contentPath']
         course_source_name = book_content_path[:book_content_path.index('/')]
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
 
         vocab_eca_group_list = jmespath.search('[?groupType==\'ECA_GROUP\']', book_vocab_content_group_list)
         vocab_asset_group_list = jmespath.search('[?groupType==\'ASSET_GROUP\']', book_vocab_content_group_list)

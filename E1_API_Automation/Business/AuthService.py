@@ -73,8 +73,8 @@ class AuthDeviceType(Enum):
 
 class Auth2Service(BaseService):
 
-    def __init__(self, host, access_token):
-        super().__init__(host, {"EF-Access-Token": access_token})
+    def __init__(self, access_token):
+        super().__init__("", {"EF-Access-Token": access_token})
 
     def get_acl_response(self):
         api_url = '/auth2/internal/api/v2/auth/acl'

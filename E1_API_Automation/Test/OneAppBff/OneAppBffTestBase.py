@@ -45,11 +45,11 @@ class OneAppBffTestBase:
 
     @BeforeClass()
     def setup(self):
-        self.bff_service = OneAppBffService(BFF_ENVIRONMENT)
-        self.cm_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
-        self.sp_service = StudyPlanService(STUDY_TIME_ENVIRONMENT)
-        self.omni_service = OMNIService(OMNI_ENVIRONMENT)
-        self.course_group_service = CourseGroupService(COURSE_GROUP_ENVIRONMENT)
+        self.bff_service = OneAppBffService()
+        self.cm_service = ContentMapService()
+        self.sp_service = StudyPlanService()
+        self.omni_service = OMNIService()
+        self.course_group_service = CourseGroupService()
         current_test_program = self.__class__.__name__
         self.key = BffProduct.HFV35.value if current_test_program.startswith('HighFlyer') else BffProduct.SSV3.value
         self.user_name = BffUsers.BffUserPw[env_key][self.key][0]['username']
@@ -59,7 +59,7 @@ class OneAppBffTestBase:
     @BeforeMethod()
     def sign_in(self):
         self.bff_service.login(self.user_name, self.password)
-        self.auth2_service = Auth2Service(AUTH2_ENVIRONMENT, self.bff_service.mou_tai.headers['EF-Access-Token'])
+        self.auth2_service = Auth2Service(self.bff_service.mou_tai.headers['EF-Access-Token'])
 
 
     def check_bff_compare_learning_result(self, result_response, learning_result_entity, learning_details_entity):
@@ -108,7 +108,7 @@ class OneAppBffTestBase:
                 insert_index += len(learning_result_entity.details[0])
 
     def get_learning_result_response(self, learning_result_entity):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         result_response = learning_result_service.get_specific_result(learning_result_entity)
         return result_response
 
@@ -198,13 +198,13 @@ class OneAppBffTestBase:
         :param json_body_dict: json body
         :return: get course structure from content map
         """
-        content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+        content_map_service = ContentMapService()
         content_map_entity = ContentMapQueryEntity(course, schema_version)
         self.__setter_content_map_entity(content_map_entity, json_body_dict)
         return content_map_service.post_content_map_query_tree(content_map_entity)
 
     def get_data_from_content_map_course_node(self, content_path, check_field) -> object:
-        content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+        content_map_service = ContentMapService()
         course_node_response = content_map_service.get_content_map_course_node(content_path)
         return course_node_response.json()[check_field]
 
@@ -359,7 +359,7 @@ class OneAppBffTestBase:
         return bff_remediation_response
 
     def verify_bff_best_attempts(self, test_instance_key):
-        remediation = RemediationService(REMEDIATION_ENVIRONMENT)
+        remediation = RemediationService()
         best_attempts = remediation.get_best_remediation_attempts(self.customer_id, test_instance_key)
         bff_best_attempts = self.bff_service.get_best_remediation_attempts(test_instance_key)
         assert_that(bff_best_attempts.status_code, equal_to(200))
@@ -375,7 +375,7 @@ class OneAppBffTestBase:
                                                                            "WITH_DESCENDANTS").json()
         last_assignment_content_path = course_node_response['children'][course_node_response['childCount'] - 1][
             'contentPath']
-        general_test_svc = GeneralTestService(GENERAL_TEST_ENVIRONMENT)
+        general_test_svc = GeneralTestService()
         general_test = general_test_svc.get_test_by_student_and_content_path(self.customer_id,
                                                                              BusinessData.SS_UNIT_CONTENT_PATH)
         if general_test.status_code == 204:

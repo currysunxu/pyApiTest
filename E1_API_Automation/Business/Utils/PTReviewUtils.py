@@ -8,7 +8,7 @@ from E1_API_Automation.Business.PTReviewService import PTReviewService
 from E1_API_Automation.Business.OSPService import OSPService
 from E1_API_Automation.Lib.db_mssql import MSSQLHelper
 from E1_API_Automation.Test_Data.PTReviewData import PtWebSQLString
-from ...Settings import TPI_ENVIRONMENT, OSP_ENVIRONMENT, DATABASE
+from ...Settings import DATABASE
 import jmespath
 import datetime
 import random
@@ -156,7 +156,7 @@ class PTReviewUtils:
         # print(omni_body_json)
 
         # call OmniProgressTestAssessment API to update overwritten score and total score
-        tpi_service = TPIService(TPI_ENVIRONMENT)
+        tpi_service = TPIService()
         tpi_response = tpi_service.put_hf_student_omni_pt_assessment(omni_body)
         assert_that(tpi_response.status_code == 204)
 
@@ -741,8 +741,8 @@ class PTReviewUtils:
     # get expected pt review bff result by book body
     @staticmethod
     def get_expected_ptr_bff_result_by_book(student_id, course, book_key, book_info_dict):
-        osp_service = OSPService(OSP_ENVIRONMENT)
-        tpi_service = TPIService(TPI_ENVIRONMENT)
+        osp_service = OSPService()
+        tpi_service = TPIService()
         if course == 'HF':
             course = 'highflyers'
 
@@ -870,7 +870,7 @@ class PTReviewUtils:
     # get expected pt review bff result by studentid body, for all courses
     @staticmethod
     def get_expected_ptr_bff_result_all_course(student_id, course):
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         if course == 'HF':
             course = 'highflyers'
 

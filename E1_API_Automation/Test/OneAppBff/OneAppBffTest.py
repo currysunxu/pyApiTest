@@ -138,7 +138,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
         assert_that(format(bff_best_score, '.2f'), equal_to(format(expected_score, '.2f')))
 
         # check homework service best attempt
-        homework_service = HomeworkService(HOMEWORK_ENVIRONMENT)
+        homework_service = HomeworkService()
         homework_best_attempt_response = homework_service.get_the_best_attempt(self.customer_id, book_content_id)
         homework_best_total_score = sum(
             Hf35BffCommonData.get_value_by_json_path(homework_best_attempt_response.json()[0],
@@ -275,7 +275,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
     def test_post_homework_activity_with_negative_token(self, negative_token):
         content_repo_data = ContentRepoCommonData()
         # insert content
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         content_json_body = content_repo_data.get_activity_content()
         content_repo_response = content_repo_service.post_content(content_json_body)
         assert_that(content_repo_response.status_code == 200)
@@ -290,7 +290,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
     def test_post_homework_activity_with_negative_parameter(self, negative_parameter):
         content_repo_data = ContentRepoCommonData()
         # insert content
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         content_json_body = content_repo_data.get_activity_content()
         content_repo_response = content_repo_service.post_content(content_json_body)
         assert_that(content_repo_response.status_code == 200)
@@ -304,7 +304,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
     def test_post_homework_activity_group_with_negative_token(self, negative_token):
         content_repo_data = ContentRepoCommonData()
         # insert content
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         content_json_body = content_repo_data.get_activity_content()
         content_repo_response = content_repo_service.post_content(content_json_body)
         assert_that(content_repo_response.status_code == 200)
@@ -416,7 +416,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
                                                                                                  unit_schema_version)
         assert_that(bff_homework_content_group_response.status_code == 200)
 
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         homework_activity_group_response = \
             content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHomework.value,
                                                              ContentRepoGroupType.TypeActivityGroup.value,
@@ -450,7 +450,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
             self.bff_service.get_handout_content_groups(book_content_id, book_content_revision, book_schema_version)
         assert_that(bff_handout_content_group_response.status_code == 200)
 
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         handout_eca_group_response = \
             content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeHandout.value,
                                                              ContentRepoGroupType.TypeECAGroup.value,
@@ -489,7 +489,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
         bff_activity_response = self.bff_service.get_homework_activities(activity_filter_body)
         assert_that(bff_activity_response.status_code == 200)
 
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         content_repo_activity_response = content_repo_service.get_activities(activity_filter_body)
         assert_that(content_repo_activity_response.status_code == 200)
         # check the bff activity api response will be same to what you get from content repo, order by id
@@ -517,7 +517,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
         bff_eca_response = self.bff_service.get_handout_ecas(eca_filter_body)
         assert_that(bff_eca_response.status_code == 200)
 
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         content_repo_eca_response = content_repo_service.get_ecas(eca_filter_body)
         assert_that(content_repo_eca_response.status_code == 200)
         # check the bff eca api response will be same to what you get from content repo
@@ -571,7 +571,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
             self.bff_service.get_vocab_content_groups(unit_content_id, unit_content_revision, unit_schema_version)
         assert_that(bff_vocab_content_group_response.status_code == 200)
 
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         vocab_eca_group_response = \
             content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeVocab.value,
                                                              ContentRepoGroupType.TypeECAGroup.value,
@@ -678,7 +678,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
         assert_that(vocab_progress_response.status_code, equal_to(200))
 
         # check with vocab service
-        vocab_service = VocabService(VOCAB_ENVIRONMENT)
+        vocab_service = VocabService()
         homework_vocab_progress_response = vocab_service.get_vocab_progress(self.customer_id, book_content_id)
         assert_that(homework_vocab_progress_response.status_code, equal_to(200))
         assert_that(vocab_progress_response.json(), equal_to(homework_vocab_progress_response.json()))
@@ -971,7 +971,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
             bff_remediation_response = self.bff_service.get_remediation_by_pt_key_and_instance_key(test_instance_key,
                                                                                                    test_id)
             assert_that(bff_remediation_response.status_code, equal_to(200))
-            remediation = RemediationService(REMEDIATION_ENVIRONMENT)
+            remediation = RemediationService()
             activity_obj = remediation.get_remediation_activity(self.customer_id, test_instance_key, test_id)
             assert_that(bff_remediation_response.json()['activityGroups'][0], equal_to(activity_obj.json()))
             # assetGroups is empty array because of random instance_key
@@ -1035,7 +1035,7 @@ class HighFlyersOneAppBffTest(OneAppBffTestBase):
         bff_flashcard_response = self.bff_service.get_flashcard_content_group(book_content_id, book_content_revision,
                                                                               book_schema_version)
         assert_that(bff_flashcard_response.status_code, equal_to(200))
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_repo_service = ContentRepoService()
         content_repo_eca_group_flashcard = content_repo_service.get_content_groups_by_param("FLASHCARD", "ECA_GROUP",
                                                                                             book_content_id,
                                                                                             book_content_revision,

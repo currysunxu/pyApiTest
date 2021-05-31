@@ -1,15 +1,15 @@
 from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Business.AuthService import AuthService
-from E1_API_Automation.Settings import AUTH_ENVIRONMENT, env_key
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.PTReviewData import BffUsers
 
 
 class PTReviewBFFService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"X-BA-TOKEN": "Token"})
+    def __init__(self):
+        super().__init__("Environment", {"X-BA-TOKEN": "Token"})
 
     def login(self):
-        auth = AuthService(AUTH_ENVIRONMENT)
+        auth = AuthService()
         self.user_name = BffUsers.BffUserPw[env_key]['username']
         self.password = BffUsers.BffUserPw[env_key]['password']
         x_ef_token = auth.login(self.user_name, self.password).json()['idToken']

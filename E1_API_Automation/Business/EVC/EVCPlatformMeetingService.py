@@ -9,11 +9,11 @@ from hamcrest import assert_that, equal_to
 from requests import request
 
 from E1_API_Automation.Business.EVC.EVCContentService import EVCContentService
-from E1_API_Automation.Settings import EVC_CONTENT_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode
 
 
-class EVCPlatformMeetingService:
+class EVCPlatformMeetingService():
+
     def __init__(self, host):
         self.host = host
         self.access_key = self.create_api_access_Key()
@@ -108,7 +108,7 @@ class EVCPlatformMeetingService:
     def meeting_update(self, component_token, topic_id):
         url = "/evc15/meeting/api/update"
 
-        content_service = EVCContentService(EVC_CONTENT_ENVIRONMENT)
+        content_service = EVCContentService()
 
         material_payload = content_service.get_lesson_by_id(topic_id).json()[0]
         action_arguments = {"materialPayload": material_payload, "materialCode": topic_id}

@@ -4,8 +4,8 @@ import jmespath
 
 
 class OMNIService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"X-ODIN-AppId": "grammarpro",
+    def __init__(self):
+        super().__init__("", {"X-ODIN-AppId": "grammarpro",
                                 "X-ODIN-AppSecret": "U2FsdGVkX19SgIpGnlaC1bhAza7MSywQ4DDTcvlWmJ0="})
 
     def get_customer_id(self, user_name, password):

@@ -8,7 +8,7 @@ Environment:
   STAGING_SG: "https://e1svc-stg.english1.com"
   LIVE_SG: "https://e1svc.kids.ef.com"
 
-KSDEnvironment:
+KidsEVCService:
   QA: "https://study-qa.english1.cn"
   STAGING: "https://study-stg.english1.cn"
   LIVE: "https://study.ef.cn"
@@ -16,7 +16,7 @@ KSDEnvironment:
   LIVE_SG: "https://study.ef.com"
 
 
-OSPEnvironment:
+OSPService:
   QA: "https://internal-osp-qa.english1.cn"
   STAGING: "https://internal-osp-stg.english1.cn"
   LIVE: "https://internal-osp.english1.cn"
@@ -24,7 +24,7 @@ OSPEnvironment:
   LIVE_SG: "http://internal-osp.english1.com"
 
 
-TPIEnvironment:
+TPIService:
   QA: "https://internal-tpi-qa.english1.cn"
   STAGING: "https://internal-tpi-stg.english1.cn"
   STAGING_SG: "https://internal-tpi-stg.english1.com"
@@ -32,7 +32,7 @@ TPIEnvironment:
   LIVE_SG: "https://internal-tpi.english1.com"
 
 
-AuthEnvironment:
+AuthService:
   QA: "https://auth-svc-qa.english1.cn"
   STAGING: "https://auth-svc-stg.english1.cn"
   STAGING_SG: "https://auth-svc-stg.english1.com"
@@ -40,7 +40,7 @@ AuthEnvironment:
   LIVE_SG: "https://auth-svc.ef.com"
 
 
-OMNIEnvironment:
+OMNIService:
   QA: "https://internal-ktsvc-qa.english1.cn/omni/apigateway"
   STAGING: "https://omni-apigw-cn-stg.english1.cn"
   STAGING_SG: "https://omni-apigw-cn-stg.english1.com"
@@ -48,88 +48,93 @@ OMNIEnvironment:
   LIVE_SG: "http://omni-apigateway-tcjp.ef.com"
 
 
-LearningResultEnvironment:
+LearningResultService:
   QA: "https://internal-ktsvc-qa.english1.cn/learning-result"
   STAGING: "https://internal-ktsvc-stg.english1.cn/learning-result"
   LIVE: "https://internal-ktsvc.english1.cn/learning-result"
 
 
-BffEnvironment:
+PTReviewBFFService:
   QA: "https://ktsvc-qa.english1.cn"
   STAGING: "https://ktsvc-stg.english1.cn"
   LIVE: "https://ktsvc.kids.ef.cn"
 
-HomeworkEnvironment:
+OneAppBffService:
+  QA: "https://ktsvc-qa.english1.cn"
+  STAGING: "https://ktsvc-stg.english1.cn"
+  LIVE: "https://ktsvc.kids.ef.cn"
+
+HomeworkService:
   QA: "https://internal-ktsvc-qa.english1.cn/practice"
   STAGING: "https://internal-ktsvc-stg.english1.cn/practice"
   LIVE: "https://internal-ktsvc.english1.cn/practice"
 
 
-CourseGroupEnvironment:
+CourseGroupService:
   QA: "https://internal-ktsvc-qa.english1.cn/course-group"
   STAGING: "https://internal-ktsvc-stg.english1.cn/course-group"
   LIVE: "https://internal-ktsvc.english1.cn/course-group"
 
 
-ContentMapEnvironment:
+ContentMapService:
   QA: "https://internal-ktsvc-qa.english1.cn/content-map"
   STAGING: "https://internal-ktsvc-stg.english1.cn/content-map"
   LIVE: "https://internal-ktsvc.english1.cn/content-map"
 
 
-ContentRepoEnvironment:
+ContentRepoService:
   QA: "https://internal-ktsvc-qa.english1.cn/content-repo"
   STAGING: "https://internal-ktsvc-stg.english1.cn/content-repo"
   LIVE: "https://internal-ktsvc.english1.cn/content-repo"
 
 
-ContentBuilderEnvironment:
+ContentBuilderService:
   QA: "https://internal-ktsvc-qa.english1.cn/content-builder"
   STAGING: "https://internal-ktsvc-stg.english1.cn/content-builder"
   LIVE: "https://internal-ktsvc.english1.cn/content-builder"
 
 
-MockTestEnvironment:
+MockTestBFFService:
   QA: "https://ktsvc-qa.english1.cn/mseb"
   STAGING: "https://ktsvc-stg.english1.cn/mseb"
   LIVE: "https://ktsvc.kids.ef.cn/mseb"
 
 
-StoryblokReleaseEnvironment:
+StoryBlokReleaseService:
   QA: "https://internal-ktsvc-qa.english1.cn/storyblok-release"
   STAGING: "https://internal-ktsvc-stg.english1.cn/storyblok-release"
   LIVE: "https://internal-ktsvc.english1.cn/storyblok-release"
 
 
-StoryblokImportEnvironment:
+StoryBlokImportService:
   QA: "https://internal-ktsvc-qa.english1.cn/storyblok-import"
   LIVE: "https://internal-ktsvc.english1.cn/storyblok-import"
 
 
-E1TPIEnvironment:
+E1TPIService:
   STAGING: "https://e1tpi-stg.english1.cn"
   STAGING_SG: "https://e1tpi-stg.english1.com"
   LIVE: "https://tpi.kids.ef.cn"
   LIVE_SG: "https://e1tpi.ef.com"
 
 
-StudyPlanEnvironment:
+StudyPlanService:
   QA: "https://internal-ktsvc-qa.english1.cn/study-plan"
   STAGING: "https://internal-ktsvc-stg.english1.cn/study-plan"
   LIVE: "https://internal-ktsvc.english1.cn/study-plan"
 
 
-LearningProfileEnvironment:
+LearningProfileService:
   STAGING: "https://e1-evc-booking-integration-stg.ef.com"
   LIVE: "https://e1-evc-booking-integration.ef.com"
 
 
-EVCContentEnvironment:
+EVCContentService:
   STAGING: "https://evc-content-staging.bj-englishtown.com"
   LIVE: "https://evc-content.bj-englishtown.com"
 
 
-EVCCDNEnvironment:
+EVCFrontendService:
   STAGING: "https://evc-fe-staging.bj-englishtown.com"
   LIVE: "https://evc-fe.bj-englishtown.com"
 
@@ -138,22 +143,22 @@ EVCDemoPageEnvironment:
   STAGING: "https://evc-ts-staging.ef.com.cn"
   LIVE: "https://evc-ts.ef.com.cn/"
 
-Auth2Environment:
+Auth2Service:
   QA: "https://internal-ktsvc-qa.english1.cn"
   STAGING: "https://internal-ktsvc-stg.english1.cn"
   LIVE: "https://internal-ktsvc.english1.cn"
 
-RemediationEnvironment:
+RemediationService:
   QA: "https://internal-ktsvc-qa.english1.cn/remediation"
   STAGING: "https://internal-ktsvc-stg.english1.cn/remediation"
   LIVE: "https://internal-ktsvc.english1.cn/remediation"
 
-VocabEnvironment:
+VocabService:
   QA: "https://internal-vocab-qa.english1.cn"
   STAGING: "https://internal-vocab-stg.english1.cn"
   LIVE: "https://internal-vocab.english1.cn"
 
-GeneralTestEnvironment:
+GeneralTestService:
   QA: "https://internal-ktsvc-qa.english1.cn/kgt"
   STAGING: "https://internal-ktsvc-stg.english1.cn/kgt"
   LIVE: "https://internal-ktsvc.english1.cn/kgt"
@@ -173,7 +178,7 @@ EVCProxyEnvironment:
     "SG": "evc-tsg-to-ts.ef.com"
   }
 
-MediaEnvironment:
+Hf35MediaService:
   QA: "https://kt-asset-qa.english1.cn"
   STAGING: "https://kt-asset-stg.english1.cn"
   LIVE: "https://kt-asset.english1.cn"

@@ -2,15 +2,13 @@ import time
 import arrow
 import jmespath
 
-from E1_API_Automation.Lib.Moutai import Moutai, Token
-from E1_API_Automation.Settings import ENVIRONMENT
+from E1_API_Automation.Business.BaseService import BaseService
+from E1_API_Automation.Lib.Moutai import  Token
 
 
-class SmallStarService():
-    def __init__(self, host):
-        self.host = host
-        print(self.host)
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+class SmallStarService(BaseService):
+    def __init__(self):
+        super().__init__("Environment", {}, Token("X-BA-TOKEN", "Token"))
 
     def login(self, username, password):
         user_info = {
@@ -224,7 +222,7 @@ if __name__ == '__main__':
     password = '12345'  # login password
     book_name = 'Book 1'  # The book that needs to be executed
     unit_name = 'Unit 2'  # The unit that needs to be executed
-    small_star_service = SmallStarService(ENVIRONMENT)
+    small_star_service = SmallStarService()
     # Environment: QA / STAGING / STAGING_SG / LIVE / LIVE_SG
 
     small_star_service.login(username, password)

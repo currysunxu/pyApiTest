@@ -1,12 +1,12 @@
 import jmespath
 
 from E1_API_Automation.Business.BaseService import BaseService
-from ..Lib.Moutai import Moutai, Token
+from ..Lib.Moutai import Token
 
 
 class PTService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"X-BA-TOKEN": "Token"})
+    def __init__(self):
+        super().__init__("Environment", {}, Token("X-BA-TOKEN", "Token"))
 
     def stuff_login(self, username, password):
         user_info = {

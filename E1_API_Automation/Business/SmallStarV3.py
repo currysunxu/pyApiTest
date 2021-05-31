@@ -7,8 +7,8 @@ from ..Lib.Moutai import Moutai, Token
 
 
 class SmallStarService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"X-BA-TOKEN": "Token"})
+    def __init__(self):
+        super().__init__("Environment", {}, Token("X-BA-TOKEN", "Token"))
 
     def login(self, user_name, password):
         user_info = {
