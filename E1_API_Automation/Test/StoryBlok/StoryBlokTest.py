@@ -182,10 +182,10 @@ class StoryBlokTestCases:
     # test course release by release scope
     # @Test(data_provider=[
     #     (['book-1', 'book-2', 'book-3', 'book-4', "book-5", "book-6", "book-7", "book-8"], ['cn-3'], 'Trailblazers30')])
-    @Test(data_provider=[
-        (['book-c', 'book-d', 'book-e', 'book-f', "book-g", "book-h", "book-i", "book-j"], ['cn-3', 'cn-3-144'], 'Highflyers35')])
     # @Test(data_provider=[
-    #     (['book-1', 'book-2', 'book-3', 'book-4'], ['cn-3'], 'Smallstars30')])
+    #     (['book-c', 'book-d', 'book-e', 'book-f', "book-g"], ['cn-3', 'cn-3-144'], 'Highflyers35')])
+    @Test(data_provider=[
+        (['book-1', 'book-2', 'book-3', 'book-4'], ['cn-3'], 'Smallstars30')])
     def test_course_release_by_scope(self, release_scopes, region_achs, release_program):
         course_config_path = StoryBlokData.StoryBlokProgram[release_program]['course-config-path']
         course_source_name = StoryBlokData.StoryBlokProgram[release_program]['source-name']
