@@ -27,9 +27,9 @@ class EVCPlatformMediaTest:
 
                                                                    int(end_time.timestamp() * 1000),
                                                                    int(real_start_time.timestamp() * 1000),
-                                                         EVCLayoutCode.Agora_Kids_PL)
+                                                         EVCLayoutCode.CN_HF_PL)
         meeting_token = (meeting_response["componentToken"])
-        teacher_info = cn_pl_meeting.meeting_register("SG", meeting_token, EVCMeetingRole.TEACHER,
+        teacher_info = cn_pl_meeting.meeting_register(teacher_location, meeting_token, EVCMeetingRole.TEACHER,
                                                                  "teacher")
         student_info = cn_pl_meeting.meeting_register("CN", meeting_token,
                                                                        EVCMeetingRole.STUDENT,
@@ -50,13 +50,14 @@ class EVCPlatformMediaTest:
         teacher_bootstrap = teacher_service.meeting_bootstrap(teacher_info["attendanceToken"])
         assert_that(jmespath.search('roleCode', teacher_bootstrap) == EVCMeetingRole.TEACHER, 'shold be teacher role')
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids', 'The layout template should be kids')
+        cn_student_service.trigger_record_class(meeting_token)
 
     @Test(data_provider={"SG"})
     def test_id_gl(self, teacher_location):
         sg_gl_meeting = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT["SG"])
         start_time = datetime.now()
-        class_duration = 15
-        class_num = 10
+        class_duration = 8
+        class_num = 2
         real_start_time = start_time + timedelta(minutes=1)
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting

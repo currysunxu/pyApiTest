@@ -230,8 +230,6 @@ class EVCPlatformMeetingService:
         params = {
             'meetingToken': meeting_token
         }
-        print('header')
-        print(self.header)
         response = requests.post(url, data='{}', params=params, headers=self.header)
 
         if response.status_code != 204:

@@ -18,6 +18,9 @@ class EVCContentMaterialType:
 
 class EVCLayoutCode:
     Kids_PL = "kids_pl"
+    CN_TB_PL = "cn_tb_pl"
+    CN_SS_PL = "cn_ss_pl"
+    CN_HF_PL = "cn_hf_pl"
     Agora_Kids_PL = "kids_pl"
     Indo_FR_GL = "indo_fr_gl"
     Indo_HF_GL = "indo_hf_gl"
