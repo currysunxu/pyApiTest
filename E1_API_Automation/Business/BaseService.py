@@ -3,7 +3,7 @@ from E1_API_Automation.Settings import yaml_cfg, env_key
 
 
 class BaseService:
-    def __init__(self,  host="", headers={}, token=""):
+    def __init__(self,  host="", headers={}, token=None):
         current_service = self.__class__.__name__ if "" == host else host
         host_from_config = self.get_current_env(current_service)
         self.host = host if "" == host_from_config else host_from_config

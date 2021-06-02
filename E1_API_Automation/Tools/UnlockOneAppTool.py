@@ -37,17 +37,17 @@ class UnlockSSUnitQuiz:
 
     @Test()
     def unlock_course_group(self):
-        student_id = 101334620
-        unlock_content_path = "smallstar/cn-3/book-3/unit-{0}/assignment-{1}"
+        student_id = 100211067
+        unlock_content_path = "smallstar/cn-3/book-4/unit-{0}/assignment-{1}"
         cm_service = ContentMapService()
         # from unit start_index to end_index+1
-        for unit in range(1, 4):
+        for unit in range(1, 11):
             # from unit start_index to end_index+1
             unit_path = unlock_content_path.format(str(unit), "")
             end_index = CommonUtils.last_index_of(unit_path, "/") - 1
             course_node_response = cm_service.get_content_map_course_node(unit_path[:end_index],
                                                                           "WITH_DESCENDANTS").json()
-            lesson_count = course_node_response['childCount']
+            lesson_count = course_node_response['childCount']+1
             for lesson in range(1, lesson_count):
                 content_path = unlock_content_path.format(str(unit), str(lesson))
                 course_group_service = CourseGroupService()

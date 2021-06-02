@@ -3,11 +3,12 @@ from ptest.decorator import TestClass, Test, BeforeClass
 
 from E1_API_Automation.Business.EVC.EVCContentService import EVCContentService
 from E1_API_Automation.Lib.HamcrestExister import exist
+from E1_API_Automation.Settings import EVC_CONTENT_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCContentMaterialType
 
 
 def get_testcase_params(topic_type: EVCLayoutCode.Kids_PL):
-    yield from list(EVCContentService.get_topic_ids(topic_type).json().keys())[0:10]
+    yield from list(EVCContentService.get_topic_ids(EVC_CONTENT_ENVIRONMENT, topic_type).json().keys())[0:10]
 
 
 @TestClass(run_mode="parallel")
@@ -15,11 +16,11 @@ class EVCContentTest:
 
     @BeforeClass()
     def before_method(self):
-        self.evc_content_service = EVCContentService()
+        self.evc_content_service = EVCContentService(EVC_CONTENT_ENVIRONMENT)
 
     @Test(tags="stg, live")
     def test_get_kids_pl_topics(self):
-        response = self.evc_content_service.get_topic_ids(EVCContentMaterialType.FM_Kids_PL)
+        response = EVCContentService.get_topic_ids(EVC_CONTENT_ENVIRONMENT, EVCContentMaterialType.FM_Kids_PL)
 
         # check response status is 200 and returned topic list is not empty
         assert_that(response.status_code, equal_to(200))
