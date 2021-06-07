@@ -8,7 +8,7 @@ from E1_API_Automation.Test_Data.EVCData import EVCComponentType, EVCMeetingRole
 
 @TestClass()
 class EVCWebSyncTest:
-    @Test(tags="stg", data_provider=["CN"])
+    # @Test(tags="stg", data_provider=["CN"])
     def test_agora_teacher_meeting_websync(self, location):
         meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[location])
         room_info = meeting_service.get_meeting_room_info(role_code=EVCMeetingRole.TEACHER, location=location)

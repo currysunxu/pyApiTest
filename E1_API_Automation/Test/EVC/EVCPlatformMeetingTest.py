@@ -277,14 +277,14 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg", data_provider={"SG"})
+    # @Test(tags="stg", data_provider={"SG"})
     def test_id_ss_gl(self, teacher_location):
         print("---init class time---")
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
         cn_student_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
 
         start_time = datetime.now()
-        class_duration = 5
+        class_duration = 30
         class_num = 3
         real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
@@ -312,11 +312,9 @@ class EVCPlatformMeetingTest:
         # teacher_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[teacher_location])
 
         teacher_url = sg_gl_meeting.get_class_entry_url(teacher_info["attendanceToken"])
-        print(teacher_url)
 
         for stu in student_list:
             stu_classurl = cn_student_service.get_class_entry_url(stu["attendanceToken"])
-            print(stu_classurl)
             sleep(5)
             stu_bootstrap = cn_student_service.meeting_bootstrap(stu["attendanceToken"])
             assert_that(jmespath.search('layout.template', stu_bootstrap) == 'kids',
@@ -485,15 +483,15 @@ class EVCPlatformMeetingTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(tags="stg")
+    # @Test(tags="stg")
     def test_agora_pl_recorded(self):
         evc_meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
-        print(start_time)
+        print("start time:" + str(start_time))
         class_duration = 5
         real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
-        print(end_time)
+        print("end time:" + str(end_time))
 
         # create meeting
         sleep(5)
