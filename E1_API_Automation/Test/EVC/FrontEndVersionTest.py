@@ -4,7 +4,7 @@ from ptest.decorator import TestClass, Test, BeforeClass
 
 from E1_API_Automation.Business.EVC.EVCFrontendService import EVCFrontendService
 from E1_API_Automation.Business.EVC.EVCPlatformMeetingService import EVCPlatformMeetingService
-from E1_API_Automation.Settings import EVC_CDN_ENVIRONMENT, EVC_PROXY_ENVIRONMENT, EVC_DEMO_PAGE_ENVIRONMENT
+from E1_API_Automation.Settings import EVC_ENVIRONMENT
 from E1_API_Automation.Test_Data.EVCData import EVC_AGORA_FRONTEND_VERSION, EVCPlatform, EVC_FM_FRONTEND_VERSION, \
     EVC_TECH_CHECK_VERSION, EVC_INDO_DEMO_VERSION
 
@@ -13,9 +13,9 @@ from E1_API_Automation.Test_Data.EVCData import EVC_AGORA_FRONTEND_VERSION, EVCP
 class FrontEndVersionTest:
     @BeforeClass()
     def before_method(self):
-        self.evc_frontend_service = EVCFrontendService(EVC_CDN_ENVIRONMENT)
+        self.evc_frontend_service = EVCFrontendService()
 
-    @Test(tags="stg, live", data_provider={"CN", "US", "UK", "SG"})
+    @Test(tags="stg, live", data_provider={"CN"})
     def test_kids_frontend_deployed(self, location):
         # get url list from test data
         frontend_file_list = self.evc_frontend_service.get_frontend_file_url()
@@ -31,7 +31,7 @@ class FrontEndVersionTest:
                     version = EVC_AGORA_FRONTEND_VERSION
 
                 url = url.format(version)
-                response = self.evc_frontend_service.request_frontend_js(url, EVC_PROXY_ENVIRONMENT[location])
+                response = self.evc_frontend_service.request_frontend_js(url, EVC_ENVIRONMENT[location])
 
                 assert_that(response.headers["vary"], equal_to("Origin"))
                 assert_that(response.headers["Access-Control-Allow-Origin"], equal_to("*"))
@@ -39,12 +39,12 @@ class FrontEndVersionTest:
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_agora_frontend_version(self, platform):
         # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_DEMO_PAGE_ENVIRONMENT)
+        meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         attendance_token = meeting_service.create_or_join_classroom()["attendanceToken"]
 
         # get version from api
         agora_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token, platform)
-        expect_file_name = EVC_CDN_ENVIRONMENT + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
+        expect_file_name = self.evc_frontend_service.host + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
                                                                                                         EVC_AGORA_FRONTEND_VERSION)
 
         # check version and url
@@ -54,12 +54,12 @@ class FrontEndVersionTest:
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_fm_frontend_version(self, platform):
         # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_DEMO_PAGE_ENVIRONMENT)
+        meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         attendance_token = meeting_service.create_or_join_classroom(use_agora="False")["attendanceToken"]
 
         # get version from api
         fm_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token, platform)
-        expect_file_name = EVC_CDN_ENVIRONMENT + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
+        expect_file_name = self.evc_frontend_service.host + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
                                                                                                         EVC_FM_FRONTEND_VERSION)
         # check version and url
         assert_that(fm_response["Version"], equal_to(EVC_FM_FRONTEND_VERSION))
@@ -67,7 +67,7 @@ class FrontEndVersionTest:
 
     @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
     def test_kids_efstudy_frontend_version(self, platform):
-        url = "{0}/_shared/evc15-fe-{1}-bundle_kids/version.json".format(EVC_CDN_ENVIRONMENT, platform)
+        url = "{0}/_shared/evc15-fe-{1}-bundle_kids/version.json".format(self.evc_frontend_service.host, platform)
         response = requests.get(url)
 
         # get parameters from response

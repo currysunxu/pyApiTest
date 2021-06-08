@@ -3,7 +3,7 @@ from ptest.decorator import TestClass, Test, BeforeClass
 
 from E1_API_Automation.Lib.HamcrestExister import exist
 from E1_API_Automation.Business.LearningProfileSevice import LearningProfileService
-from E1_API_Automation.Settings import LEARNING_PROFILE_ENVIRONMENT, env_key
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.LearningProfileData import LearningProfileData
 
 
@@ -11,7 +11,7 @@ from E1_API_Automation.Test_Data.LearningProfileData import LearningProfileData
 class LearningProfileTestCases():
     @BeforeClass()
     def set_up(self):
-        self.learning_profile_service = LearningProfileService(LEARNING_PROFILE_ENVIRONMENT)
+        self.learning_profile_service = LearningProfileService()
 
     @Test(tags='stg, live')
     def test_learning_profile(self):

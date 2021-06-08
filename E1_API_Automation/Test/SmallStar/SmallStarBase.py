@@ -5,7 +5,6 @@ from E1_API_Automation.Business.Athena import Student
 from E1_API_Automation.Business.SmallStarV3 import SmallStarService
 from E1_API_Automation.Business.TPIService import TPIService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
-from E1_API_Automation.Settings import ENVIRONMENT, TPI_ENVIRONMENT
 
 
 @TestClass()
@@ -38,9 +37,9 @@ class SmallStarBase():
 
     @BeforeClass()
     def set_up(self):
-        self.small_star_service = SmallStarService(ENVIRONMENT)
-        self.student = Student(ENVIRONMENT)
-        self.tpi_service = TPIService(TPI_ENVIRONMENT)
+        self.small_star_service = SmallStarService()
+        self.student = Student()
+        self.tpi_service = TPIService()
         self.set_context()
 
     @AfterMethod()

@@ -6,7 +6,7 @@ from E1_API_Automation.Business.PTReviewBFFService import PTReviewBFFService
 from E1_API_Automation.Business.Utils.PTReviewUtils import PTReviewUtils
 from E1_API_Automation.Business.TPIService import TPIService
 from E1_API_Automation.Business.OMNIService import OMNIService
-from ...Settings import BFF_ENVIRONMENT, OSP_ENVIRONMENT, TPI_ENVIRONMENT, OMNI_ENVIRONMENT, ENVIRONMENT, env_key
+from ...Settings import env_key
 from ...Test_Data.PTReviewData import PTReviewData, PTDATA
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Business.PTSkillScore import SkillCode, SubSkillCode
@@ -20,7 +20,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa, stg, live")
     def test_get_all_books_by_course(self):
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         # verify all the three courses
         course_code_list = ['highflyers', 'frontrunner', 'trailblazers']
         for course_code in course_code_list:
@@ -77,11 +77,11 @@ class PTReviewTestCases:
         print(omni_body_json)
 
         # call OmniProgressTestAssessment API to update overwritten score and total score
-        tpi_service = TPIService(TPI_ENVIRONMENT)
+        tpi_service = TPIService()
         tpi_response = tpi_service.put_hf_student_omni_pt_assessment(omni_body)
         assert_that(tpi_response.status_code == 204)
 
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         # call StudentPaperDigitalProgressTestAssessmentMetas API to get all the records from DB
         assess_metas = osp_service.post_hf_student_pt_assess_metas(student_id, book_key)
         assert_that(assess_metas.status_code == 200)
@@ -107,11 +107,11 @@ class PTReviewTestCases:
         print(omni_body_json)
 
         # call OmniProgressTestAssessment API to update overwritten score and total score
-        tpi_service = TPIService(TPI_ENVIRONMENT)
+        tpi_service = TPIService()
         tpi_response = tpi_service.put_hf_student_omni_pt_assessment(omni_body)
         assert_that(tpi_response.status_code == 204)
 
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         for student_id in PTReviewData.pt_hf_user_key_book_unit[env_key].keys():
             book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
             unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
@@ -136,7 +136,7 @@ class PTReviewTestCases:
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
 
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             # make sure all the score have value at first
             PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
@@ -170,7 +170,7 @@ class PTReviewTestCases:
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
 
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
 
         # make sure all the score have value at first
         PTReviewUtils.update_random_score_with_omni_pt_assess_api(student_id, test_primary_key)
@@ -202,7 +202,7 @@ class PTReviewTestCases:
         test_primary_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['TestPrimaryKey']
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
 
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
 
         if not EnvUtils.is_env_live_cn() and not EnvUtils.is_env_live_sg():
             # make sure all the score have value at first
@@ -273,7 +273,7 @@ class PTReviewTestCases:
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
 
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
 
         for skill in SkillCode.__members__:
             if skill in (SkillCode.Speaking.value, SkillCode.Writing.value):
@@ -302,7 +302,7 @@ class PTReviewTestCases:
         book_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['BookKey']
         unit_key = PTReviewData.pt_hf_user_key_book_unit[env_key][student_id]['UnitKey']
 
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
 
         for skill in SkillCode.__members__:
             if skill in (SkillCode.Speaking.value, SkillCode.Writing.value):
@@ -322,8 +322,8 @@ class PTReviewTestCases:
 
     @Test(tags="qa, stg")
     def test_enrolled_groups_with_state_api(self):
-        omni_service = OMNIService(OMNI_ENVIRONMENT)
-        tpi_service = TPIService(TPI_ENVIRONMENT)
+        omni_service = OMNIService()
+        tpi_service = TPIService()
         customer_list = PTReviewData.ptr_hf_user[env_key]
         for customer in customer_list:
             user_name = customer["username"]
@@ -342,7 +342,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa, stg")
     def test_resource_url_lessthan_50(self):
-        pt_review_service = PTReviewService(ENVIRONMENT)
+        pt_review_service = PTReviewService()
         resource_list = PTReviewData.ptr_resource_list[env_key]
         # make sure options API return 200
         recource_url_options_response = pt_review_service.options_resource_batch()
@@ -355,7 +355,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa, stg")
     def test_resource_url_exceed_50(self):
-        pt_review_service = PTReviewService(ENVIRONMENT)
+        pt_review_service = PTReviewService()
         resource_list = PTReviewData.ptr_resource_list[env_key]
 
         original_length = len(resource_list)
@@ -377,9 +377,9 @@ class PTReviewTestCases:
     # test pt review bff graphql API by book and unit
     @Test(tags="qa, stg, live")
     def test_ptr_bff_graphql_by_book_unit(self):
-        pt_review_bff_service = PTReviewBFFService(BFF_ENVIRONMENT)
+        pt_review_bff_service = PTReviewBFFService()
         pt_review_bff_service.login()
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         course_code = 'HF'
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
@@ -399,7 +399,7 @@ class PTReviewTestCases:
     # test pt review bff graphql API by book
     @Test(tags="qa, stg, live")
     def test_ptr_bff_graphql_by_book(self):
-        pt_review_bff_service = PTReviewBFFService(BFF_ENVIRONMENT)
+        pt_review_bff_service = PTReviewBFFService()
         pt_review_bff_service.login()
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         book_key = PTReviewData.ptr_bff_data[env_key]['HF']['BookKey']
@@ -419,7 +419,7 @@ class PTReviewTestCases:
     # test pt review bff graphql API for all course
     @Test(tags="qa, stg,live")
     def test_ptr_bff_graphql_all_course(self):
-        pt_review_bff_service = PTReviewBFFService(BFF_ENVIRONMENT)
+        pt_review_bff_service = PTReviewBFFService()
         pt_review_bff_service.login()
         student_id = PTReviewData.ptr_bff_data[env_key]['HF']['StudentId']
         course_code = 'HF'
@@ -435,7 +435,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa,stg")
     def test_pt_web_osp_create_pt_entity(self):
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
         student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
         expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
@@ -455,7 +455,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa,stg")
     def test_pt_web_osp_query_test_by_student_and_book(self):
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
         book_key = PTDATA.pt_web_data[env_key]['HFF']['BookKey']
         pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
@@ -474,7 +474,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa,stg")
     def test_pt_web_osp_query_test_by_test_result(self):
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         student_id = PTDATA.pt_web_data[env_key]['HFD']['StudentId']
         book_key = PTDATA.pt_web_data[env_key]['HFD']['BookKey']
         pt_key = PTDATA.pt_web_data[env_key]['HFD']['TestPrimaryKey']
@@ -490,7 +490,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa,stg,live")
     def test_pt_web_tpi_create_pt_entity(self):
-        tpi_service = TPIService(TPI_ENVIRONMENT)
+        tpi_service = TPIService()
         pt_key = PTDATA.pt_web_data[env_key]['HFF']['TestPrimaryKey']
         student_id = PTDATA.pt_web_data[env_key]['HFF']['StudentId']
         expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, student_id)
@@ -511,7 +511,7 @@ class PTReviewTestCases:
 
     @Test(tags="qa,stg")
     def test_pt_web_unlock_pt_after_paper_version_should_403(self):
-        osp_service = OSPService(OSP_ENVIRONMENT)
+        osp_service = OSPService()
         pt_key = PTDATA.pt_web_data[env_key]['HFH3']['TestPrimaryKey']
         student_id = PTDATA.pt_web_data[env_key]['HFH3']['StudentId']
         PTReviewUtils.set_pt_paper_version_from_db(pt_key, student_id)
@@ -524,7 +524,7 @@ class PTReviewTestCases:
     def test_pt_web_multiple_students_can_take_test_after_one_of_them_commit(self):
         pt_key = PTDATA.pt_web_data[env_key]['HFC4']['TestPrimaryKey']
         students_ids = PTDATA.pt_web_data[env_key]['HFC4']['StudentId']
-        tpi_service = TPIService(TPI_ENVIRONMENT)
+        tpi_service = TPIService()
         expected_entity_dict = PTReviewUtils.construct_expected_pt_web_create_entity(pt_key, students_ids)
         actual_result = tpi_service.pt_web_unlock(expected_entity_dict)
         pt_instance_key = PTReviewUtils.get_pt_instance_key_from_db(pt_key)
@@ -534,7 +534,7 @@ class PTReviewTestCases:
             assert_that(actual_result.json()["TeacherId"], equal_to(expected_entity_dict["TeacherId"]))
             assert_that(actual_result.json()["ProgressTestKey"],
                         equal_to(expected_entity_dict["ProgressTestKey"].lower()))
-            osp_service = OSPService(OSP_ENVIRONMENT)
+            osp_service = OSPService()
             pt_instance_key = str(pt_instance_key)[
                               str(pt_instance_key).find("'") + 1:str(pt_instance_key).find(")") - 1]
             commit_response = osp_service.put_commit_progress_test_hc(students_ids[0], pt_instance_key)

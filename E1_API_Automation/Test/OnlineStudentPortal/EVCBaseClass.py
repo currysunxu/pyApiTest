@@ -5,11 +5,12 @@ from time import sleep
 import arrow
 from ptest.decorator import AfterMethod, BeforeSuite
 
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from ...Business.KidsEVC import KidsEVCService
 from ...Lib.ScheduleClassTool import KidsClass, get_QA_schedule_tool, local2est, \
     ServiceSubTypeCode, get_UAT_schedule_tool, get_STG_schedule_tool
 from ...Lib.Moutai import Token
-from E1_API_Automation.Settings import env_key, KSD_ENVIRONMENT, KSDEnvironment
+from E1_API_Automation.Settings import env_key
 
 
 class EVCBase():
@@ -59,7 +60,7 @@ class EVCBase():
     est_regular_start_time = local2est(regular_start_time)
     est_regular_end_time = local2est(regular_end_time)
 
-    if KSD_ENVIRONMENT == KSDEnvironment.QA:
+    if EnvUtils.is_env_qa():
         try:
             teacher_id = os.environ['Teacher_Id']
         except:
@@ -98,7 +99,7 @@ class EVCBase():
         sis_test_student = 12226094
         sis_test_teacher_list = [10703777, 10366576]
         evc_profile_host='https://e1-evc-booking-integration-qa.ef.com'
-    if KSD_ENVIRONMENT == KSDEnvironment.STAGING:
+    if EnvUtils.is_env_stg_cn():
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
         Caroline is working on this data.
@@ -144,7 +145,7 @@ class EVCBase():
         sis_test_student = 43195098
         sis_test_teacher_list = [10584669, 10427158]
         evc_profile_host='https://e1-evc-booking-integration-stg.ef.com'
-    if KSD_ENVIRONMENT == KSDEnvironment.STAGING_SG:
+    if EnvUtils.is_env_stg_sg():
         user_info = {
             "UserName": "hf3.id.02",
             "Password": "12345",
@@ -153,7 +154,7 @@ class EVCBase():
         }
         teacher_id = ""
 
-    if KSD_ENVIRONMENT == KSDEnvironment.LIVE:
+    if EnvUtils.is_env_live_cn():
         '''
         STG data will be flesh out when SF team to migrate the Live data every 28 days.
         Caroline is working on this data.
@@ -200,7 +201,7 @@ class EVCBase():
         sis_test_teacher_list = [10584669, 10427158]
         evc_profile_host='https://e1-evc-booking-integration.ef.com'
 
-    if KSD_ENVIRONMENT == KSDEnvironment.LIVE_SG:
+    if EnvUtils.is_env_live_sg():
         user_info = {
             "UserName": "hf3.id.02",
             "Password": "12345",
@@ -220,7 +221,7 @@ class EVCBase():
     
     @BeforeSuite()
     def set_up(self):
-        self.evc_service = KidsEVCService(host=KSD_ENVIRONMENT)
+        self.evc_service = KidsEVCService()
 
 
     def create_class(self):

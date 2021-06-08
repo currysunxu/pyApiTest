@@ -3,16 +3,15 @@ from functools import reduce
 import arrow
 import jmespath
 
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Business.SchoolCourse import CourseBook
 from E1_API_Automation.Business.template.create_acitivty import Activity
-from ..Lib.Moutai import Moutai, Token
+from E1_API_Automation.Lib.Moutai import Token
 
 
-class TrailbazerService:
-    def __init__(self, host, user_name, password):
-        self.host = host
-        print(self.host)
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+class TrailbazerService(BaseService):
+    def __init__(self, user_name, password):
+        super().__init__("Environment", {}, Token("X-BA-TOKEN", "Token"))
         self.login(user_name, password)
         self.active_book = None
         self.course_plan_key = None

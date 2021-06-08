@@ -7,13 +7,10 @@ import random
 import time
 import uuid
 
-from E1_API_Automation.Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 
 
-class ContentRepoService:
-	def __init__(self, host):
-		self.host = host
-		self.mou_tai = Moutai(host=self.host)
+class ContentRepoService(BaseService):
 
 	def post_content(self,content_json_body):
 		api_url ="/admin/api/v1/contents"

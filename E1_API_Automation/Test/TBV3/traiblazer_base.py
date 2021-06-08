@@ -5,7 +5,7 @@ from ptest.decorator import AfterMethod, BeforeSuite, AfterSuite, BeforeClass, A
 from E1_API_Automation.Business.TPIService import TPIService
 from ...Business.TrailblazerV3 import TrailbazerService
 
-from ...Settings import ENVIRONMENT, env_key, DATABASE, TPI_ENVIRONMENT
+from ...Settings import env_key, DATABASE
 from ...Test_Data.TBData import TBUsers, TBSQLString
 from ...Lib.db_mssql import MSSQLHelper
 from ...Lib.Utils import *
@@ -14,10 +14,10 @@ from ...Lib.Utils import *
 class TraiblazerBaseClass():
     @BeforeClass()
     def create_tb(self):
-        self.tb_test = TrailbazerService(ENVIRONMENT, TBUsers.tb_user[env_key]['username'],
+        self.tb_test = TrailbazerService(TBUsers.tb_user[env_key]['username'],
                                          TBUsers.tb_user[env_key]['password'])
         self.picked_lesson = None
-        self.tpi_service = TPIService(TPI_ENVIRONMENT)
+        self.tpi_service = TPIService()
 
     @AfterClass()
     def sign_out(self):

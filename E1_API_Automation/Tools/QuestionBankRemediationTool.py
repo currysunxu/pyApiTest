@@ -14,7 +14,6 @@ from E1_API_Automation.Business.NGPlatform.ContentRepoService import ContentRepo
 from E1_API_Automation.Business.PipelinePublish.AEMService import AEMService
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
     PipelinePublishConstants
-from E1_API_Automation.Settings import CONTENT_MAP_ENVIRONMENT, CONTENT_REPO_ENVIRONMENT
 from E1_API_Automation.Test_Data.PipelinePublishData import AEMData
 
 
@@ -98,7 +97,7 @@ def get_mistaken_question_remediations(source_aem_env, release_program, check_bo
         source_course = AEMData.CourseData[release_program]['source-name']
         book_content_path = '{0}/{1}/{2}'.format(source_course, region_ach, check_book)
 
-        content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+        content_map_service = ContentMapService()
         content_map_course = AEMData.CourseData[release_program]['target-name']
         content_map_entity = ContentMapQueryEntity(content_map_course, region_ach=region_ach)
         content_map_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
@@ -287,7 +286,7 @@ def query_scoring_exact_match_api_by_question_tags(aem_activity_question, region
                                                       data=remediation_query_es_body,
                                                       headers={"Content-Type": "application/json"})
 
-    content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+    content_repo_service = ContentRepoService()
 
     scoring_recommend_question_list = append_activity_question_tags(content_repo_service,
                                                                     scoring_query_response.json())

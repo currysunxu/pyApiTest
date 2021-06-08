@@ -1,14 +1,13 @@
 import time
 
 import requests
-from E1_API_Automation.Lib.Moutai import Moutai
+
+from E1_API_Automation.Business.BaseService import BaseService
 
 
-class Hf35MediaService:
-    def __init__(self, host, access_token):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8"})
-        self.mou_tai.headers['EF-Access-Token'] = access_token
+class Hf35MediaService(BaseService):
+    def __init__(self, access_token):
+        super().__init__("", {'EF-Access-Token': access_token})
 
     def get_media(self, media_url):
         api_url = '/{0}'.format(media_url)
@@ -21,4 +20,3 @@ class Hf35MediaService:
             except requests.exceptions.RequestException:
                 i += 1
                 time.sleep(1)
-

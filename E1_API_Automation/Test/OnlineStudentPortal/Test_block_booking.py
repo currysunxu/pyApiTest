@@ -6,8 +6,8 @@ from hamcrest import assert_that
 from ptest.decorator import BeforeClass, Test, TestClass, AfterMethod
 
 from E1_API_Automation.Business.KidsEVC import KidsEVCService
+from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
-from E1_API_Automation.Settings import KSDEnvironment, KSD_ENVIRONMENT
 
 
 @TestClass()
@@ -21,7 +21,7 @@ class TestBlockBooking():
     UTC_end_date = datetime.strftime(end_time_date, '%Y-%m-%dT%H:%M:%S.000Z')
     UTC_end_date_multiple = datetime.strftime(end_time_date_multiple, '%Y-%m-%dT%H:%M:%S.000Z')
 
-    if KSD_ENVIRONMENT == KSDEnvironment.QA:
+    if EnvUtils.is_env_qa():
         user_info_HF = {
             "UserName": "hf2.cn.03",
             "Password": "12345",
@@ -30,7 +30,7 @@ class TestBlockBooking():
         teacher_id = "10274591"
         class_list = []
 
-    if KSD_ENVIRONMENT == KSDEnvironment.STAGING:
+    if EnvUtils.is_env_stg_cn():
         user_info_HF = {
             "UserName": "hf3.cn.03",
             "Password": "12345",
@@ -41,7 +41,7 @@ class TestBlockBooking():
 
     @BeforeClass()
     def create_service(self):
-        self.service = KidsEVCService(KSD_ENVIRONMENT)
+        self.service = KidsEVCService()
 
     def select_booking_time_slots_with_unit_lesson(self, unit_number, lesson_number, i):
         start_time = arrow.now().shift(weeks=i, days=1, hours=1).format('YYYY-MM-DD HH:00:00')

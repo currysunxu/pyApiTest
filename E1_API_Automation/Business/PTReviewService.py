@@ -6,6 +6,9 @@ from ..Lib.db_mssql import MSSQLHelper
 
 class PTReviewService(BaseService):
 
+    def __init__(self):
+        super().__init__("Environment")
+
     def post_resource_batch(self, resource_list):
         return self.mou_tai.post("/Resource/Batch", resource_list)
 

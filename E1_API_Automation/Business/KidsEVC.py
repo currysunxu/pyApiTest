@@ -1,30 +1,26 @@
 import random
 
-from ..Lib.Moutai import Moutai, Token
+from E1_API_Automation.Business.BaseService import BaseService
+from ..Lib.Moutai import Token
 from .AuthService import AuthService
-from E1_API_Automation.Settings import AUTH_ENVIRONMENT,env_key
 import jmespath
 import requests
 
 
+class KidsEVCService(BaseService):
 
-
-class KidsEVCService():
-
-    def __init__(self, host):
-        self.host = host
-        print(self.host)
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+    def __init__(self):
+        super().__init__("", {}, Token("X-BA-TOKEN", "Token"))
 
     def login(self, user_name, password):
-        auth = AuthService(getattr(AUTH_ENVIRONMENT,env_key.upper()))
+        auth = AuthService()
         id_token = auth.login(user_name, password).json()['idToken']
         headers = {"X-EF-TOKEN": id_token, "Content-Type": "application/json"}
         self.mou_tai.set_header(headers)
         return id_token
 
     def login_get_v3_token(self, user_name, password):
-        auth = AuthService(getattr(AUTH_ENVIRONMENT, env_key.upper()))
+        auth = AuthService()
         id_token = auth.login(user_name, password).json()['idToken']
         ba_token = auth.get_v3_token(id_token)
         headers = {"X-BA-TOKEN": ba_token, "Content-Type": "application/json"}
@@ -38,7 +34,7 @@ class KidsEVCService():
         return self.mou_tai.get("/ksdsvc/api/v2/student/group-classes")
 
     def get_offline_group_sessions(self, group_id):
-        return self.mou_tai.get("/ksdsvc/api/v2/groups/"+group_id+"/offline-sessions")
+        return self.mou_tai.get("/ksdsvc/api/v2/groups/" + group_id + "/offline-sessions")
 
     def get_user_profile(self):
         return self.mou_tai.get("/ksdsvc/api/v2/student/profile/")
@@ -50,14 +46,15 @@ class KidsEVCService():
         api_url = "/ksdsvc/api/v2/classes/" + class_id
         return self.mou_tai.delete(api_url)
 
-    def get_course_lesson_structure(self,class_type, course_type):
+    def get_course_lesson_structure(self, class_type, course_type):
         return self.mou_tai.get("/ksdsvc/api/v2/lessons?classType={0}&courseType={1}".format(class_type, course_type))
 
     def get_after_class_report(self, class_id):
         api_url = "/ksdsvc/api/v2/classes/{0}/acr".format(class_id)
         return self.mou_tai.get(api_url)
 
-    def change_topic(self, class_id, course_type, class_type, courseTypeLevelCode, unit_number, lesson_number, region="CN"):
+    def change_topic(self, class_id, course_type, class_type, courseTypeLevelCode, unit_number, lesson_number,
+                     region="CN"):
         body = {
             "bookingTopics": [
                 {
@@ -74,7 +71,7 @@ class KidsEVCService():
         return self.mou_tai.put("/ksdsvc/api/v2/classes/lesson", json=body)
 
     def sign_out(self):
-        auth = AuthService(getattr(AUTH_ENVIRONMENT, env_key.upper()))
+        auth = AuthService()
         auth.sign_out()
         return self.mou_tai.delete(url="/api/v1/Token/")
 
@@ -98,44 +95,56 @@ class KidsEVCService():
         json = {
             "timeSlots": time_slots
         }
-        return self.mou_tai.post(url="/ksdsvc/api/v3/block-booking/teachers?courseType={0}&classType=Regular&regionCode=CN&PageIndex=0&PageSize=20".format(course_type), json=json)
+        return self.mou_tai.post(
+            url="/ksdsvc/api/v3/block-booking/teachers?courseType={0}&classType=Regular&regionCode=CN&PageIndex=0&PageSize=20".format(
+                course_type), json=json)
 
     def block_booking_search_by_teacher(self, course_type, teacher_id, time_ranges):
-        json= {
+        json = {
             "teacherId": teacher_id,
             "timeRanges": time_ranges
         }
-        return self.mou_tai.post(url="/ksdsvc/api/v3/block-booking/availabilities?courseType={0}&classType=Regular&regionCode=CN".format(course_type), json=json)
+        return self.mou_tai.post(
+            url="/ksdsvc/api/v3/block-booking/availabilities?courseType={0}&classType=Regular&regionCode=CN".format(
+                course_type), json=json)
 
     def block_booking_search_by_weekday_and_teacher(self, course_type, teacher_id, time_ranges, weekday):
-        json= {
+        json = {
             "teacherId": teacher_id,
             "timeRanges": time_ranges,
             "dayOfWeek": weekday
         }
-        return self.mou_tai.post(url="/ksdsvc/api/v3/block-booking/availabilities?courseType={0}&classType=Regular&regionCode=CN".format(course_type), json=json)
+        return self.mou_tai.post(
+            url="/ksdsvc/api/v3/block-booking/availabilities?courseType={0}&classType=Regular&regionCode=CN".format(
+                course_type), json=json)
 
     def block_booking_search_by_slot_and_teacher(self, course_type, teacher_id, time_ranges, slot):
-        json= {
+        json = {
             "teacherId": teacher_id,
             "timeRanges": time_ranges,
             "timeSpan": slot
         }
-        return self.mou_tai.post(url="/ksdsvc/api/v3/block-booking/availabilities?courseType={0}&classType=Regular&regionCode=CN".format(course_type), json=json)
+        return self.mou_tai.post(
+            url="/ksdsvc/api/v3/block-booking/availabilities?courseType={0}&classType=Regular&regionCode=CN".format(
+                course_type), json=json)
 
     def block_booking_search_by_weekday_slot_and_teacher(self, course_type, teacher_id, time_slots):
         json = {
             "teacherId": teacher_id,
             "timeSlots": time_slots
         }
-        return self.mou_tai.post(url="/ksdsvc/api/v3/block-booking/teachers?courseType={0}&classType=Regular&regionCode=CN&PageIndex=0&PageSize=20".format(course_type), json=json)
+        return self.mou_tai.post(
+            url="/ksdsvc/api/v3/block-booking/teachers?courseType={0}&classType=Regular&regionCode=CN&PageIndex=0&PageSize=20".format(
+                course_type), json=json)
 
-    def block_booking_v3(self, course_type,course_type_level_code, teacher_id, book_slots):
+    def block_booking_v3(self, course_type, course_type_level_code, teacher_id, book_slots):
         json = {
             "teacherId": teacher_id,
             "timeSlots": book_slots
         }
-        return self.mou_tai.post(url="/ksdsvc/api/v3/block-booking?courseType={0}&courseTypeLevelCode={1}&classType=Regular&regionCode=CN".format(course_type, course_type_level_code), json=json)
+        return self.mou_tai.post(
+            url="/ksdsvc/api/v3/block-booking?courseType={0}&courseTypeLevelCode={1}&classType=Regular&regionCode=CN".format(
+                course_type, course_type_level_code), json=json)
 
     def block_booking(self, start_data_time, end_date_time, course_type):
         random_num = random.randint(0, 23)
@@ -160,20 +169,24 @@ class KidsEVCService():
         return self.mou_tai.post(url="/ksdsvc/api/v2/block-booking", json=json)
 
     def save_policy_agreement(self, ba_token, host):
-        json = {"product":"8","privacyDocumentId":3}
-        return requests.post(url= host+"/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement", json=json, headers={"Content-Type": "application/json", "X-BA-TOKEN": ba_token})
-
+        json = {"product": "8", "privacyDocumentId": 3}
+        return requests.post(url=host + "/api/v2/PrivacyPolicy/StudentPrivacyPolicyAgreement", json=json,
+                             headers={"Content-Type": "application/json", "X-BA-TOKEN": ba_token})
 
     def student_evc_profile(self, host):
-        student_id = jmespath.search('userInfo.userId',self.get_user_profile().json())
-        response = requests.get(url=host +'/api/v1/students/Kids_{0}/evc-profile'.format(student_id), verify=False, headers={"Content-Type": "application/json"})
+        student_id = jmespath.search('userInfo.userId', self.get_user_profile().json())
+        response = requests.get(url=host + '/api/v1/students/Kids_{0}/evc-profile'.format(student_id), verify=False,
+                                headers={"Content-Type": "application/json"})
 
         return response
 
     def get_all_available_teachers(self, start_stamp, end_stamp, course_type, class_type, page_index, page_size):
-        return self.mou_tai.get("/ksdsvc/api/v2/timeslots/" + start_stamp + "_" + end_stamp + "/teachers?courseType={0}&classType={1}&PageIndex={2}&PageSize={3}".format(course_type, class_type, page_index, page_size))
+        return self.mou_tai.get(
+            "/ksdsvc/api/v2/timeslots/" + start_stamp + "_" + end_stamp + "/teachers?courseType={0}&classType={1}&PageIndex={2}&PageSize={3}".format(
+                course_type, class_type, page_index, page_size))
 
-    def book_class(self, start_stamp, end_stamp, teacher_id, course_type, class_type, course_type_level_code, unit_number, lesson_number, is_reschedule, region="CN"):
+    def book_class(self, start_stamp, end_stamp, teacher_id, course_type, class_type, course_type_level_code,
+                   unit_number, lesson_number, is_reschedule, region="CN"):
         body = {
             "startDateTimeUtc": start_stamp,
             "endDateTimeUtc": end_stamp,
@@ -189,7 +202,8 @@ class KidsEVCService():
         return self.mou_tai.post("/ksdsvc/api/v2/bookings", json=body)
 
     def query_booking_history(self, course_type, class_types):
-        return self.mou_tai.get("/ksdsvc/api/v2/student/classes?courseType={0}&classTypes={1}".format(course_type, class_types))
+        return self.mou_tai.get(
+            "/ksdsvc/api/v2/student/classes?courseType={0}&classTypes={1}".format(course_type, class_types))
 
     def get_app_download_url(self):
         return self.mou_tai.get("/ksdsvc/api/v2/classroom/app-info")
@@ -201,17 +215,18 @@ class KidsEVCService():
             {"op": "replace", "path": "/classTime/startDateTimeUtc", "value": start_stamp},
             {"op": "replace", "path": "/classTime/endDateTimeUtc", "value": end_stamp}
         ]
-        return self.mou_tai.patch("/ksdsvc/api/v2/classes/"+str(class_id), json=body)
+        return self.mou_tai.patch("/ksdsvc/api/v2/classes/" + str(class_id), json=body)
 
     # this used by hfv35, to query ksd online classes
     def get_hfv3plus_student_online_class(self, start_time_utc, end_time_utc, course_type_level_code=''):
-        return self.mou_tai.get("/ksdsvc/api/v2/student/classes?CourseType=HFV3Plus&ClassTypes=Regular&ClassTypes=Demo&CourseTypeLevelCode={0}&StartDateTimeUtc={1}&EndDateTimeUtc={2}"
-                                .format(course_type_level_code, start_time_utc, end_time_utc))
+        return self.mou_tai.get(
+            "/ksdsvc/api/v2/student/classes?CourseType=HFV3Plus&ClassTypes=Regular&ClassTypes=Demo&CourseTypeLevelCode={0}&StartDateTimeUtc={1}&EndDateTimeUtc={2}"
+            .format(course_type_level_code, start_time_utc, end_time_utc))
 
     def get_teacher_info(self, teacher_id_set):
         teacher_ids = ''
         for teacher_id in teacher_id_set:
             teacher_ids = teacher_ids + "ids={0}&".format(teacher_id)
 
-        api_url = "/ksdsvc/api/v2/teachers?" +teacher_ids
+        api_url = "/ksdsvc/api/v2/teachers?" + teacher_ids
         return self.mou_tai.get(api_url)

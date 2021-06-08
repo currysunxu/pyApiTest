@@ -9,8 +9,8 @@ from E1_API_Automation.Test_Data.GPData import GP_user
 
 
 class GPService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"X-BA-TOKEN": "Token"})
+    def __init__(self):
+        super().__init__("Environment", {"X-BA-TOKEN": "Token"})
 
     def login(self, user_name, password):
         user_info = {
