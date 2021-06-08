@@ -2,19 +2,14 @@ import time
 
 import requests
 
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Business.HighFlyer35.HighFlyerUtils.Hf35BffUtils import Hf35BffUtils
-from E1_API_Automation.Lib.Moutai import Moutai
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
 
 import jmespath
 
 
-class Hf35BffService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, headers={"Content-Type": "application/json;charset=UTF-8"})
-        self.id_token = None
-        self.access_token = None
+class OneAppBffService(BaseService):
 
     def login(self, user_name, password):
         user_info = {
@@ -112,18 +107,6 @@ class Hf35BffService:
             self.mou_tai.headers[
                 'EF-Access-Token'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJqdGkiOiI2Y2QzMjEwMy05MDg4LTRiM2EtYmY1Ni1mZjE0ZjJhZjQ3MTUiLCJzdWIiOiIxMDAyIiwiaWF0IjoxNTgyNjE0NTYwLCJleHAiOjE1ODI2MjUzNjAsImNvcnJlbGF0aW9uX2lkIjoiY2Q5YWQ0ZjgtMjBmMy00YWUzLWE0YzEtMWZiOTBiMjEwOWY2IiwicmVmX2lkIjoiYWQ2MWRlMTQtMzUxMC00YjMxLTk1OTUtMzIyZWJmZjE1ZDMwIn0.sfl4sm7ON58rpUkxZ4g_PPMTb8bp1Vi4CIfYke8DxAfL0nNuQUR6fTfVCeHp71hf7GRPpnGIkgyhCX16aQMIMBZtVQWtYy_35EaCuKHCXoWUeAc6M7TJTp3qAW8UyvxX9Vh1aNvVPWWmWWI2OtvCKs1CLDRCOnVp9pDz2mm-3vUZ2IWeq1Di53tq1L2hp_DLQIK5LveLqHbGb9zesniHfVKVsPae-rOx2154Ffw6-YLxA_HJXlsgci5EQX4eYzlfcyH4jBj_u68IgZA8UflJ3ok_HkBXl2vWCOptEgq74O1o6N1qNBkHjLZZPIyI2CS79KENHYAoNln2lcEVkqjrtA"
 
-    def get_online_pl_class(self, scope, course_type_level_code=''):
-        # get online pl class api need both X-EF-TOKEN and EF-Access-Token
-        self.mou_tai.headers['X-EF-TOKEN'] = self.id_token
-        api_url = "/mega/api/v1/classes/online-pl?scope={0}&courseTypeLevelCode={1}".format(scope,
-                                                                                            course_type_level_code)
-        return self.mou_tai.get(api_url)
-
-    def get_online_gl_class(self):
-        # get online gl class api need both X-EF-TOKEN and EF-Access-Token
-        self.mou_tai.headers['X-EF-TOKEN'] = self.id_token
-        api_url = "/mega/api/v1/classes/online-gl"
-        return self.mou_tai.get(api_url)
 
     def get_privacy_policy_document(self):
         # don't need any token
@@ -251,4 +234,16 @@ class Hf35BffService:
     def get_flashcard_content_group(self, book_content_id, book_content_revision, schema_version):
         api_url = "/mega/api/v1/flashcard/content-groups?bookContentId={0}&bookContentRevision={1}&bookSchemaVersion={2}".format(
             book_content_id, book_content_revision, schema_version)
+        return self.mou_tai.get(api_url)
+
+    def get_ss_unit_quiz_content_group(self, test_id):
+        api_url = "/mega/api/v1/unit-quiz/content-groups/{0}".format(test_id)
+        return self.mou_tai.get(api_url)
+
+    def post_ss_submit_unit_quiz_attempts(self, attempts):
+        api_url = "/mega/api/v1/unit-quiz/attempts"
+        return self.mou_tai.post(api_url, attempts)
+
+    def get_ss_unit_quiz_attempts_details(self, test_id):
+        api_url = "/mega/api/v1/unit-quiz/attempts/{0}".format(test_id)
         return self.mou_tai.get(api_url)

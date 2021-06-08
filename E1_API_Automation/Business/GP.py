@@ -1,18 +1,16 @@
 import jmespath
 from hamcrest import assert_that
 
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Test_Data.GPData import ShanghaiGradeKey, MoscowGradeKey, EducationRegion
-from ..Lib.Moutai import Moutai, Token
 from ..Lib.ResetGPGradeTool import ResetGPGradeTool
 from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.GPData import GP_user
 
 
-class GPService():
+class GPService(BaseService):
     def __init__(self, host):
-        self.host = host
-        print(self.host)
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+        super().__init__(host, {"X-BA-TOKEN": "Token"})
 
     def login(self, user_name, password):
         user_info = {
@@ -88,11 +86,11 @@ class GPService():
     def put_student_profile_save(self, submit_data):
         return self.mou_tai.put("/api/v2/StudentProfile/Save/", submit_data)
 
-    def setup_student_profile(self, grade_level = '1st' ,culture_code='en-US'):
+    def setup_student_profile(self, grade_level='1st', culture_code='en-US'):
         student_id, grade_city, region_grade = self.find_student_region_grade()
         # student_id = jmespath.search('UserId', self.get_student_profile_gp().json())
         grade_key = jmespath.search("[?Name=='{0}'].Key".format(grade_level), region_grade)[0]
-        self.reset_grade(student_id,grade_city,region_grade)
+        self.reset_grade(student_id, grade_city, region_grade)
 
         submit_data = {"Birthday": "2003-12-30T16:00:00.340Z",
                        "EducationRegionKey": grade_city,
@@ -145,11 +143,11 @@ class GPService():
 
         # get student's region first city grade info
         region_grade = jmespath.search("[:1].Grades[].Grade", region_json)
-        return (student_id,grade_city,region_grade)
+        return (student_id, grade_city, region_grade)
 
     def get_dt_submit_answer(self, failed_module_number, first_time=True):
 
-        student_id,grade_city,region_grade = self.find_student_region_grade()
+        student_id, grade_city, region_grade = self.find_student_region_grade()
 
         if first_time:
             self.reset_grade(student_id, grade_city, region_grade)
@@ -403,7 +401,7 @@ class GPService():
     def get_all_module_info(self, culture_code):
 
         # get student's region and grade key from student's profile info
-        student_id,grade_city,region_grade = self.find_student_region_grade()
+        student_id, grade_city, region_grade = self.find_student_region_grade()
 
         all_module_info = self.get_available_grade(grade_city, culture_code).json()
         return all_module_info

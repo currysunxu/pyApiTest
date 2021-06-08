@@ -1,13 +1,12 @@
-from ..Lib.Moutai import Moutai, Token
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Business.AuthService import AuthService
 from E1_API_Automation.Settings import AUTH_ENVIRONMENT, env_key
 from E1_API_Automation.Test_Data.PTReviewData import BffUsers
 
 
-class PTReviewBFFService:
+class PTReviewBFFService(BaseService):
     def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, token=Token("x-ef-token", "Token"))
+        super().__init__(host, {"X-BA-TOKEN": "Token"})
 
     def login(self):
         auth = AuthService(AUTH_ENVIRONMENT)

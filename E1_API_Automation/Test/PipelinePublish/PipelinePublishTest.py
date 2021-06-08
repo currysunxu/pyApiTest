@@ -37,7 +37,9 @@ class PipelinePublishTestCases:
     # @Test(data_provider=[("LIVE", "Highflyers35",
     #                       ["book-2", "book-3", "book-4", "book-5", "book-6", "book-7", "book-8"], "cn-3")])
     @Test(data_provider=[("LIVE", "Smallstars35",
-                          ["book-4"], "cn-3")])
+                          ["book-1"], "cn-3")])
+    # @Test(data_provider=[("LIVE", "Highflyers35",
+    #                       ["book-5"], "cn-3-144")])
     def test_pp_release(self, source_aem_env, release_program, release_book_list, region_ach):
         for release_book in release_book_list:
             print('-------------------------Start verify book: {0}'.format(release_book))

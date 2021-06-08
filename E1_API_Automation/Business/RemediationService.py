@@ -1,10 +1,7 @@
-from E1_API_Automation.Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 
 
-class RemediationService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host)
+class RemediationService(BaseService):
 
     def get_remediation_activity(self, student_id, instance_key, pt_key):
         return self.mou_tai.get(

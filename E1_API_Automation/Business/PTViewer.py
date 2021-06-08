@@ -1,11 +1,10 @@
+from E1_API_Automation.Business.BaseService import BaseService
 from ..Lib.Moutai import Moutai, Token
 
 
-class PTViewerService:
+class PTViewerService(BaseService):
     def __init__(self, host):
-        self.host = host
-        print(host)
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+        super().__init__(host, {"X-BA-TOKEN": "Token"})
 
     def student_by_batch(self, student_id):
         body = [student_id]

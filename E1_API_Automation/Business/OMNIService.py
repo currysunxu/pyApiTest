@@ -1,14 +1,12 @@
-from ..Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 from enum import Enum
 import jmespath
 
 
-class OMNIService:
+class OMNIService(BaseService):
     def __init__(self, host):
-        self.host = host
-        headers = {"Content-Type": "application/json", "X-ODIN-AppId": "grammarpro",
-                   "X-ODIN-AppSecret": "U2FsdGVkX19SgIpGnlaC1bhAza7MSywQ4DDTcvlWmJ0="}
-        self.mou_tai = Moutai(host=self.host, headers=headers)
+        super().__init__(host, {"X-ODIN-AppId": "grammarpro",
+                                "X-ODIN-AppSecret": "U2FsdGVkX19SgIpGnlaC1bhAza7MSywQ4DDTcvlWmJ0="})
 
     def get_customer_id(self, user_name, password):
         user_info = {
