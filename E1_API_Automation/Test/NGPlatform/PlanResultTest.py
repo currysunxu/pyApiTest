@@ -6,7 +6,6 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.LearningCommonUtils i
 from E1_API_Automation.Business.NGPlatform.LearningResultEntity import LearningResultEntity
 from E1_API_Automation.Business.NGPlatform.LearningFieldTemplate import FieldValueType
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
-from ...Settings import LEARNING_RESULT_ENVIRONMENT
 from hamcrest import assert_that
 import random
 import string
@@ -19,7 +18,7 @@ class PlanResultTestCases:
     # test learning result insert API with single detail
     @Test(tags="qa, stg")
     def test_learning_result_insert_valid_single_detail(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result = LearningResultUtils.construct_learning_result_valid(1)
         learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
@@ -33,7 +32,7 @@ class PlanResultTestCases:
     # test learning result insert API with multiple details
     @Test(tags="qa, stg")
     def test_learning_result_insert_valid_multiple_details(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result = LearningResultUtils.construct_learning_result_valid(random.randint(2, 5))
         learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
@@ -47,7 +46,7 @@ class PlanResultTestCases:
     # test learning result with only required fields
     @Test(tags="qa, stg")
     def test_learning_result_insert_valid_only_required(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result = LearningResultUtils.construct_learning_result_valid_by_is_only_required(random.randint(1, 5),
                                                                                                   True)
@@ -62,7 +61,7 @@ class PlanResultTestCases:
     # test get specific result
     @Test(tags="qa, stg")
     def test_get_specific_result(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result = LearningResultUtils.construct_learning_result_valid(1)
         learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
@@ -84,7 +83,7 @@ class PlanResultTestCases:
     # Test when all the fields are null
     @Test(tags="qa, stg")
     def test_learning_result_insert_null_values(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # all the filed value as null
         learning_result = LearningResultEntity(None, None, None)
         learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
@@ -99,7 +98,7 @@ class PlanResultTestCases:
     # Test when all the fields are empty
     @Test(tags="qa, stg")
     def test_learning_result_insert_empty_values(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # all the filed value as ''
         learning_result = LearningResultUtils.construct_learning_result_by_value_type(None,
                                                                                       FieldValueType.EmptyValue)
@@ -115,7 +114,7 @@ class PlanResultTestCases:
     # test when all the fields, including fields in details are null
     @Test(tags="qa, stg")
     def test_learning_result_insert_null_values_including_details_fields(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # all the filed value as null, also with details list with null fields
         learning_result = LearningResultUtils.construct_learning_result_by_value_type(2,
                                                                                       FieldValueType.NoneValue)
@@ -131,7 +130,7 @@ class PlanResultTestCases:
     # test when all the fields, including fields in details are empty
     @Test(tags="qa, stg")
     def test_learning_result_insert_empty_values_including_details_fields(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # all the filed value as null, also with details list with null fields
         learning_result = LearningResultUtils.construct_learning_result_by_value_type(random.randint(1, 5),
                                                                                       FieldValueType.EmptyValue)
@@ -147,7 +146,7 @@ class PlanResultTestCases:
     # test when fields with values below min
     @Test(tags="qa, stg")
     def test_learning_result_insert_invalid_value_below_min(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # all the filed value below min
         learning_result = LearningResultUtils.construct_learning_result_by_value_type(random.randint(1, 5),
                                                                                       FieldValueType.BelowMin)
@@ -163,7 +162,7 @@ class PlanResultTestCases:
     # test when fields with values exceed max
     @Test(tags="qa, stg")
     def test_learning_result_insert_invalid_value_exceed_max(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # all the filed value as ''
         learning_result = LearningResultUtils.construct_learning_result_by_value_type(random.randint(1, 5),
                                                                                       FieldValueType.ExceedMax)
@@ -205,7 +204,7 @@ class PlanResultTestCases:
 
     # this method will be called by test cases
     def test_learning_result_insert_invalid_int_fields(self, is_exceed_int):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # following is the int type fields in result entity and details entity
         int_type_fields = ['product', 'product_module', 'expected_score', 'actual_score', 'duration']
         int_type_details_fields = ['expected_score', 'actual_score', 'duration']
@@ -258,7 +257,7 @@ class PlanResultTestCases:
     # test when date type field with invalid format value
     @Test(tags="qa, stg")
     def test_learning_result_insert_invalid_date_fields(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # following is the date type fields in details entity
         date_type_fields = ['start_time', 'end_time']
 
@@ -280,7 +279,7 @@ class PlanResultTestCases:
     # test insert with max values
     @Test(tags="qa, stg")
     def test_learning_result_insert_valid_value_max(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # all the filed value with max value
         learning_result = LearningResultUtils.construct_learning_result_by_value_type(random.randint(1, 5),
                                                                                       FieldValueType.Max)
@@ -295,7 +294,7 @@ class PlanResultTestCases:
     # test insert with min values
     @Test(tags="qa, stg")
     def test_learning_result_insert_valid_value_min(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
         # all the filed value with max value
         learning_result = LearningResultUtils.construct_learning_result_by_value_type(random.randint(1, 5),
                                                                                       FieldValueType.Min)
@@ -309,7 +308,7 @@ class PlanResultTestCases:
 
     # this method can be called by different test cases
     def test_get_result_api(self, record_number, limit_list, learning_result_query_type):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         # get result api need some same fields, so, use it as template
         learning_result_template = LearningResultUtils.construct_learning_result_template(learning_result_query_type)
@@ -444,7 +443,7 @@ class PlanResultTestCases:
     # test when product/student_key is empty for all the query APIs
     @Test(tags="qa, stg")
     def test_get_api_with_empty_value(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)
@@ -487,7 +486,7 @@ class PlanResultTestCases:
     # test when product, product_module value is not int
     @Test(tags="qa, stg")
     def test_get_api_with_invalid_format_product_id(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)
@@ -531,7 +530,7 @@ class PlanResultTestCases:
     # test when limit value is not int
     @Test(tags="qa, stg")
     def test_get_api_with_invalid_format_limit(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)
@@ -549,7 +548,7 @@ class PlanResultTestCases:
     # test when limit value is not allowed int value, that is, below 1, exceed 50
     @Test(tags="qa, stg")
     def test_get_api_with_invalid_value_limit(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)
@@ -568,7 +567,7 @@ class PlanResultTestCases:
     # test when student_key , business_key with invalid format
     @Test(tags="qa, stg")
     def test_get_api_with_invalid_value_key(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result = LearningResultUtils.construct_learning_result_valid(2)
         learning_result_insert_api_response = learning_result_service.post_learning_result_insert(learning_result)
@@ -616,7 +615,7 @@ class PlanResultTestCases:
     # test when business_key is empty for get specific result
     @Test(tags="qa, stg")
     def test_get_specific_result_with_empty_business_key(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result_template = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)
@@ -630,7 +629,7 @@ class PlanResultTestCases:
     # test when product_module is empty for get user results
     @Test(tags="qa, stg")
     def test_get_user_result_with_empty_product_module(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         # get result api need some same fields, so, use it as template
         learning_result_template = \
@@ -662,7 +661,7 @@ class PlanResultTestCases:
     # test when business_key is empty for get specific_result
     @Test(tags="qa, stg")
     def test_get_specific_result_with_empty_business_key(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         # get result api need some same fields, so, use it as template
         learning_result_template = \
@@ -688,7 +687,7 @@ class PlanResultTestCases:
     # test when there's no record can be found with the param
     @Test(tags="qa, stg")
     def test_get_api_with_not_existing_record(self):
-        learning_result_service = LearningResultService(LEARNING_RESULT_ENVIRONMENT)
+        learning_result_service = LearningResultService()
 
         learning_result = \
             LearningResultUtils.construct_learning_result_template(LearningResultQueryType.TypeGetSpecific)

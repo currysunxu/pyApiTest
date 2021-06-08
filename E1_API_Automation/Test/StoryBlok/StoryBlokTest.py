@@ -13,7 +13,6 @@ from E1_API_Automation.Business.NGPlatform.NGPlatformUtils.ContentRepoEnum impor
 from E1_API_Automation.Business.StoryBlok.StoryBlokReleaseService import StoryBlokReleaseService
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
-from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, CONTENT_MAP_ENVIRONMENT, STORYBLOK_RELEASE_ENVIRONMENT
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData, StoryblokReleaseProgram
 
 
@@ -31,7 +30,7 @@ class StoryBlokTestCases:
         assert_that(get_storyblok_reader_level_response.status_code == 200)
         storyblok_reader_level_list = jmespath.search('stories', get_storyblok_reader_level_response.json())
 
-        content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+        content_map_service = ContentMapService()
         content_map_entity = ContentMapQueryEntity('READERS_10')
         reader_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
         assert_that(reader_tree_response.status_code == 200)
@@ -59,7 +58,7 @@ class StoryBlokTestCases:
 
     # test storyblok reader/vocab release
     def test_storyblok_release(self, release_type):
-        storyblok_release_service = StoryBlokReleaseService(STORYBLOK_RELEASE_ENVIRONMENT)
+        storyblok_release_service = StoryBlokReleaseService()
 
         date_time_format = '%Y-%m-%d %H:%M:%S'
         # storyblok release support incremental release, so, need to find out increased stories from last completed release time
@@ -109,7 +108,7 @@ class StoryBlokTestCases:
                     assert_that(False, 'There\'s no reader/vocab story to be verified!')
                 break
 
-            content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+            content_repo_service = ContentRepoService()
             if release_type == StoryblokReleaseProgram.MOCKTEST:
                 latest_content_response = content_repo_service.get_latest_activities(content_id_list)
             else:
@@ -135,7 +134,7 @@ class StoryBlokTestCases:
     # test the latest course release
     @Test()
     def test_latest_course_release(self):
-        storyblok_release_service = StoryBlokReleaseService(STORYBLOK_RELEASE_ENVIRONMENT)
+        storyblok_release_service = StoryBlokReleaseService()
 
         # fetch out all the release history
         release_history_response = storyblok_release_service.get_storyblok_release_history()
@@ -168,7 +167,7 @@ class StoryBlokTestCases:
 
     # test the course release by type
     def test_course_release_by_type(self, release_type):
-        storyblok_release_service = StoryBlokReleaseService(STORYBLOK_RELEASE_ENVIRONMENT)
+        storyblok_release_service = StoryBlokReleaseService()
 
         release_history_response = storyblok_release_service.get_storyblok_release_history(
             release_type.value)
@@ -204,7 +203,7 @@ class StoryBlokTestCases:
                     storyblok_correlation_path, course_source_name, region_ach)
                 storyblok_default_reader_level = storyblok_book_story['content']['default_reader_level']
 
-                content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+                content_map_service = ContentMapService()
                 content_map_entity = ContentMapQueryEntity(target_program, region_ach=region_ach)
                 course_map_tree_response = content_map_service.post_content_map_query_tree(content_map_entity)
                 book_in_content_map = jmespath.search(
@@ -215,7 +214,7 @@ class StoryBlokTestCases:
                             'default_reader_level value not consistent between content map and storyblok for contentPath:'
                             + storyblok_correlation_path)
 
-                content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+                content_repo_service = ContentRepoService()
 
                 book_reader_content_groups = \
                     content_repo_service.get_content_groups_by_param(ContentRepoContentType.TypeReader.value,

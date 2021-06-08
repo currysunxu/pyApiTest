@@ -3,8 +3,8 @@ from ..Lib.Moutai import Moutai, Token
 
 
 class PTViewerService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"X-BA-TOKEN": "Token"})
+    def __init__(self):
+        super().__init__("Environment", {"X-BA-TOKEN": "Token"})
 
     def student_by_batch(self, student_id):
         body = [student_id]
@@ -16,10 +16,9 @@ class PTViewerService(BaseService):
         return self.mou_tai.post('/api/v2/ProgressTestSummary/Viewer/', json=body)
 
 
-class HomeworkViewerService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+class HomeworkViewerService(BaseService):
+    def __init__(self):
+        super().__init__("Environment", {}, Token("X-BA-TOKEN", "Token"))
 
     def homework_viewer_book_structure(self, book_key, region, course_plan_key):
         body = {

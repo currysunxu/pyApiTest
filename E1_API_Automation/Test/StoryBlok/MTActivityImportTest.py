@@ -8,7 +8,6 @@ from ptest.decorator import TestClass, Test
 from E1_API_Automation.Business.StoryBlok.StoryBlokImportService import StoryBlokImportService
 from E1_API_Automation.Business.StoryBlok.StoryBlokService import StoryBlokService
 from E1_API_Automation.Business.StoryBlok.StoryBlokUtils.StoryBlokUtils import StoryBlokUtils
-from E1_API_Automation.Settings import STORYBLOK_IMPORT_ENVIRONMENT
 from E1_API_Automation.Test_Data.StoryblokData import StoryBlokData, MockTestData
 
 
@@ -18,7 +17,7 @@ class MTActivityImportTest:
     @Test()
     def test_mt_activity_import(self):
         mt_activity_table_name = '21cnjy.activity_for_content'
-        storyblok_import_service = StoryBlokImportService(STORYBLOK_IMPORT_ENVIRONMENT)
+        storyblok_import_service = StoryBlokImportService()
         activity_import_status_response = storyblok_import_service.get_storyblok_import_status()
         activity_import_status_list = jmespath.search('[?status==\'COMPLETE\']', activity_import_status_response.json())
         if 'specified_uuid' in activity_import_status_list[0].keys():

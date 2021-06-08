@@ -5,13 +5,11 @@ import jmespath
 from hamcrest import assert_that
 
 from E1_API_Automation.Business.KidsEVC import KidsEVCService
-from E1_API_Automation.Settings import KSD_ENVIRONMENT
-
 
 class EVCUtils:
     @staticmethod
     def schedule_evc_pl(id_token, start_date, course_type, class_type ='Regular'):
-        evc_service = KidsEVCService(KSD_ENVIRONMENT)
+        evc_service = KidsEVCService()
         evc_service.mou_tai.headers['X-EF-TOKEN'] = id_token
 
         date_time_format = "%Y-%m-%dT%H:%M:%S.%fZ"

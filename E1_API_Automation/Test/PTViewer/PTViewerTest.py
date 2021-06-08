@@ -5,7 +5,7 @@ from E1_API_Automation.Business.E1TPIService import *
 from E1_API_Automation.Business.PTViewer import PTViewerService
 from E1_API_Automation.Business.ProgressTest import PTService
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
-from E1_API_Automation.Settings import E1TPI_ENVIRONMENT, env_key, ENVIRONMENT
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.PTViewerData import *
 
 
@@ -14,9 +14,9 @@ class PTViewerTestCases:
 
     @BeforeClass()
     def create_service(self):
-        self.e1tpi_service = E1TPIService(E1TPI_ENVIRONMENT)
-        self.pt_viewer_service = PTViewerService(ENVIRONMENT)
-        self.pt_service = PTService(ENVIRONMENT)
+        self.e1tpi_service = E1TPIService()
+        self.pt_viewer_service = PTViewerService()
+        self.pt_service = PTService()
 
     @Test(tags='stg, live')
     def test_get_pt_viewer_link(self):

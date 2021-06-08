@@ -46,9 +46,8 @@ class Staff():
 
 
 class Student():
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host, token=Token("X-BA-TOKEN", "Token"))
+    def __init__(self):
+        super().__init__("Envionrment", {}, Token("X-BA-TOKEN", "Token"))
 
     def login_student(self, lg_token, password):
         user_info = {

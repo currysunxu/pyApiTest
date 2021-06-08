@@ -5,8 +5,8 @@ from E1_API_Automation.Business.BaseService import BaseService
 
 
 class OSPService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"x-ba-token": "3C40AB54-798C-4517-A82A-26017EE98285"})
+    def __init__(self):
+        super().__init__("", {"x-ba-token": "3C40AB54-798C-4517-A82A-26017EE98285"})
 
     def get_all_books_by_course(self, course_code):
         return self.mou_tai.get('/api/v2/AllBooksByCourse/{0}'.format(course_code))

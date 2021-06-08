@@ -10,6 +10,8 @@ import jmespath
 
 
 class OneAppBffService(BaseService):
+    def __init__(self):
+        super().__init__("", {"User-Agent": "ENGLISH ONE/1.8.1/MacBookPro16,1/Mac OS X 10.16.0"})
 
     def login(self, user_name, password):
         user_info = {

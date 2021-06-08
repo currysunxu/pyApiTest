@@ -6,7 +6,7 @@ from E1_API_Automation.Business.E1TPIService import *
 from E1_API_Automation.Business.PTViewer import HomeworkViewerService
 from E1_API_Automation.Business.TrailblazerV3 import TrailbazerService
 from E1_API_Automation.Lib.HamcrestMatcher import match_to
-from E1_API_Automation.Settings import E1TPI_ENVIRONMENT, env_key, ENVIRONMENT
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.PTViewerData import *
 from E1_API_Automation.Test_Data.TBData import TBUsers
 
@@ -16,9 +16,9 @@ class HomeworkViewerTestCases:
 
     @BeforeClass()
     def create_service(self):
-        self.e1tpi_service = E1TPIService(E1TPI_ENVIRONMENT)
-        self.homework_viewer_service = HomeworkViewerService(ENVIRONMENT)
-        self.tb_service = TrailbazerService(ENVIRONMENT, TBUsers.tb_user[env_key]['username'],
+        self.e1tpi_service = E1TPIService()
+        self.homework_viewer_service = HomeworkViewerService()
+        self.tb_service = TrailbazerService(TBUsers.tb_user[env_key]['username'],
                                          TBUsers.tb_user[env_key]['password'])
         profile = self.tb_service.get_student_profile().json()
         self.book_key = jmespath.search('CourseGroups[0].Book.Key', profile)

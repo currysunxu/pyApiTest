@@ -17,7 +17,6 @@ from E1_API_Automation.Business.PipelinePublish.AEMService import AEMService
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishConstants import \
     PipelinePublishConstants
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishVerifyService import PipelinePublishVerifyService
-from E1_API_Automation.Settings import CONTENT_MAP_ENVIRONMENT, CONTENT_BUILDER_ENVIRONMENT, CONTENT_REPO_ENVIRONMENT
 from E1_API_Automation.Test_Data.PipelinePublishData import AEMData
 
 
@@ -58,7 +57,7 @@ class PipelinePublishTestCases:
             source_course = AEMData.CourseData[release_program]['source-name']
             aem_book_response = aem_service.get_aem_book(source_course, release_book)
 
-            content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
+            content_map_service = ContentMapService()
 
             if release_as_program is not None:
                 content_map_course = AEMData.CourseData[release_as_program]['target-name']
@@ -71,7 +70,7 @@ class PipelinePublishTestCases:
                                                     content_map_tree_response.json())
             book_content_id = content_map_book_tree['contentId']
 
-            content_builder_service = ContentBuilderService(CONTENT_BUILDER_ENVIRONMENT)
+            content_builder_service = ContentBuilderService()
             content_builder_processed_status_response = content_builder_service.get_release_by_status()
             release_url_list = jmespath.search('[*].url', content_builder_processed_status_response.json())
             latest_book_release_url = jmespath.search('[? contains(@, \'{0}\')]|[0]'.format(book_content_id),
@@ -108,8 +107,8 @@ class PipelinePublishTestCases:
                     template_name = template_file[:template_file.rfind('.')]
                     activity_template_dict[template_name] = activity_template
 
-        content_map_service = ContentMapService(CONTENT_MAP_ENVIRONMENT)
-        content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        content_map_service = ContentMapService()
+        content_repo_service = ContentRepoService()
         for book in book_list:
             print('-------------------------Start verify activities for book: {0}'.format(book))
             source_course = AEMData.CourseData[release_program]['source-name']

@@ -13,19 +13,19 @@ from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePub
     PipelinePublishConstants
 from E1_API_Automation.Business.PipelinePublish.PipelinePublishUtils.PipelinePublishUtils import PipelinePublishUtils
 from E1_API_Automation.Business.Utils.CommonUtils import CommonUtils
-from E1_API_Automation.Settings import CONTENT_REPO_ENVIRONMENT, BFF_ENVIRONMENT, env_key, MEDIA_ENVIRONMENT
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.BffData import BffProduct, BffUsers
 
 
 class PipelinePublishVerifyService:
     def __init__(self):
-        self.bff_service = OneAppBffService(BFF_ENVIRONMENT)
+        self.bff_service = OneAppBffService()
         key = BffProduct.HFV35.value
         user_name = BffUsers.BffUserPw[env_key][key][0]['username']
         password = BffUsers.BffUserPw[env_key][key][0]['password']
         self.bff_service.login(user_name, password)
-        self.media_service = Hf35MediaService(MEDIA_ENVIRONMENT, self.bff_service.access_token)
-        self.content_repo_service = ContentRepoService(CONTENT_REPO_ENVIRONMENT)
+        self.media_service = Hf35MediaService()
+        self.content_repo_service = ContentRepoService()
 
     def verify_content_after_release(self, aem_book_tree, content_map_book_tree, expected_release_revision):
         region_ach = content_map_book_tree['regionAch']

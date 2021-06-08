@@ -1,8 +1,8 @@
 from E1_API_Automation.Business.BaseService import BaseService
-from ..Lib.Moutai import Moutai, Token
 from E1_API_Automation.Business.AuthService import AuthService
 from E1_API_Automation.Business.Utils.EnvUtils import EnvUtils
-from E1_API_Automation.Settings import AUTH_ENVIRONMENT, env_key
+from E1_API_Automation.Lib.Moutai import Token
+from E1_API_Automation.Settings import env_key
 from E1_API_Automation.Test_Data.MockTestData import MockTestUsers, TestTableSQLString
 from E1_API_Automation.Lib.HamcrestExister import exist
 from E1_API_Automation.Settings import MYSQL_MOCKTEST_DATABASE
@@ -15,11 +15,11 @@ import json
 
 
 class MockTestBFFService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"X-EF-ID": "Token"})
+    def __init__(self):
+        super().__init__("", {}, Token("X-EF-ID", "Token"))
 
     def login(self, student_type):
-        auth = AuthService(AUTH_ENVIRONMENT)
+        auth = AuthService()
         user_name = MockTestUsers.MTUserPw[env_key][student_type][0]['username']
         password = MockTestUsers.MTUserPw[env_key][student_type][0]['password']
         id_token = auth.login(user_name, password).json()['idToken']

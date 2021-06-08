@@ -1,15 +1,12 @@
 import requests
 
-from E1_API_Automation.Lib.Moutai import Moutai
+from E1_API_Automation.Business.BaseService import BaseService
 from E1_API_Automation.Lib.db_mysql import MYSQLHelper
 from E1_API_Automation.Settings import MYSQL_MOCKTEST_DATABASE
 from E1_API_Automation.Test_Data.StoryblokData import MTTableSQLString, MockTestData
 
 
-class StoryBlokImportService:
-    def __init__(self, host):
-        self.host = host
-        self.mou_tai = Moutai(host=self.host)
+class StoryBlokImportService(BaseService):
 
     @staticmethod
     def get_valid_activities_from_mt_db(table_name, version):

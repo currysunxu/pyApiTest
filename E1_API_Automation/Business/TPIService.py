@@ -2,8 +2,8 @@ from E1_API_Automation.Business.BaseService import BaseService
 
 
 class TPIService(BaseService):
-    def __init__(self, host):
-        super().__init__(host, {"X-BA-TOKEN": "97096cec-091a-486a-9cef-4c1097a33a46"})
+    def __init__(self):
+        super().__init__("", {"X-BA-TOKEN": "97096cec-091a-486a-9cef-4c1097a33a46"})
 
     def put_hf_student_omni_pt_assessment(self, pt_score_body):
         return self.mou_tai.put("/api/v2/OmniProgressTestAssessment", pt_score_body)
@@ -46,4 +46,4 @@ class TPIService(BaseService):
         if product_code == 'SS':
             return self.mou_tai.put("/api/v2/SmallStarUnlockByContentPath", body)
         elif product_code == 'TBV3':
-            return self.mou_tai.put("/api/v2/TrailblazerUnlockByContentPath'", body)
+            return self.mou_tai.put("/api/v2/TrailblazerUnlockByContentPath", body)
