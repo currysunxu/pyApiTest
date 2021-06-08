@@ -15,8 +15,11 @@ class PTService(BaseService):
             "Password": password,
 
         }
+        response_info = self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/Staff/")
+        headers = {"X-BA-TOKEN": response_info.json()['Token'], "Content-Type": "application/json"}
+        self.mou_tai.set_header(headers)
+        return response_info
 
-        return self.mou_tai.set_request_context("post", user_info, "/api/v2/Authentication/Staff/")
 
     def get_web_socket_url(self):
         return self.mou_tai.get('/api/v2/ProgressTestWebSocket/CND')

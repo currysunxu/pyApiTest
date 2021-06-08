@@ -56,7 +56,7 @@ class PipelinePublishVerifyService:
             return error_message
 
         for i in range(len(content_map_unit_list)):
-            print("--------------------start verify unit" + str(i + 1))
+            print("--------------------start verify unit index:" + str(i))
             # for each unit, init the service as the expire time is too short in QA
             self.__init__()
 
@@ -116,7 +116,7 @@ class PipelinePublishVerifyService:
                 error_message.extend(self.verify_lesson_homework(aem_lesson_by_unit,
                                                                  content_map_lesson_by_unit))
                 print("--end of verify lesson" + str(j + 1))
-        print("--------------------end of verify unit" + str(i + 1))
+            print("--------------------end of verify unit index:" + str(i))
         return error_message
 
     def verify_aem_fields_with_content_map(self, aem_dict, content_map_dict):

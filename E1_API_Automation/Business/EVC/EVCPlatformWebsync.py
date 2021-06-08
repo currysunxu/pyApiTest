@@ -1,9 +1,14 @@
-from functools import wraps
+import string
+import os
 from random import Random
-
-import base36
+import urllib
 import jmespath
 import requests
+import base36
+import math
+import re
+
+from functools import wraps
 
 
 def need_count(if_need):
@@ -72,7 +77,6 @@ class EVCComponent:
         response = requests.post(self.websync_endpoint, params=self.param, json=json)
         return response
 
-
 class MeetingComponent(EVCComponent):
     @need_count(True)
     def handshake(self):
@@ -107,6 +111,7 @@ class EVCPlatformWebsync:
     def __init__(self, host):
         self.host = host
         self.headers = {'x-accesskey': self.access_key}
+
 
     def websync(self, room_info):
         meeting_component = MeetingComponent(ComponentType.meeting, room_info)
