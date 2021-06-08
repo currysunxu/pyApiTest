@@ -134,23 +134,10 @@ EVCCDNEnvironment:
   STAGING: "https://evc-fe-staging.bj-englishtown.com"
   LIVE: "https://evc-fe.bj-englishtown.com"
 
-EVCEnvironment:
-  QA: "https://evc-ts-qa2.bj-englishtown.com"
 
-  STAGING: {
-    "CN": "https://evc-ts-staging.kids.ef.cn",
-    "US": "https://evc-tv-to-ts-staging.kids.ef.com",
-    "UK": "https://evc-tf-to-ts-staging.kids.ef.com",
-    "SG": "https://evc-tsg-to-ts-staging.kids.ef.com"
-  }
-
-  LIVE: {
-    "CN": "https://evc-ts.kids.ef.cn",
-    "US": "https://evc-tv-to-ts.kids.ef.com",
-    "UK": "https://evc-tf-to-ts.kids.ef.com",
-    "SG": "https://evc-tsg-to-ts.kids.ef.com"
-  }
-
+EVCDemoPageEnvironment:
+  STAGING: "https://evc-ts-staging.kids.ef.cn"
+  LIVE: "https://evc-ts.kids.ef.cn/"
 
 Auth2Environment:
   QA: "https://internal-ktsvc-qa.english1.cn"
@@ -167,12 +154,31 @@ VocabEnvironment:
   STAGING: "https://internal-vocab-stg.english1.cn"
   LIVE: "https://internal-vocab.english1.cn"
 
-
 GeneralTestEnvironment:
   QA: "https://internal-ktsvc-qa.english1.cn/kgt"
   STAGING: "https://internal-ktsvc-stg.english1.cn/kgt"
   LIVE: "https://internal-ktsvc.english1.cn/kgt"
 
+EVCProxyEnvironment:
+  QA: {
+    "CN": "https://evc-ts-qa.bj-englishtown.com",
+    "US": "https://evc-ts-qa.bj-englishtown.com",
+    "UK": "https://evc-ts-qa.bj-englishtown.com",
+    "SG": "https://evc-ts-qa.bj-englishtown.com"
+  }
+  STAGING: {
+    "CN": "https://evc-ts-staging.kids.ef.cn",
+    "US": "https://evc-tv-to-ts-staging.kids.ef.com",
+    "UK": "https://evc-tf-to-ts-staging.kids.ef.com",
+    "SG": "https://evc-tsg-to-ts-staging.kids.ef.com"
+  }
+
+  LIVE: {
+    "CN": "https://evc-ts.kids.ef.cn",
+    "US": "https://evc-tv-to-ts.kids.ef.com",
+    "UK": "https://evc-tf-to-ts.kids.ef.com",
+    "SG": "https://evc-tsg-to-ts.kids.ef.com"
+  }
 
 MediaEnvironment:
   QA: "https://kt-asset-qa.english1.cn"

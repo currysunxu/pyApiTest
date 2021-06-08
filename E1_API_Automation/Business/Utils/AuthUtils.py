@@ -10,7 +10,7 @@ class AuthUtils:
         if product_key not in (AuthProduct.SSV2.value, AuthProduct.GP.value,AuthProduct.SSV3.value, AuthProduct.HF35.value):
             expected_value = product_key[0:2]
         elif product_key == AuthProduct.SSV2.value:
-            expected_value = "SSLEGACY"
+            expected_value = "SS"
         elif product_key == AuthProduct.SSV3.value:
             expected_value = "SS"
         elif product_key == AuthProduct.HF35.value:
