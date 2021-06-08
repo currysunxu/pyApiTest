@@ -9,17 +9,16 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
 from E1_API_Automation.Business.EVC.EVCPlatformMeetingService import EVCPlatformMeetingService
-from E1_API_Automation.Settings import EVC_ENVIRONMENT
-from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode, EVCProxyLocation
+from E1_API_Automation.Settings import EVC_DEMO_PAGE_ENVIRONMENT
+from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode
 
 class_duration = 5
 
-proxy_location = EVCProxyLocation.SG
+platform_service = EVCPlatformMeetingService(EVC_DEMO_PAGE_ENVIRONMENT)
 
 
 def generate_chrome_option():
     options = ChromeOptions()
-    options.add_argument('--headless')
     options.add_argument("use-fake-ui-for-media-stream")  # grant the permissions of micro and camera
     options.add_argument("use-fake-device-for-media-stream")  # use fake video & audio
     options.add_argument("ignore-certificate-errors")  # ignore certificate errors
@@ -28,10 +27,10 @@ def generate_chrome_option():
 
 
 def click_auto_play(web_driver):
-    wait = WebDriverWait(web_driver, 5)
+    wait = WebDriverWait(web_driver, 15)
     try:
         auto_play_button = wait.until(
-            EC.element_to_be_clickable((By.XPATH, "//*[@id='classroom-splash']/div[1]/div[1]/span")))
+            EC.element_to_be_clickable((By.XPATH, "//*[@id='classroom-splash']/div[2]/div[1]")))
         preporter.info("Auto play button shows.")
         auto_play_button.click()
     except:
@@ -43,8 +42,7 @@ def register_user(meeting_token, amount):
 
     if meeting_token is not None or meeting_token != "" and amount > 0:
         for i in range(amount):
-            # update location
-            student_info = platform_service.meeting_register(proxy_location, meeting_token, EVCMeetingRole.STUDENT,
+            student_info = platform_service.meeting_register("SG", meeting_token, EVCMeetingRole.STUDENT,
                                                              "test student {0}".format(i))
             platform_service.meeting_bootstrap(student_info["attendanceToken"])
             student_info_list.append(student_info["attendanceToken"])
@@ -53,7 +51,6 @@ def register_user(meeting_token, amount):
 
 
 def mock_omni_class_booking(layout_code, student_amount):
-    # start_time = datetime(2021, 5, 6, 10, 20)
     start_time = datetime.now()
     real_start_time = start_time + timedelta(minutes=1)
     end_time = real_start_time + timedelta(minutes=class_duration)
@@ -67,17 +64,14 @@ def mock_omni_class_booking(layout_code, student_amount):
     preporter.info("----Meeting token----: {0}".format(meeting_token))
 
     # update material
-    if layout_code.find('pl') == -1:
-        platform_service.meeting_update_by_material(meeting_token)
-    else:
+    if layout_code == EVCLayoutCode.Kids_PL:
         platform_service.meeting_update(meeting_token, 10999)
+    else:
+        platform_service.meeting_update_by_material(meeting_token)
 
     # register meeting & bootstrap
-    teacher_info = platform_service.meeting_register(proxy_location, meeting_token, EVCMeetingRole.TEACHER,
-                                                     "test teacher")
-    time.sleep(5)
+    teacher_info = platform_service.meeting_register("SG", meeting_token, EVCMeetingRole.TEACHER, "test teacher")
     teacher_bootstrap = platform_service.meeting_bootstrap(teacher_info["attendanceToken"])
-    print(teacher_bootstrap)
 
     # register student & bootstrap
     student_info_list = register_user(meeting_token, student_amount)
@@ -87,11 +81,11 @@ def mock_omni_class_booking(layout_code, student_amount):
 
     # enter classroom
     options = generate_chrome_option()
-    teacher_web_driver = webdriver.Chrome(options=options)
+    teacher_web_driver = webdriver.Chrome(chrome_options=options)
     teacher_web_driver.get(platform_service.get_class_entry_url(teacher_info["attendanceToken"]))
     click_auto_play(teacher_web_driver)
 
-    student_web_driver = webdriver.Chrome(options=options)
+    student_web_driver = webdriver.Chrome(chrome_options=options)
 
     for i in range(student_amount):
         if i > 0:
@@ -113,6 +107,5 @@ def mock_omni_class_booking(layout_code, student_amount):
 
 
 if __name__ == "__main__":
-    platform_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[proxy_location])
-    mock_omni_class_booking(EVCLayoutCode.CN_TB_PL, 1)
-    # mock_omni_class_booking(EVCLayoutCode.Indo_FR_GL, 2)
+    mock_omni_class_booking(EVCLayoutCode.Indo_FR_GL, 5)
+    # mock_omni_class_booking(EVCLayoutCode.Kids_PL, 1)
