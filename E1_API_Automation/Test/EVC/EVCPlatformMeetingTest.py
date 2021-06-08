@@ -39,6 +39,8 @@ class EVCPlatformMediaTest:
         teacher_service = EVCPlatformMeetingService(EVC_PROXY_ENVIRONMENT[teacher_location])
         teacher_url = teacher_service.get_class_entry_url(teacher_info["attendanceToken"])
         stu_classurl = cn_student_service.get_class_entry_url(student_info["attendanceToken"])
+
+        cn_pl_meeting.trigger_record_class(meeting_token)
         stu_bootstrap = cn_student_service.meeting_bootstrap(student_info["attendanceToken"])
 
         assert_that(jmespath.search('layout.template', stu_bootstrap) =='kids', 'The layout template should be kids')
