@@ -118,7 +118,10 @@ class EVCPlatformMeetingService:
         print(datetime.now())
         print("bootstrap: " + self.host + url)
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
-        assert_that(response.status_code, equal_to(200))
+        print('refresh again')
+        sleep(2)
+        response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
+        assert_that(response.status_code, equal_to(200),'Bootstrap failed')
         return response.json()
 
     def meeting_update(self, component_token, topic_id):
@@ -246,7 +249,7 @@ class EVCPlatformMeetingService:
 
         # register meeting & bootstrap
         user_info = self.meeting_register(location, meeting_token, role_code, user_name)
-        sleep(5)
+
         bootstrap_response = self.meeting_bootstrap(user_info["attendanceToken"])
         components = bootstrap_response['components']
         room_info = {
