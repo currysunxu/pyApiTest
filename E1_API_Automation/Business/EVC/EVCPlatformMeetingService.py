@@ -10,7 +10,8 @@ from ptest.plogger import preporter
 from requests import request
 
 from E1_API_Automation.Business.EVC.EVCContentService import EVCContentService
-from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode, EVCProxyLocation, EVCMediaType
+from E1_API_Automation.Settings import EVC_CONTENT_ENVIRONMENT, EVC_ENVIRONMENT
+from E1_API_Automation.Test_Data.EVCData import EVCMeetingRole, EVCLayoutCode, EVCProxyLocation, RTCProvider
 
 
 class EVCPlatformMeetingService:
@@ -123,7 +124,7 @@ class EVCPlatformMeetingService:
     def meeting_update(self, component_token, topic_id):
         url = "/evc15/meeting/api/update"
 
-        content_service = EVCContentService()
+        content_service = EVCContentService(EVC_CONTENT_ENVIRONMENT)
 
         material_payload = content_service.get_lesson_by_id(topic_id).json()[0]
         action_arguments = {"materialPayload": material_payload, "materialCode": topic_id}
@@ -202,7 +203,7 @@ class EVCPlatformMeetingService:
 
     def create_or_join_classroom(self, user_name="test", room_name=None, content_id="10223", duration=5,
                                  role_code=EVCMeetingRole.STUDENT, layout_code=EVCLayoutCode.Kids_PL, use_agora=True,
-                                 media_type=EVCMediaType.AGORA, center_code="S"):
+                                 media_type=RTCProvider.AGROA, center_code="S"):
 
         if room_name is None:
             r = Random()

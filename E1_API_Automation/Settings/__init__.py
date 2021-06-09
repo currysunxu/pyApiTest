@@ -38,7 +38,6 @@ def get_current_env(specific_env):
 
 
 EVC_DEMO_PAGE_ENVIRONMENT = get_current_env('EVCDemoPageEnvironment')
-EVC_PROXY_ENVIRONMENT = get_current_env('EVCProxyEnvironment')
 EVC_ENVIRONMENT = get_current_env('EVCEnvironment')
 EVC_CONTENT_ENVIRONMENT = get_current_env('EVCContentEnvironment')
 DATABASE = get_current_env('DATABASE')

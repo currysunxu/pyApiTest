@@ -1,5 +1,5 @@
 Local:
-  LOCAL_ENV: "QA"
+  LOCAL_ENV: "STG"
 
 Environment:
   QA: "https://e1svc-qa.english1.cn"
@@ -141,7 +141,7 @@ EVCFrontendService:
 
 
 EVCEnvironment:
-  QA: "https://evc-ts-qa2.bj-englishtown.com"
+  QA: { "CN":"https://evc-ts-qa2.bj-englishtown.com"}
 
   STAGING: {
     "CN": "https://evc-ts-staging.kids.ef.cn",
@@ -157,9 +157,7 @@ EVCEnvironment:
     "SG": "https://evc-tsg-to-ts.kids.ef.com"
   }
 
-EVCDemoPageEnvironment:
-  STAGING: "https://evc-ts-staging.ef.com.cn"
-  LIVE: "https://evc-ts.ef.com.cn/"
+
 
 Auth2Service:
   QA: "https://internal-ktsvc-qa.english1.cn"
@@ -181,20 +179,6 @@ GeneralTestService:
   STAGING: "https://internal-ktsvc-stg.english1.cn/kgt"
   LIVE: "https://internal-ktsvc.english1.cn/kgt"
 
-EVCProxyEnvironment:
-  STAGING: {
-    "CN": "evc-ts-staging.ef.com.cn",
-    "US": "evc-tv-to-ts-staging.ef.com",
-    "UK": "evc-tf-to-ts-staging.ef.com",
-    "SG": "evc-tsg-to-ts-staging.ef.com"
-  }
-
-  LIVE: {
-    "CN": "evc-ts.ef.com.cn",
-    "US": "evc-tv-to-ts.ef.com",
-    "UK": "evc-tf-to-ts.ef.com",
-    "SG": "evc-tsg-to-ts.ef.com"
-  }
 
 Hf35MediaService:
   QA: "https://kt-asset-qa.english1.cn"

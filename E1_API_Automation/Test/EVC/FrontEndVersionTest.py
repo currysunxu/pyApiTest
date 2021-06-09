@@ -51,29 +51,5 @@ class FrontEndVersionTest:
         assert_that(agora_response["Version"], equal_to(EVC_AGORA_FRONTEND_VERSION))
         assert_that(agora_response["FileName"], equal_to(expect_file_name))
 
-    @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
-    def test_kids_fm_frontend_version(self, platform):
-        # generate attendance token
-        meeting_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
-        attendance_token = meeting_service.create_or_join_classroom(use_agora="False")["attendanceToken"]
 
-        # get version from api
-        fm_response = self.evc_frontend_service.get_client_version_by_attendance_token(attendance_token, platform)
-        expect_file_name = self.evc_frontend_service.host + "/_shared/evc15-fe-{0}-bundle_kids/{1}/{0}.zip".format(platform,
-                                                                                                        EVC_FM_FRONTEND_VERSION)
-        # check version and url
-        assert_that(fm_response["Version"], equal_to(EVC_FM_FRONTEND_VERSION))
-        assert_that(fm_response["FileName"], equal_to(expect_file_name))
 
-    @Test(tags="stg, live", data_provider={EVCPlatform.IOS, EVCPlatform.ANDROID})
-    def test_kids_efstudy_frontend_version(self, platform):
-        url = "{0}/_shared/evc15-fe-{1}-bundle_kids/version.json".format(self.evc_frontend_service.host, platform)
-        response = requests.get(url)
-
-        # get parameters from response
-        version = response.json()["Version"]
-        file_name = response.json()["FileName"]
-
-        # check version and file_name
-        assert_that(version, equal_to(EVC_FM_FRONTEND_VERSION))
-        assert_that(file_name, equal_to(EVC_FM_FRONTEND_VERSION + "/" + platform + ".zip"))
