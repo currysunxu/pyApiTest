@@ -50,3 +50,9 @@ class RTCProvider:
     AGROA = 'agora'
     TRTC = 'trtc'
 
+class EVCProxyLocation:
+    CN = 'cn'
+    US = 'us'
+    SG = 'sg'
+    UK = 'uk'
+
