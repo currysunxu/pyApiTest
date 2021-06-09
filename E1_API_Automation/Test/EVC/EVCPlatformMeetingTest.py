@@ -14,7 +14,7 @@ from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCMeetingRole, E
 @TestClass()
 class EVCPlatformMediaTest:
 
-    @Test(data_provider={"SG", "UK", "US"})
+    @Test(tags="stg, live",data_provider={"SG", "UK", "US"})
     def test_china_pl(self, teacher_location):
         cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
@@ -54,7 +54,7 @@ class EVCPlatformMediaTest:
         assert_that(jmespath.search('layout.template', teacher_bootstrap) == 'kids',
                     'The layout template should be kids')
 
-    @Test(data_provider={"SG"})
+    @Test(tags="stg, live",data_provider={"SG"})
     def test_id_gl(self, teacher_location):
         sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
         start_time = datetime.now()
@@ -105,7 +105,7 @@ class EVCPlatformMediaTest:
                     'The layout template should be kids')
 
 
-    @Test(
+    @Test(tags="stg, live",
         data_provider={EVCLayoutCode.CN_HF_PL, EVCLayoutCode.CN_SS_PL, EVCLayoutCode.CN_TB_PL, EVCLayoutCode.Indo_HF_GL,
                        EVCLayoutCode.Indo_SS_GL, EVCLayoutCode.Indo_TB_GL, EVCLayoutCode.Indo_Phonics_GL,
                        EVCLayoutCode.Indo_Speak_Up_GL, EVCLayoutCode.Indo_Story_Teller_GL})
