@@ -114,12 +114,7 @@ class EVCPlatformMeetingService:
         param = {
             "attendanceToken": attendance_token
         }
-        print(param)
-        print(datetime.now())
-        print("bootstrap: " + self.host + url)
-        response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
-        print('refresh again')
-        sleep(2)
+
         response = requests.post(self.host + url, data=json.dumps(param), headers=self.header)
         assert_that(response.status_code, equal_to(200),'Bootstrap failed')
         return response.json()
