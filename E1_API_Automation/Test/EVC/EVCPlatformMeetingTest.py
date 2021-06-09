@@ -14,26 +14,30 @@ from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCMeetingRole, E
 @TestClass()
 class EVCPlatformMediaTest:
 
+    @BeforeClass()
+    def setup(self):
+        self.meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
+
     @Test(tags="stg, live",data_provider={"SG", "UK", "US"})
     def test_china_pl(self, teacher_location):
-        cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
+
         start_time = datetime.now()
-        class_duration = 10
-        real_start_time = start_time
+        class_duration = 5
+        real_start_time = start_time + timedelta(minutes=1)
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
-        meeting_response = cn_pl_meeting.meeting_create(int(start_time.timestamp() * 1000),
+        meeting_response = self.meeting.meeting_create(int(start_time.timestamp() * 1000),
 
                                                         int(end_time.timestamp() * 1000),
                                                         int(real_start_time.timestamp() * 1000),
                                                         EVCLayoutCode.Agora_Kids_PL)
         meeting_token = (meeting_response["componentToken"])
-        teacher_info = cn_pl_meeting.meeting_register("SG", meeting_token, EVCMeetingRole.TEACHER,
+        teacher_info = self.meeting.meeting_register("SG", meeting_token, EVCMeetingRole.TEACHER,
                                                       "teacher")
-        student_info = cn_pl_meeting.meeting_register("CN", meeting_token,
+        student_info = self.meeting.meeting_register("CN", meeting_token,
                                                       EVCMeetingRole.STUDENT,
                                                       "student")
-        cn_pl_meeting.meeting_update(meeting_token, "10999")
+        self.meeting.meeting_update(meeting_token, "10999")
         cn_student_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         teacher_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[teacher_location])
         teacher_url = teacher_service.get_class_entry_url(teacher_info["attendanceToken"])
@@ -55,30 +59,30 @@ class EVCPlatformMediaTest:
 
     @Test(tags="stg, live",data_provider={"SG"})
     def test_id_gl(self, teacher_location):
-        sg_gl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["SG"])
+
         start_time = datetime.now()
         class_duration = 15
         class_num = 10
-        real_start_time = start_time
+        real_start_time = start_time+ timedelta(minutes=1)
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
-        meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),
+        meeting_response = self.meeting.meeting_create(int(start_time.timestamp() * 1000),
 
                                                         int(end_time.timestamp() * 1000),
                                                         int(real_start_time.timestamp() * 1000),
                                                         EVCLayoutCode.Indo_HF_GL)
 
         meeting_token = (meeting_response["componentToken"])
-        teacher_info = sg_gl_meeting.meeting_register("SG", meeting_token, EVCMeetingRole.TEACHER,
+        teacher_info = self.meeting.meeting_register("SG", meeting_token, EVCMeetingRole.TEACHER,
                                                       "teacheret er irueiiuwouei uorueiiuwoue")
         student_list = []
         for i in range(0, class_num):
-            student = sg_gl_meeting.meeting_register("SG", meeting_token,
+            student = self.meeting.meeting_register("SG", meeting_token,
                                                      EVCMeetingRole.STUDENT,
                                                      "student ier eoeuwiu nt ier eoeuwiu ooiowruorowruoowr_" + str(i))
             student_list.append(student)
 
-        sg_gl_meeting.meeting_update_by_material(meeting_token)
+        self.meeting.meeting_update_by_material(meeting_token)
         cn_student_service = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         teacher_service = EVCPlatformMeetingService(EVC_ENVIRONMENT[teacher_location])
 
@@ -109,13 +113,12 @@ class EVCPlatformMediaTest:
                        EVCLayoutCode.Indo_SS_GL, EVCLayoutCode.Indo_TB_GL, EVCLayoutCode.Indo_Phonics_GL,
                        EVCLayoutCode.Indo_Speak_Up_GL, EVCLayoutCode.Indo_Story_Teller_GL})
     def test_layoutcode(self, layout_code):
-        meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
         class_duration = 10
         real_start_time = start_time + timedelta(minutes=1)
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
-        meeting_response = meeting.meeting_create(int(start_time.timestamp() * 1000),
+        meeting_response = self.meeting.meeting_create(int(start_time.timestamp() * 1000),
 
                                                   int(end_time.timestamp() * 1000),
                                                   int(real_start_time.timestamp() * 1000),
