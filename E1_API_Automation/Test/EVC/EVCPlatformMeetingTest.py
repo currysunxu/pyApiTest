@@ -12,7 +12,7 @@ from E1_API_Automation.Test_Data.EVCData import EVCLayoutCode, EVCMeetingRole, E
 
 
 @TestClass()
-class EVCPlatformMediaTest:
+class EVCPlatformMeetingTest:
 
     @BeforeClass()
     def setup(self):
