@@ -1,5 +1,5 @@
 Local:
-  LOCAL_ENV: "LIVE"
+  LOCAL_ENV: "STG"
 
 Environment:
   QA: "https://e1svc-qa.english1.cn"
