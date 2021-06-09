@@ -1,7 +1,6 @@
 import os
 
 EVC_AGORA_FRONTEND_VERSION = os.environ['agora_fe_version']
-EVC_FM_FRONTEND_VERSION = os.environ['fm_fe_version']
 EVC_TECH_CHECK_VERSION = os.environ['techcheck_version']
 EVC_INDO_DEMO_VERSION = os.environ['indo_demo_version']
 

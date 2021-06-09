@@ -5,7 +5,7 @@ from ptest.decorator import TestClass, Test, BeforeClass
 from E1_API_Automation.Business.EVC.EVCFrontendService import EVCFrontendService
 from E1_API_Automation.Business.EVC.EVCPlatformMeetingService import EVCPlatformMeetingService
 from E1_API_Automation.Settings import EVC_ENVIRONMENT
-from E1_API_Automation.Test_Data.EVCData import EVC_AGORA_FRONTEND_VERSION, EVCPlatform, EVC_FM_FRONTEND_VERSION, \
+from E1_API_Automation.Test_Data.EVCData import EVC_AGORA_FRONTEND_VERSION, EVCPlatform, \
     EVC_TECH_CHECK_VERSION, EVC_INDO_DEMO_VERSION
 
 
