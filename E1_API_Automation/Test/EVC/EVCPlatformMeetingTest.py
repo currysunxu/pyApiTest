@@ -19,7 +19,7 @@ class EVCPlatformMediaTest:
         cn_pl_meeting = EVCPlatformMeetingService(EVC_ENVIRONMENT["CN"])
         start_time = datetime.now()
         class_duration = 10
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = cn_pl_meeting.meeting_create(int(start_time.timestamp() * 1000),
@@ -39,7 +39,6 @@ class EVCPlatformMediaTest:
         teacher_url = teacher_service.get_class_entry_url(teacher_info["attendanceToken"])
         stu_classurl = cn_student_service.get_class_entry_url(student_info["attendanceToken"])
 
-        cn_pl_meeting.trigger_record_class(meeting_token)
         stu_bootstrap = cn_student_service.meeting_bootstrap(student_info["attendanceToken"])
 
         assert_that(jmespath.search('layout.template', stu_bootstrap) == 'kids', 'The layout template should be kids')
@@ -60,7 +59,7 @@ class EVCPlatformMediaTest:
         start_time = datetime.now()
         class_duration = 15
         class_num = 10
-        real_start_time = start_time + timedelta(minutes=1)
+        real_start_time = start_time
         end_time = real_start_time + timedelta(minutes=class_duration)
         # create meeting
         meeting_response = sg_gl_meeting.meeting_create(int(start_time.timestamp() * 1000),

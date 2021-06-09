@@ -259,7 +259,7 @@ class EVCPlatformMeetingService:
         return room_info
 
     def trigger_record_class(self, meeting_token):
-        sleep(5)  # not sure the reason, but it would fail without sleep
+        sleep(2)  # not sure the reason, but it would fail without sleep
         url = self.host + '/evc15/meeting/api/recording'
         params = {
             'meetingToken': meeting_token
@@ -267,8 +267,7 @@ class EVCPlatformMeetingService:
         response = requests.post(url, data='{}', params=params, headers=self.header)
 
         if response.status_code != 204:
-            response = requests.post(url, data='{}', params=params, headers=self.header)
-            assert_that(response.status_code, equal_to(204))
+            assert_that(response.status_code, equal_to(204), "recording api return wrong status")
 
         return response
 
